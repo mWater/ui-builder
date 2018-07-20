@@ -13,7 +13,7 @@ export enum DropSide {
 export interface Store {
   replaceWidget(widgetId: string, replaceWith: WidgetDef | null): void,
   addWidget(widgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: string): void,
-  dropWidget(widgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): void,
+  dragAndDropWidget(sourceWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): void,
 }
 
 // Widget definition
@@ -88,15 +88,12 @@ export abstract class LeafWidget implements Widget {
     return Object.assign({}, this.widgetDef, { id: uuid() }) 
   }
 
-  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null) {
-    if (widgetId === this.id) {
-      return replacementWidgetDef
-    }
-    return this.widgetDef
-  }
-
   addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef {
     throw new Error("Cannot add to leaf widget")
+  }
+
+  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null) {
+    return (widgetId === this.id) ? replacementWidgetDef : this.widgetDef
   }
 
   dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef {
@@ -107,14 +104,6 @@ export abstract class LeafWidget implements Widget {
   }
 }
 
-export interface HorizontalWidgetDef extends WidgetDef {
-  items: WidgetDef[]
-}
-
-export interface VerticalWidgetDef extends WidgetDef {
-  items: WidgetDef[]
-}
-
 // Handles logic of a simple dropping of a widget on another
 export function dropWidget(droppedWidgetDef: WidgetDef, targetWidgetDef: WidgetDef, dropSide: DropSide): WidgetDef {
   if (dropSide === DropSide.left) {
@@ -122,28 +111,28 @@ export function dropWidget(droppedWidgetDef: WidgetDef, targetWidgetDef: WidgetD
       id: uuid(),
       items: [droppedWidgetDef, targetWidgetDef],
       type: "horizontal"
-    } as HorizontalWidgetDef
+    }
   }
   if (dropSide === DropSide.right) {
     return {
       id: uuid(),
       items: [targetWidgetDef, droppedWidgetDef],
       type: "horizontal"
-    } as HorizontalWidgetDef
+    }
   }
   if (dropSide === DropSide.top) {
     return {
       id: uuid(),
       items: [droppedWidgetDef, targetWidgetDef],
       type: "vertical"
-    } as HorizontalWidgetDef
+    }
   }
   if (dropSide === DropSide.bottom) {
     return {
       id: uuid(),
       items: [targetWidgetDef, droppedWidgetDef],
       type: "vertical"
-    } as HorizontalWidgetDef
+    }
   }
   throw new Error("Unknown side")
 }

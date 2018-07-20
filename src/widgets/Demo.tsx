@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DropdownWidget, DropdownWidgetDef } from './DropdownWidget'
-import HorizontalWidget from './HorizontalWidget';
+import { HorizontalWidget, HorizontalWidgetDef } from './HorizontalWidget';
 import * as Widgets from './Widgets'
 
 class BasicWidgetFactory {
@@ -9,7 +9,7 @@ class BasicWidgetFactory {
       return new DropdownWidget(widgetDef as DropdownWidgetDef)
     }
     if (widgetDef.type === "horizontal") {
-      return new HorizontalWidget(widgetDef as Widgets.HorizontalWidgetDef, this.create)
+      return new HorizontalWidget(widgetDef as HorizontalWidgetDef, this.create)
     }
 
     throw new Error("Type not found")

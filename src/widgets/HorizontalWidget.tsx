@@ -3,11 +3,11 @@ import * as React from 'react';
 import * as uuid from 'uuid/v4'
 import { DropSide, dropWidget, RenderDesignerProps, RenderInstanceProps, Widget, WidgetDef, WidgetFactory } from './Widgets'
 
-interface HorizontalWidgetDef extends WidgetDef {
+export interface HorizontalWidgetDef extends WidgetDef {
   items: WidgetDef[]
 }
 
-export default class HorizontalWidget implements Widget {
+export class HorizontalWidget implements Widget {
   widgetDef: HorizontalWidgetDef
   widgetFactory: WidgetFactory
 
