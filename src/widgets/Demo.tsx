@@ -41,9 +41,9 @@ class WidgetComponentDesigner extends React.Component {
           {elem}
         </div>
       }
-    } as Widgets.RenderDesignerProps
+    } as Widgets.RenderDesignProps
 
-    return widget.renderDesigner(props)
+    return widget.renderDesign(props)
   }
 }
 

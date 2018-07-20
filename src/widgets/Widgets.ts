@@ -42,7 +42,7 @@ export interface RenderInstanceProps {
   onSelectContextVar(contextVarId: string, primaryKey: any): void; // selection call on context var (when type = "rowset" and selectable)
 }
 
-export interface RenderDesignerProps {
+export interface RenderDesignProps {
   contextVars: ContextVar[],
   store: Store,
 
@@ -50,11 +50,18 @@ export interface RenderDesignerProps {
   wrapDesignerElem(widgetDef: WidgetDef, elem: React.ReactElement<any>): React.ReactElement<any>,
 }
 
+export interface RenderEditorProps {
+  contextVars: ContextVar[],
+  store: Store,
+}
+
 export interface Widget {
   readonly id: string
 
-  renderDesigner(props: RenderDesignerProps): React.ReactElement<any> // TODO
+  renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
+  renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
+
   getContextVarExprs(contextVarId: string): Expr[] // Only for self
 
   getChildWidgetDefs(): WidgetDef[]
@@ -66,7 +73,6 @@ export interface Widget {
   replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null
   addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef
   dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef
-
 }
 
 // Handles logic of a simple dropping of a widget on another

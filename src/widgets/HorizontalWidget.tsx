@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import * as uuid from 'uuid/v4'
-import { DropSide, dropWidget, RenderDesignerProps, RenderInstanceProps, Widget, WidgetDef, WidgetFactory } from './Widgets'
+import { DropSide, dropWidget, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Widget, WidgetDef, WidgetFactory } from './Widgets'
 
 export interface HorizontalWidgetDef extends WidgetDef {
   items: WidgetDef[]
@@ -84,17 +84,17 @@ export class HorizontalWidget implements Widget {
     })
   }
 
-  renderChildDesigner(props: RenderDesignerProps, childWidgetDef: WidgetDef) {
+  renderChildDesigner(props: RenderDesignProps, childWidgetDef: WidgetDef) {
     const childWidget = this.widgetFactory(childWidgetDef)
 
     return (
       <div style={{ display: "inline-block", width: (100/this.widgetDef.items.length) + "%" }}>
-        { childWidget.renderDesigner(props) }
+        { childWidget.renderDesign(props) }
       </div>
     )
   }
 
-  renderDesigner(props: RenderDesignerProps) {
+  renderDesign(props: RenderDesignProps) {
     return (
       <div>
         { this.widgetDef.items.map(childWidget => this.renderChildDesigner(props, childWidget)) }
@@ -105,6 +105,11 @@ export class HorizontalWidget implements Widget {
   renderInstance(props: RenderInstanceProps) {
     return <div/>
   }
+  
+  renderEditor(props: RenderEditorProps) {
+    return null
+  }
+  
 
   getContextVarExprs(contextVarId: string) { return [] }
 }

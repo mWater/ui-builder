@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafWidget from './LeafWidget'
-import { RenderDesignerProps, RenderInstanceProps, WidgetDef } from './Widgets'
+import { RenderDesignProps, RenderEditorProps, RenderInstanceProps, WidgetDef } from './Widgets'
 
 export interface DropdownWidgetDef extends WidgetDef {
   column: string
@@ -13,7 +13,7 @@ export class DropdownWidget extends LeafWidget {
     super(widgetDef)
   }
 
-  renderDesigner(props: RenderDesignerProps) {
+  renderDesign(props: RenderDesignProps) {
     return props.wrapDesignerElem(this.widgetDef,
       <select>
         <option value="a">A {this.id}</option>
@@ -27,6 +27,10 @@ export class DropdownWidget extends LeafWidget {
         <option value="a">A {this.id}</option>
       </select>
     )      
+  }
+
+  renderEditor(props: RenderEditorProps) {
+    return null
   }
 
   getContextVarExprs(contextVarId: string) { return [] }

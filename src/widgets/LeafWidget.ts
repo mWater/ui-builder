@@ -1,6 +1,6 @@
 import * as uuid from 'uuid/v4'
 import Expr from './Expr';
-import { DropSide, dropWidget, RenderDesignerProps, RenderInstanceProps,Widget, WidgetDef } from './Widgets';
+import { DropSide, dropWidget, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Widget, WidgetDef } from './Widgets';
 
 export default abstract class LeafWidget implements Widget {
   widgetDef: WidgetDef
@@ -13,12 +13,14 @@ export default abstract class LeafWidget implements Widget {
     return this.widgetDef.id
   }
 
-  abstract renderDesigner(props: RenderDesignerProps): React.ReactElement<any> // TODO
+  abstract renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
 
   abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
 
   abstract getContextVarExprs(contextVarId: string): Expr[]
 
+  abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
+  
   getChildWidgetDefs() { return [] }
 
   clone() { 
