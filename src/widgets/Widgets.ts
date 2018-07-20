@@ -32,7 +32,6 @@ export interface ContextVar {
   table?: string;  // table of database (when type = "rowset")
   aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
   selectable?: boolean;  // true if row can be selected (when type = "rowset")
-  onSelect?(primaryKey: any): void; // selection call (when type = "rowset" and selectable)
 }
 
 export interface RenderInstanceProps {
@@ -40,6 +39,7 @@ export interface RenderInstanceProps {
   contextVars: ContextVar[],
   getContextVarValue(contextVarId: string): any,
   getContextVarExprValue(contextVarId: string, expr: Expr): any,
+  onSelectContextVar(contextVarId: string, primaryKey: any): void; // selection call on context var (when type = "rowset" and selectable)
 }
 
 export interface RenderDesignerProps {
@@ -51,57 +51,22 @@ export interface RenderDesignerProps {
 }
 
 export interface Widget {
-  readonly id: string,
+  readonly id: string
 
   renderDesigner(props: RenderDesignerProps): React.ReactElement<any> // TODO
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
-  getContextVarExprs(contextVarId: string): Expr[], // Only for self
+  getContextVarExprs(contextVarId: string): Expr[] // Only for self
 
-  getChildWidgetDefs(): WidgetDef[],
+  getChildWidgetDefs(): WidgetDef[]
+  // getCreatedContextVars(): ContextVar[]
+
+  // TODO filters? how to get default value pre-render? how to gather from the widget instances?
 
   clone(): WidgetDef
-  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null,
-  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef,
-  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef,
-}
+  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null
+  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef
+  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef
 
-export abstract class LeafWidget implements Widget {
-  widgetDef: WidgetDef
-
-  constructor(widgetDef: WidgetDef) {
-    this.widgetDef = widgetDef
-  }
-
-  get id() {
-    return this.widgetDef.id
-  }
-
-  abstract renderDesigner(props: RenderDesignerProps): React.ReactElement<any> // TODO
-
-  abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
-
-  abstract getContextVarExprs(contextVarId: string): Expr[]
-
-  getChildWidgetDefs() { return [] }
-
-  clone() { 
-    return Object.assign({}, this.widgetDef, { id: uuid() }) 
-  }
-
-  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef {
-    throw new Error("Cannot add to leaf widget")
-  }
-
-  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null) {
-    return (widgetId === this.id) ? replacementWidgetDef : this.widgetDef
-  }
-
-  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef {
-    if (targetWidgetId === this.id) {
-      return dropWidget(droppedWidgetDef, this.widgetDef, dropSide)
-    }
-    return this.widgetDef
-  }
 }
 
 // Handles logic of a simple dropping of a widget on another

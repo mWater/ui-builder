@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { LeafWidget, RenderDesignerProps, RenderInstanceProps, WidgetDef } from './Widgets'
+import LeafWidget from './LeafWidget'
+import { RenderDesignerProps, RenderInstanceProps, WidgetDef } from './Widgets'
 
 export interface DropdownWidgetDef extends WidgetDef {
   column: string
