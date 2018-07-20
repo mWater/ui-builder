@@ -11,20 +11,19 @@ export enum DropSide {
 }
 
 export interface Store {
-  replaceWidget(widgetId: string, replaceWith: WidgetDefn | null): void,
-  addWidget(widgetDefn: WidgetDefn, parentWidgetId: string | null, parentWidgetSection: string): void,
-  dropWidget(widgetDefn: WidgetDefn, targetWidgetId: string, dropSide: DropSide): void,
+  replaceWidget(widgetId: string, replaceWith: WidgetDef | null): void,
+  addWidget(widgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: string): void,
+  dropWidget(widgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): void,
 }
 
 // Widget definition
-export interface WidgetDefn {
+export interface WidgetDef {
   id: string     // Unique id (globally)
   type: string,  // Type of the widget
+  [index: string]: any  // Other props
 }
 
-export interface WidgetFactory {
-  create(widgetDefn: WidgetDefn): Widget
-}
+export type WidgetFactory = (widgetDef: WidgetDef) => Widget
 
 export interface ContextVar {
   id: string;     // Id of context variable
@@ -48,7 +47,7 @@ export interface RenderDesignerProps {
   store: Store,
 
   // Designer element and all sub-widget elements must wrapped using this function
-  wrapDesignerElem(widgetDefn: WidgetDefn, elem: React.ReactElement<any>): React.ReactElement<any>,
+  wrapDesignerElem(widgetDef: WidgetDef, elem: React.ReactElement<any>): React.ReactElement<any>,
 }
 
 export interface Widget {
@@ -58,23 +57,23 @@ export interface Widget {
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
   getContextVarExprs(contextVarId: string): Expr[], // Only for self
 
-  getChildWidgetDefns(): WidgetDefn[],
+  getChildWidgetDefs(): WidgetDef[],
 
-  clone(): WidgetDefn
-  replaceWidget(widgetId: string, replacementWidgetDefn: WidgetDefn | null): WidgetDefn | null,
-  addWidget(addedWidgetDefn: WidgetDefn, parentWidgetId: string | null, parentWidgetSection: any): WidgetDefn,
-  dropWidget(droppedWidgetDefn: WidgetDefn, targetWidgetId: string, dropSide: DropSide): WidgetDefn,
+  clone(): WidgetDef
+  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null,
+  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef,
+  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef,
 }
 
 export abstract class LeafWidget implements Widget {
-  widgetDefn: WidgetDefn
+  widgetDef: WidgetDef
 
-  constructor(widgetDefn: WidgetDefn) {
-    this.widgetDefn = widgetDefn
+  constructor(widgetDef: WidgetDef) {
+    this.widgetDef = widgetDef
   }
 
   get id() {
-    return this.widgetDefn.id
+    return this.widgetDef.id
   }
 
   abstract renderDesigner(props: RenderDesignerProps): React.ReactElement<any> // TODO
@@ -83,68 +82,68 @@ export abstract class LeafWidget implements Widget {
 
   abstract getContextVarExprs(contextVarId: string): Expr[]
 
-  getChildWidgetDefns() { return [] }
+  getChildWidgetDefs() { return [] }
 
   clone() { 
-    return Object.assign({}, this.widgetDefn, { id: uuid() }) 
+    return Object.assign({}, this.widgetDef, { id: uuid() }) 
   }
 
-  replaceWidget(widgetId: string, replacementWidgetDefn: WidgetDefn | null) {
+  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null) {
     if (widgetId === this.id) {
-      return replacementWidgetDefn
+      return replacementWidgetDef
     }
-    return this.widgetDefn
+    return this.widgetDef
   }
 
-  addWidget(addedWidgetDefn: WidgetDefn, parentWidgetId: string | null, parentWidgetSection: any): WidgetDefn {
+  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef {
     throw new Error("Cannot add to leaf widget")
   }
 
-  dropWidget(droppedWidgetDefn: WidgetDefn, targetWidgetId: string, dropSide: DropSide): WidgetDefn {
+  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef {
     if (targetWidgetId === this.id) {
-      return dropWidget(droppedWidgetDefn, this.widgetDefn, dropSide)
+      return dropWidget(droppedWidgetDef, this.widgetDef, dropSide)
     }
-    return this.widgetDefn
+    return this.widgetDef
   }
 }
 
-export interface HorizontalWidgetDefn extends WidgetDefn {
-  items: WidgetDefn[]
+export interface HorizontalWidgetDef extends WidgetDef {
+  items: WidgetDef[]
 }
 
-export interface VerticalWidgetDefn extends WidgetDefn {
-  items: WidgetDefn[]
+export interface VerticalWidgetDef extends WidgetDef {
+  items: WidgetDef[]
 }
 
 // Handles logic of a simple dropping of a widget on another
-export function dropWidget(droppedWidgetDefn: WidgetDefn, targetWidgetDefn: WidgetDefn, dropSide: DropSide): WidgetDefn {
+export function dropWidget(droppedWidgetDef: WidgetDef, targetWidgetDef: WidgetDef, dropSide: DropSide): WidgetDef {
   if (dropSide === DropSide.left) {
     return {
       id: uuid(),
-      items: [droppedWidgetDefn, targetWidgetDefn],
+      items: [droppedWidgetDef, targetWidgetDef],
       type: "horizontal"
-    } as HorizontalWidgetDefn
+    } as HorizontalWidgetDef
   }
   if (dropSide === DropSide.right) {
     return {
       id: uuid(),
-      items: [targetWidgetDefn, droppedWidgetDefn],
+      items: [targetWidgetDef, droppedWidgetDef],
       type: "horizontal"
-    } as HorizontalWidgetDefn
+    } as HorizontalWidgetDef
   }
   if (dropSide === DropSide.top) {
     return {
       id: uuid(),
-      items: [droppedWidgetDefn, targetWidgetDefn],
+      items: [droppedWidgetDef, targetWidgetDef],
       type: "vertical"
-    } as HorizontalWidgetDefn
+    } as HorizontalWidgetDef
   }
   if (dropSide === DropSide.bottom) {
     return {
       id: uuid(),
-      items: [targetWidgetDefn, droppedWidgetDefn],
+      items: [targetWidgetDef, droppedWidgetDef],
       type: "vertical"
-    } as HorizontalWidgetDefn
+    } as HorizontalWidgetDef
   }
   throw new Error("Unknown side")
 }

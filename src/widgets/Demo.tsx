@@ -1,24 +1,15 @@
 import * as React from 'react';
-import DropdownWidget from './DropdownWidget'
+import { DropdownWidget, DropdownWidgetDef } from './DropdownWidget'
 import HorizontalWidget from './HorizontalWidget';
 import * as Widgets from './Widgets'
 
-const rootWidget = {
-  id: "a",
-  type: "horizontal",
-  items: [
-    { id: "a1", type: "dropdown" },
-    { id: "a2", type: "dropdown" }
-  ]
-}
-
 class BasicWidgetFactory {
-  create = (widgetDefn: Widgets.WidgetDefn): Widgets.Widget => {
-    if (widgetDefn.type === "dropdown") {
-      return new DropdownWidget(widgetDefn)
+  create = (widgetDef: Widgets.WidgetDef): Widgets.Widget => {
+    if (widgetDef.type === "dropdown") {
+      return new DropdownWidget(widgetDef as DropdownWidgetDef)
     }
-    if (widgetDefn.type === "horizontal") {
-      return new HorizontalWidget(widgetDefn as Widgets.HorizontalWidgetDefn, this)
+    if (widgetDef.type === "horizontal") {
+      return new HorizontalWidget(widgetDef as Widgets.HorizontalWidgetDef, this.create)
     }
 
     throw new Error("Type not found")
@@ -27,14 +18,25 @@ class BasicWidgetFactory {
 
 const widgetFactory = new BasicWidgetFactory()
 
+let rootWidgetDef: Widgets.WidgetDef = {
+  id: "a",
+  type: "horizontal",
+  items: [
+    { id: "a1", type: "dropdown" },
+    { id: "a2", type: "dropdown" }
+  ]
+}
+const rootWidget = widgetFactory.create(rootWidgetDef)
+rootWidgetDef = rootWidget.dropWidget({ id: "a3", type: "dropdown" }, "a2", Widgets.DropSide.right)
+
 class WidgetComponentDesigner extends React.Component {
   render() {
-    const widget = widgetFactory.create(rootWidget)
+    const widget = widgetFactory.create(rootWidgetDef)
 
     const props = {
       contextVars: [],
       store: {} as Widgets.Store,
-      wrapDesignerElem(widgetDefn: Widgets.WidgetDefn, elem: React.ReactElement<any>) {
+      wrapDesignerElem(widgetDef: Widgets.WidgetDef, elem: React.ReactElement<any>) {
         return <div style={{ border: "solid 1px blue", padding: 10 }}>
           {elem}
         </div>

@@ -1,11 +1,21 @@
 import * as React from 'react';
-import { LeafWidget, RenderDesignerProps, RenderInstanceProps } from './Widgets'
+import { LeafWidget, RenderDesignerProps, RenderInstanceProps, WidgetDef } from './Widgets'
 
-export default class DropdownWidget extends LeafWidget {
+export interface DropdownWidgetDef extends WidgetDef {
+  column: string
+}
+
+export class DropdownWidget extends LeafWidget {
+  widgetDef: DropdownWidgetDef
+
+  constructor(widgetDef: DropdownWidgetDef) {
+    super(widgetDef)
+  }
+
   renderDesigner(props: RenderDesignerProps) {
-    return props.wrapDesignerElem(this.widgetDefn,
+    return props.wrapDesignerElem(this.widgetDef,
       <select>
-        <option value="a">A</option>
+        <option value="a">A {this.id}</option>
       </select>
     )     
   }
@@ -13,7 +23,7 @@ export default class DropdownWidget extends LeafWidget {
   renderInstance(props: RenderInstanceProps) {
     return (
       <select>
-        <option value="a">A</option>
+        <option value="a">A {this.id}</option>
       </select>
     )      
   }

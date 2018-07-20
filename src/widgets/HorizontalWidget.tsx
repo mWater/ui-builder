@@ -1,55 +1,94 @@
 import produce from 'immer'
 import * as React from 'react';
-import { DropSide, RenderDesignerProps, RenderInstanceProps, Widget, WidgetDefn, WidgetFactory } from './Widgets'
+import * as uuid from 'uuid/v4'
+import { DropSide, dropWidget, RenderDesignerProps, RenderInstanceProps, Widget, WidgetDef, WidgetFactory } from './Widgets'
 
-interface HorizontalWidgetDefn extends WidgetDefn {
-  items: WidgetDefn[]
+interface HorizontalWidgetDef extends WidgetDef {
+  items: WidgetDef[]
 }
 
 export default class HorizontalWidget implements Widget {
-  widgetDefn: HorizontalWidgetDefn
+  widgetDef: HorizontalWidgetDef
   widgetFactory: WidgetFactory
 
-  constructor(widgetDefn: HorizontalWidgetDefn, widgetFactory: WidgetFactory) {
-    this.widgetDefn = widgetDefn
+  constructor(widgetDef: HorizontalWidgetDef, widgetFactory: WidgetFactory) {
+    this.widgetDef = widgetDef
     this.widgetFactory = widgetFactory
   }
 
-  get id() { return this.widgetDefn.id }
+  get id() { return this.widgetDef.id }
 
-  getChildWidgetDefns(): WidgetDefn[] {
-    return this.widgetDefn.items
+  getChildWidgetDefs(): WidgetDef[] {
+    return this.widgetDef.items
   }
 
-  clone(): WidgetDefn {
-    throw new Error("Method not implemented.");
-  }
+  clone(): WidgetDef {
+    return produce(this.widgetDef, draft => {
+      draft.id = uuid()
 
-  replaceWidget(widgetId: string, replacementWidgetDefn: WidgetDefn | null): WidgetDefn | null {
-    if (widgetId === this.id) {
-      return replacementWidgetDefn
-    }
-
-    return produce(this.widgetDefn, draft => {
-      for (let i = 0; i<draft.items.length; i++) {
-        draft.items[i] = this.widgetFactory.create(draft.items[i]).clone()
+      for (let i = 0; i< draft.items.length; i++) {
+        draft.items[i] = this.widgetFactory(draft.items[i]).clone()
       }
     })
   }
 
-  addWidget(addedWidgetDefn: WidgetDefn, parentWidgetId: string | null, parentWidgetSection: any): WidgetDefn {
-    throw new Error("Method not implemented.");
+  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null {
+    if (widgetId === this.id) {
+      return replacementWidgetDef
+    }
+
+    return produce(this.widgetDef as WidgetDef, d => {
+      const draft = d as HorizontalWidgetDef
+
+      for (let i = draft.items.length - 1; i >= 0 ; i--) {
+        const childWidget = this.widgetFactory(draft.items[i]).replaceWidget(widgetId, replacementWidgetDef)
+        if (childWidget) {
+          draft.items[i] = childWidget
+        }
+        else if (draft.items.length > 1) {
+          draft.items.splice(i, 1)
+        }
+        else {
+          return draft.items[(i === 0) ? 1 : 0]
+        }
+      }
+      return
+    })
   }
 
-  dropWidget(droppedWidgetDefn: WidgetDefn, targetWidgetId: string, dropSide: DropSide): WidgetDefn {
-    throw new Error("Method not implemented.");
+  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef {
+    throw new Error("Not applicable");
   }
 
-  renderChildDesigner(props: RenderDesignerProps, childWidgetDefn: WidgetDefn) {
-    const childWidget = this.widgetFactory.create(childWidgetDefn)
+  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef {
+    // If self
+    if (targetWidgetId === this.id) {
+      return dropWidget(droppedWidgetDef, this.widgetDef, dropSide)
+    }
+
+    return produce(this.widgetDef, draft => {
+      for (let i = 0; i < draft.items.length; i++) {
+        // Insert if dropped left or right
+        if ((dropSide === DropSide.left) && (draft.items[i].id === targetWidgetId)) {
+          draft.items.splice(i, 0, droppedWidgetDef)
+          return
+        }
+        else if ((dropSide === DropSide.right) && (draft.items[i].id === targetWidgetId)) {
+          draft.items.splice(i + 1, 0, droppedWidgetDef)
+          return
+        }
+        else {
+          draft.items[i] = this.widgetFactory(draft.items[i]).dropWidget(droppedWidgetDef, targetWidgetId, dropSide)
+        }
+      }
+    })
+  }
+
+  renderChildDesigner(props: RenderDesignerProps, childWidgetDef: WidgetDef) {
+    const childWidget = this.widgetFactory(childWidgetDef)
 
     return (
-      <div style={{ display: "inline-block" }}>
+      <div style={{ display: "inline-block", width: (100/this.widgetDef.items.length) + "%" }}>
         { childWidget.renderDesigner(props) }
       </div>
     )
@@ -58,17 +97,13 @@ export default class HorizontalWidget implements Widget {
   renderDesigner(props: RenderDesignerProps) {
     return (
       <div>
-        { this.widgetDefn.items.map(childWidget => this.renderChildDesigner(props, childWidget)) }
+        { this.widgetDef.items.map(childWidget => this.renderChildDesigner(props, childWidget)) }
       </div>
     )      
   }
 
   renderInstance(props: RenderInstanceProps) {
-    return (
-      <select>
-        <option value="a">A</option>
-      </select>
-    )      
+    return <div/>
   }
 
   getContextVarExprs(contextVarId: string) { return [] }
