@@ -1,32 +1,16 @@
 import * as uuid from 'uuid/v4'
-import Expr from './Expr';
-import { DropSide, dropWidget, Filter, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Widget, WidgetDef } from './Widgets';
+import { DropSide, dropWidget, Filter, Widget, WidgetDef } from './Widgets';
 
-export default abstract class LeafWidget implements Widget {
-  widgetDef: WidgetDef
-
-  constructor(widgetDef: WidgetDef) {
-    this.widgetDef = widgetDef
-  }
-
-  get id() {
-    return this.widgetDef.id
-  }
-
-  abstract renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
-  abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
-  abstract getContextVarExprs(contextVarId: string): Expr[]
-  abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
-  
+export default abstract class LeafWidget extends Widget {
   getChildWidgetDefs() { return [] }
 
-  async getInitialFilters(contextVarId: string): Promise<Filter[]> { return [] }
+  async getInitialFilters(): Promise<Filter[]> { return [] }
 
   clone() { 
     return Object.assign({}, this.widgetDef, { id: uuid() }) 
   }
 
-  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef {
+  addWidget(): WidgetDef {
     throw new Error("Cannot add to leaf widget")
   }
 

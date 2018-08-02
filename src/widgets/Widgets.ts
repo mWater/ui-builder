@@ -65,40 +65,46 @@ export interface Filter {
   expr: Expr  // Boolean filter expression on the rowset
 }
 
-export interface Widget {
-  readonly id: string
+export abstract class Widget {
+  widgetDef: WidgetDef
+
+  constructor(widgetDef: WidgetDef) {
+    this.widgetDef = widgetDef
+  }
+
+  get id() { return this.widgetDef.id; }
 
   // Render the widget as it looks in design mode
-  renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
+  abstract renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
 
   // Render a live instance of the widget
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
+  abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
 
   // Render an optional property editor for the widget
-  renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
+  abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
 
   // Get any context variables expressions that this widget or any subwidgets need
-  getContextVarExprs(contextVarId: string): Expr[] 
+  abstract getContextVarExprs(contextVarId: string): Expr[] 
 
   // Get child widgets
-  getChildWidgetDefs(): WidgetDef[]
+  abstract getChildWidgetDefs(): WidgetDef[]
 
   // Get initial filters for this widget
-  getInitialFilters(contextVarId: string): Promise<Filter[]>;
+  abstract getInitialFilters(contextVarId: string): Promise<Filter[]>;
   
   // getCreatedContextVars(): ContextVar[]
 
   // Make a copy of the widget with a new id
-  clone(): WidgetDef
+  abstract clone(): WidgetDef
 
   // Replace/remove the widget with the specified id
-  replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null
+  abstract replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null
 
   // Add a widget to a parent widget. parentWidgetSection is widget-specific
-  addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef
+  abstract addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef
 
   // Drop a widget on top of another
-  dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef
+  abstract dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef
 }
 
 // Handles logic of a simple dropping of a widget on another
