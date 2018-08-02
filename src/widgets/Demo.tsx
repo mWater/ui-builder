@@ -35,7 +35,7 @@ class WidgetComponentDesigner extends React.Component {
 
     const props = {
       contextVars: [],
-      store: {} as Widgets.Store,
+      store: {} as Widgets.WidgetStore,
       wrapDesignerElem(widgetDef: Widgets.WidgetDef, elem: React.ReactElement<any>) {
         return <div style={{ border: "solid 1px blue", padding: 10 }}>
           {elem}

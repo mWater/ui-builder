@@ -1,6 +1,6 @@
 import * as uuid from 'uuid/v4'
 import Expr from './Expr';
-import { DropSide, dropWidget, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Widget, WidgetDef } from './Widgets';
+import { DropSide, dropWidget, Filter, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Widget, WidgetDef } from './Widgets';
 
 export default abstract class LeafWidget implements Widget {
   widgetDef: WidgetDef
@@ -14,14 +14,13 @@ export default abstract class LeafWidget implements Widget {
   }
 
   abstract renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
-
   abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
-
   abstract getContextVarExprs(contextVarId: string): Expr[]
-
   abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
   
   getChildWidgetDefs() { return [] }
+
+  async getInitialFilters(contextVarId: string): Promise<Filter[]> { return [] }
 
   clone() { 
     return Object.assign({}, this.widgetDef, { id: uuid() }) 

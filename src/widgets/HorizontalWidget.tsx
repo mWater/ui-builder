@@ -1,19 +1,19 @@
 import produce from 'immer'
 import * as React from 'react';
 import * as uuid from 'uuid/v4'
-import { DropSide, dropWidget, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Widget, WidgetDef, WidgetFactory } from './Widgets'
+import CompoundWidget from './CompoundWidget';
+import { DropSide, dropWidget, RenderDesignProps, RenderEditorProps, RenderInstanceProps, WidgetDef, WidgetFactory } from './Widgets'
 
 export interface HorizontalWidgetDef extends WidgetDef {
   items: WidgetDef[]
 }
 
-export class HorizontalWidget implements Widget {
+export class HorizontalWidget extends CompoundWidget {
   widgetDef: HorizontalWidgetDef
   widgetFactory: WidgetFactory
 
   constructor(widgetDef: HorizontalWidgetDef, widgetFactory: WidgetFactory) {
-    this.widgetDef = widgetDef
-    this.widgetFactory = widgetFactory
+    super(widgetDef, widgetFactory)
   }
 
   get id() { return this.widgetDef.id }
@@ -21,6 +21,8 @@ export class HorizontalWidget implements Widget {
   getChildWidgetDefs(): WidgetDef[] {
     return this.widgetDef.items
   }
+ 
+  getContextVarExprs(contextVarId: string) { return [] }
 
   clone(): WidgetDef {
     return produce(this.widgetDef, draft => {
@@ -109,7 +111,4 @@ export class HorizontalWidget implements Widget {
   renderEditor(props: RenderEditorProps) {
     return null
   }
-  
-
-  getContextVarExprs(contextVarId: string) { return [] }
 }

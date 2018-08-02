@@ -10,7 +10,7 @@ export enum DropSide {
   right = "Right"
 }
 
-export interface Store {
+export interface WidgetStore {
   replaceWidget(widgetId: string, replaceWith: WidgetDef | null): void,
   addWidget(widgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: string): void,
   dragAndDropWidget(sourceWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): void,
@@ -28,8 +28,8 @@ export type WidgetFactory = (widgetDef: WidgetDef) => Widget
 export interface ContextVar {
   id: string;     // Id of context variable
   name: string;   // Name of context variable
-  type: string;   // row, rowset, ...
-  table?: string;  // table of database (when type = "rowset")
+  type: string;   // row, rowset, text, number, date, datetime, enum, enumset, ...
+  table?: string;  // table of database (when type = "rowset" or "row")
   aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
   selectable?: boolean;  // true if row can be selected (when type = "rowset")
 }
@@ -40,11 +40,14 @@ export interface RenderInstanceProps {
   getContextVarValue(contextVarId: string): any,
   getContextVarExprValue(contextVarId: string, expr: Expr): any,
   onSelectContextVar(contextVarId: string, primaryKey: any): void; // selection call on context var (when type = "rowset" and selectable)
+
+  // Set a filter on a rowset context variable
+  setFilter(contextVarId: string, filter: Filter): void;
 }
 
 export interface RenderDesignProps {
   contextVars: ContextVar[],
-  store: Store,
+  store: WidgetStore,
 
   // Designer element and all sub-widget elements must wrapped using this function
   wrapDesignerElem(widgetDef: WidgetDef, elem: React.ReactElement<any>): React.ReactElement<any>,
@@ -52,26 +55,49 @@ export interface RenderDesignProps {
 
 export interface RenderEditorProps {
   contextVars: ContextVar[],
-  store: Store,
+  store: WidgetStore,
+}
+
+// A filter that applies to a particular rowset context variable
+export interface Filter {
+  id: string, // Unique id of the filter
+  memo: any,  // For internal use by the widget. Will be passed back unchanged.
+  expr: Expr  // Boolean filter expression on the rowset
 }
 
 export interface Widget {
   readonly id: string
 
+  // Render the widget as it looks in design mode
   renderDesign(props: RenderDesignProps): React.ReactElement<any> // TODO
+
+  // Render a live instance of the widget
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> // TODO
+
+  // Render an optional property editor for the widget
   renderEditor(props: RenderEditorProps): React.ReactElement<any> | null // TODO
 
-  getContextVarExprs(contextVarId: string): Expr[] // Only for self
+  // Get any context variables expressions that this widget or any subwidgets need
+  getContextVarExprs(contextVarId: string): Expr[] 
 
+  // Get child widgets
   getChildWidgetDefs(): WidgetDef[]
+
+  // Get initial filters for this widget
+  getInitialFilters(contextVarId: string): Promise<Filter[]>;
+  
   // getCreatedContextVars(): ContextVar[]
 
-  // TODO filters? how to get default value pre-render? how to gather from the widget instances?
-
+  // Make a copy of the widget with a new id
   clone(): WidgetDef
+
+  // Replace/remove the widget with the specified id
   replaceWidget(widgetId: string, replacementWidgetDef: WidgetDef | null): WidgetDef | null
+
+  // Add a widget to a parent widget. parentWidgetSection is widget-specific
   addWidget(addedWidgetDef: WidgetDef, parentWidgetId: string | null, parentWidgetSection: any): WidgetDef
+
+  // Drop a widget on top of another
   dropWidget(droppedWidgetDef: WidgetDef, targetWidgetId: string, dropSide: DropSide): WidgetDef
 }
 

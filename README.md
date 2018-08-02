@@ -22,6 +22,9 @@ Non-features:
 
 ## Outstanding issues
 - How to create context-specific palette for deep objects? (search tree and get created context vars)
+
 - How does filtering work? How to gather filters *before* rendering other parts when they have a default value?
 - Maybe store widget instance state separate from widget instance? Allow widget to manipulate? Easy state capturing?
+
+- How do required fields get enforced? Is it a widget resposibility or a table responsibility? 
 
