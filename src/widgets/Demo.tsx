@@ -48,3 +48,33 @@ class WidgetComponentDesigner extends React.Component {
 }
 
 export default WidgetComponentDesigner;
+
+// interface XProps {
+//   a: string
+// }
+
+// class X extends React.Component<XProps> {
+//   render() {
+//     return null
+//   }
+// }
+
+// class Y extends React.Component<{}> {
+//   c: X | null;
+
+//   render() {
+//     return <X a="sdfasdf" ref={ c => this.c = c }  />
+//   }
+// }
+
+// interface ZProps {
+//   xelem: React.ReactElement<X>
+// }
+
+// class Z extends React.Component<ZProps> {
+//   c: X | null;
+
+//   render() {
+//     return React.cloneElement(this.props.xelem, { ref: (c:X) => this.c = c })
+//   }
+// }

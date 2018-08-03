@@ -90,7 +90,7 @@ export class HorizontalWidget extends CompoundWidget {
     const childWidget = this.widgetFactory(childWidgetDef)
 
     return (
-      <div style={{ display: "inline-block", width: (100/this.widgetDef.items.length) + "%" }}>
+      <div key={childWidgetDef.id} style={{ display: "inline-block", width: (100/this.widgetDef.items.length) + "%" }}>
         { childWidget.renderDesign(props) }
       </div>
     )
@@ -112,3 +112,15 @@ export class HorizontalWidget extends CompoundWidget {
     return null
   }
 }
+
+// class HorizontalWidgetInstance extends React.Component<{ id: string }> {
+//   validate() { return [] }
+
+//   render() {
+//     return (
+//       <select>
+//         <option value="a">A {this.props.id}</option>
+//       </select>
+//     )      
+//   }
+// }
