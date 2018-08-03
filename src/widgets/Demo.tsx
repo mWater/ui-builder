@@ -1,24 +1,24 @@
 import * as React from 'react';
-import { DropdownWidget, DropdownWidgetDef } from './DropdownWidget'
-import { HorizontalWidget, HorizontalWidgetDef } from './HorizontalWidget';
-import * as Widgets from './Widgets'
+import * as Blocks from './Blocks'
+import { DropdownBlock, DropdownBlockDef } from './DropdownBlock'
+import { HorizontalBlock, HorizontalBlockDef } from './HorizontalBlock';
 
-class BasicWidgetFactory {
-  create = (widgetDef: Widgets.WidgetDef): Widgets.Widget => {
-    if (widgetDef.type === "dropdown") {
-      return new DropdownWidget(widgetDef as DropdownWidgetDef)
+class BasicBlockFactory {
+  create = (blockDef: Blocks.BlockDef): Blocks.Block => {
+    if (blockDef.type === "dropdown") {
+      return new DropdownBlock(blockDef as DropdownBlockDef)
     }
-    if (widgetDef.type === "horizontal") {
-      return new HorizontalWidget(widgetDef as HorizontalWidgetDef, this.create)
+    if (blockDef.type === "horizontal") {
+      return new HorizontalBlock(blockDef as HorizontalBlockDef, this.create)
     }
 
     throw new Error("Type not found")
   }
 }
 
-const widgetFactory = new BasicWidgetFactory()
+const blockFactory = new BasicBlockFactory()
 
-let rootWidgetDef: Widgets.WidgetDef = {
+let rootBlockDef: Blocks.BlockDef = {
   id: "a",
   type: "horizontal",
   items: [
@@ -26,28 +26,28 @@ let rootWidgetDef: Widgets.WidgetDef = {
     { id: "a2", type: "dropdown" }
   ]
 }
-const rootWidget = widgetFactory.create(rootWidgetDef)
-rootWidgetDef = rootWidget.dropWidget({ id: "a3", type: "dropdown" }, "a2", Widgets.DropSide.right)
+const rootBlock = blockFactory.create(rootBlockDef)
+rootBlockDef = rootBlock.dropBlock({ id: "a3", type: "dropdown" }, "a2", Blocks.DropSide.right)
 
-class WidgetComponentDesigner extends React.Component {
+class BlockComponentDesigner extends React.Component {
   render() {
-    const widget = widgetFactory.create(rootWidgetDef)
+    const block = blockFactory.create(rootBlockDef)
 
     const props = {
       contextVars: [],
-      store: {} as Widgets.WidgetStore,
-      wrapDesignerElem(widgetDef: Widgets.WidgetDef, elem: React.ReactElement<any>) {
+      store: {} as Blocks.BlockStore,
+      wrapDesignerElem(blockDef: Blocks.BlockDef, elem: React.ReactElement<any>) {
         return <div style={{ border: "solid 1px blue", padding: 10 }}>
           {elem}
         </div>
       }
-    } as Widgets.RenderDesignProps
+    } as Blocks.RenderDesignProps
 
-    return widget.renderDesign(props)
+    return block.renderDesign(props)
   }
 }
 
-export default WidgetComponentDesigner;
+export default BlockComponentDesigner;
 
 // interface XProps {
 //   a: string
