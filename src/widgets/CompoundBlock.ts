@@ -1,4 +1,4 @@
-import { Block, BlockDef, BlockFactory, Filter } from './Blocks';
+import { Block, BlockDef, BlockFactory, Filter } from './blocks';
 
 /* Block which contains other blocks */
 export default abstract class CompoundBlock extends Block {

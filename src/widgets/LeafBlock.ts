@@ -1,5 +1,5 @@
 import * as uuid from 'uuid/v4'
-import { DropSide, dropBlock, Filter, Block, BlockDef } from './Blocks';
+import { DropSide, dropBlock, Filter, Block, BlockDef } from './blocks';
 
 export default abstract class LeafBlock extends Block {
   getChildBlockDefs() { return [] }

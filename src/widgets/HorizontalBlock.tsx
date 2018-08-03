@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as uuid from 'uuid/v4'
 import CompoundBlock from './CompoundBlock';
-import { BlockDef, BlockFactory, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './Blocks'
+import { BlockDef, BlockFactory, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
 
 export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]

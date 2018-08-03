@@ -51,6 +51,9 @@ export interface RenderDesignProps {
 
   // Designer element and all sub-block elements must wrapped using this function
   wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>): React.ReactElement<any>,
+
+  // Render a placeholder that can be dropped on
+  renderPlaceholder(parentBlockId: string, parentBlockSection: string): React.ReactElement<any>
 }
 
 export interface RenderEditorProps {

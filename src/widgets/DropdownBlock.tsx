@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './Blocks'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
 
 export interface DropdownBlockDef extends BlockDef {
   column: string
