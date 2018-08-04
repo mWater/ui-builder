@@ -8,18 +8,21 @@ interface Props {
 }
 
 export default class BlockWrapper extends React.Component<Props> {
-  handleClick = () => {
+  handleClick = (ev: React.MouseEvent) => {
+    ev.stopPropagation()
     this.props.onSelect()
   } 
 
   render() {
     const style = {
       border: "solid 1px grey",
-      padding: 5
+      padding: 5,
+      margin: 2
     }
 
     if (this.props.selectedBlockId === this.props.blockDef.id) {
-      style.border = "solid 1px blue"
+      style.border = "dashed 3px blue"
+      style.margin = 0
     }
 
     return (

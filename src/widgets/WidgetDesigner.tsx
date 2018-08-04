@@ -49,6 +49,8 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 
+  handleUnselect = () => { this.setState({ selectedBlockId: null }) }
+
   createBlockStore(block: Block) {
     return {
       replaceBlock: (blockId: string, replaceWith: BlockDef | null) => {
@@ -90,7 +92,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   render() {
     return (
-      <div style={{ height: "100%" }}>
+      <div style={{ height: "100%", padding: 20 }} onClick={this.handleUnselect}>
         { /* TODO LEFT PANE */ }
         {this.renderBlock()}
         { /* TODO RIGHT PANE */ }
