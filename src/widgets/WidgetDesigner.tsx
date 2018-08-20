@@ -2,7 +2,7 @@ import BlockWrapper from "./BlockWrapper";
 
 import * as React from "react";
 import { WidgetDef } from "./Widgets";
-import { BlockFactory, BlockDef, DropSide, Block } from "./blocks";
+import { BlockFactory, BlockDef, DropSide, Block, BlockStore } from "./blocks";
 
 interface Props {
   widgetDef: WidgetDef
@@ -26,9 +26,14 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     this.setState({ selectedBlockId: blockId })
   }
 
-  wrapDesignerElem = (blockDef: BlockDef, elem: React.ReactElement<any>) => {
+  wrapDesignerElem = (store: BlockStore, blockDef: BlockDef, elem: React.ReactElement<any>) => {
     return (
-      <BlockWrapper blockDef={blockDef} selectedBlockId={this.state.selectedBlockId} onSelect={this.handleSelect.bind(null, blockDef.id)} isOver={true}>
+      <BlockWrapper 
+        blockDef={blockDef} 
+        selectedBlockId={this.state.selectedBlockId} 
+        onSelect={this.handleSelect.bind(null, blockDef.id)} 
+        store={store}
+      >
         {elem}
       </BlockWrapper>
     )
@@ -75,12 +80,13 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
       const block = this.props.blockFactory(this.props.widgetDef.blockDef)
+      const store = this.createBlockStore(block)
     
       // Create block store
       return block.renderDesign({
         contextVars: this.props.widgetDef.contextVars,
-        store: this.createBlockStore(block),
-        wrapDesignerElem: this.wrapDesignerElem,
+        store,
+        wrapDesignerElem: this.wrapDesignerElem.bind(null, store),
         renderPlaceholder: this.renderPlaceholder
       })
     }

@@ -4,15 +4,15 @@ import * as uuid from 'uuid/v4'
 import CompoundBlock from './CompoundBlock';
 import { BlockDef, BlockFactory, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
 
-export interface HorizontalBlockDef extends BlockDef {
+export interface VerticalBlockDef extends BlockDef {
   items: BlockDef[]
 }
 
-export class HorizontalBlock extends CompoundBlock {
-  blockDef: HorizontalBlockDef
+export class VerticalBlock extends CompoundBlock {
+  blockDef: VerticalBlockDef
   blockFactory: BlockFactory
 
-  constructor(blockDef: HorizontalBlockDef, blockFactory: BlockFactory) {
+  constructor(blockDef: VerticalBlockDef, blockFactory: BlockFactory) {
     super(blockDef, blockFactory)
   }
 
@@ -40,7 +40,7 @@ export class HorizontalBlock extends CompoundBlock {
     }
 
     return produce(this.blockDef as BlockDef, d => {
-      const draft = d as HorizontalBlockDef
+      const draft = d as VerticalBlockDef
 
       for (let i = draft.items.length - 1; i >= 0 ; i--) {
         const childBlock = this.blockFactory(draft.items[i]).replaceBlock(blockId, replacementBlockDef)
@@ -70,12 +70,12 @@ export class HorizontalBlock extends CompoundBlock {
 
     return produce(this.blockDef, draft => {
       for (let i = 0; i < draft.items.length; i++) {
-        // Insert if dropped left or right
-        if ((dropSide === DropSide.left) && (draft.items[i].id === targetBlockId)) {
+        // Insert if dropped top or bottom
+        if ((dropSide === DropSide.top) && (draft.items[i].id === targetBlockId)) {
           draft.items.splice(i, 0, droppedBlockDef)
           return
         }
-        else if ((dropSide === DropSide.right) && (draft.items[i].id === targetBlockId)) {
+        else if ((dropSide === DropSide.bottom) && (draft.items[i].id === targetBlockId)) {
           draft.items.splice(i + 1, 0, droppedBlockDef)
           return
         }
@@ -90,7 +90,7 @@ export class HorizontalBlock extends CompoundBlock {
     const childBlock = this.blockFactory(childBlockDef)
 
     return (
-      <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%" }}>
+      <div key={childBlockDef.id}>
         { childBlock.renderDesign(props) }
       </div>
     )

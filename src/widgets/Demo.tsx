@@ -6,6 +6,7 @@ import { WidgetDef } from './Widgets';
 import WidgetDesigner from './WidgetDesigner';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
+import { VerticalBlock, VerticalBlockDef } from './VerticalBlock';
 
 const basicBlockFactory = (blockDef: BlockDef): Block => {
   if (blockDef.type === "dropdown") {
@@ -13,6 +14,9 @@ const basicBlockFactory = (blockDef: BlockDef): Block => {
   }
   if (blockDef.type === "horizontal") {
     return new HorizontalBlock(blockDef as HorizontalBlockDef, basicBlockFactory)
+  }
+  if (blockDef.type === "vertical") {
+    return new VerticalBlock(blockDef as VerticalBlockDef, basicBlockFactory)
   }
 
   throw new Error("Type not found")

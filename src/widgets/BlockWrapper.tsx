@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BlockDef, DropSide } from "./blocks"
+import { BlockDef, DropSide, BlockStore } from "./blocks"
 import { DragSource, DropTarget, DropTargetMonitor, ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd'
 import "./BlockWrapper.css"
 import { DragDropMonitor } from "dnd-core";
@@ -8,7 +8,8 @@ import * as ReactDOM from "react-dom";
 interface Props {
   blockDef: BlockDef;
   selectedBlockId: string | null;
-  isOver: boolean;
+  store: BlockStore;
+  isOver?: boolean;
   connectDragSource?: ConnectDragSource;
   connectDropTarget?: ConnectDropTarget;
   connectDragPreview?: ConnectDragPreview;
@@ -58,8 +59,8 @@ const blockTargetSpec = {
       return
     }
 
-    // const side = component.getDecoratedComponentInstance().state.hoverSide
-    // TODO props.onBlockDrop(monitor.getItem().block, props.block, side)
+    const dropSide = component.state.hoverSide
+    props.store.dragAndDropBlock(monitor.getItem().blockDef, props.blockDef.id, dropSide)
   }
 }
 
