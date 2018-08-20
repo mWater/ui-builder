@@ -4,6 +4,8 @@ import { HorizontalBlock, HorizontalBlockDef } from './HorizontalBlock';
 import { BlockDef, Block } from './blocks';
 import { WidgetDef } from './Widgets';
 import WidgetDesigner from './WidgetDesigner';
+import HTML5Backend from 'react-dnd-html5-backend'
+import { DragDropContext } from 'react-dnd'
 
 const basicBlockFactory = (blockDef: BlockDef): Block => {
   if (blockDef.type === "dropdown") {
@@ -31,9 +33,7 @@ const initialWidgetDef: WidgetDef = {
   contextVars: []
 }
 
-// const rootBlock = blockFactory.create(rootBlockDef)
-// rootBlockDef = rootBlock.dropBlock({ id: "a3", type: "dropdown" }, "a2", blocks.DropSide.right)
-
+@DragDropContext(HTML5Backend)
 export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
   constructor(props: object) {
     super(props)

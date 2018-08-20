@@ -28,7 +28,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   wrapDesignerElem = (blockDef: BlockDef, elem: React.ReactElement<any>) => {
     return (
-      <BlockWrapper blockDef={blockDef} selectedBlockId={this.state.selectedBlockId} onSelect={this.handleSelect.bind(null, blockDef.id) }>
+      <BlockWrapper blockDef={blockDef} selectedBlockId={this.state.selectedBlockId} onSelect={this.handleSelect.bind(null, blockDef.id)} isOver={true}>
         {elem}
       </BlockWrapper>
     )
