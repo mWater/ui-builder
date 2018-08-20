@@ -3,6 +3,7 @@ import BlockWrapper from "./BlockWrapper";
 import * as React from "react";
 import { WidgetDef } from "./Widgets";
 import { BlockFactory, BlockDef, DropSide, Block, BlockStore } from "./blocks";
+import BlockPlaceholder from "./BlockPlaceholder";
 
 interface Props {
   widgetDef: WidgetDef
@@ -56,6 +57,16 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   handleUnselect = () => { this.setState({ selectedBlockId: null }) }
 
+  handleKeyDown = (e: any) => {
+    console.log(e.keyCode)
+    if (e.keyCode === 46) {  // Delete
+      if (this.state.selectedBlockId) {
+        const block = this.props.blockFactory(this.props.widgetDef.blockDef!)
+        this.handleBlockDefChange(block.replaceBlock(this.state.selectedBlockId, null))
+      }
+    }
+  }
+  
   createBlockStore(block: Block) {
     return {
       replaceBlock: (blockId: string, replaceWith: BlockDef | null) => {
@@ -98,7 +109,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   render() {
     return (
-      <div style={{ height: "100%", padding: 20 }} onClick={this.handleUnselect}>
+      <div style={{ height: "100%", padding: 20 }} onClick={this.handleUnselect} onKeyDown={this.handleKeyDown} tabIndex={0}>
         { /* TODO LEFT PANE */ }
         {this.renderBlock()}
         { /* TODO RIGHT PANE */ }
@@ -107,8 +118,3 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   }
 }
 
-class BlockPlaceholder extends React.Component<{ onSet: (blockDef: BlockDef) => void}> {
-  render() {
-    return <div/>
-  }
-}

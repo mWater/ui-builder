@@ -1,0 +1,51 @@
+import * as React from "react";
+import { BlockDef, BlockFactory, DropSide } from "./blocks"
+import { ConnectDragSource, DragSource } from "react-dnd";
+
+interface Props {
+  blockDef: BlockDef;
+  blockFactory: BlockFactory;
+  connectDragSource?: ConnectDragSource;
+}
+
+const blockSourceSpec = {
+  beginDrag(props: Props) {
+    const block = props.blockFactory(props.blockDef)
+    return {
+      blockDef: block.clone()
+    }
+  }
+}
+
+@DragSource("block", blockSourceSpec, (connect, monitor) => ({
+  connectDragSource: connect.dragSource()
+}))
+export default class BlockPlaceholder extends React.Component<Props> {
+  renderContents() {
+    const block = this.props.blockFactory(this.props.blockDef)
+
+    return block.renderDesign({
+      contextVars: [],
+      store: {
+        replaceBlock(blockId: string, replaceWith: BlockDef | null) { return },
+        addBlock(blockDef: BlockDef, parentBlockId: string | null, parentBlockSection: string) { return },
+        dragAndDropBlock(sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide) { return }
+      },
+      wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) {
+        return elem
+      },
+      renderPlaceholder(parentBlockId: string, parentBlockSection: string) {
+        return <div className="block-placeholder"/>
+      }
+    })
+  }
+
+  render() {
+    return (
+      <div style={{padding: 10, position: "relative"}}>
+        {this.renderContents()}
+        {this.props.connectDragSource!(<div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}/>)}
+      </div>
+    )
+  }
+}

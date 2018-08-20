@@ -47,7 +47,7 @@ export class VerticalBlock extends CompoundBlock {
         if (childBlock) {
           draft.items[i] = childBlock
         }
-        else if (draft.items.length > 1) {
+        else if (draft.items.length > 2) {
           draft.items.splice(i, 1)
         }
         else {

@@ -47,7 +47,7 @@ export class HorizontalBlock extends CompoundBlock {
         if (childBlock) {
           draft.items[i] = childBlock
         }
-        else if (draft.items.length > 1) {
+        else if (draft.items.length > 2) {
           draft.items.splice(i, 1)
         }
         else {
@@ -90,7 +90,7 @@ export class HorizontalBlock extends CompoundBlock {
     const childBlock = this.blockFactory(childBlockDef)
 
     return (
-      <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%" }}>
+      <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%", verticalAlign: "top" }}>
         { childBlock.renderDesign(props) }
       </div>
     )
