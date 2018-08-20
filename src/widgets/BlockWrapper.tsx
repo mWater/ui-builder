@@ -1,5 +1,6 @@
-import * as React from "react";
-import { BlockDef } from "./blocks";
+import * as React from "react"
+import { BlockDef } from "./blocks"
+import "./BlockWrapper.css"
 
 interface Props {
   blockDef: BlockDef;
@@ -14,19 +15,10 @@ export default class BlockWrapper extends React.Component<Props> {
   } 
 
   render() {
-    const style = {
-      border: "solid 1px grey",
-      padding: 5,
-      margin: 2
-    }
-
-    if (this.props.selectedBlockId === this.props.blockDef.id) {
-      style.border = "dashed 3px blue"
-      style.margin = 0
-    }
+    const selected = this.props.selectedBlockId === this.props.blockDef.id;
 
     return (
-      <div onClick={this.handleClick} style={style} >
+      <div onClick={this.handleClick} className={selected ? "block-wrapper selected" : "block-wrapper"} >
         {this.props.children}
       </div>
     )

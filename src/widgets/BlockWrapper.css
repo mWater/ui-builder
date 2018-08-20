@@ -1,0 +1,14 @@
+.block-wrapper {
+  border: solid 1px #EEE;
+  padding: 5px;
+  margin: 2px;
+}
+
+.block-wrapper:hover {
+  border: solid 1px #AAA;
+}
+
+.block-wrapper.selected {
+  border: dashed 2px blue;
+  margin: 1px;
+}
