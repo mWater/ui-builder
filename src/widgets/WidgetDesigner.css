@@ -1,0 +1,14 @@
+.widget-designer-palette {
+  height: 100%;
+  width: 20%;
+  background-color: #AAA;
+  display: inline-block;
+}
+
+.widget-designer-block {
+  height: 100%;
+  left: 20%;
+  width: 60%;
+  display: inline-block;
+  vertical-align: top;
+}

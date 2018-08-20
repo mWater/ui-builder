@@ -7,7 +7,6 @@ import WidgetDesigner from './WidgetDesigner';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
 import { VerticalBlock, VerticalBlockDef } from './VerticalBlock';
-import BlockPaletteItem from './BlockPaletteItem';
 
 const basicBlockFactory = (blockDef: BlockDef): Block => {
   if (blockDef.type === "dropdown") {
@@ -55,10 +54,6 @@ export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
   render() {
     return (
       <div>
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdown" }}
-          blockFactory={basicBlockFactory}
-        />
         <WidgetDesigner widgetDef={this.state.widgetDef} blockFactory={basicBlockFactory} onWidgetDefChange={this.handleWidgetDefChange} />
       </div>
     )

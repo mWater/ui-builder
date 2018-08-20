@@ -1,9 +1,11 @@
-import BlockWrapper from "./BlockWrapper";
+import BlockWrapper from "./BlockWrapper"
 
-import * as React from "react";
-import { WidgetDef } from "./Widgets";
-import { BlockFactory, BlockDef, DropSide, Block, BlockStore } from "./blocks";
-import BlockPlaceholder from "./BlockPlaceholder";
+import * as React from "react"
+import { WidgetDef } from "./Widgets"
+import { BlockFactory, BlockDef, DropSide, Block, BlockStore } from "./blocks"
+import BlockPlaceholder from "./BlockPlaceholder"
+import BlockPaletteItem from "./BlockPaletteItem"
+import "./WidgetDesigner.css"
 
 interface Props {
   widgetDef: WidgetDef
@@ -87,6 +89,21 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     }
   }
 
+  renderPalette() {
+    return (
+      <div className="widget-designer-palette">
+        <BlockPaletteItem 
+          blockDef={{ id: "x", type: "dropdown" }}
+          blockFactory={this.props.blockFactory}
+        />
+        <BlockPaletteItem 
+          blockDef={{ id: "x", type: "dropdown" }}
+          blockFactory={this.props.blockFactory}
+        />
+      </div>
+    )
+  }
+
   renderBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
@@ -109,9 +126,11 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   render() {
     return (
-      <div style={{ height: "100%", padding: 20 }} onClick={this.handleUnselect} onKeyDown={this.handleKeyDown} tabIndex={0}>
-        { /* TODO LEFT PANE */ }
-        {this.renderBlock()}
+      <div style={{ height: "100%", padding: 20 }}>
+        {this.renderPalette()}
+        <div className="widget-designer-block" onClick={this.handleUnselect} onKeyDown={this.handleKeyDown} tabIndex={0}>
+          {this.renderBlock()}
+        </div>
         { /* TODO RIGHT PANE */ }
       </div>
     )

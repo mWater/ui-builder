@@ -97,11 +97,11 @@ export class HorizontalBlock extends CompoundBlock {
   }
 
   renderDesign(props: RenderDesignProps) {
-    return (
-      <div>
+    return props.wrapDesignerElem(this.blockDef,
+      <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         { this.blockDef.items.map(childBlock => this.renderChildDesigner(props, childBlock)) }
       </div>
-    )      
+    )
   }
 
   renderInstance(props: RenderInstanceProps) {
