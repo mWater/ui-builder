@@ -36,7 +36,7 @@ export interface BlockDef {
   [index: string]: any  // Other props
 }
 
-export type BlockFactory = (blockDef: BlockDef) => Block
+export type CreateBlock = (blockDef: BlockDef) => Block
 
 export interface ContextVar {
   id: string;     // Id of context variable

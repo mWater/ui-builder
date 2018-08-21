@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as uuid from 'uuid/v4'
 import CompoundBlock from './CompoundBlock';
-import { BlockDef, BlockFactory, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
+import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
 
 export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]
@@ -10,10 +10,10 @@ export interface HorizontalBlockDef extends BlockDef {
 
 export class HorizontalBlock extends CompoundBlock {
   blockDef: HorizontalBlockDef
-  blockFactory: BlockFactory
+  createBlock: CreateBlock
 
-  constructor(blockDef: HorizontalBlockDef, blockFactory: BlockFactory) {
-    super(blockDef, blockFactory)
+  constructor(blockDef: HorizontalBlockDef, createBlock: CreateBlock) {
+    super(blockDef, createBlock)
   }
 
   get id() { return this.blockDef.id }
@@ -29,7 +29,7 @@ export class HorizontalBlock extends CompoundBlock {
       draft.id = uuid()
 
       for (let i = 0; i< draft.items.length; i++) {
-        draft.items[i] = this.blockFactory(draft.items[i]).clone()
+        draft.items[i] = this.createBlock(draft.items[i]).clone()
       }
     })
   }
@@ -48,7 +48,7 @@ export class HorizontalBlock extends CompoundBlock {
     return produce(this.blockDef, draft => {
       const newItems = [] as BlockDef[];
       for (const item of draft.items) {
-        const canonItem = this.blockFactory(item).canonicalize() 
+        const canonItem = this.createBlock(item).canonicalize() 
         if (canonItem) {
           newItems.push(canonItem)
         }
@@ -66,7 +66,7 @@ export class HorizontalBlock extends CompoundBlock {
       const draft = d as HorizontalBlockDef
 
       for (let i = draft.items.length - 1; i >= 0 ; i--) {
-        const childBlock = this.blockFactory(draft.items[i]).replaceBlock(blockId, replacementBlockDef)
+        const childBlock = this.createBlock(draft.items[i]).replaceBlock(blockId, replacementBlockDef)
         if (childBlock) {
           draft.items[i] = childBlock
         }
@@ -100,14 +100,14 @@ export class HorizontalBlock extends CompoundBlock {
           return
         }
         else {
-          draft.items[i] = this.blockFactory(draft.items[i]).dropBlock(droppedBlockDef, targetBlockId, dropSide)
+          draft.items[i] = this.createBlock(draft.items[i]).dropBlock(droppedBlockDef, targetBlockId, dropSide)
         }
       }
     })
   }
 
   renderChildDesigner(props: RenderDesignProps, childBlockDef: BlockDef) {
-    const childBlock = this.blockFactory(childBlockDef)
+    const childBlock = this.createBlock(childBlockDef)
 
     return (
       <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%", verticalAlign: "top" }}>

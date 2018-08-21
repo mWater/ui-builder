@@ -4,8 +4,8 @@ import { WidgetDef } from './widgets';
 import { Database } from './Database';
 import Expr from './Expr';
 
-const blockFactory = jest.fn()
-const widgetLookup = jest.fn()
+const createBlock = jest.fn()
+const lookupWidget = jest.fn()
 const widgetDef : WidgetDef= {
   id: "w1",
   name: "W1",
@@ -15,7 +15,7 @@ const widgetDef : WidgetDef= {
     { id: "b1", name: "B1", type: "text" },
   ]
 }
-widgetLookup.mockReturnValue(widgetDef)
+lookupWidget.mockReturnValue(widgetDef)
 
 const blockDef : WidgetBlockDef = {
   id: "a",
@@ -33,15 +33,15 @@ const contextVars : ContextVar[] = [
 
 describe("getInitialFilters", () => {
   test("translates", async () => {
-    const widgetBlock = new WidgetBlock(blockDef, blockFactory, widgetLookup)
+    const widgetBlock = new WidgetBlock(blockDef, createBlock, lookupWidget)
 
     const innerBlock = {
       getInitialFilters: jest.fn()
     }
   
     // Return inner block
-    blockFactory.mockReset()
-    blockFactory.mockReturnValueOnce(innerBlock)
+    createBlock.mockReset()
+    createBlock.mockReturnValueOnce(innerBlock)
     innerBlock.getInitialFilters.mockResolvedValueOnce([{ id: "f1", memo: "m", expr: {} as Expr }])
 
     const filters = await widgetBlock.getInitialFilters("a1")
@@ -56,15 +56,15 @@ describe("renderInstance", () => {
  
   // Render instance
   beforeEach(() => {
-    const widgetBlock = new WidgetBlock(blockDef, blockFactory, widgetLookup)
+    const widgetBlock = new WidgetBlock(blockDef, createBlock, lookupWidget)
 
     const innerBlock = {
       renderInstance: jest.fn()
     }
   
     // Return inner block
-    blockFactory.mockReset()
-    blockFactory.mockReturnValueOnce(innerBlock)
+    createBlock.mockReset()
+    createBlock.mockReturnValueOnce(innerBlock)
   
     renderInstanceProps = {
       database: {} as Database,

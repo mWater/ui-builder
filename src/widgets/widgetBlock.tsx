@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, BlockFactory, NullBlockStore, Filter, ContextVar } from './blocks'
-import { WidgetLookup } from './widgets';
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, ContextVar } from './blocks'
+import { LookupWidget } from './widgets';
 import Expr from './Expr';
 
 // Block which contains a widget
@@ -12,19 +12,19 @@ export interface WidgetBlockDef extends BlockDef {
 
 export class WidgetBlock extends LeafBlock {
   blockDef: WidgetBlockDef
-  blockFactory: BlockFactory
-  widgetLookup: WidgetLookup
+  createBlock: CreateBlock
+  lookupWidget: LookupWidget
 
-  constructor(blockDef: WidgetBlockDef, blockFactory: BlockFactory, widgetLookup: WidgetLookup) {
+  constructor(blockDef: WidgetBlockDef, createBlock: CreateBlock, lookupWidget: LookupWidget) {
     super(blockDef)
-    this.blockFactory = blockFactory
-    this.widgetLookup = widgetLookup
+    this.createBlock = createBlock
+    this.lookupWidget = lookupWidget
   }
 
   async getInitialFilters(contextVarId: string): Promise<Filter[]> { 
-    const widgetDef = this.widgetLookup(this.blockDef.widgetId)
-    if (widgetDef.blockDef) {
-      const innerBlock = this.blockFactory(widgetDef.blockDef)
+    const widgetDef = this.lookupWidget(this.blockDef.widgetId)
+    if (widgetDef && widgetDef.blockDef) {
+      const innerBlock = this.createBlock(widgetDef.blockDef)
 
       // Map contextVarId to internal id
       for (const key of Object.keys(this.blockDef.contextVarMap)) {
@@ -40,9 +40,9 @@ export class WidgetBlock extends LeafBlock {
 
   renderDesign(props: RenderDesignProps) {
     // Find the widget
-    const widgetDef = this.widgetLookup(this.blockDef.widgetId)
-    if (widgetDef.blockDef) {
-      const innerBlock = this.blockFactory(widgetDef.blockDef)
+    const widgetDef = this.lookupWidget(this.blockDef.widgetId)
+    if (widgetDef && widgetDef.blockDef) {
+      const innerBlock = this.createBlock(widgetDef.blockDef)
 
       // Create props for rendering inner block
       const innerProps : RenderDesignProps = {
@@ -67,9 +67,9 @@ export class WidgetBlock extends LeafBlock {
 
   renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
     // Find the widget
-    const widgetDef = this.widgetLookup(this.blockDef.widgetId)
-    if (widgetDef.blockDef) {
-      const innerBlock = this.blockFactory(widgetDef.blockDef)
+    const widgetDef = this.lookupWidget(this.blockDef.widgetId)
+    if (widgetDef && widgetDef.blockDef) {
+      const innerBlock = this.createBlock(widgetDef.blockDef)
 
       const innerProps : RenderInstanceProps = {
         database: props.database,

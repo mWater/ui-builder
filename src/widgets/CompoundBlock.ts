@@ -1,20 +1,20 @@
-import { Block, BlockDef, BlockFactory, Filter } from './blocks';
+import { Block, BlockDef, CreateBlock, Filter } from './blocks';
 
 /* Block which contains other blocks in an array called items */
 export default abstract class CompoundBlock extends Block {
-  blockFactory: BlockFactory
+  createBlock: CreateBlock
 
-  constructor(blockDef: BlockDef, blockFactory: BlockFactory) {
+  constructor(blockDef: BlockDef, createBlock: CreateBlock) {
     super(blockDef)
-    this.blockFactory = blockFactory;
+    this.createBlock = createBlock;
   }
 
   async getInitialFilters(contextVarId: string): Promise<Filter[]> {
     let filters = [] as Filter[];
-    const block = this.blockFactory(this.blockDef)
+    const block = this.createBlock(this.blockDef)
 
     for (const item of block.getChildBlockDefs()) {
-      const subblock = this.blockFactory(item);
+      const subblock = this.createBlock(item);
       const subfilters = await subblock.getInitialFilters(contextVarId);
       filters = filters.concat(subfilters);
     }

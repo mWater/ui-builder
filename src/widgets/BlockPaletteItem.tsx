@@ -1,16 +1,16 @@
 import * as React from "react";
-import { BlockDef, BlockFactory, DropSide } from "./blocks"
+import { BlockDef, CreateBlock, DropSide } from "./blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
 
 interface Props {
   blockDef: BlockDef;
-  blockFactory: BlockFactory;
+  createBlock: CreateBlock;
   connectDragSource?: ConnectDragSource;
 }
 
 const blockSourceSpec = {
   beginDrag(props: Props) {
-    const block = props.blockFactory(props.blockDef)
+    const block = props.createBlock(props.blockDef)
     return {
       blockDef: block.clone()
     }
@@ -22,7 +22,7 @@ const blockSourceSpec = {
 }))
 export default class BlockPlaceholder extends React.Component<Props> {
   renderContents() {
-    const block = this.props.blockFactory(this.props.blockDef)
+    const block = this.props.createBlock(this.props.blockDef)
 
     return block.renderDesign({
       contextVars: [],

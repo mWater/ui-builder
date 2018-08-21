@@ -1,26 +1,13 @@
 import * as React from 'react';
-import { DropdownBlock, DropdownBlockDef } from './dropdownBlock'
-import { HorizontalBlock, HorizontalBlockDef } from './horizontalBlock';
-import { BlockDef, Block } from './blocks';
-import { WidgetDef } from './widgets';
+import { WidgetDef, LookupWidget } from './widgets';
 import WidgetDesigner from './WidgetDesigner';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
-import { VerticalBlock, VerticalBlockDef } from './verticalBlock';
+import BlockFactory from './BlockFactory';
 
-const basicBlockFactory = (blockDef: BlockDef): Block => {
-  if (blockDef.type === "dropdown") {
-    return new DropdownBlock(blockDef as DropdownBlockDef)
-  }
-  if (blockDef.type === "horizontal") {
-    return new HorizontalBlock(blockDef as HorizontalBlockDef, basicBlockFactory)
-  }
-  if (blockDef.type === "vertical") {
-    return new VerticalBlock(blockDef as VerticalBlockDef, basicBlockFactory)
-  }
+const lookupWidget : LookupWidget = () => null
 
-  throw new Error("Type not found")
-}
+const basicBlockFactory = new BlockFactory(lookupWidget)
 
 const initialWidgetDef: WidgetDef = {
   id: "1234",
@@ -53,7 +40,7 @@ export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
   
   render() {
     return (
-      <WidgetDesigner widgetDef={this.state.widgetDef} blockFactory={basicBlockFactory} onWidgetDefChange={this.handleWidgetDefChange} />
+      <WidgetDesigner widgetDef={this.state.widgetDef} createBlock={basicBlockFactory.createBlock} onWidgetDefChange={this.handleWidgetDefChange} />
     )
   }
 }

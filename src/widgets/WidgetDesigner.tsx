@@ -2,14 +2,14 @@ import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
 import { WidgetDef } from "./widgets"
-import { BlockFactory, BlockDef, DropSide, Block, BlockStore } from "./blocks"
+import { CreateBlock, BlockDef, DropSide, Block, BlockStore } from "./blocks"
 import BlockPlaceholder from "./BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
 
 interface Props {
   widgetDef: WidgetDef
-  blockFactory: BlockFactory
+  createBlock: CreateBlock
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
@@ -43,7 +43,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   }
 
   handlePlaceholderSet = (parentBlockId: string, parentBlockSection: string, blockDef: BlockDef) => {
-    const block = this.props.blockFactory(this.props.widgetDef.blockDef!)
+    const block = this.props.createBlock(this.props.widgetDef.blockDef!)
     this.handleBlockDefChange(block.addBlock(blockDef, parentBlockId, parentBlockSection))
   }
 
@@ -56,7 +56,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   handleBlockDefChange = (blockDef: BlockDef | null) => {
     // Canonicalize
     if (blockDef) {
-      blockDef = this.props.blockFactory(blockDef).canonicalize()
+      blockDef = this.props.createBlock(blockDef).canonicalize()
     }
     this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
@@ -67,7 +67,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     console.log(e.keyCode)
     if (e.keyCode === 46) {  // Delete
       if (this.state.selectedBlockId) {
-        const block = this.props.blockFactory(this.props.widgetDef.blockDef!)
+        const block = this.props.createBlock(this.props.widgetDef.blockDef!)
         this.handleBlockDefChange(block.replaceBlock(this.state.selectedBlockId, null))
       }
     }
@@ -86,7 +86,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         let newBlockDef = block.replaceBlock(sourceBlockDef.id, null)
 
         // Drop block (if no block, just use new block)
-        newBlockDef = newBlockDef ? this.props.blockFactory(newBlockDef).dropBlock(sourceBlockDef, targetBlockId, dropSide) : newBlockDef
+        newBlockDef = newBlockDef ? this.props.createBlock(newBlockDef).dropBlock(sourceBlockDef, targetBlockId, dropSide) : newBlockDef
 
         this.handleBlockDefChange(newBlockDef)
       }
@@ -98,11 +98,11 @@ export default class WidgetDesigner extends React.Component<Props, State> {
       <div className="widget-designer-palette">
         <BlockPaletteItem 
           blockDef={{ id: "x", type: "dropdown" }}
-          blockFactory={this.props.blockFactory}
+          createBlock={this.props.createBlock}
         />
         <BlockPaletteItem 
           blockDef={{ id: "x", type: "dropdown" }}
-          blockFactory={this.props.blockFactory}
+          createBlock={this.props.createBlock}
         />
       </div>
     )
@@ -111,7 +111,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   renderBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
-      const block = this.props.blockFactory(this.props.widgetDef.blockDef)
+      const block = this.props.createBlock(this.props.widgetDef.blockDef)
       const store = this.createBlockStore(block)
     
       // Create block store
