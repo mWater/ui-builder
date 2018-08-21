@@ -34,6 +34,29 @@ export class HorizontalBlock extends CompoundBlock {
     })
   }
 
+  canonicalize(): BlockDef | null {
+    // Remove if zero items
+    if (this.blockDef.items.length === 0) {
+      return null
+    }
+    // Collapse if one item
+    if (this.blockDef.items.length === 1) {
+      return this.blockDef.items[0]
+    }
+
+    // Canonicalize items
+    return produce(this.blockDef, draft => {
+      const newItems = [] as BlockDef[];
+      for (const item of draft.items) {
+        const canonItem = this.blockFactory(item).canonicalize() 
+        if (canonItem) {
+          newItems.push(canonItem)
+        }
+      }
+      draft.items = newItems
+    })
+  }
+
   replaceBlock(blockId: string, replacementBlockDef: BlockDef | null): BlockDef | null {
     if (blockId === this.id) {
       return replacementBlockDef
@@ -47,11 +70,8 @@ export class HorizontalBlock extends CompoundBlock {
         if (childBlock) {
           draft.items[i] = childBlock
         }
-        else if (draft.items.length > 2) {
-          draft.items.splice(i, 1)
-        }
         else {
-          return draft.items[(i === 0) ? 1 : 0]
+          draft.items.splice(i, 1)
         }
       }
       return

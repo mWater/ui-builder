@@ -59,8 +59,13 @@ const blockTargetSpec = {
       return
     }
 
+    // Defer to next cycle to prevent drop error
     const dropSide = component.state.hoverSide
-    props.store.dragAndDropBlock(monitor.getItem().blockDef, props.blockDef.id, dropSide)
+    const sourceBlockDef = monitor.getItem().blockDef
+    const targetBlockId = props.blockDef.id
+    setTimeout(() => {
+      props.store.dragAndDropBlock(sourceBlockDef, targetBlockId, dropSide)
+    }, 0)
   }
 }
 

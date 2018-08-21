@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { DropdownBlock, DropdownBlockDef } from './DropdownBlock'
-import { HorizontalBlock, HorizontalBlockDef } from './HorizontalBlock';
+import { DropdownBlock, DropdownBlockDef } from './dropdownBlock'
+import { HorizontalBlock, HorizontalBlockDef } from './horizontalBlock';
 import { BlockDef, Block } from './blocks';
-import { WidgetDef } from './Widgets';
+import { WidgetDef } from './widgets';
 import WidgetDesigner from './WidgetDesigner';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
-import { VerticalBlock, VerticalBlockDef } from './VerticalBlock';
+import { VerticalBlock, VerticalBlockDef } from './verticalBlock';
 
 const basicBlockFactory = (blockDef: BlockDef): Block => {
   if (blockDef.type === "dropdown") {
@@ -53,39 +53,7 @@ export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
   
   render() {
     return (
-      <div>
-        <WidgetDesigner widgetDef={this.state.widgetDef} blockFactory={basicBlockFactory} onWidgetDefChange={this.handleWidgetDefChange} />
-      </div>
+      <WidgetDesigner widgetDef={this.state.widgetDef} blockFactory={basicBlockFactory} onWidgetDefChange={this.handleWidgetDefChange} />
     )
   }
 }
-
-// interface XProps {
-//   a: string
-// }
-
-// class X extends React.Component<XProps> {
-//   render() {
-//     return null
-//   }
-// }
-
-// class Y extends React.Component<{}> {
-//   c: X | null;
-
-//   render() {
-//     return <X a="sdfasdf" ref={ c => this.c = c }  />
-//   }
-// }
-
-// interface ZProps {
-//   xelem: React.ReactElement<X>
-// }
-
-// class Z extends React.Component<ZProps> {
-//   c: X | null;
-
-//   render() {
-//     return React.cloneElement(this.props.xelem, { ref: (c:X) => this.c = c })
-//   }
-// }

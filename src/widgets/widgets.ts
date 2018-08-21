@@ -9,3 +9,5 @@ export interface WidgetDef {
   contextVars: ContextVar[]; // Context variables that will be passed to inner block
 }
 
+export type WidgetLookup = (id: string) => WidgetDef
+

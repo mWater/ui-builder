@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps } from './blocks'
 
 export interface DropdownBlockDef extends BlockDef {
   column: string
@@ -24,17 +24,9 @@ export class DropdownBlock extends LeafBlock {
   renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
     return <DropdownBlockInstance id={this.id} ref={ref}/>
   }
-
-  renderEditor(props: RenderEditorProps) {
-    return null
-  }
-
-  getContextVarExprs(contextVarId: string) { return [] }
 }
 
 class DropdownBlockInstance extends React.Component<{ id: string }> implements BlockInstance {
-  // validate() { return [] }
-
   render() {
     return (
       <select>

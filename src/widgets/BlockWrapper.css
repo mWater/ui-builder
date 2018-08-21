@@ -1,15 +1,14 @@
 .block-wrapper {
-  border: solid 1px #EEE;
-  padding: 5px;
+  border: solid 2px transparent;
+  padding: 2px;
   margin: 2px;
   position: relative;
 }
 
 .block-wrapper:hover {
-  border: solid 1px #AAA;
+  border: solid 2px #e8e8e8;
 }
 
 .block-wrapper.selected {
   border: dashed 2px blue;
-  margin: 1px;
 }

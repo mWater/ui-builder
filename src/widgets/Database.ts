@@ -35,7 +35,6 @@ export interface Database {
   
   watchQuery(options: QueryOptions, onChange: () => void): void;
   watchQueryOne(options: QueryOneOptions, onChange: () => void): void;
-
   
   // Adds a row, returning the primary key as a promise
   addRow(table: string, updates: { [column: string]: any }): Promise<any>;

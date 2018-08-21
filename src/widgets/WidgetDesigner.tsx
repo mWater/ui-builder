@@ -1,7 +1,7 @@
 import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
-import { WidgetDef } from "./Widgets"
+import { WidgetDef } from "./widgets"
 import { BlockFactory, BlockDef, DropSide, Block, BlockStore } from "./blocks"
 import BlockPlaceholder from "./BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
@@ -54,6 +54,10 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   // Set the widget block
   handleBlockDefChange = (blockDef: BlockDef | null) => {
+    // Canonicalize
+    if (blockDef) {
+      blockDef = this.props.blockFactory(blockDef).canonicalize()
+    }
     this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 
