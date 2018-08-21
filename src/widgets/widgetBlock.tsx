@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, ContextVar } from './blocks'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter } from './blocks'
 import { LookupWidget } from './widgets';
 import Expr from './Expr';
 
