@@ -67,6 +67,7 @@ describe("renderInstance", () => {
     createBlock.mockReturnValueOnce(innerBlock)
   
     renderInstanceProps = {
+      locale: "en",
       database: {} as Database,
       contextVars: contextVars,
       getContextVarValue: (id) => id,

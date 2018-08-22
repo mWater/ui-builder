@@ -99,7 +99,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     return (
       <div className="widget-designer-palette">
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdown" }}
+          blockDef={{ id: "text", type: "text", text: { _base: "en", en: "" }, style: "p" }}
           createBlock={this.props.createBlock}
         />
         <BlockPaletteItem 
@@ -118,6 +118,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     
       // Create block store
       return block.renderDesign({
+        locale: "en",
         contextVars: this.props.widgetDef.contextVars,
         store,
         wrapDesignerElem: this.wrapDesignerElem.bind(null, store),

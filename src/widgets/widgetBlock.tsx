@@ -46,6 +46,7 @@ export class WidgetBlock extends LeafBlock {
 
       // Create props for rendering inner block
       const innerProps : RenderDesignProps = {
+        locale: props.locale,
         contextVars: widgetDef.contextVars,
         store: new NullBlockStore(),
         wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) { return elem },
@@ -72,6 +73,7 @@ export class WidgetBlock extends LeafBlock {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
       const innerProps : RenderInstanceProps = {
+        locale: props.locale,
         database: props.database,
         contextVars: widgetDef.contextVars,
         getContextVarValue: (contextVarId: string) => {

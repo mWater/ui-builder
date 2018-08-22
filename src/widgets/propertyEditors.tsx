@@ -1,6 +1,14 @@
 import * as React from "react";
 
-export class LocalizedTextPropertyEditor extends React.Component<{ obj: object, onChange: (obj: object) => void, locale: string, property: string }> {
+// Components to build property editors. These may use bootstrap 3 as needed.
+
+export class LocalizedTextPropertyEditor extends React.Component<{ 
+    obj: object, 
+    onChange: (obj: object) => void, 
+    locale: string, 
+    property: string,
+    placeholder?: string
+   }> {
   handleChange = (e: any) => {
     const locale = this.props.locale || "en"
 
@@ -20,21 +28,58 @@ export class LocalizedTextPropertyEditor extends React.Component<{ obj: object, 
     }
 
     return (
-      <input className="property-editor-text" type="text" value={str} onChange={this.handleChange}/>
+      <div className="input-group">
+        <input className="form-control" type="text" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
+        <span className="input-group-addon"><i className="fa fa-globe"/></span>
+      </div>
     )
   }
 }
 
+interface Option {
+  label: string,
+  value: any
+}
 
-// const x : VerticalBlockDef = {
-//   id: "a",
-//   type: "asdfasdf",
-//   items: []
-// }
+export class DropdownPropertyEditor extends React.Component<{ 
+    obj: object, 
+    onChange: (obj: object) => void,
+    property: string,
+    options: Option[],
+    nullLabel?: string }> {
 
-// class Temp extends React.Component<{}> {
-//   render() {
-//     const dsfs = (b: BlockDef) => { return }
-//     return <TextPropertyEditor value={x} onChange={dsfs} property="xid"/>
-//   }
-// }
+  handleChange = (ev: any) => {
+    const value = JSON.parse(ev.target.value)
+    this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
+  }
+
+  render() {
+    const value = this.props.obj[this.props.property]
+    const options = this.props.options.slice()
+    if (this.props.nullLabel) {
+      options.unshift({ value: null, label: this.props.nullLabel })
+    }
+
+    return (
+      <select
+        className="form-control"
+        value={JSON.stringify(value !== null ? value : null)}
+        onChange={this.handleChange}>
+        {options.map(option => <option key={JSON.stringify(option.value)} value={JSON.stringify(option.value)}>{option.label}</option>)}
+      </select>
+    )
+  }
+}
+
+export class LabelledProperty extends React.Component<{ label: string }> {
+  render() {
+    return (
+      <div className="form-group">
+        <label>{this.props.label}</label>
+        <div style={{ paddingLeft: 5 }}>
+          {this.props.children}
+        </div>
+      </div>
+    )
+  }
+}

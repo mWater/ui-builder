@@ -19,4 +19,6 @@
   width: 20%;
   display: inline-block;
   vertical-align: top;
+  padding: 5px;
+  border-left: solid 1px #AAA;
 }

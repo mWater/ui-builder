@@ -4,6 +4,7 @@ import { BlockDef, Block } from './blocks';
 import { VerticalBlock, VerticalBlockDef } from './verticalBlock';
 import { WidgetBlock, WidgetBlockDef } from './widgetBlock';
 import { LookupWidget } from './widgets';
+import { TextBlock, TextBlockDef } from './textBlock';
 
 export default class BlockFactory {
   lookupWidget: LookupWidget
@@ -21,6 +22,9 @@ export default class BlockFactory {
     }
     if (blockDef.type === "widget") {
       return new WidgetBlock(blockDef as WidgetBlockDef, this.createBlock, this.lookupWidget)
+    }
+    if (blockDef.type === "text") {
+      return new TextBlock(blockDef as TextBlockDef)
     }
 
 

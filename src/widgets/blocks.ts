@@ -48,6 +48,8 @@ export interface ContextVar {
 }
 
 export interface RenderInstanceProps {
+  /** locale to display (e.g. "en") */
+  locale: string,
   database: Database,
   contextVars: ContextVar[],
   getContextVarValue(contextVarId: string): any,
@@ -59,6 +61,8 @@ export interface RenderInstanceProps {
 }
 
 export interface RenderDesignProps {
+  /** locale to use (e.g. "en") */
+  locale: string,
   contextVars: ContextVar[],
   store: BlockStore,
 
@@ -71,8 +75,8 @@ export interface RenderDesignProps {
 
 export interface RenderEditorProps {
   contextVars: ContextVar[],
-  /** locale of the editor (default "en") */
-  locale: string
+  /** locale of the editor (e.g. "en") */
+  locale: string,
   onChange(blockDef: BlockDef): void,
 }
 
@@ -100,13 +104,13 @@ export abstract class Block {
 
   get id() { return this.blockDef.id; }
 
-  /** Render the block as it looks in design mode */
+  /** Render the block as it looks in design mode. This may use bootstrap */
   abstract renderDesign(props: RenderDesignProps): React.ReactElement<any>
 
-  /** Render a live instance of the block. ref will be called with the block instance */
+  /** Render a live instance of the block. ref will be called with the block instance. This may *not* use bootstrap */
   abstract renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any>
 
-  /** Render an optional property editor for the block */
+  /** Render an optional property editor for the block. This may use bootstrap */
   abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null
 
   /** Get any context variables expressions that this block or any subblocks need */

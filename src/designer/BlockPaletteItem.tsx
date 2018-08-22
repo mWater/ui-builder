@@ -25,6 +25,7 @@ export default class BlockPlaceholder extends React.Component<Props> {
     const block = this.props.createBlock(this.props.blockDef)
 
     return block.renderDesign({
+      locale: "en", // TODO hardcoded
       contextVars: [],
       store: {
         replaceBlock(blockId: string, replaceWith: BlockDef | null) { return },
