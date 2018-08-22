@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as uuid from 'uuid/v4'
 import CompoundBlock from './CompoundBlock';
-import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './blocks'
+import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from './blocks'
 
 export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]
@@ -23,6 +23,8 @@ export class HorizontalBlock extends CompoundBlock {
   }
  
   getContextVarExprs(contextVarId: string) { return [] }
+
+  getCreatedContextVars(): ContextVar[] { return [] }
 
   clone(): BlockDef {
     return produce(this.blockDef, draft => {

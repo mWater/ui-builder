@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BlockDef, DropSide, BlockStore } from "./blocks"
+import { BlockDef, DropSide, BlockStore } from "../widgets/blocks"
 import { DragSource, DropTarget, DropTargetMonitor, ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd'
 import "./BlockWrapper.css"
 import { DragDropMonitor } from "dnd-core";

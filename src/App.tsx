@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './App.css';
 
-import Demo from './widgets/Demo'
+import Demo from './Demo'
 
 class App extends React.Component {
   render() {

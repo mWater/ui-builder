@@ -12,7 +12,7 @@ export default class BlockFactory {
     this.lookupWidget = lookupWidget
   }
 
-  createBlock(blockDef: BlockDef): Block {
+  createBlock = (blockDef: BlockDef): Block => {
     if (blockDef.type === "horizontal") {
       return new HorizontalBlock(blockDef as HorizontalBlockDef, this.createBlock)
     }
@@ -23,7 +23,7 @@ export default class BlockFactory {
       return new WidgetBlock(blockDef as WidgetBlockDef, this.createBlock, this.lookupWidget)
     }
 
-    
+
     if (blockDef.type === "dropdown") {
       return new DropdownBlock(blockDef as DropdownBlockDef)
     }

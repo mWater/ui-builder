@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BlockDef, CreateBlock, DropSide } from "./blocks"
+import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
 
 interface Props {

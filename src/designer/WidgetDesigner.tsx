@@ -1,8 +1,8 @@
 import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
-import { WidgetDef } from "./widgets"
-import { CreateBlock, BlockDef, DropSide, Block, BlockStore } from "./blocks"
+import { WidgetDef } from "../widgets/widgets"
+import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar } from "../widgets/blocks"
 import BlockPlaceholder from "./BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
@@ -73,7 +73,9 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     }
   }
   
-  createBlockStore(block: Block) {
+  createBlockStore() {
+    const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+
     return {
       replaceBlock: (blockId: string, replaceWith: BlockDef | null) => {
         this.handleBlockDefChange(block.replaceBlock(blockId, replaceWith))
@@ -111,8 +113,8 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   renderBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
-      const block = this.props.createBlock(this.props.widgetDef.blockDef)
-      const store = this.createBlockStore(block)
+      const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+      const store = this.createBlockStore()
     
       // Create block store
       return block.renderDesign({
@@ -128,6 +130,42 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     }
   }
 
+  renderEditor() {
+    if (this.props.widgetDef.blockDef && this.state.selectedBlockId) {
+      // Find selected block ancestry
+      const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, this.state.selectedBlockId)
+
+      // Create properties
+      if (selectedBlockAncestry) {
+        const selectedBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
+
+        let contextVars : ContextVar[] = []
+        for (let i = 0; i < selectedBlockAncestry.length - 1 ; i++) {
+          contextVars = contextVars.concat(selectedBlockAncestry[i].getCreatedContextVars())
+        }
+
+        const props : RenderEditorProps = {
+          contextVars: contextVars,
+          locale: "en",
+          onChange: (blockDef: BlockDef) => {
+            const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+            this.handleBlockDefChange(block.replaceBlock(selectedBlock.id, blockDef))
+          }
+        }
+
+        return (
+          <div className="widget-designer-editor">
+            {selectedBlock.renderEditor(props)}
+          </div>
+        )
+      }
+    }
+
+    return (
+      <div className="widget-designer-editor"/>
+    )
+  }
+
   render() {
     return (
       <div style={{ height: "100%", padding: 20 }}>
@@ -135,7 +173,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         <div className="widget-designer-block" onClick={this.handleUnselect} onKeyDown={this.handleKeyDown} tabIndex={0}>
           {this.renderBlock()}
         </div>
-        { /* TODO RIGHT PANE */ }
+        {this.renderEditor()}
       </div>
     )
   }

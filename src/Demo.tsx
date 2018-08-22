@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { WidgetDef, LookupWidget } from './widgets';
-import WidgetDesigner from './WidgetDesigner';
+import { WidgetDef, LookupWidget } from './widgets/widgets';
+import WidgetDesigner from './designer/WidgetDesigner';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
-import BlockFactory from './BlockFactory';
+import BlockFactory from './widgets/BlockFactory';
 
 const lookupWidget : LookupWidget = () => null
 
