@@ -7,14 +7,21 @@ export class LocalizedTextPropertyEditor extends React.Component<{
     onChange: (obj: object) => void, 
     locale: string, 
     property: string,
-    placeholder?: string
+    placeholder?: string,
+    multiline?: boolean,
+    allowCR?: boolean
    }> {
+
   handleChange = (e: any) => {
     const locale = this.props.locale || "en"
+    let str = e.target.value
+    if (!this.props.allowCR) {
+      str = str.replace(/[\r\n]+/g, " ")
+    }
 
     const value = Object.assign({}, this.props.obj[this.props.property] || {})
     value._base = this.props.locale
-    value[locale] = e.target.value
+    value[locale] = str
 
     this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
   }
@@ -27,11 +34,11 @@ export class LocalizedTextPropertyEditor extends React.Component<{
       str = value[locale]
     }
 
-    return (
-      <div className="input-group">
+    return (this.props.multiline 
+      ?      
+        <textarea className="form-control" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
+      :
         <input className="form-control" type="text" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
-        <span className="input-group-addon"><i className="fa fa-globe"/></span>
-      </div>
     )
   }
 }

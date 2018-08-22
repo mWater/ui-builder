@@ -4,6 +4,8 @@ import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, Render
 import { LabelledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from './propertyEditors'
 import { LocalizedString, localize } from './localization'
 
+import { InlineExprsEditorComponent } from 'mwater-expressions-ui'
+
 export interface TextBlockDef extends BlockDef {
   /** Text content */
   text: LocalizedString,
@@ -41,8 +43,8 @@ export class TextBlock extends LeafBlock {
     //   )
     // }
     // else {
-      return props.wrapDesignerElem(this.blockDef,
-        React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem Ipsum</span>))
+    return props.wrapDesignerElem(this.blockDef,
+      React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem Ipsum</span>))
 //    }
   }
 
@@ -61,6 +63,7 @@ export class TextBlock extends LeafBlock {
             property="text"
             locale={props.locale}
             placeholder="Lorem Ipsum"
+            multiline
           />
         </LabelledProperty>
         <LabelledProperty label="Style">
