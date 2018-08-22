@@ -66,6 +66,9 @@ export interface RenderDesignProps {
   contextVars: ContextVar[],
   store: BlockStore,
 
+  /** Selected block id as some blocks may display differently when selected */
+  selectedId: string | null,
+
   // Designer element and all sub-block elements must wrapped using this function
   wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>): React.ReactElement<any>,
 

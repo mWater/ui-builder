@@ -35,6 +35,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         blockDef={blockDef} 
         selectedBlockId={this.state.selectedBlockId} 
         onSelect={this.handleSelect.bind(null, blockDef.id)} 
+        onRemove={this.handleRemoveBlock.bind(null, blockDef.id)} 
         store={store}
       >
         {elem}
@@ -63,16 +64,11 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   handleUnselect = () => { this.setState({ selectedBlockId: null }) }
 
-  handleKeyDown = (e: any) => {
-    console.log(e.keyCode)
-    if (e.keyCode === 46) {  // Delete
-      if (this.state.selectedBlockId) {
-        const block = this.props.createBlock(this.props.widgetDef.blockDef!)
-        this.handleBlockDefChange(block.replaceBlock(this.state.selectedBlockId, null))
-      }
-    }
+  handleRemoveBlock = (blockId: string) => {
+    const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+    this.handleBlockDefChange(block.replaceBlock(blockId, null))
   }
-  
+
   createBlockStore() {
     const block = this.props.createBlock(this.props.widgetDef.blockDef!)
 
@@ -118,6 +114,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     
       // Create block store
       return block.renderDesign({
+        selectedId: this.state.selectedBlockId,
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
         store,
@@ -171,7 +168,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     return (
       <div style={{ height: "100%", padding: 20 }}>
         {this.renderPalette()}
-        <div className="widget-designer-block" onClick={this.handleUnselect} onKeyDown={this.handleKeyDown} tabIndex={0}>
+        <div className="widget-designer-block" onClick={this.handleUnselect}>
           {this.renderBlock()}
         </div>
         {this.renderEditor()}

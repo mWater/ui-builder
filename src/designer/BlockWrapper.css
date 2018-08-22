@@ -12,3 +12,11 @@
 .block-wrapper.selected {
   border: dashed 1px #38D;
 }
+
+.block-wrapper .delete-block {
+  position: absolute;
+  color: #38D;
+  top: -11px;
+  right: -6px;
+  cursor: pointer;
+}

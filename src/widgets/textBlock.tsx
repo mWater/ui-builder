@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LeafBlock from './LeafBlock'
 import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from './blocks'
-import { LocalizedTextPropertyEditor, LabelledProperty, DropdownPropertyEditor } from './propertyEditors'
+import { LabelledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from './propertyEditors'
 import { LocalizedString, localize } from './localization'
 
 export interface TextBlockDef extends BlockDef {
@@ -21,13 +21,33 @@ export class TextBlock extends LeafBlock {
   renderDesign(props: RenderDesignProps) {
     const text = localize(this.blockDef.text, props.locale)
 
-    return props.wrapDesignerElem(this.blockDef,
-      React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem Ipsum</span>))
+    // if (props.selectedId === this.id) {
+    //   const handleChange = (e: any) => {
+    //     const locale = props.locale || "en"
+    //     const value = Object.assign({}, this.blockDef.text || {})
+    //     value._base = props.locale
+    //     value[locale] = e.target.value
+    //     props.store.replaceBlock(this.id, Object.assign({}, this.blockDef, { text: value }))
+    //   }
+    
+    //   return props.wrapDesignerElem(this.blockDef,
+    //     React.createElement(this.blockDef.style, {}, 
+    //       <textarea 
+    //         value={text} 
+    //         placeholder="Lorem Ipsum" 
+    //         style={{border: "none", borderColor: "transparent", width: "100%"}} 
+    //         onChange={handleChange}/>
+    //     )
+    //   )
+    // }
+    // else {
+      return props.wrapDesignerElem(this.blockDef,
+        React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem Ipsum</span>))
+//    }
   }
 
   renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
     const text = localize(this.blockDef.text, props.locale)
-
     return React.createElement(this.blockDef.style, {}, text)
   }
 

@@ -11,6 +11,7 @@
   width: 60%;
   display: inline-block;
   vertical-align: top;
+  padding: 5;
 }
 
 .widget-designer-editor {

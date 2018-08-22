@@ -14,6 +14,7 @@ interface Props {
   connectDropTarget?: ConnectDropTarget;
   connectDragPreview?: ConnectDragPreview;
   onSelect(): void;
+  onRemove(): void;
 }
 
 interface State {
@@ -175,6 +176,7 @@ export default class BlockWrapper extends React.Component<Props, State> {
       this.props.connectDragSource!(
         this.props.connectDropTarget!(
           <div onClick={this.handleClick} className={selected ? "block-wrapper selected" : "block-wrapper"}>
+            {selected ? <span className="delete-block" onClick={this.props.onRemove}><i className="fa fa-remove"/></span> : null}
             {this.renderHover()}
             {this.props.children}
           </div>

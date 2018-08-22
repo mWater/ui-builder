@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
+import { BlockDef, CreateBlock, DropSide } from "./blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
 
 interface Props {
@@ -20,13 +20,13 @@ const blockSourceSpec = {
 @DragSource("block", blockSourceSpec, (connect, monitor) => ({
   connectDragSource: connect.dragSource()
 }))
-export default class BlockPaletteItem extends React.Component<Props> {
+export default class BlockPlaceholder extends React.Component<Props> {
   renderContents() {
     const block = this.props.createBlock(this.props.blockDef)
 
     return block.renderDesign({
+      locale: "en",
       selectedId: null,
-      locale: "en", // TODO hardcoded
       contextVars: [],
       store: {
         replaceBlock(blockId: string, replaceWith: BlockDef | null) { return },
