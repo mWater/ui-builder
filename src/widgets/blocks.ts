@@ -67,9 +67,6 @@ export interface RenderDesignProps {
 
   // All sub-block elements must wrapped using this function
   wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>): React.ReactElement<any>,
-
-  // Render a placeholder that can be dropped on
-  renderPlaceholder(parentBlockId: string, parentBlockSection: string): React.ReactElement<any>
 }
 
 export interface RenderEditorProps {
@@ -110,10 +107,10 @@ export abstract class Block {
   abstract renderInstance(props: RenderInstanceProps, ref?: (blockInstance: BlockInstance | null) => void): React.ReactElement<any>
 
   /** Render an optional property editor for the block. This may use bootstrap */
-  abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null
+  renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }
 
-  /** Get any context variables expressions that this block or any subblocks need */
-  abstract getContextVarExprs(contextVarId: string): Expr[] 
+  /** Get any context variables expressions that this block needs (not including subblocks) */
+  getContextVarExprs(contextVarId: string): Expr[] { return [] }
 
   /** Get child blocks */
   abstract getChildBlockDefs(): BlockDef[]
@@ -139,15 +136,12 @@ export abstract class Block {
   abstract getInitialFilters(contextVarId: string): Promise<Filter[]>;
   
   /** Get context variables which are created by this block and available to its children */
-  abstract getCreatedContextVars(): ContextVar[]
+  getCreatedContextVars(): ContextVar[] { return [] }
 
   /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children */
   canonicalize(): BlockDef | null {
     return this.blockDef
   }
-
-  /** Add a block to a parent block. parentBlockSection is block-specific */
-  abstract addBlock(addedBlockDef: BlockDef, parentBlockId: string | null, parentBlockSection: any): BlockDef
 }
 
 // Handles logic of a simple dropping of a block on another

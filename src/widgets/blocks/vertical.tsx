@@ -21,10 +21,6 @@ export class VerticalBlock extends CompoundBlock {
     return this.blockDef.items
   }
  
-  getContextVarExprs(contextVarId: string) { return [] }
-
-  getCreatedContextVars(): ContextVar[] { return [] }
-
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     // Apply action to all children, discarding null ones
     return produce(this.blockDef, draft => {
@@ -55,14 +51,6 @@ export class VerticalBlock extends CompoundBlock {
     })
   }
 
-  addBlock(addedBlockDef: BlockDef, parentBlockId: string | null, parentBlockSection: any): BlockDef {
-    return produce(this.blockDef as BlockDef, draft => {
-      for (let i = draft.items.length - 1; i >= 0 ; i--) {
-        draft.items[i] = this.createBlock(draft.items[i]).addBlock(addedBlockDef, parentBlockId, parentBlockSection)
-      }
-    })
-  }
-
   renderChildDesign(props: RenderDesignProps, childBlockDef: BlockDef) {
     const childBlock = this.createBlock(childBlockDef)
 
@@ -83,9 +71,5 @@ export class VerticalBlock extends CompoundBlock {
 
   renderInstance(props: RenderInstanceProps) {
     return <div/>
-  }
-  
-  renderEditor(props: RenderEditorProps) {
-    return null
   }
 }

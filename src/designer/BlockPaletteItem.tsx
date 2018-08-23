@@ -39,9 +39,6 @@ export default class BlockPaletteItem extends React.Component<Props> {
       wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) {
         return elem
       },
-      renderPlaceholder(parentBlockId: string, parentBlockSection: string) {
-        return <div className="block-placeholder"/>
-      }
     })
   }
 

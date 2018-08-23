@@ -21,10 +21,6 @@ export class HorizontalBlock extends CompoundBlock {
     return this.blockDef.items
   }
  
-  getContextVarExprs(contextVarId: string) { return [] }
-
-  getCreatedContextVars(): ContextVar[] { return [] }
-
   canonicalize(): BlockDef | null {
     // Remove if zero items
     if (this.blockDef.items.length === 0) {
@@ -54,14 +50,6 @@ export class HorizontalBlock extends CompoundBlock {
     })
   }
 
-  addBlock(addedBlockDef: BlockDef, parentBlockId: string | null, parentBlockSection: any): BlockDef {
-    return produce(this.blockDef as BlockDef, draft => {
-      for (let i = draft.items.length - 1; i >= 0 ; i--) {
-        draft.items[i] = this.createBlock(draft.items[i]).addBlock(addedBlockDef, parentBlockId, parentBlockSection)
-      }
-    })
-  }
-
   renderChildDesign(props: RenderDesignProps, childBlockDef: BlockDef) {
     const childBlock = this.createBlock(childBlockDef)
 
@@ -82,9 +70,5 @@ export class HorizontalBlock extends CompoundBlock {
 
   renderInstance(props: RenderInstanceProps) {
     return <div/>
-  }
-  
-  renderEditor(props: RenderEditorProps) {
-    return null
   }
 }

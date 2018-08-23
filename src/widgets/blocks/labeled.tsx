@@ -25,22 +25,10 @@ export class LabeledBlock extends CompoundBlock {
     return this.blockDef.child ? [this.blockDef.child] : []
   }
  
-  getContextVarExprs(contextVarId: string) { return [] }
-
-  getCreatedContextVars(): ContextVar[] { return [] }
-
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {
       if (draft.child) {
         draft.child = action(draft.child)
-      }
-    })
-  }
-
-  addBlock(addedBlockDef: BlockDef, parentBlockId: string | null, parentBlockSection: any): BlockDef {
-    return produce(this.blockDef, draft => {
-      if (parentBlockId === this.id) {
-        draft.child = addedBlockDef
       }
     })
   }

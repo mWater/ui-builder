@@ -46,16 +46,6 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     )
   }
 
-  handlePlaceholderSet = (parentBlockId: string, parentBlockSection: string, blockDef: BlockDef) => {
-    const block = this.props.createBlock(this.props.widgetDef.blockDef!)
-    this.handleBlockDefChange(block.addBlock(blockDef, parentBlockId, parentBlockSection))
-  }
-
-  // Render a placeholder for blocks that can be dropped on
-  renderPlaceholder = (parentBlockId: string, parentBlockSection: string) => {
-    return <BlockPlaceholder onSet={this.handlePlaceholderSet.bind(null, parentBlockId, parentBlockSection)} />
-  }
-
   // Set the widget block
   handleBlockDefChange = (blockDef: BlockDef | null) => {
     // Canonicalize
@@ -121,6 +111,11 @@ export default class WidgetDesigner extends React.Component<Props, State> {
           schema={this.props.schema}
         />
         <BlockPaletteItem 
+          blockDef={{ id: "x", type: "collapsible", label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" }, content: null }}
+          createBlock={this.props.createBlock}
+          schema={this.props.schema}
+        />
+        <BlockPaletteItem 
           blockDef={{ id: "x", type: "textInput", column: "Partner Name" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
@@ -152,8 +147,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
         store,
-        wrapDesignerElem: this.wrapDesignerElem.bind(null, store),
-        renderPlaceholder: this.renderPlaceholder
+        wrapDesignerElem: this.wrapDesignerElem.bind(null, store)
       }))
     }
     else {

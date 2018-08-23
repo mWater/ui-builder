@@ -52,7 +52,6 @@ export class WidgetBlock extends LeafBlock {
         contextVars: widgetDef.contextVars,
         store: new NullBlockStore(),
         wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) { return elem },
-        renderPlaceholder(parentBlockId: string, parentBlockSection: string) { return <div/> }
       }
   
       return props.wrapDesignerElem(this.blockDef,
