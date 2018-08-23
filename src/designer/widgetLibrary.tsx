@@ -32,7 +32,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     }
   }
 
-  handleTabChange(widgetId: string, widgetDef: WidgetDef) {
+  handleTabChange = (widgetId: string, widgetDef: WidgetDef) => {
     this.props.onWidgetLibraryChange(produce(this.props.widgetLibrary, (draft) => {
       draft.widgets[widgetId] = widgetDef
     }))

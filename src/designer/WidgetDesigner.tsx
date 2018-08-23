@@ -121,7 +121,17 @@ export default class WidgetDesigner extends React.Component<Props, State> {
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdown" }}
+          blockDef={{ id: "x", type: "textInput", column: "Partner Name" }}
+          createBlock={this.props.createBlock}
+          schema={this.props.schema}
+        />
+        <BlockPaletteItem 
+          blockDef={{ id: "x", type: "dropdownInput", column: "Partner Type" }}
+          createBlock={this.props.createBlock}
+          schema={this.props.schema}
+        />
+        <BlockPaletteItem 
+          blockDef={{ id: "x", type: "dropdownInput", column: "Partner Status" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />

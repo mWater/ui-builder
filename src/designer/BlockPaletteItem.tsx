@@ -47,7 +47,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
 
   render() {
     return (
-      <div style={{padding: 5, position: "relative", backgroundColor: "white", borderRadius: 4, border: "solid 1px #888", margin: 5 }}>
+      <div style={{padding: 5, position: "relative", backgroundColor: "white", border: "solid 1px #AAA", margin: 5 }}>
         {this.renderContents()}
         {this.props.connectDragSource!(<div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}/>)}
       </div>

@@ -1,11 +1,12 @@
-import { DropdownBlock, DropdownBlockDef } from './blocks/dropdownBlock'
-import { HorizontalBlock, HorizontalBlockDef } from './blocks/horizontalBlock';
+import { HorizontalBlock, HorizontalBlockDef } from './blocks/horizontal';
 import { BlockDef, Block } from './blocks';
-import { VerticalBlock, VerticalBlockDef } from './blocks/verticalBlock';
+import { VerticalBlock, VerticalBlockDef } from './blocks/vertical';
 import { WidgetBlock, WidgetBlockDef } from './widgetBlock';
 import { LookupWidget } from './widgets';
-import { TextBlock, TextBlockDef } from './blocks/textBlock';
-import { LabeledBlock, LabeledBlockDef } from './blocks/labeledBlock';
+import { TextBlock, TextBlockDef } from './blocks/text';
+import { LabeledBlock, LabeledBlockDef } from './blocks/labeled';
+import { TextInputBlock, TextInputBlockDef } from './blocks/textInput';
+import { DropdownInputBlock, DropdownInputBlockDef } from './blocks/dropdownInput';
 
 export default class BlockFactory {
   createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block => {
@@ -19,10 +20,12 @@ export default class BlockFactory {
         return new WidgetBlock(blockDef as WidgetBlockDef, internalCreateBlock, lookupWidget)
       case "text":
         return new TextBlock(blockDef as TextBlockDef)
-      case "dropdown":
-        return new DropdownBlock(blockDef as DropdownBlockDef)
       case "labeled":
         return new LabeledBlock(blockDef as LabeledBlockDef, internalCreateBlock)
+      case "textInput":
+        return new TextInputBlock(blockDef as TextInputBlockDef)
+      case "dropdownInput":
+        return new DropdownInputBlock(blockDef as DropdownInputBlockDef)
     }
     throw new Error("Type not found")
   }

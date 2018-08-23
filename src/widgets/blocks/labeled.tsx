@@ -58,7 +58,7 @@ export class LabeledBlock extends CompoundBlock {
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         <div style={{fontWeight: "bold"}}>
-          { labelText ? labelText : <span className="text-muted">Lorem ipsum</span>}
+          { labelText ? labelText : <span className="text-muted">Label</span>}
         </div>
         { this.blockDef.child 
           ? 

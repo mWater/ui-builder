@@ -21,43 +21,10 @@ const simpleWidgetDef: WidgetDef = {
         "type": "text",
         "text": {
           "_base": "en",
-          "en": "This is a test"
+          "en": "Partner Page"
         },
         "style": "h1"
       },
-      {
-        "id": "76ecb1c1-b9a8-4760-a7b6-40dae77b3c24",
-        "type": "text",
-        "text": {
-          "_base": "en",
-          "en": "First section"
-        },
-        "style": "h3"
-      },
-      {
-        "id": "62dc6a7d-9630-485f-8675-8477410a5047",
-        "items": [
-          {
-            "id": "ec78e543-bef7-4f49-8581-7649e383c667",
-            "type": "text",
-            "text": {
-              "_base": "en",
-              "en": "I wonder why I wonder..."
-            },
-            "style": "p"
-          },
-          {
-            "id": "ffdaa670-5e26-4e7f-90c1-038612511166",
-            "type": "text",
-            "text": {
-              "_base": "en",
-              "en": "Would this solve it?"
-            },
-            "style": "p"
-          }
-        ],
-        "type": "horizontal"
-      }
     ],
     "type": "vertical"
   },

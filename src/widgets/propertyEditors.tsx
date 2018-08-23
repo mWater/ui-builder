@@ -43,6 +43,36 @@ export class LocalizedTextPropertyEditor extends React.Component<{
   }
 }
 
+export class TextPropertyEditor extends React.Component<{ 
+  obj: object, 
+  onChange: (obj: object) => void, 
+  property: string,
+  placeholder?: string,
+  multiline?: boolean,
+  allowCR?: boolean
+ }> {
+
+handleChange = (e: any) => {
+  let str = e.target.value
+  if (!this.props.allowCR) {
+    str = str.replace(/[\r\n]+/g, " ")
+  }
+
+  this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: str }))
+}
+
+render() {
+  const value = this.props.obj[this.props.property] || ""
+
+  return (this.props.multiline 
+    ?      
+      <textarea className="form-control" value={value} onChange={this.handleChange} placeholder={this.props.placeholder} />
+    :
+      <input className="form-control" type="text" value={value} onChange={this.handleChange} placeholder={this.props.placeholder} />
+  )
+}
+}
+
 interface Option {
   label: string,
   value: any
