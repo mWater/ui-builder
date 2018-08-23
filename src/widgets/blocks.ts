@@ -1,8 +1,7 @@
 import * as React from 'react'
 import * as uuid from 'uuid/v4'
 import { Database } from './Database'
-import Expr from './Expr'
-import { Schema } from 'mwater-expressions'
+import { Schema, Expr } from 'mwater-expressions'
 
 export enum DropSide {
   top = "Top",
