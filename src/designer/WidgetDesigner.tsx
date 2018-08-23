@@ -18,7 +18,8 @@ interface Props {
 interface State {
   selectedBlockId: string | null
 }
-  
+
+/** Design mode for a single widget */
 export default class WidgetDesigner extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -132,10 +133,10 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
       const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+      // Create block store
       const store = this.createBlockStore()
     
-      // Create block store
-      return block.renderDesign({
+      return this.wrapDesignerElem(store, block.blockDef, block.renderDesign({
         schema: this.props.schema,
         selectedId: this.state.selectedBlockId,
         locale: "en",
@@ -143,7 +144,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         store,
         wrapDesignerElem: this.wrapDesignerElem.bind(null, store),
         renderPlaceholder: this.renderPlaceholder
-      })
+      }))
     }
     else {
       // Create placeholder

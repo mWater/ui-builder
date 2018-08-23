@@ -9,10 +9,16 @@ interface Props {
   blockDef: BlockDef;
   selectedBlockId: string | null;
   store: BlockStore;
+
+  /** Injected by react-dnd */
   isOver?: boolean;
+  /** Injected by react-dnd */
   connectDragSource?: ConnectDragSource;
+  /** Injected by react-dnd */
   connectDropTarget?: ConnectDropTarget;
+  /** Injected by react-dnd */
   connectDragPreview?: ConnectDragPreview;
+
   onSelect(): void;
   onRemove(): void;
 }
@@ -71,7 +77,6 @@ const blockTargetSpec = {
   }
 }
 
-
 // Gets the drop side (top, left, right, bottom)
 function getDropSide(monitor: DropTargetMonitor, component: any) {
   // Get underlying component
@@ -109,7 +114,7 @@ function getDropSide(monitor: DropTargetMonitor, component: any) {
   }
 }
 
-
+/** Wraps a block in a draggable control with an x to remove */
 @DragSource("block", blockSourceSpec, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()

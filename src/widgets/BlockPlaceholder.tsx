@@ -18,7 +18,12 @@ const blockTargetSpec = {
       return
     }
 
-    props.onSet(monitor.getItem().blockDef)
+    // Defer to next cycle to prevent drop error
+    const sourceBlockDef = monitor.getItem().blockDef
+
+    setTimeout(() => {
+      props.onSet(sourceBlockDef)
+    }, 0)
   }
 }
 

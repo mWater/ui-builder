@@ -41,8 +41,7 @@ export class TextBlock extends LeafBlock {
     //   )
     // }
     // else {
-    return props.wrapDesignerElem(this.blockDef,
-      React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem ipsum</span>))
+    return React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem ipsum</span>)
 //    }
   }
 

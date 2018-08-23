@@ -55,14 +55,14 @@ export class LabeledBlock extends CompoundBlock {
 
     const labelText = localize(this.blockDef.label, props.locale)
 
-    return props.wrapDesignerElem(this.blockDef,
+    return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         <div style={{fontWeight: "bold"}}>
           { labelText ? labelText : <span className="text-muted">Lorem ipsum</span>}
         </div>
         { this.blockDef.child 
           ? 
-            this.createBlock(this.blockDef.child).renderDesign(props) 
+            props.wrapDesignerElem(this.blockDef.child, this.createBlock(this.blockDef.child).renderDesign(props))
           : 
             <BlockPlaceholder onSet={handleAdd} /> }
       </div>

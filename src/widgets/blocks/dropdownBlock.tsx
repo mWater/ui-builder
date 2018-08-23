@@ -15,7 +15,7 @@ export class DropdownBlock extends LeafBlock {
   }
 
   renderDesign(props: RenderDesignProps) {
-    return props.wrapDesignerElem(this.blockDef,
+    return (
       <select>
         <option value="a">A {this.id}</option>
       </select>

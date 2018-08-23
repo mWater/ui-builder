@@ -68,13 +68,13 @@ export class VerticalBlock extends CompoundBlock {
 
     return (
       <div key={childBlockDef.id}>
-        { childBlock.renderDesign(props) }
+        { props.wrapDesignerElem(childBlockDef, childBlock.renderDesign(props)) }
       </div>
     )
   }
 
   renderDesign(props: RenderDesignProps) {
-    return props.wrapDesignerElem(this.blockDef,
+    return (
       <div style={{ paddingLeft: 5, paddingRight: 5 }}>
         { this.blockDef.items.map(childBlock => this.renderChildDesign(props, childBlock)) }
       </div>

@@ -67,13 +67,13 @@ export class HorizontalBlock extends CompoundBlock {
 
     return (
       <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%", verticalAlign: "top" }}>
-        { childBlock.renderDesign(props) }
+        { props.wrapDesignerElem(childBlockDef, childBlock.renderDesign(props)) }
       </div>
     )
   }
 
   renderDesign(props: RenderDesignProps) {
-    return props.wrapDesignerElem(this.blockDef,
+    return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         { this.blockDef.items.map(childBlock => this.renderChildDesign(props, childBlock)) }
       </div>
