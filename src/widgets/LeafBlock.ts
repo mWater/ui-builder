@@ -20,7 +20,7 @@ export default abstract class LeafBlock extends Block {
   canonicalize() { return this.blockDef }
 
   addBlock(): BlockDef {
-    throw new Error("Cannot add to leaf block")
+    return this.blockDef
   }
 
   replaceBlock(blockId: string, replacementBlockDef: BlockDef | null) {

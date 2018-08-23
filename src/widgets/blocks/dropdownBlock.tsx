@@ -1,7 +1,7 @@
 import * as React from 'react';
-import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from './blocks'
-import { LocalizedTextPropertyEditor } from './propertyEditors';
+import LeafBlock from '../LeafBlock'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
+import { LocalizedTextPropertyEditor } from '../propertyEditors';
 
 export interface DropdownBlockDef extends BlockDef {
   column: string

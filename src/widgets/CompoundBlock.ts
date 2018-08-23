@@ -1,6 +1,6 @@
 import { Block, BlockDef, CreateBlock, Filter } from './blocks';
 
-/* Block which contains other blocks in an array called items */
+/* Block which contains other blocks */
 export default abstract class CompoundBlock extends Block {
   createBlock: CreateBlock
 

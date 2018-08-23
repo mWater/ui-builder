@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BlockDef } from "../widgets/blocks"
+import { BlockDef } from "./blocks"
 import { DropTarget, DropTargetMonitor, ConnectDropTarget } from 'react-dnd'
 import "./BlockPlaceholder.css"
 

@@ -78,7 +78,7 @@ export class DropdownPropertyEditor extends React.Component<{
   }
 }
 
-export class LabelledProperty extends React.Component<{ label: string }> {
+export class LabeledProperty extends React.Component<{ label: string }> {
   render() {
     return (
       <div className="form-group">

@@ -3,7 +3,7 @@ import BlockWrapper from "./BlockWrapper"
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
 import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar } from "../widgets/blocks"
-import BlockPlaceholder from "./BlockPlaceholder"
+import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
 import { Schema } from "mwater-expressions";
@@ -98,6 +98,11 @@ export default class WidgetDesigner extends React.Component<Props, State> {
       <div className="widget-designer-palette">
         <BlockPaletteItem 
           blockDef={{ id: "text", type: "text", text: { _base: "en", en: "" }, style: "p" }}
+          createBlock={this.props.createBlock}
+          schema={this.props.schema}
+        />
+        <BlockPaletteItem 
+          blockDef={{ id: "labeled", type: "labeled", label: { _base: "en", en: "" }, child: null }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />

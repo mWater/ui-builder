@@ -1,8 +1,8 @@
 import * as React from 'react';
-import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from './blocks'
-import { LabelledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from './propertyEditors'
-import { LocalizedString, localize } from './localization'
+import LeafBlock from '../LeafBlock'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
+import { LabeledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors'
+import { LocalizedString, localize } from '../localization'
 
 export interface TextBlockDef extends BlockDef {
   /** Text content */
@@ -54,7 +54,7 @@ export class TextBlock extends LeafBlock {
   renderEditor(props: RenderEditorProps) {
     return (
       <div>
-        <LabelledProperty label="Text">
+        <LabeledProperty label="Text">
           <LocalizedTextPropertyEditor 
             obj={this.blockDef}
             onChange={props.onChange}
@@ -63,8 +63,8 @@ export class TextBlock extends LeafBlock {
             placeholder="Lorem Ipsum"
             multiline
           />
-        </LabelledProperty>
-        <LabelledProperty label="Style">
+        </LabeledProperty>
+        <LabeledProperty label="Style">
           <DropdownPropertyEditor 
             obj={this.blockDef}
             onChange={props.onChange}
@@ -78,7 +78,7 @@ export class TextBlock extends LeafBlock {
               { value: "h4", label: "Heading 4"}
             ]}
           />
-        </LabelledProperty>
+        </LabeledProperty>
       </div>
     )
   }

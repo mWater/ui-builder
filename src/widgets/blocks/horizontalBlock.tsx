@@ -1,18 +1,18 @@
 import produce from 'immer'
 import * as React from 'react';
 import * as uuid from 'uuid/v4'
-import CompoundBlock from './CompoundBlock';
-import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from './blocks'
+import CompoundBlock from '../CompoundBlock';
+import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
 
-export interface VerticalBlockDef extends BlockDef {
+export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]
 }
 
-export class VerticalBlock extends CompoundBlock {
-  blockDef: VerticalBlockDef
+export class HorizontalBlock extends CompoundBlock {
+  blockDef: HorizontalBlockDef
   createBlock: CreateBlock
 
-  constructor(blockDef: VerticalBlockDef, createBlock: CreateBlock) {
+  constructor(blockDef: HorizontalBlockDef, createBlock: CreateBlock) {
     super(blockDef, createBlock)
   }
 
@@ -65,7 +65,7 @@ export class VerticalBlock extends CompoundBlock {
     }
 
     return produce(this.blockDef as BlockDef, d => {
-      const draft = d as VerticalBlockDef
+      const draft = d as HorizontalBlockDef
 
       for (let i = draft.items.length - 1; i >= 0 ; i--) {
         const childBlock = this.createBlock(draft.items[i]).replaceBlock(blockId, replacementBlockDef)
@@ -81,7 +81,11 @@ export class VerticalBlock extends CompoundBlock {
   }
 
   addBlock(addedBlockDef: BlockDef, parentBlockId: string | null, parentBlockSection: any): BlockDef {
-    throw new Error("Not applicable");
+    return produce(this.blockDef as BlockDef, draft => {
+      for (let i = draft.items.length - 1; i >= 0 ; i--) {
+        draft.items[i] = this.createBlock(draft.items[i]).addBlock(addedBlockDef, parentBlockId, parentBlockSection)
+      }
+    })
   }
 
   dropBlock(droppedBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide): BlockDef {
@@ -92,12 +96,12 @@ export class VerticalBlock extends CompoundBlock {
 
     return produce(this.blockDef, draft => {
       for (let i = 0; i < draft.items.length; i++) {
-        // Insert if dropped top or bottom
-        if ((dropSide === DropSide.top) && (draft.items[i].id === targetBlockId)) {
+        // Insert if dropped left or right
+        if ((dropSide === DropSide.left) && (draft.items[i].id === targetBlockId)) {
           draft.items.splice(i, 0, droppedBlockDef)
           return
         }
-        else if ((dropSide === DropSide.bottom) && (draft.items[i].id === targetBlockId)) {
+        else if ((dropSide === DropSide.right) && (draft.items[i].id === targetBlockId)) {
           draft.items.splice(i + 1, 0, droppedBlockDef)
           return
         }
@@ -108,11 +112,11 @@ export class VerticalBlock extends CompoundBlock {
     })
   }
 
-  renderChildDesigner(props: RenderDesignProps, childBlockDef: BlockDef) {
+  renderChildDesign(props: RenderDesignProps, childBlockDef: BlockDef) {
     const childBlock = this.createBlock(childBlockDef)
 
     return (
-      <div key={childBlockDef.id}>
+      <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%", verticalAlign: "top" }}>
         { childBlock.renderDesign(props) }
       </div>
     )
@@ -120,10 +124,10 @@ export class VerticalBlock extends CompoundBlock {
 
   renderDesign(props: RenderDesignProps) {
     return props.wrapDesignerElem(this.blockDef,
-      <div style={{ paddingLeft: 5, paddingRight: 5 }}>
-        { this.blockDef.items.map(childBlock => this.renderChildDesigner(props, childBlock)) }
+      <div style={{ paddingTop: 5, paddingBottom: 5 }}>
+        { this.blockDef.items.map(childBlock => this.renderChildDesign(props, childBlock)) }
       </div>
-    )      
+    )
   }
 
   renderInstance(props: RenderInstanceProps) {

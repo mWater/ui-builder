@@ -97,7 +97,7 @@ export interface ValidationError {
 }
 
 export interface BlockInstance extends React.Component {
-  validate?(): ValidationError[]
+  validate?(): ValidationError[] // TODO needed??
 }
 
 export abstract class Block {
@@ -113,7 +113,7 @@ export abstract class Block {
   abstract renderDesign(props: RenderDesignProps): React.ReactElement<any>
 
   /** Render a live instance of the block. ref will be called with the block instance. This may *not* use bootstrap */
-  abstract renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any>
+  abstract renderInstance(props: RenderInstanceProps, ref?: (blockInstance: BlockInstance | null) => void): React.ReactElement<any>
 
   /** Render an optional property editor for the block. This may use bootstrap */
   abstract renderEditor(props: RenderEditorProps): React.ReactElement<any> | null
