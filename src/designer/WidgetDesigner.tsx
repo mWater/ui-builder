@@ -63,6 +63,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         return this.props.createBlock(b).canonicalize()
       })
     }
+    console.log(JSON.stringify({ ...this.props.widgetDef, blockDef }, null, 2))
     this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 
@@ -84,7 +85,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         if (removeBlockId === this.props.widgetDef.blockDef!.id) {
           return
         }
-        
+
         // Remove source block
         if (removeBlockId) {
           newBlockDef = block.process(this.props.createBlock, (b: BlockDef) => (b.id === removeBlockId) ? null : b)
@@ -92,6 +93,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         else {
           newBlockDef = block.blockDef
         }
+
         // If nothing left
         if (!newBlockDef) {
           this.handleBlockDefChange(null)

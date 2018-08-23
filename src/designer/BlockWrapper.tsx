@@ -66,7 +66,7 @@ const blockTargetSpec = {
     const targetBlockDef = props.blockDef
 
     setTimeout(() => {
-      props.store.alterBlock(targetBlockDef.id, (b) => dropBlock(sourceBlockDef, targetBlockDef, dropSide), sourceBlockDef.id)
+      props.store.alterBlock(targetBlockDef.id, (b) => dropBlock(sourceBlockDef, b, dropSide), sourceBlockDef.id)
     }, 0)
   }
 }
