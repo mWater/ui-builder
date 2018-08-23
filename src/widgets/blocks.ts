@@ -12,8 +12,7 @@ export enum DropSide {
 }
 
 export interface BlockStore {
-  alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null): void,
-  dragAndDropBlock(sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide): void
+  alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string): void
 }
 
 // Store which throws on any operation

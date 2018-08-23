@@ -77,31 +77,28 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     const block = this.props.createBlock(this.props.widgetDef.blockDef!)
 
     return {
-      alterBlock: (blockId: string, action: (blockDef: BlockDef) => BlockDef | null) => {
-        this.handleBlockDefChange(block.process(this.props.createBlock, (b: BlockDef) => (b.id === blockId) ? action(b) : b))
-      },
-      dragAndDropBlock: (sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide) => {
-        // Remove source block
-        let newBlockDef = block.process(this.props.createBlock, (b: BlockDef) => (b.id === sourceBlockDef.id) ? null : b)
+      alterBlock: (blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string) => {
+        let newBlockDef
 
-        // If no block, just use source block
-        if (!newBlockDef) {
-          this.handleBlockDefChange(sourceBlockDef)
+        // Do not allow self-removal in drag
+        if (removeBlockId === this.props.widgetDef.blockDef!.id) {
+          return
+        }
+        
+        // Remove source block
+        if (removeBlockId) {
+          newBlockDef = block.process(this.props.createBlock, (b: BlockDef) => (b.id === removeBlockId) ? null : b)
         }
         else {
-          // Perform action to replace target block with drop results
-          const action = (b: BlockDef) => {
-            // Only replace if matches target id
-            if (b.id === targetBlockId) {
-              return dropBlock(sourceBlockDef, b, dropSide)
-            }
-            return b
-          }
-          
-          newBlockDef = this.props.createBlock(newBlockDef).process(this.props.createBlock, action)
+          newBlockDef = block.blockDef
+        }
+        // If nothing left
+        if (!newBlockDef) {
+          this.handleBlockDefChange(null)
+          return
         }
 
-        // Drop block
+        newBlockDef = this.props.createBlock(newBlockDef).process(this.props.createBlock, (b: BlockDef) => (b.id === blockId) ? action(b) : b)
         this.handleBlockDefChange(newBlockDef)
       }
     }

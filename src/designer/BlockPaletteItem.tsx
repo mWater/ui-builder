@@ -34,8 +34,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
       locale: "en", // TODO hardcoded
       contextVars: [],
       store: {
-        alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null) { return },
-        dragAndDropBlock(sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide) { return }
+        alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null) { return }
       },
       wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) {
         return elem

@@ -26,6 +26,7 @@ export class VerticalBlock extends CompoundBlock {
   getCreatedContextVars(): ContextVar[] { return [] }
 
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+    // Apply action to all children, discarding null ones
     return produce(this.blockDef, draft => {
       const newItems: BlockDef[] = []
       for (const item of draft.items) {
@@ -47,7 +48,11 @@ export class VerticalBlock extends CompoundBlock {
     if (this.blockDef.items.length === 1) {
       return this.blockDef.items[0]
     }
-    return this.blockDef
+
+    // Flatten out nested vertical blocks
+    return produce(this.blockDef, (draft) => {
+      draft.items = draft.items.map(item => item.type === "vertical" ? item.items : item).reduce((a, b) => a.concat(b), [])
+    })
   }
 
   addBlock(addedBlockDef: BlockDef, parentBlockId: string | null, parentBlockSection: any): BlockDef {

@@ -34,10 +34,14 @@ export class HorizontalBlock extends CompoundBlock {
     if (this.blockDef.items.length === 1) {
       return this.blockDef.items[0]
     }
-    return this.blockDef
+    // Flatten out nested horizontal blocks
+    return produce(this.blockDef, (draft) => {
+      draft.items = draft.items.map(item => item.type === "horizontal" ? item.items : item).reduce((a, b) => a.concat(b), [])
+    })
   }
 
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+    // Apply action to all children, discarding null ones
     return produce(this.blockDef, draft => {
       const newItems: BlockDef[] = []
       for (const item of draft.items) {

@@ -47,7 +47,10 @@ export class LabeledBlock extends CompoundBlock {
 
   renderDesign(props: RenderDesignProps) {
     const handleAdd = (addedBlockDef: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: LabeledBlockDef) => b.child = addedBlockDef))
+      props.store.alterBlock(this.id, produce((b: LabeledBlockDef) => { 
+        b.child = addedBlockDef 
+        return b
+      }), addedBlockDef.id)
     }
 
     const labelText = localize(this.blockDef.label, props.locale)

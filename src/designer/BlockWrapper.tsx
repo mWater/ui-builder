@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BlockDef, DropSide, BlockStore } from "../widgets/blocks"
+import { BlockDef, DropSide, BlockStore, dropBlock } from "../widgets/blocks"
 import { DragSource, DropTarget, DropTargetMonitor, ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd'
 import "./BlockWrapper.css"
 import { DragDropMonitor } from "dnd-core";
@@ -63,9 +63,10 @@ const blockTargetSpec = {
     // Defer to next cycle to prevent drop error
     const dropSide = component.state.hoverSide
     const sourceBlockDef = monitor.getItem().blockDef
-    const targetBlockId = props.blockDef.id
+    const targetBlockDef = props.blockDef
+
     setTimeout(() => {
-      props.store.dragAndDropBlock(sourceBlockDef, targetBlockId, dropSide)
+      props.store.alterBlock(targetBlockDef.id, (b) => dropBlock(sourceBlockDef, targetBlockDef, dropSide), sourceBlockDef.id)
     }, 0)
   }
 }
