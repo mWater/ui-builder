@@ -1,8 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
-import * as uuid from 'uuid/v4'
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
+import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
 
 export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]
@@ -26,16 +25,6 @@ export class HorizontalBlock extends CompoundBlock {
 
   getCreatedContextVars(): ContextVar[] { return [] }
 
-  clone(): BlockDef {
-    return produce(this.blockDef, draft => {
-      draft.id = uuid()
-
-      for (let i = 0; i< draft.items.length; i++) {
-        draft.items[i] = this.createBlock(draft.items[i]).clone()
-      }
-    })
-  }
-
   canonicalize(): BlockDef | null {
     // Remove if zero items
     if (this.blockDef.items.length === 0) {
@@ -45,38 +34,19 @@ export class HorizontalBlock extends CompoundBlock {
     if (this.blockDef.items.length === 1) {
       return this.blockDef.items[0]
     }
+    return this.blockDef
+  }
 
-    // Canonicalize items
+  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {
-      const newItems = [] as BlockDef[];
+      const newItems: BlockDef[] = []
       for (const item of draft.items) {
-        const canonItem = this.createBlock(item).canonicalize() 
-        if (canonItem) {
-          newItems.push(canonItem)
+        const newItem = action(item)
+        if (newItem) {
+          newItems.push(newItem)
         }
       }
       draft.items = newItems
-    })
-  }
-
-  replaceBlock(blockId: string, replacementBlockDef: BlockDef | null): BlockDef | null {
-    if (blockId === this.id) {
-      return replacementBlockDef
-    }
-
-    return produce(this.blockDef as BlockDef, d => {
-      const draft = d as HorizontalBlockDef
-
-      for (let i = draft.items.length - 1; i >= 0 ; i--) {
-        const childBlock = this.createBlock(draft.items[i]).replaceBlock(blockId, replacementBlockDef)
-        if (childBlock) {
-          draft.items[i] = childBlock
-        }
-        else {
-          draft.items.splice(i, 1)
-        }
-      }
-      return
     })
   }
 
@@ -84,30 +54,6 @@ export class HorizontalBlock extends CompoundBlock {
     return produce(this.blockDef as BlockDef, draft => {
       for (let i = draft.items.length - 1; i >= 0 ; i--) {
         draft.items[i] = this.createBlock(draft.items[i]).addBlock(addedBlockDef, parentBlockId, parentBlockSection)
-      }
-    })
-  }
-
-  dropBlock(droppedBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide): BlockDef {
-    // If self
-    if (targetBlockId === this.id) {
-      return dropBlock(droppedBlockDef, this.blockDef, dropSide)
-    }
-
-    return produce(this.blockDef, draft => {
-      for (let i = 0; i < draft.items.length; i++) {
-        // Insert if dropped left or right
-        if ((dropSide === DropSide.left) && (draft.items[i].id === targetBlockId)) {
-          draft.items.splice(i, 0, droppedBlockDef)
-          return
-        }
-        else if ((dropSide === DropSide.right) && (draft.items[i].id === targetBlockId)) {
-          draft.items.splice(i + 1, 0, droppedBlockDef)
-          return
-        }
-        else {
-          draft.items[i] = this.createBlock(draft.items[i]).dropBlock(droppedBlockDef, targetBlockId, dropSide)
-        }
       }
     })
   }

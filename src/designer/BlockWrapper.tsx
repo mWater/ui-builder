@@ -136,7 +136,6 @@ export default class BlockWrapper extends React.Component<Props, State> {
     if (this.props.isOver) {
       switch (this.state.hoverSide) {
         case DropSide.left:
-          console.log("LEFT")
           lineStyle.borderLeft = "solid 3px #38D"
           lineStyle.top = 0
           lineStyle.bottom = 0

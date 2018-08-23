@@ -1,4 +1,3 @@
-import * as uuid from 'uuid/v4'
 import { DropSide, dropBlock, Filter, Block, BlockDef, RenderEditorProps, ContextVar } from './blocks';
 
 // Block which doesn't contain any other blocks
@@ -7,30 +6,15 @@ export default abstract class LeafBlock extends Block {
 
   async getInitialFilters(contextVarId: string): Promise<Filter[]> { return [] }
 
-  clone() { 
-    return Object.assign({}, this.blockDef, { id: uuid() }) 
-  }
-
   renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }
 
   getCreatedContextVars(): ContextVar[] { return [] }
 
+  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef { return this.blockDef }
+
   getContextVarExprs(contextVarId: string) { return [] }
 
-  canonicalize() { return this.blockDef }
-
   addBlock(): BlockDef {
-    return this.blockDef
-  }
-
-  replaceBlock(blockId: string, replacementBlockDef: BlockDef | null) {
-    return (blockId === this.id) ? replacementBlockDef : this.blockDef
-  }
-
-  dropBlock(droppedBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide): BlockDef {
-    if (targetBlockId === this.id) {
-      return dropBlock(droppedBlockDef, this.blockDef, dropSide)
-    }
     return this.blockDef
   }
 }

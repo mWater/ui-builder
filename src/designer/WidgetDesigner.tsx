@@ -2,7 +2,7 @@ import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar } from "../widgets/blocks"
+import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar, dropBlock } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
@@ -59,7 +59,9 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   handleBlockDefChange = (blockDef: BlockDef | null) => {
     // Canonicalize
     if (blockDef) {
-      blockDef = this.props.createBlock(blockDef).canonicalize()
+      blockDef = this.props.createBlock(blockDef).process(this.props.createBlock, (b: BlockDef) => {
+        return this.props.createBlock(b).canonicalize()
+      })
     }
     this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
@@ -68,26 +70,38 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   handleRemoveBlock = (blockId: string) => {
     const block = this.props.createBlock(this.props.widgetDef.blockDef!)
-    this.handleBlockDefChange(block.replaceBlock(blockId, null))
+    this.handleBlockDefChange(block.process(this.props.createBlock, (b: BlockDef) => (b.id === blockId) ? null : b))
   }
 
   createBlockStore() {
     const block = this.props.createBlock(this.props.widgetDef.blockDef!)
 
     return {
-      replaceBlock: (blockId: string, replaceWith: BlockDef | null) => {
-        this.handleBlockDefChange(block.replaceBlock(blockId, replaceWith))
-      },
-      addBlock: (blockDef: BlockDef, parentBlockId: string | null, parentBlockSection: string) => {
-        this.handleBlockDefChange(block.addBlock(blockDef, parentBlockId, parentBlockSection))
+      alterBlock: (blockId: string, action: (blockDef: BlockDef) => BlockDef | null) => {
+        this.handleBlockDefChange(block.process(this.props.createBlock, (b: BlockDef) => (b.id === blockId) ? action(b) : b))
       },
       dragAndDropBlock: (sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide) => {
         // Remove source block
-        let newBlockDef = block.replaceBlock(sourceBlockDef.id, null)
+        let newBlockDef = block.process(this.props.createBlock, (b: BlockDef) => (b.id === sourceBlockDef.id) ? null : b)
 
-        // Drop block (if no block, just use new block)
-        newBlockDef = newBlockDef ? this.props.createBlock(newBlockDef).dropBlock(sourceBlockDef, targetBlockId, dropSide) : newBlockDef
+        // If no block, just use source block
+        if (!newBlockDef) {
+          this.handleBlockDefChange(sourceBlockDef)
+        }
+        else {
+          // Perform action to replace target block with drop results
+          const action = (b: BlockDef) => {
+            // Only replace if matches target id
+            if (b.id === targetBlockId) {
+              return dropBlock(sourceBlockDef, b, dropSide)
+            }
+            return b
+          }
+          
+          newBlockDef = this.props.createBlock(newBlockDef).process(this.props.createBlock, action)
+        }
 
+        // Drop block
         this.handleBlockDefChange(newBlockDef)
       }
     }
@@ -140,6 +154,8 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   renderEditor() {
     if (this.props.widgetDef.blockDef && this.state.selectedBlockId) {
+      const store = this.createBlockStore()
+
       // Find selected block ancestry
       const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, this.state.selectedBlockId)
 
@@ -156,8 +172,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
           contextVars: contextVars,
           locale: "en",
           onChange: (blockDef: BlockDef) => {
-            const block = this.props.createBlock(this.props.widgetDef.blockDef!)
-            this.handleBlockDefChange(block.replaceBlock(selectedBlock.id, blockDef))
+            store.alterBlock(blockDef.id, () => blockDef)
           }
         }
 

@@ -1,8 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
-import * as uuid from 'uuid/v4'
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, dropBlock, DropSide, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
+import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
 import { LocalizedString, localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor } from '../propertyEditors';
 import BlockPlaceholder from '../BlockPlaceholder';
@@ -30,33 +29,10 @@ export class LabeledBlock extends CompoundBlock {
 
   getCreatedContextVars(): ContextVar[] { return [] }
 
-  clone(): BlockDef {
-    return produce(this.blockDef, draft => {
-      draft.id = uuid()
-      
-      if (draft.child) {
-        draft.child = this.createBlock(draft.child).clone()
-      }
-    })
-  }
-
-  canonicalize(): BlockDef | null {
-    // Canonicalize child
+  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {
       if (draft.child) {
-        draft.child = this.createBlock(draft.child).canonicalize() 
-      }
-    })
-  }
-
-  replaceBlock(blockId: string, replacementBlockDef: BlockDef | null): BlockDef | null {
-    if (blockId === this.id) {
-      return replacementBlockDef
-    }
-
-    return produce(this.blockDef, draft => {
-      if (draft.child) {
-        draft.child = this.createBlock(draft.child).replaceBlock(blockId, replacementBlockDef) 
+        draft.child = action(draft.child)
       }
     })
   }
@@ -69,22 +45,9 @@ export class LabeledBlock extends CompoundBlock {
     })
   }
 
-  dropBlock(droppedBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide): BlockDef {
-    // If self
-    if (targetBlockId === this.id) {
-      return dropBlock(droppedBlockDef, this.blockDef, dropSide)
-    }
-
-    return produce(this.blockDef, draft => {
-      if (draft.child) {
-        draft.child = this.dropBlock(droppedBlockDef, targetBlockId, dropSide) 
-      }
-    })
-  }
-
   renderDesign(props: RenderDesignProps) {
     const handleAdd = (addedBlockDef: BlockDef) => {
-      props.store.addBlock(addedBlockDef, this.id, "child")
+      props.store.alterBlock(this.id, produce((b: LabeledBlockDef) => b.child = addedBlockDef))
     }
 
     const labelText = localize(this.blockDef.label, props.locale)

@@ -2,6 +2,7 @@ import * as React from "react";
 import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
 import { Schema } from "mwater-expressions";
+import * as uuid from 'uuid/v4'
 
 interface Props {
   blockDef: BlockDef
@@ -12,9 +13,10 @@ interface Props {
 
 const blockSourceSpec = {
   beginDrag(props: Props) {
+    // Create deep clone
     const block = props.createBlock(props.blockDef)
     return {
-      blockDef: block.clone()
+      blockDef: block.process(props.createBlock, (b) => Object.assign({}, b, { id: uuid() }))
     }
   }
 }
@@ -32,8 +34,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
       locale: "en", // TODO hardcoded
       contextVars: [],
       store: {
-        replaceBlock(blockId: string, replaceWith: BlockDef | null) { return },
-        addBlock(blockDef: BlockDef, parentBlockId: string | null, parentBlockSection: string) { return },
+        alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null) { return },
         dragAndDropBlock(sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide) { return }
       },
       wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) {
