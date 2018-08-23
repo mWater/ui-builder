@@ -5,14 +5,13 @@ import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
 import BlockFactory from './widgets/BlockFactory';
 import { Schema } from 'mwater-expressions';
+import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
 
-const lookupWidget : LookupWidget = () => null
+const basicBlockFactory = new BlockFactory()
 
-const basicBlockFactory = new BlockFactory(lookupWidget)
-
-const initialWidgetDef: WidgetDef = {
+const simpleWidgetDef: WidgetDef = {
   "id": "1234",
-  "name": "Test",
+  "name": "Partner",
   "description": "Test",
   "blockDef": {
     "id": "71e7e315-fb7a-4309-a13e-9c1e72d94dd4",
@@ -65,29 +64,37 @@ const initialWidgetDef: WidgetDef = {
   "contextVars": []
 }
 
+const initialWidgetLibrary : WidgetLibrary = {
+  widgets: {
+    "1234": simpleWidgetDef
+  }
+}
+
 const schema = new Schema()
 
 @DragDropContext(HTML5Backend)
-export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
+export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary}> {
   constructor(props: object) {
     super(props)
 
     this.state = {
-      widgetDef: initialWidgetDef
+      widgetLibrary: initialWidgetLibrary
     }
   }
 
-  handleWidgetDefChange = (widgetDef: WidgetDef) => {
-    this.setState({ widgetDef })
+  handleWidgetLibraryChange = (widgetLibrary: WidgetLibrary) => {
+    this.setState({ widgetLibrary })
   }
   
   render() {
     return (
-      <WidgetDesigner 
-        widgetDef={this.state.widgetDef} 
-        createBlock={basicBlockFactory.createBlock} 
-        schema={schema}
-        onWidgetDefChange={this.handleWidgetDefChange} />
+      <div style={{ padding: 5, height: "100%" }}>
+        <WidgetLibraryDesigner
+          widgetLibrary={this.state.widgetLibrary} 
+          blockFactory={basicBlockFactory} 
+          schema={schema}
+          onWidgetLibraryChange={this.handleWidgetLibraryChange} />
+      </div>
     )
   }
 }

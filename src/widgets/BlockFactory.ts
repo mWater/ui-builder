@@ -8,26 +8,21 @@ import { TextBlock, TextBlockDef } from './blocks/textBlock';
 import { LabeledBlock, LabeledBlockDef } from './blocks/labeledBlock';
 
 export default class BlockFactory {
-  lookupWidget: LookupWidget
-
-  constructor(lookupWidget: LookupWidget) {
-    this.lookupWidget = lookupWidget
-  }
-
-  createBlock = (blockDef: BlockDef): Block => {
+  createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block => {
+    const internalCreateBlock = this.createBlock.bind(null, lookupWidget)
     switch (blockDef.type) {
       case "horizontal":
-        return new HorizontalBlock(blockDef as HorizontalBlockDef, this.createBlock)
+        return new HorizontalBlock(blockDef as HorizontalBlockDef, internalCreateBlock)
       case "vertical":
-        return new VerticalBlock(blockDef as VerticalBlockDef, this.createBlock)
+        return new VerticalBlock(blockDef as VerticalBlockDef, internalCreateBlock)
       case "widget":
-        return new WidgetBlock(blockDef as WidgetBlockDef, this.createBlock, this.lookupWidget)
+        return new WidgetBlock(blockDef as WidgetBlockDef, internalCreateBlock, lookupWidget)
       case "text":
         return new TextBlock(blockDef as TextBlockDef)
       case "dropdown":
         return new DropdownBlock(blockDef as DropdownBlockDef)
       case "labeled":
-        return new LabeledBlock(blockDef as LabeledBlockDef, this.createBlock)
+        return new LabeledBlock(blockDef as LabeledBlockDef, internalCreateBlock)
     }
     throw new Error("Type not found")
   }

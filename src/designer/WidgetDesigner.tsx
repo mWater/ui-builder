@@ -191,7 +191,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   render() {
     return (
-      <div style={{ height: "100%", padding: 20 }}>
+      <div style={{ height: "100%" }}>
         {this.renderPalette()}
         <div className="widget-designer-block" onClick={this.handleUnselect}>
           {this.renderBlock()}

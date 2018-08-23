@@ -12,7 +12,7 @@ test("drops left", () => {
 
 
 test("findBlockAncestry", () => {
-  const createBlock = new BlockFactory(jest.fn()).createBlock
+  const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
 
   // Create simple tree
   const blockDef = {

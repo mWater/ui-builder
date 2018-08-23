@@ -1,4 +1,4 @@
-import Expr from './Expr'
+import { Expr } from 'mwater-expressions'
 
 export enum OrderDir {
   asc = "asc",
