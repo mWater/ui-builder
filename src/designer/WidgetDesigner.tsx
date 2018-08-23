@@ -110,7 +110,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     return (
       <div className="widget-designer-palette">
         <BlockPaletteItem 
-          blockDef={{ id: "text", type: "text", text: { _base: "en", en: "" }, style: "p" }}
+          blockDef={{ id: "text", type: "text", text: { _base: "en", en: "" }, style: "div" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />

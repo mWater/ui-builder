@@ -34,7 +34,7 @@ export class TextBlock extends LeafBlock {
     //     React.createElement(this.blockDef.style, {}, 
     //       <textarea 
     //         value={text} 
-    //         placeholder="Lorem Ipsum" 
+    //         placeholder="Lorem ipsum" 
     //         style={{border: "none", borderColor: "transparent", width: "100%"}} 
     //         onChange={handleChange}/>
     //     )
@@ -42,7 +42,7 @@ export class TextBlock extends LeafBlock {
     // }
     // else {
     return props.wrapDesignerElem(this.blockDef,
-      React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem Ipsum</span>))
+      React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Lorem ipsum</span>))
 //    }
   }
 
@@ -60,7 +60,7 @@ export class TextBlock extends LeafBlock {
             onChange={props.onChange}
             property="text"
             locale={props.locale}
-            placeholder="Lorem Ipsum"
+            placeholder="Lorem ipsum"
             multiline
           />
         </LabeledProperty>
@@ -70,8 +70,8 @@ export class TextBlock extends LeafBlock {
             onChange={props.onChange}
             property="style"
             options={[
+              { value: "div", label: "Plain Text"},
               { value: "p", label: "Paragraph"},
-              { value: "div", label: "Paragraph (no margin)"},
               { value: "h1", label: "Heading 1"},
               { value: "h2", label: "Heading 2"},
               { value: "h3", label: "Heading 3"},

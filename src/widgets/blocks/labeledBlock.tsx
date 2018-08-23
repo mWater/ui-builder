@@ -58,7 +58,7 @@ export class LabeledBlock extends CompoundBlock {
     return props.wrapDesignerElem(this.blockDef,
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         <div style={{fontWeight: "bold"}}>
-          { labelText ? labelText : <span className="text-muted">Lorem Ipsum</span>}
+          { labelText ? labelText : <span className="text-muted">Lorem ipsum</span>}
         </div>
         { this.blockDef.child 
           ? 
@@ -89,7 +89,7 @@ export class LabeledBlock extends CompoundBlock {
             onChange={props.onChange}
             property="label"
             locale={props.locale}
-            placeholder="Lorem Ipsum"
+            placeholder="Lorem ipsum"
             multiline
           />
         </LabeledProperty>
