@@ -4,6 +4,7 @@ import WidgetDesigner from './designer/WidgetDesigner';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
 import BlockFactory from './widgets/BlockFactory';
+import { Schema } from 'mwater-expressions';
 
 const lookupWidget : LookupWidget = () => null
 
@@ -64,6 +65,8 @@ const initialWidgetDef: WidgetDef = {
   "contextVars": []
 }
 
+const schema = new Schema()
+
 @DragDropContext(HTML5Backend)
 export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
   constructor(props: object) {
@@ -80,7 +83,11 @@ export default class Demo extends React.Component<{}, { widgetDef: WidgetDef}> {
   
   render() {
     return (
-      <WidgetDesigner widgetDef={this.state.widgetDef} createBlock={basicBlockFactory.createBlock} onWidgetDefChange={this.handleWidgetDefChange} />
+      <WidgetDesigner 
+        widgetDef={this.state.widgetDef} 
+        createBlock={basicBlockFactory.createBlock} 
+        schema={schema}
+        onWidgetDefChange={this.handleWidgetDefChange} />
     )
   }
 }

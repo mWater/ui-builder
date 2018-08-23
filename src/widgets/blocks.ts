@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as uuid from 'uuid/v4'
 import { Database } from './Database'
 import Expr from './Expr'
+import { Schema } from 'mwater-expressions'
 
 export enum DropSide {
   top = "Top",
@@ -65,6 +66,7 @@ export interface RenderDesignProps {
   locale: string,
   contextVars: ContextVar[],
   store: BlockStore,
+  schema: Schema,
 
   /** Selected block id as some blocks may display differently when selected */
   selectedId: string | null,

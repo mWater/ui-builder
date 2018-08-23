@@ -1,11 +1,13 @@
 import * as React from "react";
 import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
+import { Schema } from "mwater-expressions";
 
 interface Props {
-  blockDef: BlockDef;
-  createBlock: CreateBlock;
-  connectDragSource?: ConnectDragSource;
+  blockDef: BlockDef
+  createBlock: CreateBlock
+  schema: Schema
+  connectDragSource?: ConnectDragSource
 }
 
 const blockSourceSpec = {
@@ -26,6 +28,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
 
     return block.renderDesign({
       selectedId: null,
+      schema: this.props.schema,
       locale: "en", // TODO hardcoded
       contextVars: [],
       store: {

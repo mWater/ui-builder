@@ -1,11 +1,13 @@
 import * as React from "react";
 import { BlockDef, CreateBlock, DropSide } from "./blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
+import { Schema } from "mwater-expressions";
 
 interface Props {
   blockDef: BlockDef;
   createBlock: CreateBlock;
   connectDragSource?: ConnectDragSource;
+  schema: Schema
 }
 
 const blockSourceSpec = {
@@ -27,6 +29,7 @@ export default class BlockPlaceholder extends React.Component<Props> {
     return block.renderDesign({
       locale: "en",
       selectedId: null,
+      schema: this.props.schema,
       contextVars: [],
       store: {
         replaceBlock(blockId: string, replaceWith: BlockDef | null) { return },

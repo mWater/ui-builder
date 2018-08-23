@@ -13,7 +13,7 @@
     "react-dnd-html5-backend": "^5.0.1",
     "react-dom": "^16.4.1",
     "react-library": "github:mWater/react-library",
-    "react-scripts-ts": "2.16.0",
+    "react-scripts-ts": "^2.17.0",
     "uuid": "^3.3.2"
   },
   "scripts": {

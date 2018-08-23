@@ -4,8 +4,6 @@ import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, Render
 import { LabelledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from './propertyEditors'
 import { LocalizedString, localize } from './localization'
 
-import { InlineExprsEditorComponent } from 'mwater-expressions-ui'
-
 export interface TextBlockDef extends BlockDef {
   /** Text content */
   text: LocalizedString,

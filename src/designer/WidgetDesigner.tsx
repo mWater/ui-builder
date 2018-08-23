@@ -6,10 +6,12 @@ import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderE
 import BlockPlaceholder from "./BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
+import { Schema } from "mwater-expressions";
 
 interface Props {
   widgetDef: WidgetDef
   createBlock: CreateBlock
+  schema: Schema
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
@@ -97,10 +99,12 @@ export default class WidgetDesigner extends React.Component<Props, State> {
         <BlockPaletteItem 
           blockDef={{ id: "text", type: "text", text: { _base: "en", en: "" }, style: "p" }}
           createBlock={this.props.createBlock}
+          schema={this.props.schema}
         />
         <BlockPaletteItem 
           blockDef={{ id: "x", type: "dropdown" }}
           createBlock={this.props.createBlock}
+          schema={this.props.schema}
         />
       </div>
     )
@@ -114,6 +118,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     
       // Create block store
       return block.renderDesign({
+        schema: this.props.schema,
         selectedId: this.state.selectedBlockId,
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
