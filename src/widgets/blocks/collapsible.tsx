@@ -67,7 +67,7 @@ export class CollapsibleBlock extends CompoundBlock {
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <Collapsible label={labelNode}>
+        <Collapsible label={labelNode} forceOpen>
           {contentNode}
         </Collapsible>
       </div>
@@ -93,6 +93,7 @@ export class CollapsibleBlock extends CompoundBlock {
 
 interface Props {
   label: React.ReactNode
+  forceOpen?: boolean
 }
 
 class Collapsible extends React.Component<Props, { collapsed: boolean }> {
@@ -105,7 +106,9 @@ class Collapsible extends React.Component<Props, { collapsed: boolean }> {
   }
 
   handleToggle = () => {
-    this.setState({ collapsed: !this.state.collapsed })
+    if (!this.props.forceOpen) {
+      this.setState({ collapsed: !this.state.collapsed })
+    }
   }
 
   render() {

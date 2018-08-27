@@ -27,7 +27,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
   constructor(props: Props) {
     super(props)
     this.state = {
-      openTabs: ["1234"],
+      openTabs: ["1234", "1235"],
       activeTabIndex: 0
     }
   }
