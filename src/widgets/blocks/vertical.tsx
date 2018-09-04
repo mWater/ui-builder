@@ -69,6 +69,10 @@ export class VerticalBlock extends CompoundBlock {
   }
 
   renderInstance(props: RenderInstanceProps) {
-    return <div/>
+    return (
+      <div style={{ paddingLeft: 5, paddingRight: 5 }}>
+        { this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef)) }
+      </div>
+    )      
   }
 }

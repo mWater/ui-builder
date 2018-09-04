@@ -45,3 +45,18 @@ export interface Database {
   
   removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
 }
+
+export class MockDatabase implements Database {
+  async query(options: QueryOptions) { return [] }
+  
+  /** Adds a listener which is called with each change to the database */
+  addChangeListener(changeListener: ChangeListener) { return }
+  removeChangeListener(changeListener: ChangeListener) { return }
+
+  /** Adds a row, returning the primary key as a promise */
+  async addRow(table: string, updates: { [column: string]: any }) { return null }
+
+  async updateRow(table: string, primaryKey: any, updates: { [column: string]: any }) { return }
+  
+  async removeRow(table: string, primaryKey: any, updates: { [column: string]: any }) { return }
+}

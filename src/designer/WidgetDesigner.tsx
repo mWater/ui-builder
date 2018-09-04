@@ -2,11 +2,14 @@ import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar, dropBlock, RenderDesignProps } from "../widgets/blocks"
+import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar, dropBlock, RenderDesignProps, RenderInstanceProps, Filter } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
-import { Schema } from "mwater-expressions";
+import { Schema, Expr } from "mwater-expressions";
+import BlockPalette from "./BlockPalette";
+import { Toggle } from 'react-library/lib/bootstrap'
+import { MockDatabase } from "../widgets/Database";
 
 interface Props {
   widgetDef: WidgetDef
@@ -15,7 +18,10 @@ interface Props {
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
+enum Mode { Design, Preview }
+
 interface State {
+  mode: Mode
   selectedBlockId: string | null
 }
 
@@ -24,6 +30,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
+      mode: Mode.Design,
       selectedBlockId: null
     }
   }
@@ -84,71 +91,10 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   }
 
   renderPalette() {
-    return (
-      <div className="widget-designer-palette">
-        <BlockPaletteItem 
-          blockDef={{ id: "text", type: "text", text: { _base: "en", en: "" }, style: "div" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "labeled", type: "labeled", label: { _base: "en", en: "" }, child: null }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "collapsible", label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" }, content: null }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "textInput", column: "Name" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "expression", expr: "Name" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdownInput", column: "Type" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "expression", expr: "Type" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdownInput", column: "Status" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ id: "x", type: "expression", expr: "Status" }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-        <BlockPaletteItem 
-          blockDef={{ 
-            id: "x", 
-            type: "queryTable", 
-            headers: [
-              { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },
-              { id: "h2", type: "text", text: { _base: "en", en: "Header 2" }, style: "div" }
-            ], 
-            contents: [null, null] 
-          }}
-          createBlock={this.props.createBlock}
-          schema={this.props.schema}
-        />
-      </div>
-    )
+    return <BlockPalette createBlock={this.props.createBlock} schema={this.props.schema} />
   }
 
-  renderBlock() {
+  renderDesignBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
       const block = this.props.createBlock(this.props.widgetDef.blockDef)
@@ -201,7 +147,7 @@ export default class WidgetDesigner extends React.Component<Props, State> {
       // Find selected block ancestry
       const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, this.state.selectedBlockId)
 
-      // Create properties
+      // Create props
       if (selectedBlockAncestry) {
         const selectedBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
 
@@ -231,16 +177,81 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     )
   }
 
+  handleSetMode = (mode: Mode) => { 
+    this.setState({mode})
+  }
+
+  renderDesign() {
+    return [
+      this.renderPalette(),
+      (
+        <div className="widget-designer-block" onClick={this.handleUnselect}>
+          {this.renderDesignBlock()}
+        </div>
+      ),
+      this.renderEditor()
+    ]
+  }
+
+  renderPreview() {
+    if (!this.props.widgetDef.blockDef) {
+      return null 
+    }
+    const block = this.props.createBlock(this.props.widgetDef.blockDef)
+
+    const props: RenderInstanceProps = {
+      locale: "en",
+      database: new MockDatabase(),
+      contextVars: this.props.widgetDef.contextVars,
+      getContextVarValue(contextVarId: string) { return null },
+      getContextVarExprValue(contextVarId: string, expr: Expr) { return null },
+      onSelectContextVar(contextVarId: string, primaryKey: any) { return },
+      setFilter(contextVarId: string, filter: Filter) { return },
+      getFilters(contextVarId: string) { return [] },
+      renderChildBlock: (childProps: RenderInstanceProps, childBlockDef: BlockDef | null) => {
+        if (!childBlockDef) {
+          return <div/>
+        }
+        
+        const childBlock = this.props.createBlock(childBlockDef)
+        return childBlock.renderInstance(childProps)
+      }
+    }
+    
+    return [
+      (<div className="widget-designer-palette"/>),
+      (<div className="widget-designer-preview">
+        {block.renderInstance(props)}
+      </div>),
+      (<div className="widget-designer-editor"/>)
+    ]
+  }
+
   render() {
     return (
       <div style={{ height: "100%" }}>
-        {this.renderPalette()}
-        <div className="widget-designer-block" onClick={this.handleUnselect}>
-          {this.renderBlock()}
+        <div className="widget-designer-header">
+          <div style={{float: "right"}}>
+            <Toggle 
+              value={this.state.mode}
+              options={[{ value: Mode.Design, label: "Design" }, { value: Mode.Preview, label: "Preview" }]}
+              onChange={this.handleSetMode}
+              size="sm"
+              />
+          </div>
         </div>
-        {this.renderEditor()}
+        { this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview() }
       </div>
     )
   }
 }
 
+// class ModeToggle extends React.Component<{ mode: Mode, onChange: (mode: Mode) => void}> {
+//   render() {
+//     <div className="btn-group btn-group-sm">
+//       <button className={ this.props.mode === Mode.Design ? "btn btn-primary" : "btn btn-primary"
+//     </div>
+//     _.map @props.options, @renderOption
+
+//   }
+// }

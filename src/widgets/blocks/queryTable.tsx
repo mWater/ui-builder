@@ -94,6 +94,7 @@ export class QueryTableBlock extends CompoundBlock {
       }))
     }
 
+    // Remove last column
     const handleRemoveColumn = () => {
       props.onChange(produce(this.blockDef, b => {
         if (b.headers.length > 1) {
@@ -115,4 +116,3 @@ export class QueryTableBlock extends CompoundBlock {
     )
   }
 }
-
