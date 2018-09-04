@@ -132,7 +132,15 @@ export default class WidgetDesigner extends React.Component<Props, State> {
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "queryTable", headers: [null], contents: [null] }}
+          blockDef={{ 
+            id: "x", 
+            type: "queryTable", 
+            headers: [
+              { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },
+              { id: "h2", type: "text", text: { _base: "en", en: "Header 2" }, style: "div" }
+            ], 
+            contents: [null, null] 
+          }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />

@@ -126,8 +126,8 @@ export class WidgetBlock extends LeafBlock {
             return props.getFilters(outerContextVarId)
           }
           return []
-        }
-
+        },
+        renderChildBlock: props.renderChildBlock
       }
   
       return innerBlock.renderInstance(innerProps, ref)

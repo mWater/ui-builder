@@ -57,6 +57,9 @@ export interface RenderInstanceProps {
 
   /** Get any filters set on a rowset context variable  */
   getFilters(contextVarId: string): Filter[];
+
+  /** All sub-block elements must rendered using this function. onSet will be called only when transitioning from null to a value */
+  renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null): React.ReactElement<any>
 }
 
 export interface RenderDesignProps {

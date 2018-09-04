@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
+import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, BlockStore } from '../blocks'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { compact } from 'lodash-es'
 
@@ -35,29 +35,39 @@ export class QueryTableBlock extends CompoundBlock {
   }
 
   renderDesign(props: RenderDesignProps) {
-    // // Allow dropping
-    // const handleSetLabel = (blockDef: BlockDef) => {
-    //   props.store.alterBlock(this.id, produce((b: QueryTableBlockDef) => { 
-    //     b.label = blockDef 
-    //     return b
-    //   }), blockDef.id)
-    // }
+    const setHeader = (index: number, blockDef: BlockDef) => {
+      props.store.alterBlock(this.id, produce(b => {
+        b!.headers[index] = blockDef
+      }))
+    }
 
-    // const handleSetContent = (blockDef: BlockDef) => {
-    //   props.store.alterBlock(this.id, produce((b: QueryTableBlockDef) => { 
-    //     b.content = blockDef 
-    //     return b
-    //   }), blockDef.id)
-    // }
+    const setContent = (index: number, blockDef: BlockDef) => {
+      props.store.alterBlock(this.id, produce(b => {
+        b!.contents[index] = blockDef
+      }))
+    }
 
-    // const labelNode = this.blockDef.label ?
-    //   props.wrapDesignerElem(this.blockDef.label, this.createBlock(this.blockDef.label).renderDesign(props))
-    //   : <BlockPlaceholder onSet={handleSetLabel} />
+    return (
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            { this.blockDef.headers.map((b, index) => {
+              return <th key={index}>{props.renderChildBlock(props, b, setHeader.bind(null, index))}</th>
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            { this.blockDef.contents.map((b, index) => {
+              return <td key={index}>{props.renderChildBlock(props, b, setContent.bind(null, index))}</td>
+            })}
+          </tr>
+        </tbody>
+      </table>
+    )
+  }
 
-    // const contentNode = this.blockDef.content ?
-    //   props.wrapDesignerElem(this.blockDef.content, this.createBlock(this.blockDef.content).renderDesign(props))
-    //   : <BlockPlaceholder onSet={handleSetContent} />
-
+  renderInstance(props: RenderInstanceProps) {
     return (
       <table className="table table-bordered">
         <thead>
@@ -76,28 +86,32 @@ export class QueryTableBlock extends CompoundBlock {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
-    // const labelNode = this.blockDef.label ?
-    //   this.createBlock(this.blockDef.label).renderInstance(props) : null
+  renderEditor(props: RenderEditorProps) {
+    const handleAddColumn = () => {
+      props.onChange(produce(this.blockDef, b => {
+        b.headers.push(null)
+        b.contents.push(null)
+      }))
+    }
 
-    // const contentNode = this.blockDef.content ?
-    //   this.createBlock(this.blockDef.content).renderInstance(props) : null
+    const handleRemoveColumn = () => {
+      props.onChange(produce(this.blockDef, b => {
+        if (b.headers.length > 1) {
+          b.headers.splice(b.headers.length - 1, 1)
+          b.contents.splice(b.contents.length - 1, 1)
+        }
+      }))
+    }
 
     return (
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Header 1</th>
-            <th>Header 2</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Cell 1</td>
-            <td>Cell 2</td>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <button type="button" className="btn btn-default" onClick={handleAddColumn}>
+          <i className="fa fa-plus"/> Add Column
+        </button>
+        <button type="button" className="btn btn-default" onClick={handleRemoveColumn}>
+          <i className="fa fa-minus"/> Remove Column
+        </button>
+      </div>
     )
   }
 }
