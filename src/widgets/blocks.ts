@@ -45,7 +45,6 @@ export interface RenderInstanceProps {
   database: Database,
   contextVars: ContextVar[],
 
-  // TODO how to indicate when changed?? 
   /** Gets the value of a context variable */
   getContextVarValue(contextVarId: string): any,
 
@@ -57,12 +56,8 @@ export interface RenderInstanceProps {
   /** Set a filter on a rowset context variable */
   setFilter(contextVarId: string, filter: Filter): void;
 
-  // TODO how to know when changed? Does each block using a rowset need to get filters and combine with rowset value? Or does rowset value automatically 
-  // include filters?
-  /** Get any filters set on a rowset context variable */
+  /** Get any filters set on a rowset context variable  */
   getFilters(contextVarId: string): Filter[];
-  
-  getFilteredRowsetValue(contextVarId: string): Expr;
 }
 
 export interface RenderDesignProps {

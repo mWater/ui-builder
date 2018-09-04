@@ -9,9 +9,9 @@ import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
 
 const basicBlockFactory = new BlockFactory()
 
-const partnerWidgetDef: WidgetDef = {
+const waterPointsWidgetDef: WidgetDef = {
   "id": "1234",
-  "name": "Partner",
+  "name": "Water Points",
   "description": "Test",
   "blockDef": {
     "id": "71e7e315-fb7a-4309-a13e-9c1e72d94dd4",
@@ -21,7 +21,7 @@ const partnerWidgetDef: WidgetDef = {
         "type": "text",
         "text": {
           "_base": "en",
-          "en": "Partner Page"
+          "en": "Water Points"
         },
         "style": "h1"
       },
@@ -31,9 +31,9 @@ const partnerWidgetDef: WidgetDef = {
   "contextVars": []
 }
 
-const interventionWidgetDef: WidgetDef = {
+const waterPointWidgetDef: WidgetDef = {
   "id": "1235",
-  "name": "Intervention",
+  "name": "Water Point",
   "description": "Test",
   "blockDef": {
     "id": "71e7e315-fb7a-4309-a13e-9c1e72d94dd4",
@@ -43,7 +43,7 @@ const interventionWidgetDef: WidgetDef = {
         "type": "text",
         "text": {
           "_base": "en",
-          "en": "Intervention Page"
+          "en": "Water Point Page"
         },
         "style": "h1"
       },
@@ -55,8 +55,8 @@ const interventionWidgetDef: WidgetDef = {
 
 const initialWidgetLibrary : WidgetLibrary = {
   widgets: {
-    "1234": partnerWidgetDef,
-    "1235": interventionWidgetDef
+    "1234": waterPointsWidgetDef,
+    "1235": waterPointWidgetDef
   }
 }
 

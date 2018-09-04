@@ -73,7 +73,8 @@ describe("renderInstance", () => {
       getContextVarValue: (id) => id,
       getContextVarExprValue: (id) => id,
       onSelectContextVar: jest.fn(),
-      setFilter: jest.fn()
+      setFilter: jest.fn(),
+      getFilters: jest.fn()
     }
     widgetBlock.renderInstance(renderInstanceProps, () => { return })
 

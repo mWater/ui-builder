@@ -111,6 +111,15 @@ export class WidgetBlock extends LeafBlock {
             props.setFilter(outerContextVarId, filter)
           }
         },
+        getFilters: (contextVarId: string) => {
+          // Lookup outer id
+          const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
+          if (outerContextVarId) {
+            return props.getFilters(outerContextVarId)
+          }
+          return []
+        }
+
       }
   
       return innerBlock.renderInstance(innerProps, ref)

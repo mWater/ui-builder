@@ -116,32 +116,32 @@ export default class WidgetDesigner extends React.Component<Props, State> {
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "textInput", column: "Partner Name" }}
+          blockDef={{ id: "x", type: "textInput", column: "Name" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "expression", expr: "Partner Name" }}
+          blockDef={{ id: "x", type: "expression", expr: "Name" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdownInput", column: "Partner Type" }}
+          blockDef={{ id: "x", type: "dropdownInput", column: "Type" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "expression", expr: "Partner Type" }}
+          blockDef={{ id: "x", type: "expression", expr: "Type" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "dropdownInput", column: "Partner Status" }}
+          blockDef={{ id: "x", type: "dropdownInput", column: "Status" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
         <BlockPaletteItem 
-          blockDef={{ id: "x", type: "expression", expr: "Partner Status" }}
+          blockDef={{ id: "x", type: "expression", expr: "Status" }}
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
