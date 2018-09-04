@@ -110,7 +110,7 @@ export abstract class Block {
   /** Render the block as it looks in design mode. This may use bootstrap */
   abstract renderDesign(props: RenderDesignProps): React.ReactElement<any>
 
-  /** Render a live instance of the block. ref will be called with the block instance. This may *not* use bootstrap */
+  /** Render a live instance of the block. ref will be called with the block instance. This may use bootstrap for now */
   abstract renderInstance(props: RenderInstanceProps, ref?: (blockInstance: BlockInstance | null) => void): React.ReactElement<any>
 
   /** Render an optional property editor for the block. This may use bootstrap */

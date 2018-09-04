@@ -17,7 +17,6 @@ export class ExpressionBlock extends LeafBlock {
 
   renderDesign(props: RenderDesignProps) {
     return (
-      // TODO NO BOOTSTRAP HERE
       <div>
         <span className="text-muted">[</span>
         {this.blockDef.expr}
@@ -28,7 +27,6 @@ export class ExpressionBlock extends LeafBlock {
 
   renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
     return (
-      // TODO NO BOOTSTRAP HERE
       <div>{this.blockDef.expr}</div>
     )     
   }

@@ -70,6 +70,14 @@ export default class BlockPalette extends React.Component<Props> {
           createBlock={this.props.createBlock}
           schema={this.props.schema}
         />
+        <BlockPaletteItem 
+          blockDef={{ 
+            id: "x", 
+            type: "search"
+          }}
+          createBlock={this.props.createBlock}
+          schema={this.props.schema}
+        />
       </div>
     )
   }
