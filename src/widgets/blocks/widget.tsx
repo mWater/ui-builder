@@ -1,8 +1,9 @@
 import * as React from 'react';
-import LeafBlock from './LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter } from './blocks'
-import { LookupWidget } from './widgets';
+import LeafBlock from '../LeafBlock'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter } from '../blocks'
+import { LookupWidget } from '../widgets';
 import { Expr } from 'mwater-expressions'
+import BlockPlaceholder from '../BlockPlaceholder';
 
 // Block which contains a widget
 export interface WidgetBlockDef extends BlockDef {
@@ -51,10 +52,17 @@ export class WidgetBlock extends LeafBlock {
         locale: props.locale,
         contextVars: widgetDef.contextVars,
         store: new NullBlockStore(),
-        wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) { return elem },
+        renderChildBlock: (childProps, childBlockDef) => { 
+          if (childBlockDef) {
+            const childBlock = this.createBlock(childBlockDef)
+            return childBlock.renderDesign(props)
+          }
+          else {
+            return <BlockPlaceholder/>
+          }
+        },
       }
-  
-      return props.wrapDesignerElem(this.blockDef,
+      return (
         <div>
           {innerBlock.renderDesign(innerProps)}
           {/* Cover up design so it can't be edited */}
@@ -63,7 +71,7 @@ export class WidgetBlock extends LeafBlock {
       )     
     } 
     else { // Handle case of widget with null block
-      return props.wrapDesignerElem(this.blockDef, <div style={{height: 10}}/>)
+      return <div/>
     }
   }
 

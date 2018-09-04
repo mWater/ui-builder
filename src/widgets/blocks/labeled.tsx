@@ -49,11 +49,7 @@ export class LabeledBlock extends CompoundBlock {
         <div style={{fontWeight: "bold"}}>
           { labelText ? labelText : <span className="text-muted">Label</span>}
         </div>
-        { this.blockDef.child 
-          ? 
-            props.wrapDesignerElem(this.blockDef.child, this.createBlock(this.blockDef.child).renderDesign(props))
-          : 
-            <BlockPlaceholder onSet={handleAdd} /> }
+        { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
       </div>
     )
   }

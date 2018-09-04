@@ -6,7 +6,7 @@ import "./BlockPlaceholder.css"
 interface Props {
   isOver?: boolean;
   connectDropTarget?: ConnectDropTarget;
-  onSet: (blockDef: BlockDef) => void;
+  onSet?: (blockDef: BlockDef) => void;
 }
 
 const blockTargetSpec = {
@@ -22,7 +22,9 @@ const blockTargetSpec = {
     const sourceBlockDef = monitor.getItem().blockDef
 
     setTimeout(() => {
-      props.onSet(sourceBlockDef)
+      if (props.onSet) {
+        props.onSet(sourceBlockDef)
+      }
     }, 0)
   }
 }

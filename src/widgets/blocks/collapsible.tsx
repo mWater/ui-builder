@@ -58,13 +58,8 @@ export class CollapsibleBlock extends CompoundBlock {
       }), blockDef.id)
     }
 
-    const labelNode = this.blockDef.label ?
-      props.wrapDesignerElem(this.blockDef.label, this.createBlock(this.blockDef.label).renderDesign(props))
-      : <BlockPlaceholder onSet={handleSetLabel} />
-
-    const contentNode = this.blockDef.content ?
-      props.wrapDesignerElem(this.blockDef.content, this.createBlock(this.blockDef.content).renderDesign(props))
-      : <BlockPlaceholder onSet={handleSetContent} />
+    const labelNode = props.renderChildBlock(props, this.blockDef.label, handleSetLabel)
+    const contentNode = props.renderChildBlock(props, this.blockDef.content, handleSetContent)
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>

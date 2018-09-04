@@ -1,4 +1,4 @@
-import { WidgetBlock, WidgetBlockDef } from './widgetBlock'
+import { WidgetBlock, WidgetBlockDef } from './blocks/widget'
 import { ContextVar, RenderInstanceProps, BlockDef, Filter } from './blocks';
 import { WidgetDef } from './widgets';
 import { Database } from './Database';

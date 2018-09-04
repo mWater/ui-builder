@@ -21,29 +21,7 @@ export class TextBlock extends LeafBlock {
 
   renderDesign(props: RenderDesignProps) {
     const text = localize(this.blockDef.text, props.locale)
-
-    // if (props.selectedId === this.id) {
-    //   const handleChange = (e: any) => {
-    //     const locale = props.locale || "en"
-    //     const value = Object.assign({}, this.blockDef.text || {})
-    //     value._base = props.locale
-    //     value[locale] = e.target.value
-    //     props.store.replaceBlock(this.id, Object.assign({}, this.blockDef, { text: value }))
-    //   }
-    
-    //   return props.wrapDesignerElem(this.blockDef,
-    //     React.createElement(this.blockDef.style, {}, 
-    //       <textarea 
-    //         value={text} 
-    //         placeholder="Lorem ipsum" 
-    //         style={{border: "none", borderColor: "transparent", width: "100%"}} 
-    //         onChange={handleChange}/>
-    //     )
-    //   )
-    // }
-    // else {
     return React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Text</span>)
-//    }
   }
 
   renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {

@@ -1,7 +1,7 @@
 import { HorizontalBlock, HorizontalBlockDef } from './blocks/horizontal';
 import { BlockDef, Block } from './blocks';
 import { VerticalBlock, VerticalBlockDef } from './blocks/vertical';
-import { WidgetBlock, WidgetBlockDef } from './widgetBlock';
+import { WidgetBlock, WidgetBlockDef } from './blocks/widget';
 import { LookupWidget } from './widgets';
 import { TextBlock, TextBlockDef } from './blocks/text';
 import { LabeledBlock, LabeledBlockDef } from './blocks/labeled';

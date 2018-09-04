@@ -48,7 +48,6 @@ export interface RenderInstanceProps {
   /** Gets the value of a context variable */
   getContextVarValue(contextVarId: string): any,
 
-  // TODO how to indicate when changed?? What to display while change is in progress?
   getContextVarExprValue(contextVarId: string, expr: Expr): any,
 
   onSelectContextVar(contextVarId: string, primaryKey: any): void; // selection call on context var (when type = "rowset" and selectable)
@@ -70,8 +69,8 @@ export interface RenderDesignProps {
   /** Selected block id as some blocks may display differently when selected */
   selectedId: string | null,
 
-  // All sub-block elements must wrapped using this function
-  wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>): React.ReactElement<any>,
+  /** All sub-block elements must rendered using this function. onSet will be called only when transitioning from null to a value */
+  renderChildBlock(props: RenderDesignProps, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void): React.ReactElement<any>
 }
 
 export interface RenderEditorProps {

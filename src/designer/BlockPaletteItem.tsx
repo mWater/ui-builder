@@ -3,6 +3,7 @@ import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
 import { ConnectDragSource, DragSource } from "react-dnd";
 import { Schema } from "mwater-expressions";
 import * as uuid from 'uuid/v4'
+import BlockPlaceholder from "../widgets/BlockPlaceholder";
 
 interface Props {
   blockDef: BlockDef
@@ -36,8 +37,14 @@ export default class BlockPaletteItem extends React.Component<Props> {
       store: {
         alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null) { return }
       },
-      wrapDesignerElem(blockDef: BlockDef, elem: React.ReactElement<any>) {
-        return elem
+      renderChildBlock: (props, childBlockDef) => {
+        if (childBlockDef) {
+          const childBlock = this.props.createBlock(childBlockDef)
+          return childBlock.renderDesign(props)
+        }
+        else {
+          return <BlockPlaceholder/>
+        }
       },
     })
   }

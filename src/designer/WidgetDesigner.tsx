@@ -2,7 +2,7 @@ import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar, dropBlock } from "../widgets/blocks"
+import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar, dropBlock, RenderDesignProps } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
@@ -30,20 +30,6 @@ export default class WidgetDesigner extends React.Component<Props, State> {
 
   handleSelect = (blockId: string) => {
     this.setState({ selectedBlockId: blockId })
-  }
-
-  wrapDesignerElem = (store: BlockStore, blockDef: BlockDef, elem: React.ReactElement<any>) => {
-    return (
-      <BlockWrapper 
-        blockDef={blockDef} 
-        selectedBlockId={this.state.selectedBlockId} 
-        onSelect={this.handleSelect.bind(null, blockDef.id)} 
-        onRemove={this.handleRemoveBlock.bind(null, blockDef.id)} 
-        store={store}
-      >
-        {elem}
-      </BlockWrapper>
-    )
   }
 
   // Set the widget block
@@ -157,22 +143,46 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   renderBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
-      const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+      const block = this.props.createBlock(this.props.widgetDef.blockDef)
+
       // Create block store
       const store = this.createBlockStore()
-    
-      return this.wrapDesignerElem(store, block.blockDef, block.renderDesign({
+
+      // Create renderChildBlock
+      const renderChildBlock = (props: RenderDesignProps, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void) => {
+        if (childBlockDef) {
+          const childBlock = this.props.createBlock(childBlockDef)
+          return (
+            <BlockWrapper 
+              blockDef={childBlockDef} 
+              selectedBlockId={this.state.selectedBlockId} 
+              onSelect={this.handleSelect.bind(null, childBlockDef.id)} 
+              onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)} 
+              store={store}
+            >
+              {childBlock.renderDesign(props)}
+            </BlockWrapper>
+          )
+        }
+        else {
+          return <BlockPlaceholder onSet={onSet}/>
+        }
+      }
+
+      const renderDesignProps : RenderDesignProps = {
         schema: this.props.schema,
         selectedId: this.state.selectedBlockId,
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
         store,
-        wrapDesignerElem: this.wrapDesignerElem.bind(null, store)
-      }))
+        renderChildBlock: renderChildBlock
+      }
+    
+      return renderChildBlock(renderDesignProps, block.blockDef, this.handleBlockDefChange)
     }
     else {
       // Create placeholder
-      return <BlockPlaceholder onSet={this.handleBlockDefChange.bind(null)} />
+      return <BlockPlaceholder onSet={this.handleBlockDefChange} />
     }
   }
 
