@@ -5,6 +5,7 @@ import { LabeledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } 
 import { LocalizedString, localize } from '../localization'
 
 export interface TextBlockDef extends BlockDef {
+  type: "text"
   /** Text content */
   text: LocalizedString,
   /** style ("p", "div", "h1", "h2", "h3", "h4") */

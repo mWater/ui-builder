@@ -19,9 +19,6 @@ export class NullBlockStore implements BlockStore {
   alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null): void {
     throw new Error("Not allowed")
   }  
-  dragAndDropBlock(sourceBlockDef: BlockDef, targetBlockId: string, dropSide: DropSide): void {
-    throw new Error("Not allowed")
-  }
 }
 
 // Block definition
@@ -47,12 +44,25 @@ export interface RenderInstanceProps {
   locale: string,
   database: Database,
   contextVars: ContextVar[],
+
+  // TODO how to indicate when changed?? 
+  /** Gets the value of a context variable */
   getContextVarValue(contextVarId: string): any,
+
+  // TODO how to indicate when changed?? What to display while change is in progress?
   getContextVarExprValue(contextVarId: string, expr: Expr): any,
+
   onSelectContextVar(contextVarId: string, primaryKey: any): void; // selection call on context var (when type = "rowset" and selectable)
 
-  // Set a filter on a rowset context variable
+  /** Set a filter on a rowset context variable */
   setFilter(contextVarId: string, filter: Filter): void;
+
+  // TODO how to know when changed? Does each block using a rowset need to get filters and combine with rowset value? Or does rowset value automatically 
+  // include filters?
+  /** Get any filters set on a rowset context variable */
+  getFilters(contextVarId: string): Filter[];
+  
+  getFilteredRowsetValue(contextVarId: string): Expr;
 }
 
 export interface RenderDesignProps {

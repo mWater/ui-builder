@@ -4,6 +4,7 @@ import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, Render
 import { TextPropertyEditor } from '../propertyEditors';
 
 export interface TextInputBlockDef extends BlockDef {
+  type: "textInput"
   column: string // TODO
 }
 

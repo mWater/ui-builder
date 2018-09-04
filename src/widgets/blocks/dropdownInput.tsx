@@ -4,6 +4,7 @@ import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, Render
 import { TextPropertyEditor } from '../propertyEditors';
 
 export interface DropdownInputBlockDef extends BlockDef {
+  type: "dropdownInput"
   column: string // TODO
 }
 

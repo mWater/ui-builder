@@ -4,6 +4,7 @@ import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
 
 export interface VerticalBlockDef extends BlockDef {
+  type: "vertical"
   items: BlockDef[]
 }
 

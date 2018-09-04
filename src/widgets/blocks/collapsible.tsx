@@ -5,6 +5,7 @@ import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInst
 import BlockPlaceholder from '../BlockPlaceholder';
 
 export interface CollapsibleBlockDef extends BlockDef {
+  type: "collapsible"
   label: BlockDef | null
   content: BlockDef | null
 }

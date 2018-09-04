@@ -18,25 +18,27 @@ export interface QueryOptions {
   limit?: number
 }
 
-export interface QueryOneOptions {
-  select: { [alias: string]: Expr },
-  from: string,       // Table that this is from
-  where?: Expr,       // Where clause
-  order?: Order[]
-}
+// export interface QueryOneOptions {
+//   select: { [alias: string]: Expr },
+//   from: string,       // Table that this is from
+//   where?: Expr,       // Where clause
+//   order?: Order[]
+// }
 
 interface Row {
   [alias: string]: any 
 }
 
+type ChangeListener = () => void
+
 export interface Database {
   query(options: QueryOptions): Promise<Row[]>;
-  queryOne(options: QueryOneOptions): Promise<Row>;
   
-  watchQuery(options: QueryOptions, onChange: () => void): void;
-  watchQueryOne(options: QueryOneOptions, onChange: () => void): void;
-  
-  // Adds a row, returning the primary key as a promise
+  /** Adds a listener which is called with each change to the database */
+  addChangeListener(changeListener: ChangeListener): void;
+  removeChangeListener(changeListener: ChangeListener): void;
+
+  /** Adds a row, returning the primary key as a promise */
   addRow(table: string, updates: { [column: string]: any }): Promise<any>;
 
   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
