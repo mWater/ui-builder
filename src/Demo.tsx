@@ -11,7 +11,7 @@ const basicBlockFactory = new BlockFactory()
 
 const waterPointsWidgetDef: WidgetDef = {
   "id": "1234",
-  "name": "Water Points",
+  "name": "Water Point List",
   "description": "Test",
   "blockDef": {
     "id": "71e7e315-fb7a-4309-a13e-9c1e72d94dd4",

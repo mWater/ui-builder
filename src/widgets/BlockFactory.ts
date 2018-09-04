@@ -9,6 +9,7 @@ import { TextInputBlock, TextInputBlockDef } from './blocks/textInput';
 import { DropdownInputBlock, DropdownInputBlockDef } from './blocks/dropdownInput';
 import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
 import { ExpressionBlock, ExpressionBlockDef } from './blocks/expression';
+import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable';
 
 export default class BlockFactory {
   createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block => {
@@ -32,6 +33,8 @@ export default class BlockFactory {
         return new CollapsibleBlock(blockDef as CollapsibleBlockDef, internalCreateBlock)
       case "expression":
         return new ExpressionBlock(blockDef as ExpressionBlockDef)
+      case "queryTable":
+        return new QueryTableBlock(blockDef as QueryTableBlockDef, internalCreateBlock)
     }
     throw new Error("Type not found")
   }
