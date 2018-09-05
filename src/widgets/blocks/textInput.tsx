@@ -8,13 +8,7 @@ export interface TextInputBlockDef extends BlockDef {
   column: string // TODO
 }
 
-export class TextInputBlock extends LeafBlock {
-  blockDef: TextInputBlockDef
-
-  constructor(blockDef: TextInputBlockDef) {
-    super(blockDef)
-  }
-
+export class TextInputBlock extends LeafBlock<TextInputBlockDef> {
   renderDesign(props: RenderDesignProps) {
     return (
       <input type="text" className="form-control" placeholder={this.blockDef.column} />

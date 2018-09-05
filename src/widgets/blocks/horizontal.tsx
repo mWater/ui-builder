@@ -8,14 +8,7 @@ export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]
 }
 
-export class HorizontalBlock extends CompoundBlock {
-  blockDef: HorizontalBlockDef
-  createBlock: CreateBlock
-
-  constructor(blockDef: HorizontalBlockDef, createBlock: CreateBlock) {
-    super(blockDef, createBlock)
-  }
-
+export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
   get id() { return this.blockDef.id }
 
   getChildBlockDefs(): BlockDef[] {

@@ -11,8 +11,7 @@ export interface WidgetBlockDef extends BlockDef {
   contextVarMap: { [contextVarId: string]: string };  // Maps each internal widgets' context variable id to an external one
 }
 
-export class WidgetBlock extends LeafBlock {
-  blockDef: WidgetBlockDef
+export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   createBlock: CreateBlock
   lookupWidget: LookupWidget
 

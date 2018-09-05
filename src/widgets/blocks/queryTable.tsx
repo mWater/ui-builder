@@ -15,14 +15,7 @@ export interface QueryTableBlockDef extends BlockDef {
   // where?
 }
 
-export class QueryTableBlock extends CompoundBlock {
-  blockDef: QueryTableBlockDef
-  createBlock: CreateBlock
-
-  constructor(blockDef: QueryTableBlockDef, createBlock: CreateBlock) {
-    super(blockDef, createBlock)
-  }
-
+export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   getChildBlockDefs(): BlockDef[] {
     return compact(this.blockDef.headers.concat(this.blockDef.contents))
   }

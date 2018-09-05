@@ -10,16 +10,7 @@ export interface CollapsibleBlockDef extends BlockDef {
   content: BlockDef | null
 }
 
-export class CollapsibleBlock extends CompoundBlock {
-  blockDef: CollapsibleBlockDef
-  createBlock: CreateBlock
-
-  constructor(blockDef: CollapsibleBlockDef, createBlock: CreateBlock) {
-    super(blockDef, createBlock)
-  }
-
-  get id() { return this.blockDef.id }
-
+export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
   getChildBlockDefs(): BlockDef[] {
     const childBlockDefs = []
     if (this.blockDef.label) {

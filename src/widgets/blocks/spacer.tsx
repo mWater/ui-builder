@@ -7,13 +7,7 @@ export interface SpacerBlockDef extends BlockDef {
 }
 
 // TODO
-export class SpacerBlock extends LeafBlock {
-  blockDef: SpacerBlockDef
-
-  constructor(blockDef: SpacerBlockDef) {
-    super(blockDef)
-  }
-
+export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
   renderDesign(props: RenderDesignProps) {
     return (
       <div/>

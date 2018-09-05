@@ -28,7 +28,7 @@ export interface BlockDef {
   [index: string]: any  // Other props
 }
 
-export type CreateBlock = (blockDef: BlockDef) => Block
+export type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>
 
 export interface ContextVar {
   id: string;     // Id of context variable
@@ -98,10 +98,10 @@ export interface BlockInstance extends React.Component {
   validate?(): ValidationError[] // TODO needed??
 }
 
-export abstract class Block {
-  blockDef: BlockDef
+export abstract class Block<T extends BlockDef> {
+  blockDef: T
 
-  constructor(blockDef: BlockDef) {
+  constructor(blockDef: T) {
     this.blockDef = blockDef
   }
 
@@ -189,7 +189,7 @@ export function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, d
   throw new Error("Unknown side")
 }
 
-export function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlock, blockId: string): Block[] | null {
+export function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlock, blockId: string): Array<Block<BlockDef>> | null {
   const rootBlock = createBlock(rootBlockDef)
 
   // Return self if true

@@ -12,16 +12,7 @@ export interface LabeledBlockDef extends BlockDef {
   child: BlockDef | null
 }
 
-export class LabeledBlock extends CompoundBlock {
-  blockDef: LabeledBlockDef
-  createBlock: CreateBlock
-
-  constructor(blockDef: LabeledBlockDef, createBlock: CreateBlock) {
-    super(blockDef, createBlock)
-  }
-
-  get id() { return this.blockDef.id }
-
+export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
   getChildBlockDefs(): BlockDef[] {
     return this.blockDef.child ? [this.blockDef.child] : []
   }

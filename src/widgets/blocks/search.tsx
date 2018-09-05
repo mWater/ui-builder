@@ -7,13 +7,7 @@ export interface SearchBlockDef extends BlockDef {
   // TODO expressions to search
 }
 
-export class SearchBlock extends LeafBlock {
-  blockDef: SearchBlockDef
-
-  constructor(blockDef: SearchBlockDef) {
-    super(blockDef)
-  }
-
+export class SearchBlock extends LeafBlock<SearchBlockDef> {
   renderDesign(props: RenderDesignProps) {
     return (
       <div className="input-group">

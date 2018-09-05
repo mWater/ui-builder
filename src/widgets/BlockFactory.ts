@@ -13,7 +13,7 @@ import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable';
 import { SearchBlock, SearchBlockDef } from './blocks/search';
 
 export default class BlockFactory {
-  createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block => {
+  createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block<BlockDef> => {
     const internalCreateBlock = this.createBlock.bind(null, lookupWidget)
     switch (blockDef.type) {
       case "horizontal":

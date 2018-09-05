@@ -8,13 +8,7 @@ export interface ExpressionBlockDef extends BlockDef {
   expr: string // TODO
 }
 
-export class ExpressionBlock extends LeafBlock {
-  blockDef: ExpressionBlockDef
-
-  constructor(blockDef: ExpressionBlockDef) {
-    super(blockDef)
-  }
-
+export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   renderDesign(props: RenderDesignProps) {
     return (
       <div>
