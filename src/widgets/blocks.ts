@@ -33,10 +33,10 @@ export type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>
 export interface ContextVar {
   id: string;     // Id of context variable
   name: string;   // Name of context variable
-  type: string;   // row, rowset, text, number, date, datetime, enum, enumset, ...
+  type: string;   // "row", "rowset", "text", "number", "date", "datetime", "enum", "enumset", ...
   table?: string;  // table of database (when type = "rowset" or "row")
-  aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
-  selectable?: boolean;  // true if row can be selected (when type = "rowset")
+  // aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
+  // selectable?: boolean;  // true if row can be selected (when type = "rowset")
 }
 
 export interface RenderInstanceProps {

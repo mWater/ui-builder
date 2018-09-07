@@ -11,6 +11,7 @@ import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
 import { ExpressionBlock, ExpressionBlockDef } from './blocks/expression';
 import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable';
 import { SearchBlock, SearchBlockDef } from './blocks/search';
+import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 
 export default class BlockFactory {
   createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block<BlockDef> => {
@@ -38,6 +39,8 @@ export default class BlockFactory {
         return new QueryTableBlock(blockDef as QueryTableBlockDef, internalCreateBlock)
       case "search":
         return new SearchBlock(blockDef as SearchBlockDef)
+      case "button":
+        return new ButtonBlock(blockDef as ButtonBlockDef)
     }
     throw new Error("Type not found")
   }

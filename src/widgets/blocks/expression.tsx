@@ -19,7 +19,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     )     
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     return (
       <div>{this.blockDef.expr}</div>
     )     

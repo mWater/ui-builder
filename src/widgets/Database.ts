@@ -44,7 +44,19 @@ export interface Database {
   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
   
   removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
+
+  // batch(): DatabaseBatch;
 }
+
+// interface DatabaseBatch {
+//   addRow(table: string, updates: { [column: string]: any }): Promise<any>;
+
+//   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
+  
+//   removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
+
+//   complete(): void;
+// }
 
 export class MockDatabase implements Database {
   async query(options: QueryOptions) { return [] }
