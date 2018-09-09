@@ -1,7 +1,7 @@
-import { WidgetBlock, WidgetBlockDef } from './blocks/widget'
-import { ContextVar, RenderInstanceProps, BlockDef, Filter } from './blocks';
-import { WidgetDef } from './widgets';
-import { Database } from './Database';
+import { WidgetBlock, WidgetBlockDef } from './widget'
+import { ContextVar, RenderInstanceProps, BlockDef, Filter } from '../blocks';
+import { WidgetDef } from '../widgets';
+import { Database } from '../Database';
 import { Expr } from 'mwater-expressions';
 
 const createBlock = jest.fn()
@@ -12,7 +12,7 @@ const widgetDef : WidgetDef= {
   description: "",
   blockDef: {} as BlockDef,
   contextVars: [
-    { id: "b1", name: "B1", type: "text" },
+    { id: "b1", name: "B1", type: "rowset" },
   ]
 }
 lookupWidget.mockReturnValue(widgetDef)
@@ -30,6 +30,8 @@ const contextVars : ContextVar[] = [
   { id: "a1", name: "A1", type: "text" },
   { id: "a2", name: "A2", type: "text" }
 ]
+
+// TODO: getContextVarExprs(contextVarId: string) should gather from children
 
 describe("getInitialFilters", () => {
   test("translates", async () => {

@@ -3,10 +3,15 @@ import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
 import { TextPropertyEditor, LabeledProperty, LocalizedTextPropertyEditor, DropdownPropertyEditor } from '../propertyEditors';
 import { localize, LocalizedString } from '../localization';
+import { ActionDef } from '../actions';
 
 export interface ButtonBlockDef extends BlockDef {
   type: "button"
   label: LocalizedString
+
+  /** Action to perform when button is clicked */
+  actionDef: ActionDef
+
   /** default, primary  */
   style: string 
   /** normal, small, large */

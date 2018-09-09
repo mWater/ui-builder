@@ -48,9 +48,15 @@ export interface RenderInstanceProps {
   /** Gets the value of a context variable */
   getContextVarValue(contextVarId: string): any,
 
+  /**
+   * Gets the value of an expression based off of a context variable
+   * @param contextVarId 
+   * @param expr 
+   */
   getContextVarExprValue(contextVarId: string, expr: Expr): any,
 
-  onSelectContextVar(contextVarId: string, primaryKey: any): void; // selection call on context var (when type = "rowset" and selectable)
+  /** Selection call on context var (when type = "rowset" and selectable) */
+  onSelectContextVar(contextVarId: string, primaryKey: any): void; 
 
   /** Set a filter on a rowset context variable */
   setFilter(contextVarId: string, filter: Filter): void;
@@ -116,7 +122,7 @@ export abstract class Block<T extends BlockDef> {
   /** Render an optional property editor for the block. This may use bootstrap */
   renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }
 
-  /** Get any context variables expressions that this block needs (not including subblocks) */
+  /** Get any context variables expressions that this block needs (not including child blocks) */
   getContextVarExprs(contextVarId: string): Expr[] { return [] }
 
   /** Get child blocks */

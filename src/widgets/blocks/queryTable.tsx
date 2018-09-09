@@ -3,7 +3,7 @@ import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, BlockStore } from '../blocks'
 import BlockPlaceholder from '../BlockPlaceholder';
-import { compact } from 'lodash-es'
+import * as _ from 'lodash'
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -17,7 +17,7 @@ export interface QueryTableBlockDef extends BlockDef {
 
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   getChildBlockDefs(): BlockDef[] {
-    return compact(this.blockDef.headers.concat(this.blockDef.contents))
+    return _.compact(this.blockDef.headers.concat(this.blockDef.contents))
   }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
