@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/lodash": "^4.14.116",
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
     "immer": "^1.5.0",
-    "lodash-es": "^4.17.10",
+    "lodash": "^3.10.1",
     "mwater-expressions": "github:mWater/mwater-expressions",
     "mwater-expressions-ui": "github:mWater/mwater-expressions-ui",
     "react": "^16.4.1",
@@ -25,7 +26,6 @@
   },
   "devDependencies": {
     "@types/jest": "^23.1.6",
-    "@types/lodash-es": "^4.17.1",
     "@types/node": "^10.5.2",
     "@types/react": "^16.4.6",
     "@types/react-dom": "^16.0.6",

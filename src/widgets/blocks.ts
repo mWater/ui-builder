@@ -50,8 +50,8 @@ export interface RenderInstanceProps {
 
   /**
    * Gets the value of an expression based off of a context variable
-   * @param contextVarId 
-   * @param expr 
+   * @param contextVarId id of context variable
+   * @param expr expression to get value of
    */
   getContextVarExprValue(contextVarId: string, expr: Expr): any,
 

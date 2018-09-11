@@ -1,6 +1,6 @@
 import * as React from "react";
 
-// Components to build property editors. These may use bootstrap 3 as needed.
+/* Components to build property editors. These may use bootstrap 3 as needed. */
 
 export class LocalizedTextPropertyEditor extends React.Component<{ 
     obj: object, 

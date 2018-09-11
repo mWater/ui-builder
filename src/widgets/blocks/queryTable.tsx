@@ -2,7 +2,6 @@ import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, BlockStore } from '../blocks'
-import BlockPlaceholder from '../BlockPlaceholder';
 import * as _ from 'lodash'
 
 export interface QueryTableBlockDef extends BlockDef {

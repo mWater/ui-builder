@@ -2,16 +2,16 @@ import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, DropSide, findBlockAncestry, BlockStore, RenderEditorProps, ContextVar, dropBlock, RenderDesignProps, RenderInstanceProps, Filter } from "../widgets/blocks"
+import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, ContextVar, RenderDesignProps, RenderInstanceProps, Filter } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
-import BlockPaletteItem from "./BlockPaletteItem"
 import "./WidgetDesigner.css"
 import { Schema, Expr } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { MockDatabase } from "../widgets/Database";
+import { LabeledProperty, TextPropertyEditor } from "../widgets/propertyEditors";
 
-interface Props {
+interface WidgetDesignerProps {
   widgetDef: WidgetDef
   createBlock: CreateBlock
   schema: Schema
@@ -26,8 +26,8 @@ interface State {
 }
 
 /** Design mode for a single widget */
-export default class WidgetDesigner extends React.Component<Props, State> {
-  constructor(props: Props) {
+export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
+  constructor(props: WidgetDesignerProps) {
     super(props)
     this.state = {
       mode: Mode.Design,
@@ -173,7 +173,9 @@ export default class WidgetDesigner extends React.Component<Props, State> {
     }
 
     return (
-      <div className="widget-designer-editor"/>
+      <div className="widget-designer-editor">
+        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} />
+      </div>
     )
   }
 
@@ -246,12 +248,24 @@ export default class WidgetDesigner extends React.Component<Props, State> {
   }
 }
 
-// class ModeToggle extends React.Component<{ mode: Mode, onChange: (mode: Mode) => void}> {
-//   render() {
-//     <div className="btn-group btn-group-sm">
-//       <button className={ this.props.mode === Mode.Design ? "btn btn-primary" : "btn btn-primary"
-//     </div>
-//     _.map @props.options, @renderOption
+interface WidgetEditorProps {
+  widgetDef: WidgetDef
+  onWidgetDefChange(widgetDef: WidgetDef): void
+}
 
-//   }
-// }
+class WidgetEditor extends React.Component<WidgetEditorProps> {
+  render() {
+    return (
+      <div>
+        <LabeledProperty label="Name">
+          <TextPropertyEditor 
+            obj={this.props.widgetDef}
+            onChange={this.props.onWidgetDefChange}
+            property="name"
+          />
+        </LabeledProperty>
+        <div>TODO: context variables editor</div>
+      </div>
+    )
+  }
+}
