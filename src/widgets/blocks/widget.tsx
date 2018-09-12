@@ -21,22 +21,23 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     this.lookupWidget = lookupWidget
   }
 
-  async getInitialFilters(contextVarId: string): Promise<Filter[]> { 
-    const widgetDef = this.lookupWidget(this.blockDef.widgetId)
-    if (widgetDef && widgetDef.blockDef) {
-      const innerBlock = this.createBlock(widgetDef.blockDef)
+  // TODO get initial filters, mapped
+  // async getInitialFilters(contextVarId: string): Promise<Filter[]> { 
+  //   const widgetDef = this.lookupWidget(this.blockDef.widgetId)
+  //   if (widgetDef && widgetDef.blockDef) {
+  //     const innerBlock = this.createBlock(widgetDef.blockDef)
 
-      // Map contextVarId to internal id
-      for (const key of Object.keys(this.blockDef.contextVarMap)) {
-        const value = this.blockDef.contextVarMap[key]
-        if (value === contextVarId) {
-          return innerBlock.getInitialFilters(key)
-        }
-      }
-    }
+  //     // Map contextVarId to internal id
+  //     for (const key of Object.keys(this.blockDef.contextVarMap)) {
+  //       const value = this.blockDef.contextVarMap[key]
+  //       if (value === contextVarId) {
+  //         return innerBlock.getInitialFilters(key)
+  //       }
+  //     }
+  //   }
 
-    return []
-  }
+  //   return []
+  // }
 
   getContextVarExprs(contextVarId: string) {
     // TODO!!
@@ -111,6 +112,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         }, 
         onSelectContextVar: (contextVarId: string, primaryKey: any) => {
+          // TODO
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
@@ -118,6 +120,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         },
         setFilter: (contextVarId: string, filter: Filter) => {
+          // TODO
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
@@ -125,6 +128,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         },
         getFilters: (contextVarId: string) => {
+          // TODO
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {

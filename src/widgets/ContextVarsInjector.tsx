@@ -1,52 +1,43 @@
-import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter } from "./blocks";
+import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter, getBlockTree } from "./blocks";
 import * as React from "react";
-
-interface ContextVarValue {
-  contextVar: ContextVar
-  value: any
-}
+import ContextVarInjector from './ContextVarInjector'
+import * as _ from "lodash";
 
 interface Props {
-  contextVarValues: ContextVarValue[]
+  contextVars: ContextVar[]
+  contextVarValues: { [contextVarId: string]: any }
   renderInstanceProps: RenderInstanceProps
+
   /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
   innerBlock: BlockDef
   createBlock: CreateBlock
   children: (renderInstanceProps: RenderInstanceProps) => React.ReactElement<any>
 }
 
-interface State {
-  filters: { [contextVarId: string]: Filter[] }
-}
-
 /** Injects one or more context variables into the inner render instance props. 
  * Holds state of the filters that are applied to rowset. 
  * Computes values of expressions
  */
-export default class ContextVarsInjector extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      filters: {}
-    }
-  }
-  
+export default class ContextVarsInjector extends React.Component<Props> {
   render() {
-    const outer = this.props.renderInstanceProps
+    // Wrap once per child
+    let elem = this.props.children
 
-    // Create inner props
-    const innerProps: RenderInstanceProps = {
-      locale: outer.locale,
-      database: outer.database,
-      onSelectContextVar: outer.onSelectContextVar,
-      renderChildBlock: outer.renderChildBlock,
-      contextVars: outer.contextVars.concat(this.props.contextVarValues.map(cvv => cvv.contextVar)),
-      getContextVarValue: outer.getContextVarValue, // TODO
-      getContextVarExprValue: outer.getContextVarExprValue, // TODO
-      setFilter: outer.setFilter, // TODO
-      getFilters: outer.getFilters, // TODO
+    for (const contextVar of this.props.contextVars) {
+      // Get context var exprs
+      const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock).map(b => b.getContextVarExprs(contextVar.id)))
+
+      elem = (outerProps: RenderInstanceProps) => (
+        <ContextVarInjector 
+            contextVar={contextVar} 
+            value={this.props.contextVarValues[contextVar.id]} 
+            renderInstanceProps={outerProps}
+            contextVarExprs={contextVarExprs}>
+          {renderProps => elem(renderProps)}
+        </ContextVarInjector>
+      )
     }
-    return this.props.children(innerProps)
+
+    return elem(this.props.renderInstanceProps)
   }
 }

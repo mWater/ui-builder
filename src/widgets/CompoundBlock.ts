@@ -8,16 +8,4 @@ export default abstract class CompoundBlock<T extends BlockDef> extends Block<T>
     super(blockDef)
     this.createBlock = createBlock;
   }
-
-  async getInitialFilters(contextVarId: string): Promise<Filter[]> {
-    let filters = [] as Filter[];
-    const block = this.createBlock(this.blockDef)
-
-    for (const item of block.getChildBlockDefs()) {
-      const subblock = this.createBlock(item);
-      const subfilters = await subblock.getInitialFilters(contextVarId);
-      filters = filters.concat(subfilters);
-    }
-    return filters;
-  }
 }

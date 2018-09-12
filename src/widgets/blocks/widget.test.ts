@@ -35,24 +35,24 @@ const contextVars : ContextVar[] = [
 
 // TODO: getContextVarExprs(contextVarId: string) should gather from children
 
-describe("getInitialFilters", () => {
-  test("translates", async () => {
-    const widgetBlock = new WidgetBlock(blockDef, createBlock, lookupWidget)
+// describe("getInitialFilters", () => {
+//   test("translates", async () => {
+//     const widgetBlock = new WidgetBlock(blockDef, createBlock, lookupWidget)
 
-    const innerBlock = {
-      getInitialFilters: jest.fn()
-    }
+//     const innerBlock = {
+//       getInitialFilters: jest.fn()
+//     }
   
-    // Return inner block
-    createBlock.mockReset()
-    createBlock.mockReturnValueOnce(innerBlock)
-    innerBlock.getInitialFilters.mockResolvedValueOnce([{ id: "f1", memo: "m", expr: {} as Expr }])
+//     // Return inner block
+//     createBlock.mockReset()
+//     createBlock.mockReturnValueOnce(innerBlock)
+//     innerBlock.getInitialFilters.mockResolvedValueOnce([{ id: "f1", memo: "m", expr: {} as Expr }])
 
-    const filters = await widgetBlock.getInitialFilters("a1")
-    expect(filters).toEqual([{ id: "f1", memo: "m", expr: {} as Expr }])
-    expect(innerBlock.getInitialFilters.mock.calls[0][0]).toBe("b1")
-  })
-})
+//     const filters = await widgetBlock.getInitialFilters("a1")
+//     expect(filters).toEqual([{ id: "f1", memo: "m", expr: {} as Expr }])
+//     expect(innerBlock.getInitialFilters.mock.calls[0][0]).toBe("b1")
+//   })
+// })
 
 describe("renderInstance", () => {
   let renderInstanceProps : RenderInstanceProps

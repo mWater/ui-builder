@@ -32,3 +32,22 @@ test("findBlockAncestry", () => {
   expect(blocks.findBlockAncestry(blockDef, createBlock, "c1")!.map(b => b.id)).toEqual(["a1", "b1", "c1"])
   expect(blocks.findBlockAncestry(blockDef, createBlock, "x")).toBeNull()
 })
+
+test("getBlockTree", () => {
+  const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
+
+  // Create simple tree
+  const blockDef = {
+    id: "a1",
+    type: "horizontal",
+    items: [
+      { 
+        id: "b1", 
+        type: "horizontal",
+        items: [{ id: "c1", type: "horizontal", items: [] }]
+      }
+    ]
+  }
+  
+  expect(blocks.getBlockTree(blockDef, createBlock).map(b => b.id)).toEqual(["a1", "b1", "c1"])
+})
