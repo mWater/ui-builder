@@ -23,7 +23,9 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       <LabeledProperty label="Name">
         <TextPropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="name" />
       </LabeledProperty>
-      <ContextVarsEditor contextVars={this.props.widgetDef.contextVars} onChange={this.handleContextVarsChange} schema={this.props.schema} />
+      <LabeledProperty label="Context Variables">
+        <ContextVarsEditor contextVars={this.props.widgetDef.contextVars} onChange={this.handleContextVarsChange} schema={this.props.schema} />
+      </LabeledProperty>
     </div>)
   }
 }
@@ -32,6 +34,24 @@ interface ContextVarsEditorProps {
   contextVars: ContextVar[]
   onChange: (contextVars: ContextVar[]) => void
   schema: Schema
+}
+
+class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChange: (contextVar: ContextVar) => void}> { 
+  handleNameChange = () => {
+    const name = window.prompt("Enter name", this.props.contextVar.name)
+    if (name) {
+      this.props.onChange({ ...this.props.contextVar, name })
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
+        &nbsp;({this.props.contextVar.type} {this.props.contextVar.table ? `of ${this.props.contextVar.table}` : ""}
+      </div>
+    )
+  }
 }
 
 class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
@@ -49,19 +69,27 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
           name: localize(table.name) + " Row",
           type: "row",
           table: table.id
-        }, label: localize(table.name) + " Row"})
+        }, 
+        label: localize(table.name) + " Row"
+      })
+
+      contextVarOptions.push({
+        value: {
+          id: uuid(),
+          name: localize(table.name) + " Rowset",
+          type: "rowset",
+          table: table.id
+        }, 
+        label: localize(table.name) + " Rowset"
+      })
     }
 
     return (
       <div>
         <ListEditor items={this.props.contextVars} onItemsChange={this.props.onChange}>
-          {(contextVar, onContextVarChange) => 
-            <div>
-              {contextVar.name}: {contextVar.type} {contextVar.table ? ` (${contextVar.table})` : ""}
-            </div>
-          }
+          { (contextVar, onContextVarChange) => <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange}/> }
         </ListEditor>
-        <Select value={null} nullLabel="+ Add Context Variable" options={contextVarOptions} onChange={this.handleAddContextVar}/>
+        <Select value={null} nullLabel="+ Add Context Variable" options={contextVarOptions} onChange={this.handleAddContextVar} size="sm" />
       </div>
     )
   }
