@@ -38,6 +38,11 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     return []
   }
 
+  getContextVarExprs(contextVarId: string) {
+    // TODO!!
+    return []
+  }
+
   renderDesign(props: RenderDesignProps) {
     // Find the widget
     const widgetDef = this.lookupWidget(this.blockDef.widgetId)

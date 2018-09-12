@@ -8,7 +8,7 @@ import "./WidgetDesigner.css"
 import { Schema, Expr, DataSource } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
-import { MockDatabase } from "../widgets/Database"
+import { MockDatabase } from "../Database"
 import { WidgetEditor } from "./WidgetEditor";
 
 interface WidgetDesignerProps {

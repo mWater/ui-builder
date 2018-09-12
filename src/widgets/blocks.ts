@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as uuid from 'uuid/v4'
-import { Database } from './Database'
+import { Database } from '../Database'
 import { Schema, Expr, DataSource } from 'mwater-expressions'
 
 /** Side on which another block is dropped on a block */

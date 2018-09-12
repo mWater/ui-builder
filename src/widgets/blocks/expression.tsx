@@ -2,10 +2,16 @@ import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
 import { TextPropertyEditor } from '../propertyEditors';
+import { Expr } from 'mwater-expressions';
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
-  expr: string // TODO
+  
+  /** Context variable (row or rowset) to use for expression */
+  contextVarId: string
+
+  /** Expression to be displayed */
+  expr: Expr
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {

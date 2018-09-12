@@ -25,18 +25,18 @@ export interface QueryOptions {
 //   order?: Order[]
 // }
 
-interface Row {
+export interface Row {
   [alias: string]: any 
 }
 
-type ChangeListener = () => void
+export type DatabaseChangeListener = () => void
 
 export interface Database {
   query(options: QueryOptions): Promise<Row[]>;
   
   /** Adds a listener which is called with each change to the database */
-  addChangeListener(changeListener: ChangeListener): void;
-  removeChangeListener(changeListener: ChangeListener): void;
+  addChangeListener(changeListener: DatabaseChangeListener): void;
+  removeChangeListener(changeListener: DatabaseChangeListener): void;
 
   /** Adds a row, returning the primary key as a promise */
   addRow(table: string, updates: { [column: string]: any }): Promise<any>;
@@ -62,8 +62,8 @@ export class MockDatabase implements Database {
   async query(options: QueryOptions) { return [] }
   
   /** Adds a listener which is called with each change to the database */
-  addChangeListener(changeListener: ChangeListener) { return }
-  removeChangeListener(changeListener: ChangeListener) { return }
+  addChangeListener(changeListener: DatabaseChangeListener) { return }
+  removeChangeListener(changeListener: DatabaseChangeListener) { return }
 
   /** Adds a row, returning the primary key as a promise */
   async addRow(table: string, updates: { [column: string]: any }) { return null }

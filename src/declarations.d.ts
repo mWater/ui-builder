@@ -129,12 +129,18 @@ declare module 'mwater-expressions' {
     getColumns(tableId: string): Column[]
   }
 
-  type Expr = LiteralExpr | FieldExpr | OpExpr
+  type Expr = LiteralExpr | FieldExpr | OpExpr | IdExpr
 
   interface LiteralExpr {
     type: "literal"
     valueType: string
+    idTable?: string
     value: any  
+  }
+
+  interface IdExpr {
+    type: "id"
+    table: string
   }
 
   interface FieldExpr {
@@ -190,6 +196,8 @@ declare module 'mwater-expressions/lib/MWaterDataSource'
 // }
 
 declare module 'mwater-expressions-ui' 
+
+declare module 'canonical-json'
 
 declare module 'react-library/lib/bootstrap' {
   import { ReactNode } from "react";

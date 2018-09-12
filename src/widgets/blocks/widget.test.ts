@@ -1,7 +1,7 @@
 import { WidgetBlock, WidgetBlockDef } from './widget'
 import { ContextVar, RenderInstanceProps, BlockDef, Filter } from '../blocks';
 import { WidgetDef } from '../widgets';
-import { Database } from '../Database';
+import { Database } from '../../Database';
 import { Expr } from 'mwater-expressions';
 
 const createBlock = jest.fn()

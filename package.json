@@ -5,6 +5,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.116",
     "bootstrap": "^3.3.7",
+    "canonical-json": "0.0.4",
     "font-awesome": "^4.7.0",
     "immer": "^1.5.0",
     "lodash": "^3.10.1",

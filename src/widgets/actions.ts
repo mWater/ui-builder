@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ContextVar } from './blocks';
-import { Database } from './Database';
+import { Database } from '../Database';
 import { Expr } from 'mwater-expressions';
 
 // Action definition
