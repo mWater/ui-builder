@@ -3,6 +3,7 @@ import * as uuid from 'uuid/v4'
 import { Database } from './Database'
 import { Schema, Expr } from 'mwater-expressions'
 
+/** Side on which another block is dropped on a block */
 export enum DropSide {
   top = "Top",
   bottom = "Bottom",
@@ -10,18 +11,19 @@ export enum DropSide {
   right = "Right"
 }
 
+/** Store which permits modification of the block tree */
 export interface BlockStore {
   alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string): void
 }
 
-// Store which throws on any operation
+/** Store which throws on any operation */
 export class NullBlockStore implements BlockStore {
   alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null): void {
     throw new Error("Not allowed")
   }  
 }
 
-// Block definition
+/** Block definition */
 export interface BlockDef {
   id: string     // Unique id (globally)
   type: string,  // Type of the block
@@ -30,6 +32,7 @@ export interface BlockDef {
 
 export type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>
 
+/** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset */
 export interface ContextVar {
   id: string;     // Id of context variable
   name: string;   // Name of context variable

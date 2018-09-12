@@ -28,7 +28,8 @@ const waterPointsWidgetDef: WidgetDef = {
     ],
     "type": "vertical"
   },
-  "contextVars": []
+  contextVars: [],
+  contextVarPreviewValues: {}
 }
 
 const waterPointWidgetDef: WidgetDef = {
@@ -50,7 +51,8 @@ const waterPointWidgetDef: WidgetDef = {
     ],
     "type": "vertical"
   },
-  "contextVars": []
+  "contextVars": [],
+  contextVarPreviewValues: {}
 }
 
 const initialWidgetLibrary : WidgetLibrary = {
@@ -60,7 +62,17 @@ const initialWidgetLibrary : WidgetLibrary = {
   }
 }
 
-const schema = new Schema()
+const schema = new Schema({
+  tables: [
+    { 
+      id: "entities.water_point",
+      name: { _base: "en", en: "Water Points" },
+      contents: [
+        { id: "name", type: "text", name: { _base: "en", en: "Name" } }
+      ]
+    }
+  ]
+})
 
 @DragDropContext(HTML5Backend)
 export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary}> {

@@ -13,7 +13,8 @@ const widgetDef : WidgetDef= {
   blockDef: {} as BlockDef,
   contextVars: [
     { id: "b1", name: "B1", type: "rowset" },
-  ]
+  ],
+  contextVarPreviewValues: {}
 }
 lookupWidget.mockReturnValue(widgetDef)
 
@@ -23,7 +24,8 @@ const blockDef : WidgetBlockDef = {
   widgetId: "w1",
   contextVarMap: {
     b1: "a1"
-  }
+  },
+  contextVarPreviewValues: {}
 }
 
 const contextVars : ContextVar[] = [

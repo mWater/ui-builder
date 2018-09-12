@@ -1,4 +1,4 @@
-import BlockWrapper from "./BlockWrapper"
+    import BlockWrapper from "./BlockWrapper"
 
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
@@ -8,8 +8,8 @@ import "./WidgetDesigner.css"
 import { Schema, Expr } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
-import { MockDatabase } from "../widgets/Database";
-import { LabeledProperty, TextPropertyEditor } from "../widgets/propertyEditors";
+import { MockDatabase } from "../widgets/Database"
+import { WidgetEditor } from "./WidgetEditor";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -174,7 +174,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     return (
       <div className="widget-designer-editor">
-        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} />
+        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} schema={this.props.schema}/>
       </div>
     )
   }
@@ -236,7 +236,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
           <div style={{float: "right"}}>
             <Toggle 
               value={this.state.mode}
-              options={[{ value: Mode.Design, label: "Design" }, { value: Mode.Preview, label: "Preview" }]}
+              options={[
+                { value: Mode.Design, label: [<i key="design" className="fa fa-pencil"/>, " Design"] }, 
+                { value: Mode.Preview, label: [<i key="design" className="fa fa-play"/>, " Preview"] }]}
               onChange={this.handleSetMode}
               size="sm"
               />
@@ -248,24 +250,3 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 }
 
-interface WidgetEditorProps {
-  widgetDef: WidgetDef
-  onWidgetDefChange(widgetDef: WidgetDef): void
-}
-
-class WidgetEditor extends React.Component<WidgetEditorProps> {
-  render() {
-    return (
-      <div>
-        <LabeledProperty label="Name">
-          <TextPropertyEditor 
-            obj={this.props.widgetDef}
-            onChange={this.props.onWidgetDefChange}
-            property="name"
-          />
-        </LabeledProperty>
-        <div>TODO: context variables editor</div>
-      </div>
-    )
-  }
-}

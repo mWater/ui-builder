@@ -1,9 +1,9 @@
 import * as React from "react";
 import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
-import { ConnectDragSource, DragSource } from "react-dnd";
-import { Schema } from "mwater-expressions";
+import { ConnectDragSource, DragSource } from "react-dnd"
+import { Schema } from "mwater-expressions"
 import * as uuid from 'uuid/v4'
-import BlockPlaceholder from "../widgets/BlockPlaceholder";
+import BlockPlaceholder from "../widgets/BlockPlaceholder"
 
 interface Props {
   blockDef: BlockDef

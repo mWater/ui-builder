@@ -1,7 +1,7 @@
 import * as React from "react";
-import BlockPaletteItem from "./BlockPaletteItem";
-import { CreateBlock } from "../widgets/blocks";
-import { Schema } from "mwater-expressions";
+import BlockPaletteItem from "./BlockPaletteItem"
+import { CreateBlock } from "../widgets/blocks"
+import { Schema } from "mwater-expressions"
 
 interface Props {
   createBlock: CreateBlock
@@ -14,12 +14,9 @@ export default class BlockPalette extends React.Component<Props> {
       { id: "", type: "text", text: { _base: "en", en: "" }, style: "div" },
       { id: "", type: "labeled", label: { _base: "en", en: "" }, child: null },
       { id: "", type: "collapsible", label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" }, content: null },
-      { id: "", type: "textInput", column: "Name" },
-      { id: "", type: "expression", expr: "Name" },
-      { id: "", type: "dropdownInput", column: "Type" },
-      { id: "", type: "expression", expr: "Type" },
-      { id: "", type: "dropdownInput", column: "Status" },
-      { id: "", type: "expression", expr: "Status" },
+      { id: "", type: "textInput", column: null },
+      { id: "", type: "expression", expr: null },
+      { id: "", type: "dropdownInput", column: null },
       { 
         id: "", 
         type: "queryTable", 
