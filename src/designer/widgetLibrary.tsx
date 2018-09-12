@@ -1,6 +1,6 @@
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets";
-import { Schema } from "mwater-expressions";
+import { Schema, DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
 import produce from "immer";
 import BlockFactory from "../widgets/BlockFactory";
@@ -13,6 +13,7 @@ export interface WidgetLibrary {
 interface Props {
   blockFactory: BlockFactory
   schema: Schema
+  dataSource: DataSource
   widgetLibrary: WidgetLibrary
   onWidgetLibraryChange(widgetLibrary: WidgetLibrary): void
 }
@@ -68,6 +69,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         widgetDef={widgetDef}
         createBlock={this.props.blockFactory.createBlock.bind(null, this.lookupWidget)}
         schema={this.props.schema}
+        dataSource={this.props.dataSource}
         onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
       />
     }
@@ -98,6 +100,7 @@ class WidgetTab extends React.Component<{
     widgetDef: WidgetDef
     createBlock: CreateBlock
     schema: Schema
+    dataSource: DataSource
     onWidgetDefChange(widgetDef: WidgetDef): void
   }> {
 
@@ -106,6 +109,7 @@ class WidgetTab extends React.Component<{
       widgetDef={this.props.widgetDef}
       createBlock={this.props.createBlock}
       schema={this.props.schema}
+      dataSource={this.props.dataSource}
       onWidgetDefChange={this.props.onWidgetDefChange}
     />
   }

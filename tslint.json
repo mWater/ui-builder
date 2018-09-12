@@ -15,6 +15,7 @@
     "no-console": false,
     "object-literal-shorthand": false,
     "jsx-boolean-value": false,
-    "no-debugger": false
+    "no-debugger": false,
+    "no-var-requires": false
   }
 }

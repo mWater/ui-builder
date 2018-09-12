@@ -47,6 +47,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       // Create props for rendering inner block
       const innerProps : RenderDesignProps = {
         schema: props.schema,
+        dataSource: props.dataSource,
         selectedId: null,
         locale: props.locale,
         contextVars: widgetDef.contextVars,

@@ -5,7 +5,7 @@ import { WidgetDef } from "../widgets/widgets"
 import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, ContextVar, RenderDesignProps, RenderInstanceProps, Filter } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
-import { Schema, Expr } from "mwater-expressions";
+import { Schema, Expr, DataSource } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { MockDatabase } from "../widgets/Database"
@@ -15,6 +15,7 @@ interface WidgetDesignerProps {
   widgetDef: WidgetDef
   createBlock: CreateBlock
   schema: Schema
+  dataSource: DataSource
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
@@ -91,7 +92,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 
   renderPalette() {
-    return <BlockPalette createBlock={this.props.createBlock} schema={this.props.schema} />
+    return <BlockPalette createBlock={this.props.createBlock} schema={this.props.schema} dataSource={this.props.dataSource} />
   }
 
   renderDesignBlock() {
@@ -125,6 +126,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
       const renderDesignProps : RenderDesignProps = {
         schema: this.props.schema,
+        dataSource: this.props.dataSource,
         selectedId: this.state.selectedBlockId,
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
@@ -174,7 +176,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     return (
       <div className="widget-designer-editor">
-        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} schema={this.props.schema}/>
+        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} schema={this.props.schema} dataSource={this.props.dataSource}/>
       </div>
     )
   }

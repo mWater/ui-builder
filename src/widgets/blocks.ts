@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as uuid from 'uuid/v4'
 import { Database } from './Database'
-import { Schema, Expr } from 'mwater-expressions'
+import { Schema, Expr, DataSource } from 'mwater-expressions'
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -77,6 +77,7 @@ export interface RenderDesignProps {
   contextVars: ContextVar[],
   store: BlockStore,
   schema: Schema,
+  dataSource: DataSource
 
   /** Selected block id as some blocks may display differently when selected */
   selectedId: string | null,

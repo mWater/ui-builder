@@ -4,15 +4,17 @@ import { LabeledProperty, TextPropertyEditor } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
 import { ContextVar } from "../widgets/blocks";
 import { Select } from "react-library/lib/bootstrap";
-import { Schema } from "mwater-expressions";
+import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
 
 interface WidgetEditorProps {
   widgetDef: WidgetDef
   schema: Schema
+  dataSource: DataSource
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
+/** Edits the overall properties of a widget */
 export class WidgetEditor extends React.Component<WidgetEditorProps> {
   handleContextVarsChange = (contextVars: ContextVar[]) => {
     this.props.onWidgetDefChange({ ...this.props.widgetDef, contextVars })

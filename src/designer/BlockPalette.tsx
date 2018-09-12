@@ -1,11 +1,12 @@
 import * as React from "react";
 import BlockPaletteItem from "./BlockPaletteItem"
 import { CreateBlock } from "../widgets/blocks"
-import { Schema } from "mwater-expressions"
+import { Schema, DataSource } from "mwater-expressions"
 
 interface Props {
   createBlock: CreateBlock
   schema: Schema
+  dataSource: DataSource
 }
 
 export default class BlockPalette extends React.Component<Props> {
@@ -32,7 +33,7 @@ export default class BlockPalette extends React.Component<Props> {
 
     return (
       <div className="widget-designer-palette">
-        { items.map((blockDef, index) => <BlockPaletteItem key={index} blockDef={blockDef} createBlock={this.props.createBlock} schema={this.props.schema}/>) }
+        { items.map((blockDef, index) => <BlockPaletteItem key={index} blockDef={blockDef} createBlock={this.props.createBlock} schema={this.props.schema} dataSource={this.props.dataSource} />) }
       </div>
     )
   }

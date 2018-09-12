@@ -6,6 +6,7 @@ import { DragDropContext } from 'react-dnd'
 import BlockFactory from './widgets/BlockFactory';
 import { Schema } from 'mwater-expressions';
 import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
+import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
 
 const basicBlockFactory = new BlockFactory()
 
@@ -74,6 +75,8 @@ const schema = new Schema({
   ]
 })
 
+const dataSource = new MWaterDataSource("https://api.mwater.co/v3/")
+
 @DragDropContext(HTML5Backend)
 export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary}> {
   constructor(props: object) {
@@ -95,6 +98,7 @@ export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLib
           widgetLibrary={this.state.widgetLibrary} 
           blockFactory={basicBlockFactory} 
           schema={schema}
+          dataSource={dataSource}
           onWidgetLibraryChange={this.handleWidgetLibraryChange} />
       </div>
     )

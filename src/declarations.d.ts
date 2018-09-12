@@ -1,4 +1,3 @@
-
 declare module 'mwater-expressions' {
   interface LocalizedString {
     _base: string,
@@ -175,6 +174,21 @@ declare module 'mwater-expressions' {
     //   throw new Error("Not implemented")
   }
 }
+
+declare module 'mwater-expressions/lib/MWaterDataSource'
+//  {
+//   import { DataSource } from "mwater-expressions";
+
+//   export default class MWaterDataSource extends DataSource {
+//     /**
+//       serverCaching: allows server to send cached results. default true
+//       localCaching allows local MRU cache. default true
+//       imageApiUrl: overrides apiUrl for images
+//      */
+//     constructor(apiUrl: string, options?: { serverCaching?: boolean, localCaching?: boolean, imageApiUrl?: string })
+//   }
+// }
+
 declare module 'mwater-expressions-ui' 
 
 declare module 'react-library/lib/bootstrap' {
