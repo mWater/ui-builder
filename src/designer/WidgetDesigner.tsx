@@ -161,6 +161,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         const props : RenderEditorProps = {
           contextVars: contextVars,
           locale: "en",
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
           onChange: (blockDef: BlockDef) => {
             store.alterBlock(blockDef.id, () => blockDef)
           }
@@ -206,6 +208,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     const props: RenderInstanceProps = {
       locale: "en",
       database: new MockDatabase(),
+      schema: this.props.schema,
       contextVars: this.props.widgetDef.contextVars,
       getContextVarValue(contextVarId: string) { return null },
       getContextVarExprValue(contextVarId: string, expr: Expr) { return null },

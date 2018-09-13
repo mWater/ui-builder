@@ -179,6 +179,15 @@ declare module 'mwater-expressions' {
     // getCacheExpiry: -> 
     //   throw new Error("Not implemented")
   }
+
+  class ExprUtils {
+    constructor(schema: Schema)
+
+    summarizeExpr(expr: Expr, locale?: string): string
+
+    /** Converts a literal value related to an expression to a string, using name of enums. preferEnumCodes tries to use code over name */
+    stringifyExprLiteral(expr: Expr, literal: any, locale?: string, preferEnumCodes?: boolean): string
+  }
 }
 
 declare module 'mwater-expressions/lib/MWaterDataSource'
@@ -195,7 +204,25 @@ declare module 'mwater-expressions/lib/MWaterDataSource'
 //   }
 // }
 
-declare module 'mwater-expressions-ui' 
+declare module 'mwater-expressions-ui' {
+  import { Schema, DataSource, Expr, LocalizedString } from 'mwater-expressions'
+
+  class ExprComponent extends React.Component<{
+    schema: Schema
+    dataSource: DataSource
+    table: string
+    value: Expr
+    onChange: (expr: Expr) => void
+
+    /** If specified, the types (value type) of expression required. e.g. ["boolean"] */
+    types?: string[]
+    enumValues?: Array<{ id: string, name: LocalizedString }>
+    idTable?: string
+    preferLiteral?: boolean
+    aggrStatuses?: Array<"individual" | "literal" | "aggregate">
+    placeholder?: string
+  }> {}
+}
 
 declare module 'canonical-json'
 

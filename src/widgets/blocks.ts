@@ -46,6 +46,7 @@ export interface RenderInstanceProps {
   /** locale to display (e.g. "en") */
   locale: string,
   database: Database,
+  schema: Schema,
   contextVars: ContextVar[],
 
   /** Gets the value of a context variable */
@@ -90,6 +91,8 @@ export interface RenderEditorProps {
   contextVars: ContextVar[],
   /** locale of the editor (e.g. "en") */
   locale: string,
+  schema: Schema,
+  dataSource: DataSource,
   onChange(blockDef: BlockDef): void,
 }
 

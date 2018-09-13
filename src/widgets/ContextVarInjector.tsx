@@ -41,15 +41,12 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    console.log("### componentDidUpdate")
     if (!_.isEqual(prevProps.value, this.props.value) || !_.isEqual(prevState.filters, this.state.filters)) {
-      console.log("### performQueries")
       this.performQueries()
     }
   }
 
   performQueries() {
-    console.log(this.state.filters)
     // Query database if row TODO null value?
     if (this.props.contextVar.type === "row") {
       const table: string = this.props.contextVar.table!
@@ -137,6 +134,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
     const innerProps: RenderInstanceProps = {
       locale: outer.locale,
       database: outer.database,
+      schema: outer.schema,
       onSelectContextVar: outer.onSelectContextVar,
       renderChildBlock: outer.renderChildBlock,
       contextVars: outer.contextVars.concat(this.props.contextVar),

@@ -1,6 +1,40 @@
 import * as React from "react";
+import { Select } from "react-library/lib/bootstrap";
+import { ContextVar } from "./blocks";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
+
+export class LabeledProperty extends React.Component<{ label: string }> {
+  render() {
+    return (
+      <div className="form-group">
+        <label>{this.props.label}</label>
+        <div style={{ paddingLeft: 5 }}>
+          {this.props.children}
+        </div>
+      </div>
+    )
+  }
+}
+
+/** Creates a property editor for a property */
+export class PropertyEditor<T, K extends keyof T> extends React.Component<{
+  obj: T,
+  onChange: (obj: T) => void, 
+  property: K,
+  children: (value: T[K], onChange: (value: T[K]) => void) => React.ReactElement<any>
+}> {
+
+  handleChange = (value: T[K]) => {
+    this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
+  }
+
+  render() {
+    const value = this.props.obj[this.props.property]
+  
+    return this.props.children(value, this.handleChange)
+  }
+}
 
 export class LocalizedTextPropertyEditor extends React.Component<{ 
     obj: object, 
@@ -85,38 +119,38 @@ export class DropdownPropertyEditor extends React.Component<{
     options: Option[],
     nullLabel?: string }> {
 
-  handleChange = (ev: any) => {
-    const value = JSON.parse(ev.target.value)
+  handleChange = (value: any) => {
     this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
   }
 
   render() {
     const value = this.props.obj[this.props.property]
-    const options = this.props.options.slice()
-    if (this.props.nullLabel) {
-      options.unshift({ value: null, label: this.props.nullLabel })
-    }
 
     return (
-      <select
-        className="form-control"
-        value={JSON.stringify(value !== null ? value : null)}
-        onChange={this.handleChange}>
-        {options.map(option => <option key={JSON.stringify(option.value)} value={JSON.stringify(option.value)}>{option.label}</option>)}
-      </select>
+      <Select
+        value={value}
+        onChange={this.handleChange}
+        options={this.props.options} 
+        nullLabel={this.props.nullLabel}
+      />
     )
   }
 }
 
-export class LabeledProperty extends React.Component<{ label: string }> {
+
+export class ContextVarPropertyEditor extends React.Component<{ 
+  value: ContextVar | null, 
+  onChange: (value: ContextVar) => void,
+  contextVars: ContextVar[],
+  types?: string[]}> {
+
   render() {
-    return (
-      <div className="form-group">
-        <label>{this.props.label}</label>
-        <div style={{ paddingLeft: 5 }}>
-          {this.props.children}
-        </div>
-      </div>
-    )
+    const contextVars = this.props.contextVars.filter(cv => !this.props.types || this.props.types.includes(cv.type))
+
+    return <Select
+      value={this.props.value}
+      onChange={this.props.onChange}
+      options={contextVars.map(cv => ({ label: cv.name, value: cv }))}
+    />
   }
 }

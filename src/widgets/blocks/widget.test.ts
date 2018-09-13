@@ -2,7 +2,7 @@ import { WidgetBlock, WidgetBlockDef } from './widget'
 import { ContextVar, RenderInstanceProps, BlockDef, Filter } from '../blocks';
 import { WidgetDef } from '../widgets';
 import { Database } from '../../Database';
-import { Expr } from 'mwater-expressions';
+import { Expr, Schema } from 'mwater-expressions';
 
 const createBlock = jest.fn()
 const lookupWidget = jest.fn()
@@ -73,6 +73,7 @@ describe("renderInstance", () => {
     renderInstanceProps = {
       locale: "en",
       database: {} as Database,
+      schema: {} as Schema,
       contextVars: contextVars,
       getContextVarValue: (id) => id,
       getContextVarExprValue: (id) => id,

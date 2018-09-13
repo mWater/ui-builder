@@ -3,8 +3,7 @@ import { shallow, mount } from 'enzyme'
 import { RenderInstanceProps, Filter } from "./blocks";
 import { Database, QueryOptions } from "../Database";
 import * as React from "react";
-import { Expr } from "mwater-expressions";
-
+import { Expr, Schema } from "mwater-expressions";
 
 const createMockDatabase = () => {
   return {
@@ -29,6 +28,7 @@ beforeEach(() => {
   outerRenderProps = {
     locale: "en",
     database: database,
+    schema: {} as Schema,
     contextVars: [],
     getContextVarValue: jest.fn(),
     getContextVarExprValue:  jest.fn(),
