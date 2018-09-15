@@ -55,7 +55,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       <div>
         <LabeledProperty label="Context Variable">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="contextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars}/>}
+            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
 
@@ -63,7 +63,15 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           ?
           <LabeledProperty label="Expression">
             <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="expr">
-              {(value: Expr, onChange) => <ExprComponent value={value} onChange={onChange} schema={props.schema} dataSource={props.dataSource} table={contextVar.table!}/>}
+              {(value: Expr, onChange) => (
+                <ExprComponent 
+                  value={value} 
+                  onChange={onChange} 
+                  schema={props.schema} 
+                  dataSource={props.dataSource} 
+                  aggrStatuses={["individual", "aggregate", "literal"]}
+                  table={contextVar.table!}/>
+              )}
             </PropertyEditor>
           </LabeledProperty>
           : null

@@ -139,8 +139,8 @@ export class DropdownPropertyEditor extends React.Component<{
 
 
 export class ContextVarPropertyEditor extends React.Component<{ 
-  value: ContextVar | null, 
-  onChange: (value: ContextVar) => void,
+  value: string | null, 
+  onChange: (value: string) => void,
   contextVars: ContextVar[],
   types?: string[]}> {
 
@@ -150,7 +150,8 @@ export class ContextVarPropertyEditor extends React.Component<{
     return <Select
       value={this.props.value}
       onChange={this.props.onChange}
-      options={contextVars.map(cv => ({ label: cv.name, value: cv }))}
+      nullLabel="Select..."
+      options={contextVars.map(cv => ({ label: cv.name, value: cv.id }))}
     />
   }
 }

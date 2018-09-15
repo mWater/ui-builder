@@ -153,7 +153,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       if (selectedBlockAncestry) {
         const selectedBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
 
-        let contextVars : ContextVar[] = []
+        let contextVars = this.props.widgetDef.contextVars
         for (let i = 0; i < selectedBlockAncestry.length - 1 ; i++) {
           contextVars = contextVars.concat(selectedBlockAncestry[i].getCreatedContextVars())
         }
