@@ -6,6 +6,8 @@ import { ContextVar } from "../widgets/blocks";
 import { Select } from "react-library/lib/bootstrap";
 import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
+import { produce } from "immer";
+import { ExprComponent } from "mwater-expressions-ui";
 
 interface WidgetEditorProps {
   widgetDef: WidgetDef
@@ -27,6 +29,18 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       </LabeledProperty>
       <LabeledProperty label="Context Variables">
         <ContextVarsEditor contextVars={this.props.widgetDef.contextVars} onChange={this.handleContextVarsChange} schema={this.props.schema} />
+      </LabeledProperty>
+      <LabeledProperty label="Preview Variable Values">
+        {this.props.widgetDef.contextVars.map((contextVar) => {
+          return <ContextVarPreviewValue 
+            key={contextVar.id}
+            contextVar={contextVar} 
+            widgetDef={this.props.widgetDef} 
+            schema={this.props.schema}
+            dataSource={this.props.dataSource}
+            onWidgetDefChange={this.props.onWidgetDefChange}
+            />
+        })}
       </LabeledProperty>
     </div>)
   }
@@ -96,6 +110,59 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
     )
   }
 }
+
+/** Allows editing of the preview value for one context variable */
+class ContextVarPreviewValue extends React.Component<{
+  contextVar: ContextVar
+  widgetDef: WidgetDef
+  schema: Schema
+  dataSource: DataSource
+  onWidgetDefChange(widgetDef: WidgetDef): void
+}> {
+
+  handleChange = (value: any) => {
+    this.props.onWidgetDefChange(produce(this.props.widgetDef, (draft) => {
+      draft.contextVarPreviewValues[this.props.contextVar.id] = value
+    }))
+  }
+
+  renderValue(value: any) {
+    if (this.props.contextVar.type === "row") {
+      return <ExprComponent 
+        schema={this.props.schema} 
+        dataSource={this.props.dataSource}
+        table={this.props.contextVar.table!}
+        types={["id"]}
+        idTable={this.props.contextVar.table}
+        value={value}
+        onChange={this.handleChange}
+        />
+    }
+
+    if (this.props.contextVar.type === "rowset") {
+      return <ExprComponent 
+        schema={this.props.schema} 
+        dataSource={this.props.dataSource}
+        table={this.props.contextVar.table!}
+        types={["boolean"]}
+        value={value}
+        onChange={this.handleChange}
+        />
+    }
+    return <i>Not supported</i>
+  }
+  render() {
+    const value = this.props.widgetDef.contextVarPreviewValues[this.props.contextVar.id]
+
+    return (
+      <div>
+        <div>{this.props.contextVar.name}:</div>
+        {this.renderValue(value)}
+      </div>
+    )
+  }
+}
+
 
 interface ListEditorProps<T> {
   items: T[],

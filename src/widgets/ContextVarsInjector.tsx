@@ -7,13 +7,11 @@ interface Props {
   contextVars: ContextVar[]
   contextVarValues: { [contextVarId: string]: any }
   renderInstanceProps: RenderInstanceProps
-  /** What to display when loading */
-  loadingElem: React.ReactElement<any> 
 
   /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
   innerBlock: BlockDef
   createBlock: CreateBlock
-  children: (renderInstanceProps: RenderInstanceProps) => React.ReactElement<any>
+  children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>
 }
 
 /** Injects one or more context variables into the inner render instance props. 
@@ -23,24 +21,24 @@ interface Props {
 export default class ContextVarsInjector extends React.Component<Props> {
   render() {
     // Wrap once per child
-    let elem = (renderProps: RenderInstanceProps, isLoading: boolean) => isLoading ? this.props.loadingElem : this.props.children(renderProps)
+    let elem = this.props.children
 
     for (const contextVar of this.props.contextVars) {
       // Get context var exprs
       const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock).map(b => b.getContextVarExprs(contextVar.id)))
 
       const currentElem = elem
-      elem = (outerProps: RenderInstanceProps, isLoading: boolean) => (
+      elem = (outerProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => (
         <ContextVarInjector 
             contextVar={contextVar} 
             value={this.props.contextVarValues[contextVar.id]} 
             renderInstanceProps={outerProps}
             contextVarExprs={contextVarExprs}>
-          {(renderProps, innerIsLoading) => currentElem(renderProps, innerIsLoading || isLoading)}
+          {(renderProps, innerLoading, innerRefreshing) => currentElem(renderProps, innerLoading || loading, innerRefreshing || refreshing)}
         </ContextVarInjector>
       )
     }
 
-    return elem(this.props.renderInstanceProps, false)
+    return elem(this.props.renderInstanceProps, false, false)
   }
 }

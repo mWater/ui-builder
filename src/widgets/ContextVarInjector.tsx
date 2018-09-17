@@ -11,12 +11,13 @@ interface Props {
   renderInstanceProps: RenderInstanceProps
   contextVarExprs?: Expr[]
   initialFilters?: Filter[]
-  children: (renderInstanceProps: RenderInstanceProps, loading: boolean) => React.ReactElement<any>
+  children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>
 }
 
 interface State {
   filters: Filter[]
   loading: boolean
+  refreshing: boolean
   /** Value of expressions. Index by canonicalized JSON */
   exprValues: { [exprJson: string]: any }
 }
@@ -31,7 +32,8 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
 
     this.state = {
       filters: props.initialFilters || [],
-      loading: false,
+      loading: true,
+      refreshing: false,
       exprValues: {}
     }
   }
@@ -46,7 +48,9 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
     }
   }
 
-  performQueries() {
+  async performQueries() {
+    this.setState({ refreshing: true })
+
     // Query database if row TODO null value?
     if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       const table: string = this.props.contextVar.table!
@@ -68,21 +72,17 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
       }
 
       // Perform query
-      this.setState({ loading: true })
-      this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
-        if (rows.length === 0) {
-          this.setState({ exprValues: {} })
+      const rows = await this.props.renderInstanceProps.database.query(queryOptions)
+      if (rows.length === 0) {
+        this.setState({ exprValues: {} })
+      }
+      else {
+        const exprValues = {}
+        for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
+          exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
         }
-        else {
-          const exprValues = {}
-          for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
-            exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
-          }
-          this.setState({ exprValues, loading: false })
-        }
-      }).catch(e => {
-        throw e
-      })
+        this.setState({ exprValues, loading: false })
+      }
     }
 
     // Query database if rowset
@@ -112,21 +112,19 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
       }
 
       // Perform query
-      this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
-        if (rows.length === 0) {
-          this.setState({ exprValues: {}, loading: false })
+      const rows = await this.props.renderInstanceProps.database.query(queryOptions)
+      if (rows.length === 0) {
+        this.setState({ exprValues: {} })
+      }
+      else {
+        const exprValues = {}
+        for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
+          exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
         }
-        else {
-          const exprValues = {}
-          for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
-            exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
-          }
-          this.setState({ exprValues, loading: false })
-        }
-      }).catch(e => {
-        throw e
-      })
+        this.setState({ exprValues })
+      }
     }
+    this.setState({ refreshing: false, loading: false })
   }
   
   render() {
@@ -176,6 +174,6 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
         }
       },
     }
-    return this.props.children(innerProps, this.state.loading)
+    return this.props.children(innerProps, this.state.loading, this.state.refreshing)
   }
 }

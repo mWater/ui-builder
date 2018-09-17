@@ -227,7 +227,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         return childBlock.renderInstance(childProps)
       }
     }
-    const loadingElem = <div style={{ textAlign: "center", fontSize: 20, color: "grey" }}><i className="fa fa-spinner fa-spin"/></div>
 
     return [
       (<div className="widget-designer-palette"/>),
@@ -237,9 +236,13 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
           contextVarValues={this.props.widgetDef.contextVarPreviewValues}
           renderInstanceProps={rootProps}
           innerBlock={this.props.widgetDef.blockDef}
-          createBlock={this.props.createBlock}
-          loadingElem={loadingElem}>
-          {(props: RenderInstanceProps) => block.renderInstance(props)}
+          createBlock={this.props.createBlock}>
+          {(props: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+            if (loading) {
+              return <div style={{ textAlign: "center", fontSize: 20, color: "grey" }}><i className="fa fa-spinner fa-spin"/></div>
+            }
+            return block.renderInstance(props)
+          }}
         </ContextVarsInjector>
       </div>),
       (<div className="widget-designer-editor"/>)
