@@ -48,7 +48,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
 
   performQueries() {
     // Query database if row TODO null value?
-    if (this.props.contextVar.type === "row") {
+    if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       const table: string = this.props.contextVar.table!
 
       const queryOptions: QueryOptions = {
@@ -68,6 +68,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
       }
 
       // Perform query
+      this.setState({ loading: true })
       this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
         if (rows.length === 0) {
           this.setState({ exprValues: {} })
@@ -77,7 +78,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
           for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
             exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
           }
-          this.setState({ exprValues })
+          this.setState({ exprValues, loading: false })
         }
       }).catch(e => {
         throw e
@@ -85,7 +86,8 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
     }
 
     // Query database if rowset
-    if (this.props.contextVar.type === "rowset") {
+    this.setState({ loading: true })
+    if (this.props.contextVar.type === "rowset" && this.props.contextVarExprs!.length > 0) {
       const table: string = this.props.contextVar.table!
 
       const queryOptions: QueryOptions = {
@@ -112,14 +114,14 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
       // Perform query
       this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
         if (rows.length === 0) {
-          this.setState({ exprValues: {} })
+          this.setState({ exprValues: {}, loading: false })
         }
         else {
           const exprValues = {}
           for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
             exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
           }
-          this.setState({ exprValues })
+          this.setState({ exprValues, loading: false })
         }
       }).catch(e => {
         throw e
@@ -174,6 +176,6 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
         }
       },
     }
-    return this.props.children(innerProps, false)
+    return this.props.children(innerProps, this.state.loading)
   }
 }

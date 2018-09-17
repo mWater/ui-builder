@@ -164,6 +164,7 @@ test("filters are applied for rowset variables", (done) => {
   ]
 
   let innerRenderProps: RenderInstanceProps
+  let innerIsLoading = false
     
   // Need mount as shallow rendering fails to call lifecycle componentDidUpdate
   const x = mount((
@@ -173,8 +174,9 @@ test("filters are applied for rowset variables", (done) => {
       value={value}
       contextVarExprs={contextVarExprs}
       initialFilters={initialFilters}>
-      { (renderInstanceProps: RenderInstanceProps) => {
+      { (renderInstanceProps: RenderInstanceProps, isLoading: boolean) => {
           innerRenderProps = renderInstanceProps
+          innerIsLoading = isLoading
           return <div/>
       }}
     </ContextVarInjector>))
@@ -188,6 +190,8 @@ test("filters are applied for rowset variables", (done) => {
     from: "t1",
     where: { type: "op", table: "t1", op: "and", exprs: [value, initialFilters[0].expr] }
   }
+  // TODO test properly isLoading
+  // expect(innerIsLoading).toBe(true)
 
   setImmediate(() => {
     // Should perform the query
@@ -214,6 +218,6 @@ test("filters are applied for rowset variables", (done) => {
       expect(queryOptions2).toEqual(expectedQueryOptions2)
     
       done()
-    }, 1000)
+    }, 10)
   })
 })

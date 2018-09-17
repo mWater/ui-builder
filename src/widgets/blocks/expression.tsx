@@ -16,6 +16,11 @@ export interface ExpressionBlockDef extends BlockDef {
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
+
+  getContextVarExprs(contextVarId: string): Expr[] { 
+    return (contextVarId === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
+  }
+  
   renderDesign(props: RenderDesignProps) {
     const summary = new ExprUtils(props.schema).summarizeExpr(this.blockDef.expr, props.locale)
 

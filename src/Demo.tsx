@@ -93,7 +93,7 @@ const schema = new Schema({
   ]
 })
 
-const dataSource = new MWaterDataSource("https://api.mwater.co/v3/")
+const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { localCaching: false, serverCaching: false })
 
 @DragDropContext(HTML5Backend)
 export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary}> {

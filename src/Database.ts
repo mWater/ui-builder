@@ -1,20 +1,20 @@
 import { Expr } from 'mwater-expressions'
 
-export enum OrderDir {
+export enum OrderByDir {
   asc = "asc",
   desc = "desc"
 }
 
-export interface Order {
+export interface OrderBy {
   expr: Expr,
-  dir: OrderDir
+  dir: OrderByDir
 }
 
 export interface QueryOptions {
   select: { [alias: string]: Expr },
   from: string,       // Table that this is from
   where?: Expr,       // Where clause
-  order?: Order[], 
+  orderBy?: OrderBy[], 
   limit?: number
 }
 

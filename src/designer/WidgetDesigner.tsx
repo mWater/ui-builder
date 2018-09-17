@@ -10,6 +10,9 @@ import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { MockDatabase } from "../Database"
 import { WidgetEditor } from "./WidgetEditor";
+import { DataSourceDatabase } from "../DataSourceDatabase";
+import { QueryCompiler } from "../QueryCompiler";
+import ContextVarsInjector from "../widgets/ContextVarsInjector";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -205,11 +208,11 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     }
     const block = this.props.createBlock(this.props.widgetDef.blockDef)
 
-    const props: RenderInstanceProps = {
+    const rootProps: RenderInstanceProps = {
       locale: "en",
-      database: new MockDatabase(),
+      database: new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)), // TODO make non-live
       schema: this.props.schema,
-      contextVars: this.props.widgetDef.contextVars,
+      contextVars: [],
       getContextVarValue(contextVarId: string) { return null },
       getContextVarExprValue(contextVarId: string, expr: Expr) { return null },
       onSelectContextVar(contextVarId: string, primaryKey: any) { return },
@@ -224,11 +227,20 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         return childBlock.renderInstance(childProps)
       }
     }
-    
+    const loadingElem = <div style={{ textAlign: "center", fontSize: 20, color: "grey" }}><i className="fa fa-spinner fa-spin"/></div>
+
     return [
       (<div className="widget-designer-palette"/>),
       (<div className="widget-designer-preview">
-        {block.renderInstance(props)}
+        <ContextVarsInjector 
+          contextVars={this.props.widgetDef.contextVars} 
+          contextVarValues={this.props.widgetDef.contextVarPreviewValues}
+          renderInstanceProps={rootProps}
+          innerBlock={this.props.widgetDef.blockDef}
+          createBlock={this.props.createBlock}
+          loadingElem={loadingElem}>
+          {(props: RenderInstanceProps) => block.renderInstance(props)}
+        </ContextVarsInjector>
       </div>),
       (<div className="widget-designer-editor"/>)
     ]

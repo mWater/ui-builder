@@ -119,6 +119,8 @@ declare module 'mwater-expressions' {
   class Schema {
     constructor(schemaJson?: SchemaJson)
 
+    addTable(table: Table): Schema
+
     getTables(): Table[]
 
     getTable(tableId: string): Table | null
@@ -158,11 +160,44 @@ declare module 'mwater-expressions' {
 
   interface JsonQL {
     type: string
+    [other: string]: any
   }
 
+  interface JsonQLQuery {
+    type: "query"
+    selects: JsonQLSelect[]
+    from: JsonQLFrom
+    where: JsonQLExpr
+    orderBy: any // TODO
+    groupBy: any // TODO
+    limit?: number
+  }
+
+  interface JsonQLExpr {
+    // TODO
+    type: string
+    [other: string]: any
+  }
+  
+  type JsonQLFrom = JsonQLTableFrom
+
+  interface JsonQLTableFrom {
+    type: "table"
+    table: string
+    alias: string
+  }
+  interface JsonQLSelect {
+    expr: Expr
+    alias: string
+  }
+
+  interface Row {
+    [alias: string]: any 
+  }
+  
   class DataSource {
     /** Performs a single query. Calls cb with (error, rows) */
-    performQuery(query: JsonQL, cb: (error: any, rows: any[]) => void): void
+    performQuery(query: JsonQL, cb: (error: any, rows: Row[]) => void): void
 
     /** Get the url to download an image (by id from an image or imagelist column)
       Height, if specified, is minimum height needed. May return larger image
@@ -180,32 +215,44 @@ declare module 'mwater-expressions' {
     //   throw new Error("Not implemented")
   }
 
+  type AggrStatus = "individual" | "literal" | "aggregate"
+
   class ExprUtils {
     constructor(schema: Schema)
 
     summarizeExpr(expr: Expr, locale?: string): string
 
+    getExprType(expr: Expr): string | null
+
+    getExprAggrStatus(expr: Expr): AggrStatus | null
+
     /** Converts a literal value related to an expression to a string, using name of enums. preferEnumCodes tries to use code over name */
     stringifyExprLiteral(expr: Expr, literal: any, locale?: string, preferEnumCodes?: boolean): string
   }
+
+  class ExprCompiler {
+    constructor(schema: Schema)
+
+    compileExpr(options: { expr: Expr, tableAlias: string }): JsonQLExpr
+    compileTable(table: string, alias: string): JsonQLFrom
+  }
 }
 
-declare module 'mwater-expressions/lib/MWaterDataSource'
-//  {
-//   import { DataSource } from "mwater-expressions";
+declare module 'mwater-expressions/lib/MWaterDataSource' {
+  import { DataSource } from "mwater-expressions";
 
-//   export default class MWaterDataSource extends DataSource {
-//     /**
-//       serverCaching: allows server to send cached results. default true
-//       localCaching allows local MRU cache. default true
-//       imageApiUrl: overrides apiUrl for images
-//      */
-//     constructor(apiUrl: string, options?: { serverCaching?: boolean, localCaching?: boolean, imageApiUrl?: string })
-//   }
-// }
+  export default class MWaterDataSource extends DataSource {
+    /**
+      serverCaching: allows server to send cached results. default true
+      localCaching allows local MRU cache. default true
+      imageApiUrl: overrides apiUrl for images
+     */
+    constructor(apiUrl: string, client?: string | null, options?: { serverCaching?: boolean, localCaching?: boolean, imageApiUrl?: string })
+  }
+}
 
 declare module 'mwater-expressions-ui' {
-  import { Schema, DataSource, Expr, LocalizedString } from 'mwater-expressions'
+  import { Schema, DataSource, Expr, LocalizedString, AggrStatus } from 'mwater-expressions'
 
   class ExprComponent extends React.Component<{
     schema: Schema
@@ -219,7 +266,7 @@ declare module 'mwater-expressions-ui' {
     enumValues?: Array<{ id: string, name: LocalizedString }>
     idTable?: string
     preferLiteral?: boolean
-    aggrStatuses?: Array<"individual" | "literal" | "aggregate">
+    aggrStatuses?: Array<AggrStatus>
     placeholder?: string
   }> {}
 }
