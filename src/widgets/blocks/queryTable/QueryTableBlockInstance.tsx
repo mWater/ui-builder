@@ -34,7 +34,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     // Get expressions
     const rowsetCV = rips.contextVars.find(cv => cv.id === block.blockDef.rowset)!
-    const rowExprs = block.getRowExprs(rowsetCV)
+    const rowExprs = block.getRowExprs(this.props.renderInstanceProps.contextVars)
     const rowsetCVValue = rips.getContextVarValue(rowsetCV.id)
 
     // Create where
@@ -75,7 +75,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const rowcv = this.props.block.createRowContextVar(rowsetCV!)
 
     // TODO move out of here to be faster
-    const rowExprs = this.props.block.getRowExprs(rowsetCV)
+    const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars)
 
     // Row context variable value
     const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.renderInstanceProps.schema, rowsetCV)

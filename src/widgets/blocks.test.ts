@@ -27,10 +27,10 @@ test("findBlockAncestry", () => {
     ]
   }
   
-  expect(blocks.findBlockAncestry(blockDef, createBlock, "a1")!.map(b => b.id)).toEqual(["a1"])
-  expect(blocks.findBlockAncestry(blockDef, createBlock, "b1")!.map(b => b.id)).toEqual(["a1", "b1"])
-  expect(blocks.findBlockAncestry(blockDef, createBlock, "c1")!.map(b => b.id)).toEqual(["a1", "b1", "c1"])
-  expect(blocks.findBlockAncestry(blockDef, createBlock, "x")).toBeNull()
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "a1")!.map(b => b.blockDef!.id)).toEqual(["a1"])
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "b1")!.map(b => b.blockDef!.id)).toEqual(["a1", "b1"])
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "c1")!.map(b => b.blockDef!.id)).toEqual(["a1", "b1", "c1"])
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "x")).toBeNull()
 })
 
 test("getBlockTree", () => {
@@ -49,5 +49,5 @@ test("getBlockTree", () => {
     ]
   }
   
-  expect(blocks.getBlockTree(blockDef, createBlock).map(b => b.id)).toEqual(["a1", "b1", "c1"])
+  expect(blocks.getBlockTree(blockDef, createBlock, []).map(b => b.id)).toEqual(["a1", "b1", "c1"])
 })

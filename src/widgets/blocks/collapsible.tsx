@@ -1,8 +1,9 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
+import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import BlockPlaceholder from '../BlockPlaceholder';
+import * as _ from 'lodash';
 
 export interface CollapsibleBlockDef extends BlockDef {
   type: "collapsible"
@@ -11,15 +12,8 @@ export interface CollapsibleBlockDef extends BlockDef {
 }
 
 export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
-  getChildBlockDefs(): BlockDef[] {
-    const childBlockDefs = []
-    if (this.blockDef.label) {
-      childBlockDefs.push(this.blockDef.label)
-    }
-    if (this.blockDef.content) {
-      childBlockDefs.push(this.blockDef.content)
-    }
-    return childBlockDefs
+  getChildren(): ChildBlock[] {
+    return _.compact([this.blockDef.label, this.blockDef.content]).map(bd => ({ blockDef: bd, contextVars: [] }))
   }
  
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {

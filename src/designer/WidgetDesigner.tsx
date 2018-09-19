@@ -150,15 +150,15 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       const store = this.createBlockStore()
 
       // Find selected block ancestry
-      const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, this.state.selectedBlockId)
+      let contextVars = this.props.widgetDef.contextVars
+      const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, contextVars, this.state.selectedBlockId)
 
       // Create props
       if (selectedBlockAncestry) {
-        const selectedBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
+        const selectedChildBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
 
-        let contextVars = this.props.widgetDef.contextVars
         for (let i = 0; i < selectedBlockAncestry.length - 1 ; i++) {
-          contextVars = contextVars.concat(selectedBlockAncestry[i].getCreatedContextVars())
+          contextVars = contextVars.concat(selectedBlockAncestry[i].contextVars)
         }
 
         const props : RenderEditorProps = {
@@ -170,6 +170,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
             store.alterBlock(blockDef.id, () => blockDef)
           }
         }
+
+        // Create block
+        const selectedBlock = this.props.createBlock(selectedChildBlock.blockDef)
 
         return (
           <div className="widget-designer-editor">

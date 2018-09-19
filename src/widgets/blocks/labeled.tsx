@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
+import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import { LocalizedString, localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor } from '../propertyEditors';
 import BlockPlaceholder from '../BlockPlaceholder';
@@ -13,8 +13,8 @@ export interface LabeledBlockDef extends BlockDef {
 }
 
 export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
-  getChildBlockDefs(): BlockDef[] {
-    return this.blockDef.child ? [this.blockDef.child] : []
+  getChildren(): ChildBlock[] {
+    return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: [] }] : []
   }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {

@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree } from '../../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock } from '../../blocks'
 import { Expr, Schema, ExprUtils } from 'mwater-expressions';
 import { Row } from '../../../Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
@@ -15,7 +15,7 @@ export interface QueryTableBlockDef extends BlockDef {
   headers: Array<BlockDef | null>
   contents: Array<BlockDef | null>
 
-  /** Context variable of rowset for table to use */
+  /** Id of context variable of rowset for table to use */
   rowset: string
   limit: number
   where: Expr | null
@@ -23,8 +23,13 @@ export interface QueryTableBlockDef extends BlockDef {
 }
 
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
-  getChildBlockDefs(): BlockDef[] {
-    return _.compact(this.blockDef.headers.concat(this.blockDef.contents))
+  getChildren(contextVars: ContextVar[]): ChildBlock[] {
+    // Get rowset context variable
+    const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowset)
+
+    const headerChildren: ChildBlock[] = _.compact(this.blockDef.headers).map(bd => ({ blockDef: bd, contextVars: [] }))
+    const contentChildren: ChildBlock[] = _.compact(this.blockDef.contents).map(bd => ({ blockDef: bd, contextVars: rowsetCV ? [this.createRowContextVar(rowsetCV)] : [] }))
+    return headerChildren.concat(contentChildren)
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
@@ -54,13 +59,13 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   }
 
   /** Get list of expressions used in a row by content blocks */
-  getRowExprs(rowsetCV: ContextVar): Expr[] {
+  getRowExprs(contextVars: ContextVar[]): Expr[] {
     let exprs: Expr[] = []
 
     for (const contentBlockDef of this.blockDef.contents) {
       // Get block tree, compiling expressions for each one
       if (contentBlockDef) {
-        for (const descBlock of getBlockTree(contentBlockDef, this.createBlock)) {
+        for (const descBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
           exprs = exprs.concat(descBlock.getContextVarExprs(this.getRowContextVarId()))
         }
       }

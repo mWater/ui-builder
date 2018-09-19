@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar } from '../blocks'
+import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 
 export interface HorizontalBlockDef extends BlockDef {
   type: "horizontal"
@@ -11,8 +11,8 @@ export interface HorizontalBlockDef extends BlockDef {
 export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
   get id() { return this.blockDef.id }
 
-  getChildBlockDefs(): BlockDef[] {
-    return this.blockDef.items
+  getChildren(): ChildBlock[] {
+    return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: [] }))
   }
  
   canonicalize(): BlockDef | null {

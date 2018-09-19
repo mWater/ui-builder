@@ -2,7 +2,7 @@ import { DropSide, dropBlock, Filter, Block, BlockDef, RenderEditorProps, Contex
 
 // Block which doesn't contain any other blocks
 export default abstract class LeafBlock<T extends BlockDef> extends Block<T> {
-  getChildBlockDefs() { return [] }
+  getChildren() { return [] }
 
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef { return this.blockDef }
 }

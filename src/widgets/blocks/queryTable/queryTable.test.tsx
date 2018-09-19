@@ -81,5 +81,5 @@ test("gets row expressions", () => {
   const expr = { type: "field", table: "t1", column: "text" }
   const qtbd = { ...qtbdSingle, contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: expr }] }
   const qtb = new QueryTableBlock(qtbd, createBlock)
-  expect(qtb.getRowExprs(rowsetCV)).toEqual([expr])
+  expect(qtb.getRowExprs(contextVars)).toEqual([expr])
 })
