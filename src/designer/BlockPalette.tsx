@@ -45,7 +45,8 @@ export default class BlockPalette extends React.Component<Props> {
             { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },
             { id: "h2", type: "text", text: { _base: "en", en: "Header 2" }, style: "div" }
           ], 
-          contents: [null, null] 
+          contents: [null, null],
+          limit: 100
         }
       },
       {

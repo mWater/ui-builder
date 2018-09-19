@@ -14,7 +14,7 @@ const waterPointsWidgetDef: WidgetDef = {
   "name": "Water Point List",
   "description": "Test",
   "blockDef": {
-    "id": "dd63a813-55e1-4652-ae99-3dcb75a4b3a1",
+    "id": "210017a2-7ad8-4a4b-9e26-d43bbdcd723d",
     "items": [
       {
         "id": "fc2269a6-c74c-4005-b06d-2f9cddd0815e",
@@ -35,6 +35,44 @@ const waterPointsWidgetDef: WidgetDef = {
           "exprs": []
         },
         "contextVarId": "45c4cb2a-7bf5-4f33-b6dc-00d2053357de"
+      },
+      {
+        "id": "f3684226-7e0e-4165-b594-b61536e9cc61",
+        "type": "queryTable",
+        "headers": [
+          {
+            "id": "62caad04-b7b1-4590-ae9e-e602da8b1cc1",
+            "type": "text",
+            "text": {
+              "_base": "en",
+              "en": "Header 1"
+            },
+            "style": "div"
+          },
+          {
+            "id": "034cdbf1-5855-40a6-b234-36074a68e230",
+            "type": "text",
+            "text": {
+              "_base": "en",
+              "en": "Header 2"
+            },
+            "style": "div"
+          }
+        ],
+        "contents": [
+          {
+            "id": "b3fabc30-668e-4b93-96f8-b4f85cbcc2b3",
+            "type": "expression",
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "name"
+            },
+            "contextVarId": "45c4cb2a-7bf5-4f33-b6dc-00d2053357de"
+          },
+          null
+        ],
+        limit: 10,
       }
     ],
     "type": "vertical"

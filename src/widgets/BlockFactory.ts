@@ -9,7 +9,7 @@ import { TextInputBlock, TextInputBlockDef } from './blocks/textInput';
 import { DropdownInputBlock, DropdownInputBlockDef } from './blocks/dropdownInput';
 import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
 import { ExpressionBlock, ExpressionBlockDef } from './blocks/expression';
-import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable';
+import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable/queryTable';
 import { SearchBlock, SearchBlockDef } from './blocks/search';
 import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 

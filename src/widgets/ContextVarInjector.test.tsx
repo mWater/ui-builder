@@ -4,23 +4,13 @@ import { RenderInstanceProps, Filter } from "./blocks";
 import { Database, QueryOptions } from "../Database";
 import * as React from "react";
 import { Expr, Schema } from "mwater-expressions";
-
-const createMockDatabase = () => {
-  return {
-    query: jest.fn(),
-    addChangeListener: jest.fn(),
-    removeChangeListener: jest.fn(),
-    addRow: jest.fn(),
-    updateRow: jest.fn(),
-    removeRow: jest.fn()
-  }
-}
+import mockDatabase from "../__fixtures__/mockDatabase";
 
 let database: Database
 let outerRenderProps: RenderInstanceProps
 
 beforeEach(() => {
-  const db = createMockDatabase()
+  const db = mockDatabase()
   db.query = jest.fn(() => Promise.resolve([{ e0: "abc" }]))
 
   database = db

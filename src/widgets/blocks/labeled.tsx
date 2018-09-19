@@ -17,11 +17,9 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
     return this.blockDef.child ? [this.blockDef.child] : []
   }
  
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {
-      if (draft.child) {
-        draft.child = action(draft.child)
-      }
+      draft.child = action(draft.child)
     })
   }
 
@@ -45,7 +43,7 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { // TODO, ref: (blockInstance: BlockInstance | null) => void) {
+  renderInstance(props: RenderInstanceProps) {
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         <div style={{fontWeight: "bold"}}>
