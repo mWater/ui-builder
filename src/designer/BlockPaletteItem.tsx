@@ -6,6 +6,7 @@ import * as uuid from 'uuid/v4'
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 
 interface Props {
+  title?: string
   blockDef: BlockDef
   createBlock: CreateBlock
   schema: Schema
@@ -54,6 +55,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
   render() {
     return (
       <div style={{padding: 5, position: "relative", backgroundColor: "white", border: "solid 1px #AAA", margin: 5 }}>
+        <div style={{ position: "relative", textAlign: "center", top: -5, fontSize: 10, marginBottom: -5 }}>{this.props.title}</div>
         {this.renderContents()}
         {this.props.connectDragSource!(<div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}/>)}
       </div>

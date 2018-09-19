@@ -21,6 +21,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     this.lookupWidget = lookupWidget
   }
 
+  // TODO validate
   // TODO get initial filters, mapped
   // async getInitialFilters(contextVarId: string): Promise<Filter[]> { 
   //   const widgetDef = this.lookupWidget(this.blockDef.widgetId)
