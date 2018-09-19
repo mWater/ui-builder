@@ -6,6 +6,9 @@ import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Co
 import { Expr, Schema, ExprUtils } from 'mwater-expressions';
 import { Row } from '../../../Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../../propertyEditors';
+import { NumberInput, Select } from 'react-library/lib/bootstrap';
+import { ExprComponent } from 'mwater-expressions-ui';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -143,6 +146,9 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   }
 
   renderEditor(props: RenderEditorProps) {
+    // Get rowset context variable
+    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowset)
+
     const handleAddColumn = () => {
       props.onChange(produce(this.blockDef, b => {
         b.headers.push(null)
@@ -162,10 +168,42 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
     return (
       <div>
-        <button type="button" className="btn btn-default" onClick={handleAddColumn}>
+        <LabeledProperty label="Rowset">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowset">
+            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Mode">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="mode">
+            {(value, onChange) => <Select value={value} onChange={onChange} options={[{ value: "singleRow", label: "One item per row" }, { value: "multiRow", label: "Multiple item per row" }]} />}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Filter">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="where">
+            {(value: Expr, onChange) => (
+                <ExprComponent 
+                  value={value} 
+                  onChange={onChange} 
+                  schema={props.schema} 
+                  dataSource={props.dataSource} 
+                  types={["boolean"]}
+                  table={rowsetCV!.table!}/>
+              )}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Maximum rows">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="limit">
+            {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
           <i className="fa fa-plus"/> Add Column
         </button>
-        <button type="button" className="btn btn-default" onClick={handleRemoveColumn}>
+        <button type="button" className="btn btn-link btn-sm" onClick={handleRemoveColumn}>
           <i className="fa fa-minus"/> Remove Column
         </button>
       </div>

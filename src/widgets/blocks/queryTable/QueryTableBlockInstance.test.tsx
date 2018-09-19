@@ -76,11 +76,12 @@ test("creates query", () => {
   })
 })
 
-test("adds filters", () => {
+test("adds filters and where", () => {
   (database.query as jest.Mock).mockResolvedValue([])
 
   rips.getFilters = () => [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: true }}]
-  const inst = mount(<QueryTableBlockInstance block={qtbSingle} renderInstanceProps={rips} />)
+  const qtb = createBlock({ ...qtbdSingle, where: { type: "literal", valueType: "boolean", value: false }})
+  const inst = mount(<QueryTableBlockInstance block={qtb} renderInstanceProps={rips} />)
 
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions
   expect(queryOptions).toEqual({
@@ -95,7 +96,8 @@ test("adds filters", () => {
       table: "t1",
       exprs: [
         { type: "field", table: "t1", column: "boolean" },
-        { type: "literal", valueType: "boolean", value: true }
+        { type: "literal", valueType: "boolean", value: true },
+        { type: "literal", valueType: "boolean", value: false }
       ]
     },
     limit: 10

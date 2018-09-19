@@ -45,6 +45,11 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       exprs: _.compact([rowsetCVValue].concat(_.map(rips.getFilters(rowsetCV.id), f => f.expr)))
     }
 
+    // Add own where
+    if (block.blockDef.where) {
+      where.exprs.push(block.blockDef.where)
+    }
+
     const queryOptions: QueryOptions = {
       select: {},
       from: rowsetCV.table!,
