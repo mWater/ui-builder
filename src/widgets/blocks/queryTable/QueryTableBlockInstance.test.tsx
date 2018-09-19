@@ -8,6 +8,7 @@ import simpleSchema from "../../../__fixtures__/schema";
 import BlockFactory from '../../BlockFactory';
 import mockDatabase from '../../../__fixtures__/mockDatabase';
 import { QueryOptions } from '../../../Database';
+import { Expr } from 'mwater-expressions';
 
 // Outer context vars
 const rowsetCV = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -15,7 +16,7 @@ const contextVars: ContextVar[] = [rowsetCV]
 
 const schema = simpleSchema()
 
-const exprText = { type: "field", table: "t1", column: "text" }
+const exprText: Expr = { type: "field", table: "t1", column: "text" }
 
 const qtbdSingle: QueryTableBlockDef = {
   id: "123",
@@ -100,6 +101,18 @@ test("adds filters", () => {
     limit: 10
   })
 
+})
+
+test("injects context variables", () => {
+  (database.query as jest.Mock).mockResolvedValue([])
+
+  const inst = mount(<QueryTableBlockInstance block={qtbSingle} renderInstanceProps={rips} />)
+  inst.setState({ rows: [{ id: "r1", e0: "abc" }] })
+  const rowRips = (inst.instance() as QueryTableBlockInstance).createRowRenderInstanceProps(0) as RenderInstanceProps
+
+  expect(rowRips.getContextVarValue("123_row")).toBe("r1")
+
+  expect(rowRips.getContextVarExprValue("123_row", exprText)).toBe("abc")
 })
 
 // TODO performs action on row click

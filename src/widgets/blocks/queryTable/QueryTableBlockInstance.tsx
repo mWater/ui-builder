@@ -74,6 +74,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const rowsetCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.block.blockDef.rowset)!
     const rowcv = this.props.block.createRowContextVar(rowsetCV!)
 
+    // TODO move out of here to be faster
     const rowExprs = this.props.block.getRowExprs(rowsetCV)
 
     // Row context variable value
@@ -87,7 +88,9 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         if (cvid !== rowcv.id) {
           return rips.getContextVarExprValue(cvid, expr)
         }
-        // TODO map expression to query column
+        // Look up expression
+        const exprIndex = rowExprs.findIndex(rowExpr => _.isEqual(expr, rowExpr))
+        return this.state.rows![rowIndex]["e" + exprIndex]
       }
     }
   }
