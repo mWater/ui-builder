@@ -9,6 +9,8 @@ export interface DropdownInputBlockDef extends BlockDef {
 }
 
 export class DropdownInputBlock extends LeafBlock<DropdownInputBlockDef> {
+  validate() { return null }
+
   renderDesign(props: RenderDesignProps) {
     return (
       <select className="form-control" value="a" style={{color: "#999"}}>

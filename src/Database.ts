@@ -15,7 +15,7 @@ export interface QueryOptions {
   from: string,       // Table that this is from
   where?: Expr,       // Where clause
   orderBy?: OrderBy[], 
-  limit?: number
+  limit?: number | null
 }
 
 // export interface QueryOneOptions {

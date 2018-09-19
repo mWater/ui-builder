@@ -14,6 +14,8 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
   getChildren(): ChildBlock[] {
     return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: [] }))
   }
+
+  validate() { return null }
  
   canonicalize(): BlockDef | null {
     // Remove if zero items

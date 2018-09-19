@@ -14,6 +14,8 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
   getChildren(): ChildBlock[] {
     return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: [] }))
   }
+
+  validate() { return null }
  
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     // Apply action to all children, discarding null ones

@@ -19,6 +19,8 @@ export interface ButtonBlockDef extends BlockDef {
 }
 
 export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
+  validate() { return null }
+  
   renderButton(locale: string, onClick: () => void) {
     const label = localize(this.blockDef.label, locale)
     let className = "btn btn-" + this.blockDef.style

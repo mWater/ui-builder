@@ -144,6 +144,9 @@ export abstract class Block<T extends BlockDef> {
   /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
   abstract getChildren(contextVars: ContextVar[]): ChildBlock[]
 
+  /** Determine if block is valid. null means valid, string is error message. Does not validate children */
+  abstract validate(schema: Schema, contextVars: ContextVar[]): string | null
+
   /** 
    * Processes entire tree, starting at bottom. Allows 
    * easy mutation of the tree

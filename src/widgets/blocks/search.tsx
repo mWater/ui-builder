@@ -8,6 +8,11 @@ export interface SearchBlockDef extends BlockDef {
 }
 
 export class SearchBlock extends LeafBlock<SearchBlockDef> {
+  validate() {
+    // TODO
+    return null   
+  }
+  
   renderDesign(props: RenderDesignProps) {
     return (
       <div className="input-group">

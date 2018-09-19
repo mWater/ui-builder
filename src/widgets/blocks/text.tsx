@@ -13,6 +13,8 @@ export interface TextBlockDef extends BlockDef {
 }
 
 export class TextBlock extends LeafBlock<TextBlockDef> {
+  validate() { return null }
+  
   renderDesign(props: RenderDesignProps) {
     const text = localize(this.blockDef.text, props.locale)
     return React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Text</span>)

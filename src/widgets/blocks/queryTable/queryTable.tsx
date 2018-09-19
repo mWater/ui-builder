@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock } from '../../blocks'
-import { Expr, Schema, ExprUtils } from 'mwater-expressions';
+import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { Row } from '../../../Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../../propertyEditors';
@@ -19,8 +19,8 @@ export interface QueryTableBlockDef extends BlockDef {
   contents: Array<BlockDef | null>
 
   /** Id of context variable of rowset for table to use */
-  rowset: string
-  limit: number
+  rowset: string | null
+  limit: number | null
   where: Expr | null
   // order?
 }
@@ -33,6 +33,25 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     const headerChildren: ChildBlock[] = _.compact(this.blockDef.headers).map(bd => ({ blockDef: bd, contextVars: [] }))
     const contentChildren: ChildBlock[] = _.compact(this.blockDef.contents).map(bd => ({ blockDef: bd, contextVars: rowsetCV ? [this.createRowContextVar(rowsetCV)] : [] }))
     return headerChildren.concat(contentChildren)
+  }
+
+  validate(schema: Schema, contextVars: ContextVar[]) { 
+    // Validate rowset
+    const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowset && cv.type === "rowset")
+    if (!rowsetCV) {
+      return "Rowset required"
+    }
+
+    const exprValidator = new ExprValidator(schema)
+    let error: string | null
+    
+    // Validate where
+    error = exprValidator.validateExpr(this.blockDef.where, { table: rowsetCV.table })
+    if (error) {
+      return error
+    }
+
+    return null
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {

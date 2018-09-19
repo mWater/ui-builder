@@ -15,6 +15,8 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
   getChildren(): ChildBlock[] {
     return _.compact([this.blockDef.label, this.blockDef.content]).map(bd => ({ blockDef: bd, contextVars: [] }))
   }
+
+  validate() { return null }
  
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {

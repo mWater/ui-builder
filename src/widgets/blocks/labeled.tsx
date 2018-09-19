@@ -16,6 +16,8 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
   getChildren(): ChildBlock[] {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: [] }] : []
   }
+
+  validate() { return null }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {

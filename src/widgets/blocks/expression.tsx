@@ -1,8 +1,8 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar } from '../blocks'
 import { TextPropertyEditor, PropertyEditor, ContextVarPropertyEditor, LabeledProperty } from '../propertyEditors';
-import { Expr, ExprUtils, Schema } from 'mwater-expressions';
+import { Expr, ExprUtils, Schema, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 
 export interface ExpressionBlockDef extends BlockDef {
@@ -16,11 +16,29 @@ export interface ExpressionBlockDef extends BlockDef {
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
-
   getContextVarExprs(contextVarId: string): Expr[] { 
     return (contextVarId === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
   }
-  
+
+  validate(schema: Schema, contextVars: ContextVar[]) { 
+    // Validate cv
+    const contextVar = contextVars.find(cv => cv.id === this.blockDef.rowset && (cv.type === "rowset" || cv.type === "row"))
+    if (!contextVar) {
+      return "Context var required"
+    }
+
+    const exprValidator = new ExprValidator(schema)
+    let error: string | null
+    
+    // Validate expr
+    error = exprValidator.validateExpr(this.blockDef.expr, { table: contextVar.table })
+    if (error) {
+      return error
+    }
+
+    return null
+  }
+
   renderDesign(props: RenderDesignProps) {
     const summary = new ExprUtils(props.schema).summarizeExpr(this.blockDef.expr, props.locale)
 
@@ -47,11 +65,6 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       <div>{str}</div>
     )     
   }
-
-  // validate(schema: Schema): string | null {
-  //   if (!this.blockDef.)
-  //   return null
-  // }
 
   renderEditor(props: RenderEditorProps) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)

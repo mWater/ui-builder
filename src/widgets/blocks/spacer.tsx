@@ -8,6 +8,8 @@ export interface SpacerBlockDef extends BlockDef {
 
 // TODO
 export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
+  validate() { return null }
+  
   renderDesign(props: RenderDesignProps) {
     return (
       <div/>
