@@ -235,6 +235,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
           contextVars={this.props.widgetDef.contextVars} 
           contextVarValues={this.props.widgetDef.contextVarPreviewValues}
           renderInstanceProps={rootProps}
+          schema={this.props.schema}
           innerBlock={this.props.widgetDef.blockDef}
           createBlock={this.props.createBlock}>
           {(props: RenderInstanceProps, loading: boolean, refreshing: boolean) => {

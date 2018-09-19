@@ -1,6 +1,6 @@
 import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter } from "./blocks";
 import * as React from "react";
-import { Expr } from "mwater-expressions";
+import { Expr, ExprUtils, Schema } from "mwater-expressions";
 import { QueryOptions } from "../Database";
 import * as canonical from 'canonical-json'
 import * as _ from "lodash";
@@ -11,6 +11,7 @@ interface Props {
   renderInstanceProps: RenderInstanceProps
   contextVarExprs?: Expr[]
   initialFilters?: Filter[]
+  schema: Schema
   children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>
 }
 
@@ -96,9 +97,13 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
         where: this.props.value as Expr
       }
 
+      // Add expressions as selects (only if aggregate for rowset)
+      const exprUtils = new ExprUtils(this.props.schema)
+      const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
+
       // Add expressions as selects
-      for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
-        queryOptions.select["e" + i] = this.props.contextVarExprs![i]
+      for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
+        queryOptions.select["e" + i] = nonAggrExpressions[i]
       }
 
       // Add filters
@@ -118,8 +123,8 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
       }
       else {
         const exprValues = {}
-        for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
-          exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
+        for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
+          exprValues[canonical(nonAggrExpressions[i])] = rows[0]["e" + i]
         }
         this.setState({ exprValues })
       }

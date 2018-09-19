@@ -5,9 +5,11 @@ import { Database, QueryOptions } from "../Database";
 import * as React from "react";
 import { Expr, Schema } from "mwater-expressions";
 import mockDatabase from "../__fixtures__/mockDatabase";
+import simpleSchema from "../__fixtures__/schema";
 
 let database: Database
 let outerRenderProps: RenderInstanceProps
+const schema = simpleSchema()
 
 beforeEach(() => {
   const db = mockDatabase()
@@ -41,6 +43,7 @@ test("inner contains extra context vars", () => {
   const x = shallow((
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
+      schema={schema}
       contextVar={contextVar} 
       value={value}
       contextVarExprs={contextVarExprs}>
@@ -66,6 +69,7 @@ test("exprs are computed for row variables", (done) => {
   const x = shallow((
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
+      schema={schema}
       contextVar={contextVar} 
       value={value}
       contextVarExprs={contextVarExprs}>
@@ -101,10 +105,11 @@ test("exprs are computed for row variables", (done) => {
   })
 })
 
-test("exprs are computed for rowset variables", (done) => {
+test("exprs are computed for rowset variables, excluding non-aggregates", (done) => {
   const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs : Expr[] = [
+    { type: "field", table: "t1", column: "text" },
     { type: "op", table: "t1", op: "count", exprs: [] }
   ]
 
@@ -114,6 +119,7 @@ test("exprs are computed for rowset variables", (done) => {
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
       contextVar={contextVar} 
+      schema={schema}
       value={value}
       contextVarExprs={contextVarExprs}>
       { (renderInstanceProps: RenderInstanceProps) => {
@@ -126,7 +132,7 @@ test("exprs are computed for rowset variables", (done) => {
   const queryOptions = (database.query as jest.Mock).mock.calls[0][0] as QueryOptions
   const expectedQueryOptions : QueryOptions = {
     select: {
-      e0: contextVarExprs[0]
+      e0: contextVarExprs[1]
     },
     from: "t1",
     where: value
@@ -137,7 +143,7 @@ test("exprs are computed for rowset variables", (done) => {
     expect(queryOptions).toEqual(expectedQueryOptions)
   
     // Should get the value
-    expect(innerRenderProps!.getContextVarExprValue(contextVar.id, contextVarExprs[0])).toBe("abc")
+    expect(innerRenderProps!.getContextVarExprValue(contextVar.id, contextVarExprs[1])).toBe("abc")
   
     done()
   })
@@ -162,6 +168,7 @@ test("filters are applied for rowset variables", (done) => {
       renderInstanceProps={outerRenderProps} 
       contextVar={contextVar} 
       value={value}
+      schema={schema}
       contextVarExprs={contextVarExprs}
       initialFilters={initialFilters}>
       { (renderInstanceProps: RenderInstanceProps, isLoading: boolean) => {

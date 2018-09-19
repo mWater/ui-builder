@@ -14,10 +14,11 @@ export class DataSourceDatabase implements Database {
     this.queryCompiler = queryCompiler
   }
   
-  async query(options: QueryOptions) {
+  query(options: QueryOptions) {
     const jsonql = this.queryCompiler.compileQuery(options)
     
-    return await new Promise<Row[]>((resolve, reject) => {
+    debugger
+    return new Promise<Row[]>((resolve, reject) => {
       this.dataSource.performQuery(jsonql, (error, rows) => {
         if (error) {
           reject(error)

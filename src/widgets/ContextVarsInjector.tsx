@@ -2,11 +2,13 @@ import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter, getBloc
 import * as React from "react";
 import ContextVarInjector from './ContextVarInjector'
 import * as _ from "lodash";
+import { Schema } from "mwater-expressions";
 
 interface Props {
   contextVars: ContextVar[]
   contextVarValues: { [contextVarId: string]: any }
   renderInstanceProps: RenderInstanceProps
+  schema: Schema
 
   /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
   innerBlock: BlockDef
@@ -31,6 +33,7 @@ export default class ContextVarsInjector extends React.Component<Props> {
       elem = (outerProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => (
         <ContextVarInjector 
             contextVar={contextVar} 
+            schema={this.props.schema}
             value={this.props.contextVarValues[contextVar.id]} 
             renderInstanceProps={outerProps}
             contextVarExprs={contextVarExprs}>

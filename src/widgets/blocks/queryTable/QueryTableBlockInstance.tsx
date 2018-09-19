@@ -118,7 +118,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         </tr>)
     }
 
-    return this.state.rows.map(this.renderRow)
+    return this.state.rows.map((row, rowIndex) => this.renderRow(row, rowIndex))
   }
 
   render() {

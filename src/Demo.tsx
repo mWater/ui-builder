@@ -68,11 +68,13 @@ const waterPointsWidgetDef: WidgetDef = {
               "table": "entities.water_point",
               "column": "name"
             },
-            "contextVarId": "45c4cb2a-7bf5-4f33-b6dc-00d2053357de"
+            "contextVarId": "f3684226-7e0e-4165-b594-b61536e9cc61_row"
           },
           null
         ],
         limit: 10,
+        rowset: "45c4cb2a-7bf5-4f33-b6dc-00d2053357de",
+        mode: "singleRow"
       }
     ],
     "type": "vertical"
