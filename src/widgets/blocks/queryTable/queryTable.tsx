@@ -109,13 +109,13 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     const setHeader = (index: number, blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce(b => {
         b!.headers[index] = blockDef
-      }))
+      }), blockDef.id)
     }
 
     const setContent = (index: number, blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce(b => {
         b!.contents[index] = blockDef
-      }))
+      }), blockDef.id)
     }
 
     return (

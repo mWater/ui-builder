@@ -229,7 +229,7 @@ export function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlo
     if (childBlock.blockDef) {
       const childAncestry: ChildBlock[] | null = findBlockAncestry(childBlock.blockDef, createBlock, contextVars.concat(childBlock.contextVars), blockId)
       if (childAncestry) {
-        return [{ blockDef: rootBlockDef, contextVars: [] } as ChildBlock].concat(childAncestry)
+        return [{ blockDef: rootBlockDef, contextVars: childBlock.contextVars } as ChildBlock].concat(childAncestry)
       }
     }
   }
