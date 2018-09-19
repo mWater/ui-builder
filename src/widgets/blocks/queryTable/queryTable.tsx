@@ -140,6 +140,14 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       }), blockDef.id)
     }
 
+    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowset && cv.type === "rowset")
+    let contentProps = props
+    
+    // Add context variable if knowable
+    if (rowsetCV) {
+      contentProps = { ...contentProps, contextVars: props.contextVars.concat([this.createRowContextVar(rowsetCV)]) }
+    }
+
     return (
       <table className="table table-bordered">
         <thead>
@@ -152,7 +160,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
         <tbody>
           <tr>
             { this.blockDef.contents.map((b, index) => {
-              return <td key={index}>{props.renderChildBlock(props, b, setContent.bind(null, index))}</td>
+              return <td key={index}>{props.renderChildBlock(contentProps, b, setContent.bind(null, index))}</td>
             })}
           </tr>
         </tbody>

@@ -13,6 +13,10 @@
   border: dashed 1px #38D;
 }
 
+.block-wrapper.validation-error {
+  border: dashed 2px red;
+}
+
 .block-wrapper .delete-block {
   position: absolute;
   color: #38D;

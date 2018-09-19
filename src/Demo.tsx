@@ -76,7 +76,7 @@ const waterPointsWidgetDef: WidgetDef = {
             "expr": {
               "type": "field",
               "table": "entities.water_point",
-              "column": "desc"
+              "column": "descx"
             },
             "contextVarId": "f3684226-7e0e-4165-b594-b61536e9cc61_row"
           }

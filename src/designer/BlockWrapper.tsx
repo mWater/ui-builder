@@ -1,5 +1,5 @@
 import * as React from "react"
-import { BlockDef, DropSide, BlockStore, dropBlock } from "../widgets/blocks"
+import { BlockDef, DropSide, BlockStore, dropBlock, CreateBlock } from "../widgets/blocks"
 import { DragSource, DropTarget, DropTargetMonitor, ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd'
 import "./BlockWrapper.css"
 import { DragDropMonitor } from "dnd-core";
@@ -9,6 +9,7 @@ interface Props {
   blockDef: BlockDef;
   selectedBlockId: string | null;
   store: BlockStore;
+  validationError: string | null;
 
   /** Injected by react-dnd */
   isOver?: boolean;
@@ -175,12 +176,20 @@ export default class BlockWrapper extends React.Component<Props, State> {
   }
 
   render() {
-    const selected = this.props.selectedBlockId === this.props.blockDef.id;
+    const selected = this.props.selectedBlockId === this.props.blockDef.id
+
+    let className = "block-wrapper"
+    if (this.props.validationError) {
+      className += " validation-error"
+    }
+    else if (selected) {
+      className += " selected"
+    }
 
     return (
       this.props.connectDragSource!(
         this.props.connectDropTarget!(
-          <div onClick={this.handleClick} className={selected ? "block-wrapper selected" : "block-wrapper"}>
+          <div onClick={this.handleClick} className={className}>
             {selected ? <span className="delete-block" onClick={this.props.onRemove}><i className="fa fa-remove"/></span> : null}
             {this.renderHover()}
             {this.props.children}

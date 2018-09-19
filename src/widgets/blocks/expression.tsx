@@ -20,10 +20,11 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     return (contextVarId === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
   }
 
-  validate(schema: Schema, contextVars: ContextVar[]) { 
+  validate(schema: Schema, contextVars: ContextVar[]) {
     // Validate cv
-    const contextVar = contextVars.find(cv => cv.id === this.blockDef.rowset && (cv.type === "rowset" || cv.type === "row"))
+    const contextVar = contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
     if (!contextVar) {
+      debugger
       return "Context var required"
     }
 

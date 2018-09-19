@@ -110,6 +110,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       const renderChildBlock = (props: RenderDesignProps, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void) => {
         if (childBlockDef) {
           const childBlock = this.props.createBlock(childBlockDef)
+          const validationError = childBlock.validate(this.props.schema, props.contextVars)
+      
           return (
             <BlockWrapper 
               blockDef={childBlockDef} 
@@ -117,6 +119,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
               onSelect={this.handleSelect.bind(null, childBlockDef.id)} 
               onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)} 
               store={store}
+              validationError={validationError}
             >
               {childBlock.renderDesign(props)}
             </BlockWrapper>
