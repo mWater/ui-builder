@@ -1,10 +1,12 @@
 import * as React from "react"
+import * as uuid from 'uuid/v4'
 import { WidgetDef } from "../widgets/widgets";
 import { Schema, DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
 import produce from "immer";
 import BlockFactory from "../widgets/BlockFactory";
 import { CreateBlock } from "../widgets/blocks";
+import * as _ from "lodash";
 
 export interface WidgetLibrary {
   widgets: { [id: string]: WidgetDef }
@@ -47,6 +49,24 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     this.setState({ activeTabIndex: index })
   }
 
+  handleAddWidget = (widgetDef: WidgetDef) => {
+    const widgetLibrary = produce(this.props.widgetLibrary, (draft) => {
+      draft.widgets[widgetDef.id] = widgetDef
+    })
+    this.props.onWidgetLibraryChange(widgetLibrary)
+    this.setState({ openTabs: this.state.openTabs.concat(widgetDef.id)})
+  }
+
+  handleCloseTab = (index: number) => {
+    const openTabs = this.state.openTabs.slice()
+    openTabs.splice(index, 1)
+    this.setState({ openTabs: openTabs })
+  }
+
+  handleOpenWidget = (widgetId: string) => {
+    this.setState({ openTabs: this.state.openTabs.concat(widgetId)})
+  }
+
   renderTab(tab: string, index: number) {
     const activeTabId = this.state.openTabs[index]
     const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
@@ -55,6 +75,8 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
       <li className={(index === this.state.activeTabIndex) ? "active" : ""}>
         <a onClick={this.handleSelectTab.bind(null, index)}>
           {widgetDef.name}
+          &nbsp;
+          <a onClick={this.handleCloseTab.bind(null, index)}><i className="fa fa-remove text-muted"/></a>
         </a>
       </li>
     )
@@ -74,7 +96,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
       />
     }
     else {
-      return "TODO"
+      return <NewTab widgetLibrary={this.props.widgetLibrary} onAddWidget={this.handleAddWidget} onOpenWidget={this.handleOpenWidget} />
     }
   }
 
@@ -113,5 +135,47 @@ class WidgetTab extends React.Component<{
       onWidgetDefChange={this.props.onWidgetDefChange}
     />
   }
+}
 
+/** Tab which lists existing tabs and offers a button to create a new tab */
+class NewTab extends React.Component<{  
+  widgetLibrary: WidgetLibrary
+  onAddWidget: (widgetDef: WidgetDef) => void,
+  onOpenWidget: (widgetId: string) => void, 
+}> {
+
+  /** Add a new blank widget */
+  handleAdd = () => {
+    this.props.onAddWidget({
+      id: uuid(),
+      name: "Untitled",
+      description: "",
+      blockDef: null,
+      contextVars: [],
+      contextVarPreviewValues: {}
+    })
+  }
+
+  renderExistingWidgets() {
+    const widgets = _.sortBy(_.values(this.props.widgetLibrary.widgets), "name")
+
+    return (
+      <div className="list-group">
+        { widgets.map(widget => (
+          <a className="list-group-item" key={widget.id} onClick={this.props.onOpenWidget.bind(null, widget.id)}>{widget.name}</a>
+        )) }
+      </div>
+    )
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderExistingWidgets()}
+        <button type="button" className="btn btn-primary" onClick={this.handleAdd}>
+          <i className="fa fa-plus"/> New Widget
+        </button>
+      </div>
+    )
+  }
 }
