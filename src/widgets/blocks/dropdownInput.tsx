@@ -19,7 +19,7 @@ export class DropdownInputBlock extends LeafBlock<DropdownInputBlockDef> {
     )     
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     return (
       <select className="form-control" value="a" style={{color: "#999"}}>
         <option value="a" disabled>{this.blockDef.column}</option>

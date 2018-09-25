@@ -22,7 +22,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     return (
       <div className="input-group">
         <span className="input-group-addon"><i className="fa fa-search"/></span>

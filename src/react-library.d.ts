@@ -1,3 +1,16 @@
+
+declare module 'react-library/lib/ModalPopupComponent' {
+  class ModalPopupComponent extends React.Component<{
+    header?: React.ReactNode
+    footer?: React.ReactNode
+    size?: "large" | "full"
+    showCloseX?: boolean
+    onClose: () => void
+  }> {}
+
+  export default ModalPopupComponent
+}
+
 declare module 'react-library/lib/bootstrap' {
   import { ReactNode } from "react";
 

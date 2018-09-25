@@ -57,7 +57,7 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { // TODO, ref: (blockInstance: BlockInstance | null) => void) {
+  renderInstance(props: RenderInstanceProps) { 
     const labelNode = this.blockDef.label ?
       this.createBlock(this.blockDef.label).renderInstance(props) : null
 

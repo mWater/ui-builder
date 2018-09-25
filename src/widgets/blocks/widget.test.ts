@@ -82,7 +82,7 @@ describe("renderInstance", () => {
       getFilters: jest.fn(),
       renderChildBlock: jest.fn()
     }
-    widgetBlock.renderInstance(renderInstanceProps, () => { return })
+    widgetBlock.renderInstance(renderInstanceProps)
 
     // Get inner renderInstanceProps
     innerRenderInstanceProps = innerBlock.renderInstance.mock.calls[0][0] as RenderInstanceProps

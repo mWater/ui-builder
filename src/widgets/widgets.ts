@@ -15,4 +15,3 @@ export interface WidgetDef {
 }
 
 export type LookupWidget = (id: string) => WidgetDef | null
-

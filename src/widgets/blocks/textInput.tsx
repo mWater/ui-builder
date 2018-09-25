@@ -18,7 +18,7 @@ export class TextInputBlock extends LeafBlock<TextInputBlockDef> {
     )     
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     return (
       <input type="text" className="form-control" placeholder={this.blockDef.column} />
     )     

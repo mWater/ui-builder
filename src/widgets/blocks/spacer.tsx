@@ -16,7 +16,7 @@ export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     return (
       <div/>
     )

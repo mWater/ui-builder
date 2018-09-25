@@ -68,7 +68,7 @@ export interface RenderInstanceProps {
   /** Get any filters set on a rowset context variable  */
   getFilters(contextVarId: string): Filter[];
 
-  /** All sub-block elements must rendered using this function. onSet will be called only when transitioning from null to a value 
+  /** All sub-block elements must rendered using this function. 
    * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string 
    * per instance 
    */
@@ -132,8 +132,8 @@ export abstract class Block<T extends BlockDef> {
   /** Render the block as it looks in design mode. This may use bootstrap */
   abstract renderDesign(props: RenderDesignProps): React.ReactElement<any>
 
-  /** Render a live instance of the block. ref will be called with the block instance. This may use bootstrap for now */
-  abstract renderInstance(props: RenderInstanceProps, ref?: (blockInstance: BlockInstance | null) => void): React.ReactElement<any>
+  /** Render a live instance of the block. This may use bootstrap for now */
+  abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any>
 
   /** Render an optional property editor for the block. This may use bootstrap */
   renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }

@@ -13,6 +13,8 @@ import { WidgetEditor } from "./WidgetEditor";
 import { DataSourceDatabase } from "../DataSourceDatabase";
 import { QueryCompiler } from "../QueryCompiler";
 import ContextVarsInjector from "../widgets/ContextVarsInjector";
+import { PageStackDisplay } from "../PageStackDisplay";
+import { Page } from "../PageStack";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -177,8 +179,12 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         // Create block
         const selectedBlock = this.props.createBlock(selectedChildBlock.blockDef)
 
+        // Check for errors
+        const validationError = selectedBlock.validate(this.props.schema, contextVars)
+
         return (
           <div className="widget-designer-editor">
+            { validationError ? <div className="alert alert-danger">{validationError}</div> : null }
             {selectedBlock.renderEditor(props)}
           </div>
         )
@@ -208,49 +214,27 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     ]
   }
 
+  /** Render a preview of the widget in a page */
   renderPreview() {
     if (!this.props.widgetDef.blockDef) {
       return null 
     }
-    const block = this.props.createBlock(this.props.widgetDef.blockDef)
 
-    const rootProps: RenderInstanceProps = {
-      locale: "en",
-      database: new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)), // TODO make non-live
-      schema: this.props.schema,
-      contextVars: [],
-      getContextVarValue(contextVarId: string) { return null },
-      getContextVarExprValue(contextVarId: string, expr: Expr) { return null },
-      onSelectContextVar(contextVarId: string, primaryKey: any) { return },
-      setFilter(contextVarId: string, filter: Filter) { return },
-      getFilters(contextVarId: string) { return [] },
-      renderChildBlock: (childProps: RenderInstanceProps, childBlockDef: BlockDef | null) => {
-        if (!childBlockDef) {
-          return <div/>
-        }
-        
-        const childBlock = this.props.createBlock(childBlockDef)
-        return childBlock.renderInstance(childProps)
-      }
+    const database = new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)) // TODO make non-live
+
+    // Create normal page to display
+    const page: Page = {
+      type: "normal",
+      contextVarValues: this.props.widgetDef.contextVarPreviewValues,
+      database: database,
+      widgetDef: this.props.widgetDef
     }
+    const pageElem = <PageStackDisplay initialPage={page} locale="en" schema={this.props.schema} createBlock={this.props.createBlock} />
 
     return [
       (<div className="widget-designer-palette"/>),
       (<div className="widget-designer-preview">
-        <ContextVarsInjector 
-          contextVars={this.props.widgetDef.contextVars} 
-          contextVarValues={this.props.widgetDef.contextVarPreviewValues}
-          renderInstanceProps={rootProps}
-          schema={this.props.schema}
-          innerBlock={this.props.widgetDef.blockDef}
-          createBlock={this.props.createBlock}>
-          {(props: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
-            if (loading) {
-              return <div style={{ textAlign: "center", fontSize: 20, color: "grey" }}><i className="fa fa-spinner fa-spin"/></div>
-            }
-            return block.renderInstance(props)
-          }}
-        </ContextVarsInjector>
+        {pageElem}
       </div>),
       (<div className="widget-designer-editor"/>)
     ]

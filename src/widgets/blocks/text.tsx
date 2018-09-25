@@ -20,7 +20,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     return React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Text</span>)
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     const text = localize(this.blockDef.text, props.locale)
     return React.createElement(this.blockDef.style, {}, text)
   }

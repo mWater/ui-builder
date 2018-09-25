@@ -86,7 +86,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
   }
 
-  renderInstance(props: RenderInstanceProps, ref: (blockInstance: BlockInstance | null) => void): React.ReactElement<any> {
+  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     // Find the widget
     const widgetDef = this.lookupWidget(this.blockDef.widgetId)
     if (widgetDef && widgetDef.blockDef) {
@@ -145,7 +145,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         renderChildBlock: props.renderChildBlock
       }
   
-      return innerBlock.renderInstance(innerProps, ref)
+      return innerBlock.renderInstance(innerProps)
     } 
     else { // Handle case of widget with null block
       return <div/>

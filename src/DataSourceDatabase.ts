@@ -17,7 +17,6 @@ export class DataSourceDatabase implements Database {
   query(options: QueryOptions) {
     const jsonql = this.queryCompiler.compileQuery(options)
     
-    debugger
     return new Promise<Row[]>((resolve, reject) => {
       this.dataSource.performQuery(jsonql, (error, rows) => {
         if (error) {
