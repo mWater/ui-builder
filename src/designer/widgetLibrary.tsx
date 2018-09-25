@@ -7,6 +7,7 @@ import produce from "immer";
 import BlockFactory from "../widgets/BlockFactory";
 import { CreateBlock } from "../widgets/blocks";
 import * as _ from "lodash";
+import { ActionFactory } from "../widgets/actions";
 
 export interface WidgetLibrary {
   widgets: { [id: string]: WidgetDef }
@@ -16,6 +17,7 @@ interface Props {
   blockFactory: BlockFactory
   schema: Schema
   dataSource: DataSource
+  actionFactory: ActionFactory
   widgetLibrary: WidgetLibrary
   onWidgetLibraryChange(widgetLibrary: WidgetLibrary): void
 }
@@ -76,7 +78,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         <a onClick={this.handleSelectTab.bind(null, index)}>
           {widgetDef.name}
           &nbsp;
-          <a onClick={this.handleCloseTab.bind(null, index)}><i className="fa fa-remove text-muted"/></a>
+          { (index === this.state.activeTabIndex) ? <a onClick={this.handleCloseTab.bind(null, index)}><i className="fa fa-remove text-muted"/></a> : null }
         </a>
       </li>
     )
@@ -92,6 +94,8 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         createBlock={this.props.blockFactory.createBlock.bind(null, this.lookupWidget)}
         schema={this.props.schema}
         dataSource={this.props.dataSource}
+        actionFactory={this.props.actionFactory}
+        widgetLibrary={this.props.widgetLibrary}
         onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
       />
     }
@@ -123,6 +127,8 @@ class WidgetTab extends React.Component<{
     createBlock: CreateBlock
     schema: Schema
     dataSource: DataSource
+    actionFactory: ActionFactory
+    widgetLibrary: WidgetLibrary
     onWidgetDefChange(widgetDef: WidgetDef): void
   }> {
 
@@ -132,6 +138,8 @@ class WidgetTab extends React.Component<{
       createBlock={this.props.createBlock}
       schema={this.props.schema}
       dataSource={this.props.dataSource}
+      actionFactory={this.props.actionFactory}
+      widgetLibrary={this.props.widgetLibrary}
       onWidgetDefChange={this.props.onWidgetDefChange}
     />
   }

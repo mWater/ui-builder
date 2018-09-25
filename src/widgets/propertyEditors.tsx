@@ -1,6 +1,9 @@
 import * as React from "react";
 import { Select } from "react-library/lib/bootstrap";
 import { ContextVar } from "./blocks";
+import { ActionDef, ActionFactory } from "./actions";
+import { Action } from "redux";
+import { WidgetLibrary } from "../designer/widgetLibrary";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -153,5 +156,50 @@ export class ContextVarPropertyEditor extends React.Component<{
       nullLabel="Select..."
       options={contextVars.map(cv => ({ label: cv.name, value: cv.id }))}
     />
+  }
+}
+
+/** Edits an action definition, allowing selection of action */
+export class ActionDefEditor extends React.Component<{
+  value: ActionDef | null
+  onChange: (actionDef: ActionDef | null) => void
+  locale: string
+  contextVars: ContextVar[]
+  actionFactory: ActionFactory
+  widgetLibrary: WidgetLibrary
+}> {
+
+  handleChangeAction = (type: string | null) => {
+    if (type) {
+      this.props.onChange(this.props.actionFactory.createNewActionDef(type))
+    }
+    else {
+      this.props.onChange(null)
+    }
+  }
+
+  render() {
+    const action = this.props.value ? this.props.actionFactory.createAction(this.props.value) : null
+
+    return (
+      <div>
+        <Select 
+          nullLabel="No Action"
+          onChange={this.handleChangeAction}
+          value={this.props.value ? this.props.value.type : null}
+          options={this.props.actionFactory.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
+        />
+        { action 
+          ? action.renderEditor({ 
+              widgetLibrary: this.props.widgetLibrary,
+              actionDef: this.props.value!, 
+              locale: this.props.locale, 
+              contextVars: this.props.contextVars, 
+              onChange: this.props.onChange 
+            }) 
+          : null }
+      </div>
+    )
+    
   }
 }

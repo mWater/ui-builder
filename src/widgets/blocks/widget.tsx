@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter } from '../blocks'
+import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps } from '../blocks'
 import { LookupWidget } from '../widgets';
 import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
@@ -150,5 +150,9 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     else { // Handle case of widget with null block
       return <div/>
     }
+  }
+
+  renderEditor(props: RenderEditorProps) {
+    return <div>TODO</div>
   }
 }

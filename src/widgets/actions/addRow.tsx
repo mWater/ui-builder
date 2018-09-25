@@ -13,7 +13,7 @@ interface ContextVarExpr {
 
 export interface AddRowActionDef extends ActionDef {
   type: "addRow"
-  table: string
+  table: string | null
 
   /** Expressions to generate column values */
   columnValues: { [columnId: string]: ContextVarExpr };  

@@ -15,12 +15,16 @@ import { QueryCompiler } from "../QueryCompiler";
 import ContextVarsInjector from "../widgets/ContextVarsInjector";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
+import { ActionFactory } from "../widgets/actions";
+import { WidgetLibrary } from "./widgetLibrary";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
   createBlock: CreateBlock
   schema: Schema
   dataSource: DataSource
+  actionFactory: ActionFactory
+  widgetLibrary: WidgetLibrary
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
@@ -171,6 +175,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
           locale: "en",
           schema: this.props.schema,
           dataSource: this.props.dataSource,
+          actionFactory: this.props.actionFactory,
+          widgetLibrary: this.props.widgetLibrary,
           onChange: (blockDef: BlockDef) => {
             store.alterBlock(blockDef.id, () => blockDef)
           }

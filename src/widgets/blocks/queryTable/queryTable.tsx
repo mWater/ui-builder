@@ -6,9 +6,10 @@ import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Co
 import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { Row } from '../../../Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../../propertyEditors';
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor } from '../../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
+import { ActionDef } from '../../actions';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -20,9 +21,13 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Id of context variable of rowset for table to use */
   rowset: string | null
+
   limit: number | null
   where: Expr | null
   // order?
+
+  /** Action to be executed when row is clicked */
+  rowClickAction: ActionDef | null
 }
 
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
@@ -224,6 +229,20 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
         <LabeledProperty label="Maximum rows">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="limit">
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="When row clicked">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowClickAction">
+            {(value, onChange) => (
+              <ActionDefEditor 
+                value={value} 
+                onChange={onChange} 
+                locale={props.locale}
+                actionFactory={props.actionFactory} 
+                widgetLibrary={props.widgetLibrary}
+                contextVars={props.contextVars} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { ContextVar } from './blocks';
 import { Database } from '../Database';
 import { Expr } from 'mwater-expressions';
+import { WidgetLibrary } from '../designer/widgetLibrary';
 
 // Action definition
 export interface ActionDef {
@@ -9,12 +10,31 @@ export interface ActionDef {
   [index: string]: any  // Other props
 }
 
+export interface ActionFactory {
+  /** Create an action from an action def */
+  createAction(actionDef: ActionDef): Action<ActionDef>
+
+  /** Create a new action def with defaults set of the specified type */
+  createNewActionDef(type: string): ActionDef
+
+  /** Get a list of all known action types */
+  getActionTypes(): Array<{ type: string, name: string }>
+}
+
+export type CreateAction = (actionDef: ActionDef) => Action<ActionDef>
+
 export interface RenderActionEditorProps {
   /** Context variables for the action */
   contextVars: ContextVar[]
 
   /** locale of the editor (e.g. "en") */
   locale: string
+
+  /** Action being edited */
+  actionDef: ActionDef
+
+  /** Widget library that lists all available widgets */
+  widgetLibrary: WidgetLibrary
 
   onChange(actionDef: ActionDef): void
 }

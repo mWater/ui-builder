@@ -16,7 +16,8 @@ const qtbdSingle: QueryTableBlockDef = {
   contents: [],
   rowset: "cv1",
   limit: 10,
-  where: null
+  where: null,
+  rowClickAction: null
 }
 
 const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
@@ -31,7 +32,8 @@ const qtbdMultiple: QueryTableBlockDef = {
   contents: [],
   rowset: "cv1",
   limit: 10,
-  where: null
+  where: null,
+  rowClickAction: null
 }
 
 const qtbMultiple = new QueryTableBlock(qtbdMultiple, createBlock)

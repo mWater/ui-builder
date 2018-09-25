@@ -26,7 +26,8 @@ const qtbdSingle: QueryTableBlockDef = {
   contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: exprText }],
   rowset: "cv1",
   limit: 10,
-  where: null
+  where: null,
+  rowClickAction: null
 }
 
 const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())

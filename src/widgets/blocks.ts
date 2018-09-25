@@ -2,6 +2,8 @@ import * as React from 'react'
 import * as uuid from 'uuid/v4'
 import { Database } from '../Database'
 import { Schema, Expr, DataSource } from 'mwater-expressions'
+import { ActionFactory } from './actions';
+import { WidgetLibrary } from '../designer/widgetLibrary';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -91,12 +93,14 @@ export interface RenderDesignProps {
 }
 
 export interface RenderEditorProps {
-  contextVars: ContextVar[],
+  contextVars: ContextVar[]
   /** locale of the editor (e.g. "en") */
-  locale: string,
-  schema: Schema,
-  dataSource: DataSource,
-  onChange(blockDef: BlockDef): void,
+  locale: string
+  schema: Schema
+  dataSource: DataSource
+  actionFactory: ActionFactory
+  widgetLibrary: WidgetLibrary
+  onChange(blockDef: BlockDef): void
 }
 
 /** A filter that applies to a particular rowset context variable */
