@@ -46,21 +46,29 @@ interface TextboxProps {
 }
 
 /** Text box that updates only on blur */
-class Textbox extends React.Component<TextboxProps, { text: string }> {
+class Textbox extends React.Component<TextboxProps, { text: string | null }> {
   constructor(props: TextboxProps) {
     super(props)
 
-    this.state = { text: props.value }
+    this.state = { text: null }
   }
 
   componentDidUpdate(prevProps: TextboxProps) {
     // If different, override text
-    if (prevProps.value !== this.props.value) {
+    if (prevProps.value !== this.props.value && this.state.text != null) {
       this.setState({ text: this.props.value })
     }
   }
 
+  handleFocus = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    // Start tracking state internally
+    this.setState({ text: this.props.value })
+  }
+
   handleBlur = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    // Stop tracking state internally
+    this.setState({ text: null })
+    
     this.props.onChange(ev.target.value)
   }
 
@@ -74,7 +82,8 @@ class Textbox extends React.Component<TextboxProps, { text: string }> {
         className="form-control"
         type="text"
         placeholder={this.props.placeholder}
-        value={this.state.text}
+        value={ this.state.text != null ? this.state.text : this.props.value }
+        onFocus={this.handleFocus}
         onBlur={this.handleBlur}
         onChange={this.handleChange}
       />

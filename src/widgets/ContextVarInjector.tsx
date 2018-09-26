@@ -88,7 +88,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
     }
 
     // Query database if rowset
-    this.setState({ loading: true })
+    this.setState({ refreshing: true })
     if (this.props.contextVar.type === "rowset" && this.props.contextVarExprs!.length > 0) {
       const table: string = this.props.contextVar.table!
 

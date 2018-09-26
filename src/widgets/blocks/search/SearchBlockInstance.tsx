@@ -24,6 +24,8 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
   createFilter(searchText: string) {
     const blockDef = this.props.blockDef
     
+    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
     // Get table
     const table = this.props.renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowsetContextVarId)!.table!
 
@@ -35,7 +37,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
           table: table,
           exprs: [
             se,
-            { type: "literal", valueType: "text", value: searchText }
+            { type: "literal", valueType: "text", value: escapeRegex(searchText) }
           ]
         } as Expr
       })

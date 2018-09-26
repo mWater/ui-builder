@@ -100,7 +100,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
             return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
           }
           return (
-            <div style={{ opacity: refreshing ? 0.4 : undefined }}>
+            <div style={{ opacity: refreshing ? 0.6 : undefined }}>
               { block.renderInstance(innerRenderInstanceProps) }
             </div>
           )

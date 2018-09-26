@@ -26,7 +26,7 @@ test("creates search on single expression", async () => {
   const searchExprs: Expr[] = [
     { type: "field", table: "t1", column: "text" }
   ]
-  const filter = await getFilter({ id: "s", rowsetContextVarId: "cv1", searchExprs: searchExprs, type: "search", placeholder: null }, "xyz")
+  const filter = await getFilter({ id: "s", rowsetContextVarId: "cv1", searchExprs: searchExprs, type: "search", placeholder: null }, "xyz*")
   expect(filter).toEqual({
     contextVarId: "cv1",
     filter: {
@@ -42,7 +42,7 @@ test("creates search on single expression", async () => {
             op: "~*",
             exprs: [
               searchExprs[0],
-              { type: "literal", valueType: "text", value: "xyz" }
+              { type: "literal", valueType: "text", value: "xyz\\*" }
             ]
           }
         ]
