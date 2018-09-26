@@ -51,7 +51,7 @@ export default class BlockPalette extends React.Component<Props> {
       },
       {
         title: "Search Box",
-        blockDef: { id: "", type: "search", searchExprs: [] },
+        blockDef: { id: "", type: "search", searchExprs: [], placeholder: null },
       },
       {
         title: "Button",

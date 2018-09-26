@@ -59,25 +59,6 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     this.closePage()
   }
 
-  renderPage(page: Page, index: number) {
-    const contents = this.renderPageContents(page)
-
-    switch (page.type) {
-      case "normal":
-        return (
-          <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index}>
-            {contents}
-          </NormalPage>
-        )
-      case "modal":
-        return (
-          <ModalPage onClose={this.handleClose} key={index}>
-            {contents}
-          </ModalPage>
-        )
-    }
-  }
-
   renderPageContents(page: Page) {
     // Lookup widget
     const widgetDef = this.props.lookupWidget(page.widgetId)!
@@ -120,6 +101,39 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
         }}
       </ContextVarsInjector>
   }
+
+  renderPage(page: Page, index: number) {
+    // Determine if invisible (behind a normal page)
+    let invisible = false
+    for (let i = index + 1; i < this.state.pages.length ; i++) {
+      if (this.state.pages[i].type === "normal") {
+        invisible = true
+      }
+    }
+
+    const contents = this.renderPageContents(page)
+
+    switch (page.type) {
+      case "normal":
+        return (
+          <div style={{ display: invisible ? "none" : "block" }}>
+            <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index}>
+              {contents}
+            </NormalPage>
+          </div>
+        )
+      case "modal":
+        return (
+          <div style={{ display: invisible ? "none" : "block" }}>
+            <ModalPage onClose={this.handleClose} key={index}>
+              {contents}
+            </ModalPage>
+          </div>
+        )
+    }
+  }
+
+
   
   render() {
     return this.state.pages.map((page, index) => this.renderPage(page, index))
