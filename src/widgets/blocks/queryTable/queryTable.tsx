@@ -103,13 +103,20 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
   /** Get list of expressions used in a row by content blocks */
   getRowExprs(contextVars: ContextVar[]): Expr[] {
+    const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
+    if (!rowsetCV) {
+      return []
+    }
+
     let exprs: Expr[] = []
+    
+    const rowCV = this.createRowContextVar(rowsetCV)
 
     for (const contentBlockDef of this.blockDef.contents) {
       // Get block tree, compiling expressions for each one
       if (contentBlockDef) {
         for (const descBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
-          exprs = exprs.concat(descBlock.getContextVarExprs(this.getRowContextVarId()))
+          exprs = exprs.concat(descBlock.getContextVarExprs(rowCV))
         }
       }
     }

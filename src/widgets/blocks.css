@@ -1,0 +1,8 @@
+.required-control {
+  color: red;
+  font-size: 12pt;
+  text-align: right;
+  line-height: 2px;
+  position: relative;
+  right: 2px;
+}

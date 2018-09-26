@@ -5,13 +5,13 @@ import { WidgetBlock, WidgetBlockDef } from './blocks/widget';
 import { LookupWidget } from './widgets';
 import { TextBlock, TextBlockDef } from './blocks/text';
 import { LabeledBlock, LabeledBlockDef } from './blocks/labeled';
-import { TextInputBlock, TextInputBlockDef } from './blocks/textInput';
 import { DropdownInputBlock, DropdownInputBlockDef } from './blocks/dropdownInput';
 import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
 import { ExpressionBlock, ExpressionBlockDef } from './blocks/expression';
 import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable/queryTable';
 import { SearchBlock, SearchBlockDef } from './blocks/search/search';
 import { ButtonBlock, ButtonBlockDef } from './blocks/button';
+import { TextboxBlock, TextboxBlockDef } from './blocks/controls/textbox';
 
 export default class BlockFactory {
   createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block<BlockDef> => {
@@ -27,8 +27,8 @@ export default class BlockFactory {
         return new TextBlock(blockDef as TextBlockDef)
       case "labeled":
         return new LabeledBlock(blockDef as LabeledBlockDef, internalCreateBlock)
-      case "textInput":
-        return new TextInputBlock(blockDef as TextInputBlockDef)
+      case "textbox":
+        return new TextboxBlock(blockDef as TextboxBlockDef)
       case "dropdownInput":
         return new DropdownInputBlock(blockDef as DropdownInputBlockDef)
       case "collapsible":

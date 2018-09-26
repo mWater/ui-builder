@@ -15,12 +15,12 @@ declare module 'react-library/lib/bootstrap' {
   import { ReactNode } from "react";
 
   class TextInput extends React.Component<{
-    value: string
+    value: string | null
     onChange?: (value: string | null) => void
     placeholder?: string
     size?: "sm" | "lg"
     emptyNull?: boolean
-    style: object
+    style?: object
   }> {}
 
   class NumberInput extends React.Component<{
@@ -44,6 +44,12 @@ declare module 'react-library/lib/bootstrap' {
     size?: string
     nullLabel?: string
     style?: object
+    inline?: boolean
+  }> {}
+
+  class Checkbox extends React.Component<{
+    value: boolean
+    onChange?: (value: boolean) => void
     inline?: boolean
   }> {}
 

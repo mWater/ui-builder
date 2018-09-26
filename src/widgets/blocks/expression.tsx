@@ -16,8 +16,8 @@ export interface ExpressionBlockDef extends BlockDef {
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
-  getContextVarExprs(contextVarId: string): Expr[] { 
-    return (contextVarId === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
+  getContextVarExprs(contextVar: ContextVar): Expr[] { 
+    return (contextVar.id === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
   }
 
   validate(options: ValidateBlockOptions) {

@@ -26,7 +26,7 @@ export default class BlockPalette extends React.Component<Props> {
       },
       {
         title: "Text Box",
-        blockDef: { id: "", type: "textInput", column: null },
+        blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null },
       },
       {
         title: "Expression",

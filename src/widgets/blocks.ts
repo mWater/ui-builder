@@ -5,6 +5,7 @@ import { Schema, Expr, DataSource } from 'mwater-expressions'
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
+import "./blocks.css"
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -148,7 +149,7 @@ export abstract class Block<T extends BlockDef> {
   renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }
 
   /** Get any context variables expressions that this block needs (not including child blocks) */
-  getContextVarExprs(contextVarId: string): Expr[] { return [] }
+  getContextVarExprs(contextVar: ContextVar): Expr[] { return [] }
 
   /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
   abstract getChildren(contextVars: ContextVar[]): ChildBlock[]

@@ -1,5 +1,6 @@
 import { AddRowAction, AddRowActionDef } from "./addRow";
 import { Action } from "../actions";
+import { ContextVar } from "../blocks";
 
 
 test("gets context var exprs", () => {
@@ -18,6 +19,6 @@ test("gets context var exprs", () => {
     }
   }
 
-  const varExprs = new AddRowAction(ad).getContextVarExprs("cv2")
+  const varExprs = new AddRowAction(ad).getContextVarExprs({ id: "cv2" } as ContextVar)
   expect(varExprs).toEqual([{ type: "literal", valueType: "number", value: 456 }])
 })

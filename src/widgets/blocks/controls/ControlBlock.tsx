@@ -1,39 +1,63 @@
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions } from "../../blocks";
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from "../../propertyEditors";
 import { Expr, Column } from "mwater-expressions";
 import { ExprComponent } from "mwater-expressions-ui";
-import { Select } from "react-library/lib/bootstrap";
+import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
 
-interface ControlBlockDef extends BlockDef {
+export interface ControlBlockDef extends BlockDef {
   /** Row context variable id */
   rowContextVarId: string | null
 
   /** Column id that control is controlling */
   column: string | null
+
+  /** True if value is required */
+  required: boolean
 }
 
-abstract class ControlBlock<T> extends LeafBlock<ControlBlockDef> {
+export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
 
-  abstract renderControl(props: { value: T | null, onChange: (value: T | null) => void }): React.ReactElement<any>
+  abstract renderControl(props: { value: any, onChange: (value: any) => void }): React.ReactElement<any>
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-  abstract renderControlEditor(props: RenderEditorProps): React.ReactElement<any>
+  abstract renderControlEditor(props: RenderEditorProps): React.ReactElement<any> | null
 
   /** Filter the columns that this control is for */
   abstract filterColumn(column: Column): boolean
 
   renderDesign(props: RenderDesignProps) {
     // Simply render empty control
-    return this.renderControl({ value: null, onChange: () => { return }})
+    return (
+      <div>
+        { this.renderRequired() }
+        { this.renderControl({ value: null, onChange: () => { return }}) }
+      </div>
+    ) 
+  }
+
+  renderRequired() {
+    return this.blockDef.required ? <div className="required-control">*</div> : null
   }
 
   renderInstance(props: RenderInstanceProps) {
+    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
+
+    const handleChange = (newValue: T | null) => {
+      console.warn("TODO")
+    }
+
     // Get current value
-    // TODO
-    return this.renderControl({ value: null, onChange: () => { return }})
+    const value = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: this.blockDef.column! })
+
+    return (
+      <div>
+        { this.renderRequired() }
+        { this.renderControl({ value: value, onChange: handleChange}) }
+      </div>
+    )
   }
 
   renderEditor(props: RenderEditorProps) {
@@ -59,18 +83,25 @@ abstract class ControlBlock<T> extends LeafBlock<ControlBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
           : null }
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="required">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Required</Checkbox>}
+        </PropertyEditor>
+
       </div>
     )
   }
 
-  getContextVarExprs(contextVarId: string): Expr[] { 
-    return []
-    // let exprs: Expr[] = []
-
-    // if (this.blockDef.rowContextVarId === contextVarId)
-    //   return [
-    //     { type: }
-    //   ]
+  getContextVarExprs(contextVar: ContextVar): Expr[] { 
+    if (this.blockDef.rowContextVarId && this.blockDef.rowContextVarId === contextVar.id && this.blockDef.column) {
+      return [
+        { type: "id", table: contextVar.table!},
+        { type: "field", table: contextVar.table!, column: this.blockDef.column },
+      ]
+    }
+    else {
+      return []
+    }
   }
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */

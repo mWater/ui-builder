@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar } from '../blocks'
 import { LookupWidget } from '../widgets';
 import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
@@ -44,7 +44,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   //   return []
   // }
 
-  getContextVarExprs(contextVarId: string) {
+  getContextVarExprs(contextVar: ContextVar) {
     // TODO!!
     return []
   }

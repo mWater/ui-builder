@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
 import { Expr } from 'mwater-expressions';
 import * as _ from 'lodash'
+import { ContextVar } from '../blocks';
 
 interface ContextVarExpr {
   /** Optional context variable which expression is based on. Can be null for literal expression */
@@ -30,9 +31,9 @@ export class AddRowAction extends Action<AddRowActionDef> {
   }
 
   /** Get any context variables expressions that this action needs */
-  getContextVarExprs(contextVarId: string) {
+  getContextVarExprs(contextVar: ContextVar) {
     // Get ones for the specified context var
-    return _.values(this.actionDef.columnValues).filter(cve => cve.contextVarId === contextVarId).map(cve => cve.expr)
+    return _.values(this.actionDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
   }
   
   renderEditor(props: RenderActionEditorProps) {

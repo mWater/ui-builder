@@ -60,9 +60,6 @@ export abstract class Action<T extends ActionDef> {
   /** Determine if action is valid. null means valid, string is error message */
   abstract validate(options: ValidateActionOptions): string | null
 
-  /** Get any context variables expressions that this action needs TODO needed? */
-  // getContextVarExprs(contextVarId: string): Expr[] { return [] }
-
   /** Perform the action, returning a promise that fulfills when complete */
   abstract performAction(options: PerformActionOptions): Promise<void>
   
