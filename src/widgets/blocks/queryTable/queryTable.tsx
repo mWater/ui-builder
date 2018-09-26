@@ -181,6 +181,8 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     // Get rowset context variable
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowset)
 
+    const rowCV = rowsetCV ? this.createRowContextVar(rowsetCV) : null
+
     const handleAddColumn = () => {
       props.onChange(produce(this.blockDef, b => {
         b.headers.push(null)
@@ -231,20 +233,22 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
           </PropertyEditor>
         </LabeledProperty>
-
-        <LabeledProperty label="When row clicked">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowClickAction">
-            {(value, onChange) => (
-              <ActionDefEditor 
-                value={value} 
-                onChange={onChange} 
-                locale={props.locale}
-                actionFactory={props.actionFactory} 
-                widgetLibrary={props.widgetLibrary}
-                contextVars={props.contextVars} />
-            )}
-          </PropertyEditor>
-        </LabeledProperty>
+        
+        { rowCV ? 
+          <LabeledProperty label="When row clicked">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowClickAction">
+              {(value, onChange) => (
+                <ActionDefEditor 
+                  value={value} 
+                  onChange={onChange} 
+                  locale={props.locale}
+                  actionFactory={props.actionFactory} 
+                  widgetLibrary={props.widgetLibrary}
+                  contextVars={props.contextVars.concat(rowCV)} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null } 
 
         <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
           <i className="fa fa-plus"/> Add Column

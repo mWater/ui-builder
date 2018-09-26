@@ -140,15 +140,18 @@ export class DropdownPropertyEditor extends React.Component<{
   }
 }
 
-
+/** Allows selecting a context variable */
 export class ContextVarPropertyEditor extends React.Component<{ 
   value: string | null, 
   onChange: (value: string) => void,
   contextVars: ContextVar[],
-  types?: string[]}> {
+  types?: string[],
+  table?: string
+}> {
 
   render() {
-    const contextVars = this.props.contextVars.filter(cv => !this.props.types || this.props.types.includes(cv.type))
+    let contextVars = this.props.contextVars.filter(cv => !this.props.types || this.props.types.includes(cv.type))
+    contextVars = contextVars.filter(cv => !this.props.table || this.props.table === cv.table)
 
     return <Select
       value={this.props.value}
