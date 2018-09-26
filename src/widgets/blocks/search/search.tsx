@@ -15,7 +15,7 @@ export interface SearchBlockDef extends BlockDef {
   placeholder: LocalizedString | null
 
   /** Id of context variable of rowset for table to use */
-  rowsetId: string | null
+  rowsetContextVarId: string | null
 
   /** Text expressions to search on  */
   searchExprs: Array<Expr | null>
@@ -24,7 +24,7 @@ export interface SearchBlockDef extends BlockDef {
 export class SearchBlock extends LeafBlock<SearchBlockDef> {
   validate(options: ValidateBlockOptions) { 
     // Validate rowset
-    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetId && cv.type === "rowset")
+    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {
       return "Rowset required"
     }
@@ -72,12 +72,12 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
 
   renderEditor(props: RenderEditorProps) {
     // Get rowset context variable
-    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetId)
+    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetId">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>

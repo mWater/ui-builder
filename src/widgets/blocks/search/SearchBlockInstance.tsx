@@ -25,7 +25,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     const blockDef = this.props.blockDef
     
     // Get table
-    const table = this.props.renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowsetId)!.table!
+    const table = this.props.renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowsetContextVarId)!.table!
 
     if (searchText) {
       const searchExprs: Expr[] = blockDef.searchExprs.map(se => {
@@ -60,7 +60,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     this.setState({ searchText: searchText })
 
     // Set filter 
-    this.props.renderInstanceProps.setFilter(blockDef.rowsetId!, this.createFilter(searchText))
+    this.props.renderInstanceProps.setFilter(blockDef.rowsetContextVarId!, this.createFilter(searchText))
   }
 
   render() {

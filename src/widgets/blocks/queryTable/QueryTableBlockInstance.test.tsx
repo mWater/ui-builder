@@ -26,7 +26,7 @@ const qtbdSingle: QueryTableBlockDef = {
   mode: "singleRow",
   headers: [],
   contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: exprText }],
-  rowsetId: "cv1",
+  rowsetContextVarId: "cv1",
   limit: 10,
   where: null,
   rowClickAction: null
