@@ -14,7 +14,7 @@ const qtbdSingle: QueryTableBlockDef = {
   mode: "singleRow",
   headers: [],
   contents: [],
-  rowset: "cv1",
+  rowsetId: "cv1",
   limit: 10,
   where: null,
   rowClickAction: null
@@ -30,7 +30,7 @@ const qtbdMultiple: QueryTableBlockDef = {
   mode: "multiRow",
   headers: [],
   contents: [],
-  rowset: "cv1",
+  rowsetId: "cv1",
   limit: 10,
   where: null,
   rowClickAction: null

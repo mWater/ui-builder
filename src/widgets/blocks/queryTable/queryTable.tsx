@@ -20,7 +20,7 @@ export interface QueryTableBlockDef extends BlockDef {
   contents: Array<BlockDef | null>
 
   /** Id of context variable of rowset for table to use */
-  rowset: string | null
+  rowsetId: string | null
 
   limit: number | null
   where: Expr | null
@@ -33,7 +33,7 @@ export interface QueryTableBlockDef extends BlockDef {
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get rowset context variable
-    const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowset)
+    const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetId)
 
     const headerChildren: ChildBlock[] = _.compact(this.blockDef.headers).map(bd => ({ blockDef: bd, contextVars: [] }))
     const contentChildren: ChildBlock[] = _.compact(this.blockDef.contents).map(bd => ({ blockDef: bd, contextVars: rowsetCV ? [this.createRowContextVar(rowsetCV)] : [] }))
@@ -42,7 +42,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
   validate(options: ValidateBlockOptions) { 
     // Validate rowset
-    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowset && cv.type === "rowset")
+    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetId && cv.type === "rowset")
     if (!rowsetCV) {
       return "Rowset required"
     }
@@ -161,7 +161,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       }), blockDef.id)
     }
 
-    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowset && cv.type === "rowset")
+    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetId && cv.type === "rowset")
     let contentProps = props
     
     // Add context variable if knowable
@@ -195,7 +195,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
   renderEditor(props: RenderEditorProps) {
     // Get rowset context variable
-    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowset)
+    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetId)
 
     const rowCV = rowsetCV ? this.createRowContextVar(rowsetCV) : null
 
@@ -219,7 +219,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowset">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
@@ -230,20 +230,22 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
-        <LabeledProperty label="Filter">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="where">
-            {(value: Expr, onChange) => (
-                <ExprComponent 
-                  value={value} 
-                  onChange={onChange} 
-                  schema={props.schema} 
-                  dataSource={props.dataSource} 
-                  types={["boolean"]}
-                  table={rowsetCV!.table!}/>
-              )}
-          </PropertyEditor>
-        </LabeledProperty>
-
+        { rowsetCV ?
+          <LabeledProperty label="Filter">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="where">
+              {(value: Expr, onChange) => (
+                  <ExprComponent 
+                    value={value} 
+                    onChange={onChange} 
+                    schema={props.schema} 
+                    dataSource={props.dataSource} 
+                    types={["boolean"]}
+                    table={rowsetCV!.table!}/>
+                )}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        
         <LabeledProperty label="Maximum rows">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="limit">
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
