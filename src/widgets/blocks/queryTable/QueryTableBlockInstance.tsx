@@ -13,14 +13,14 @@ interface Props {
 interface State {
   rows?: Row[]
   refreshing: boolean
-
-  /** Current query options to determine if refresh needed */
-  queryOptions?: QueryOptions 
 }
 
 // TODO handle db refresh
 // TODO use AsyncLoadComponent to prevent one-behind errors
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
+  /** Current query options to determine if refresh needed */
+  queryOptions?: QueryOptions 
+
   constructor(props: Props) {
     super(props)
 
@@ -28,14 +28,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   componentDidMount() {
-    this.performQuery(this.createQuery())
+    this.performQuery()
   }
 
   componentDidUpdate(prevProps: Props) {
     // Redo query if changed
     const newQueryOptions = this.createQuery()
-    if (!_.isEqual(newQueryOptions, this.state.queryOptions)) {
-      this.performQuery(newQueryOptions)
+    if (!_.isEqual(newQueryOptions, this.queryOptions)) {
+      this.performQuery()
     }
   }
 
@@ -79,11 +79,18 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     return queryOptions
   }
 
-  performQuery(queryOptions: QueryOptions) {
-    this.setState({ refreshing: true, queryOptions: queryOptions })
+  performQuery() {
+    const queryOptions = this.createQuery()
+    this.queryOptions = queryOptions
+
+    // Mark as refreshing
+    this.setState({ refreshing: true })
 
     this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
-      this.setState({ rows, refreshing: false })
+      // Check if still relevant
+      if (_.isEqual(queryOptions, this.createQuery())) {
+        this.setState({ rows, refreshing: false })
+      }
     }).catch(error => {
       // TODO handle errors
     })

@@ -23,7 +23,6 @@ interface State {
   exprValues: { [exprJson: string]: any }
 }
 
-// TODO use async loading component to prevent reloads!
 /** Injects one context variable into the inner render instance props. 
  * Holds state of the filters that are applied to rowset-type context vars
  * Computes values of expressions for row and rowset types
@@ -50,31 +49,69 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
     }
   }
 
-  async performQueries() {
-    this.setState({ refreshing: true })
+  createRowQueryOptions(table: string) {
+    const queryOptions: QueryOptions = {
+      select: {},
+      from: table,
+      where: { 
+        type: "op",
+        op: "=",
+        table: table,
+        exprs: [{ type: "id", table: table }, { type: "literal", valueType: "id", idTable: table, value: this.props.value }]
+      }
+    }
 
+    // Add expressions as selects
+    for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
+      queryOptions.select["e" + i] = this.props.contextVarExprs![i]
+    }
+
+    return queryOptions
+  }
+
+  createRowsetQueryOptions(table: string) {
+    const queryOptions: QueryOptions = {
+      select: {},
+      from: table,
+      where: this.props.value as Expr
+    }
+
+    // Add expressions as selects (only if aggregate for rowset)
+    const exprUtils = new ExprUtils(this.props.schema)
+    const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
+
+    // Add expressions as selects
+    for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
+      queryOptions.select["e" + i] = nonAggrExpressions[i]
+    }
+
+    // Add filters
+    if (this.state.filters.length > 0) {
+      queryOptions.where = {
+        type: "op",
+        table: table,
+        op: "and",
+        exprs: _.compact([queryOptions.where].concat(_.compact(this.state.filters.map(f => f.expr))))
+      }
+    }
+    return queryOptions
+  }
+
+  async performQueries() {
     // Query database if row TODO null value?
     if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
+      this.setState({ refreshing: true })
       const table: string = this.props.contextVar.table!
 
-      const queryOptions: QueryOptions = {
-        select: {},
-        from: table,
-        where: { 
-          type: "op",
-          op: "=",
-          table: table,
-          exprs: [{ type: "id", table: table }, { type: "literal", valueType: "id", idTable: table, value: this.props.value }]
-        }
-      }
-
-      // Add expressions as selects
-      for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
-        queryOptions.select["e" + i] = this.props.contextVarExprs![i]
-      }
-
       // Perform query
+      const queryOptions = this.createRowQueryOptions(table)
       const rows = await this.props.renderInstanceProps.database.query(queryOptions)
+
+      // Ignore if out of date
+      if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
+        return
+      }
+
       if (rows.length === 0) {
         this.setState({ exprValues: {} })
       }
@@ -88,37 +125,22 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
     }
 
     // Query database if rowset
-    this.setState({ refreshing: true })
     if (this.props.contextVar.type === "rowset" && this.props.contextVarExprs!.length > 0) {
+      this.setState({ refreshing: true })
       const table: string = this.props.contextVar.table!
+      
+      // Perform query
+      const queryOptions = this.createRowsetQueryOptions(table)
+      const rows = await this.props.renderInstanceProps.database.query(queryOptions)
 
-      const queryOptions: QueryOptions = {
-        select: {},
-        from: table,
-        where: this.props.value as Expr
+      // Ignore if out of date
+      if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table))) {
+        return
       }
 
-      // Add expressions as selects (only if aggregate for rowset)
       const exprUtils = new ExprUtils(this.props.schema)
       const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
 
-      // Add expressions as selects
-      for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
-        queryOptions.select["e" + i] = nonAggrExpressions[i]
-      }
-
-      // Add filters
-      if (this.state.filters.length > 0) {
-        queryOptions.where = {
-          type: "op",
-          table: table,
-          op: "and",
-          exprs: _.compact([queryOptions.where].concat(_.compact(this.state.filters.map(f => f.expr))))
-        }
-      }
-
-      // Perform query
-      const rows = await this.props.renderInstanceProps.database.query(queryOptions)
       if (rows.length === 0) {
         this.setState({ exprValues: {} })
       }
