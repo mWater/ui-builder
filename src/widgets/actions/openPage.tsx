@@ -30,13 +30,6 @@ export interface OpenPageActionDef extends ActionDef {
 }
 
 export class OpenPageAction extends Action<OpenPageActionDef> {
-  pageStack: PageStack
-
-  constructor(actionDef: OpenPageActionDef, pageStack: PageStack) {
-    super(actionDef)
-    this.pageStack = pageStack
-  }
-
   async performAction(options: PerformActionOptions): Promise<void> {
     const contextVarValues = {}
 
@@ -46,7 +39,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     }
 
 
-    this.pageStack.openPage({
+    options.pageStack.openPage({
       type: this.actionDef.pageType,
       database: options.database,
       widgetId: this.actionDef.widgetId!,

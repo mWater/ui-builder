@@ -244,7 +244,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
                   value={value} 
                   onChange={onChange} 
                   locale={props.locale}
-                  actionFactory={props.actionFactory} 
+                  actionLibrary={props.actionLibrary} 
                   widgetLibrary={props.widgetLibrary}
                   contextVars={props.contextVars.concat(rowCV)} />
               )}

@@ -2,8 +2,9 @@ import * as React from 'react'
 import * as uuid from 'uuid/v4'
 import { Database } from '../Database'
 import { Schema, Expr, DataSource } from 'mwater-expressions'
-import { ActionFactory } from './actions';
 import { WidgetLibrary } from '../designer/widgetLibrary';
+import { ActionLibrary } from './ActionLibrary';
+import { PageStack } from '../PageStack';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -50,7 +51,8 @@ export interface RenderInstanceProps {
   database: Database,
   schema: Schema,
   contextVars: ContextVar[]
-  actionFactory: ActionFactory
+  actionLibrary: ActionLibrary
+  pageStack: PageStack
 
   /** Gets the value of a context variable */
   getContextVarValue(contextVarId: string): any
@@ -99,7 +101,7 @@ export interface RenderEditorProps {
   locale: string
   schema: Schema
   dataSource: DataSource
-  actionFactory: ActionFactory
+  actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary
   onChange(blockDef: BlockDef): void
 }

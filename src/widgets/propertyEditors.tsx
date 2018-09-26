@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Select } from "react-library/lib/bootstrap";
 import { ContextVar } from "./blocks";
-import { ActionDef, ActionFactory } from "./actions";
-import { Action } from "redux";
+import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
+import { ActionLibrary } from "./ActionLibrary";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -168,13 +168,13 @@ export class ActionDefEditor extends React.Component<{
   onChange: (actionDef: ActionDef | null) => void
   locale: string
   contextVars: ContextVar[]
-  actionFactory: ActionFactory
+  actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary
 }> {
 
   handleChangeAction = (type: string | null) => {
     if (type) {
-      this.props.onChange(this.props.actionFactory.createNewActionDef(type))
+      this.props.onChange(this.props.actionLibrary.createNewActionDef(type))
     }
     else {
       this.props.onChange(null)
@@ -182,7 +182,7 @@ export class ActionDefEditor extends React.Component<{
   }
 
   render() {
-    const action = this.props.value ? this.props.actionFactory.createAction(this.props.value) : null
+    const action = this.props.value ? this.props.actionLibrary.createAction(this.props.value) : null
 
     return (
       <div>
@@ -190,7 +190,7 @@ export class ActionDefEditor extends React.Component<{
           nullLabel="No Action"
           onChange={this.handleChangeAction}
           value={this.props.value ? this.props.value.type : null}
-          options={this.props.actionFactory.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
+          options={this.props.actionLibrary.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
         />
         { action 
           ? action.renderEditor({ 

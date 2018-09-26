@@ -107,13 +107,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       // Run action
       if (this.props.block.blockDef.rowClickAction) {
         const actionDef = this.props.block.blockDef.rowClickAction
-        const action = this.props.renderInstanceProps.actionFactory.createAction(actionDef)
+        const action = this.props.renderInstanceProps.actionLibrary.createAction(actionDef)
 
         action.performAction({
           contextVars: rowRIProps.contextVars,
           database: rowRIProps.database,
           locale: rowRIProps.locale,
-          getContextVarValue: rowRIProps.getContextVarValue
+          getContextVarValue: rowRIProps.getContextVarValue,
+          pageStack: rowRIProps.pageStack
         })
       }
       const rowsetCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.block.blockDef.rowset)!

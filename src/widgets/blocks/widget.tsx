@@ -93,10 +93,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
       const innerProps : RenderInstanceProps = {
-        locale: props.locale,
-        database: props.database,
-        schema: props.schema,
-        actionFactory: props.actionFactory,
+        ...props,
         contextVars: widgetDef.contextVars,
         getContextVarValue: (contextVarId: string) => {
           // Lookup outer id

@@ -7,7 +7,7 @@ import BlockFactory from './widgets/BlockFactory';
 import { Schema } from 'mwater-expressions';
 import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
 import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
-import { BasicActionFactory } from './widgets/BasicActionFactory';
+import { ActionLibrary } from './widgets/ActionLibrary';
 const basicBlockFactory = new BlockFactory()
 
 const waterPointsWidgetDef: WidgetDef = {
@@ -148,7 +148,7 @@ const schema = new Schema({
 
 const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { localCaching: false, serverCaching: false })
 
-const actionFactory = new BasicActionFactory()
+const actionLibrary = new ActionLibrary()
 
 @DragDropContext(HTML5Backend)
 export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary}> {
@@ -171,7 +171,7 @@ export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLib
         <WidgetLibraryDesigner
           widgetLibrary={this.state.widgetLibrary} 
           blockFactory={basicBlockFactory} 
-          actionFactory={actionFactory}
+          actionLibrary={actionLibrary}
           schema={schema}
           dataSource={dataSource}
           onWidgetLibraryChange={this.handleWidgetLibraryChange} />

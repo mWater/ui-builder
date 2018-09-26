@@ -6,7 +6,8 @@ import * as React from "react";
 import { Expr, Schema } from "mwater-expressions";
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
-import { ActionFactory } from "./actions";
+import { ActionLibrary } from "./ActionLibrary";
+import { PageStack } from "../PageStack";
 
 let database: Database
 let outerRenderProps: RenderInstanceProps
@@ -23,7 +24,8 @@ beforeEach(() => {
     database: database,
     schema: {} as Schema,
     contextVars: [],
-    actionFactory: {} as ActionFactory,
+    actionLibrary: {} as ActionLibrary,
+    pageStack: {} as PageStack,
     getContextVarValue: jest.fn(),
     getContextVarExprValue:  jest.fn(),
     onSelectContextVar: jest.fn(),

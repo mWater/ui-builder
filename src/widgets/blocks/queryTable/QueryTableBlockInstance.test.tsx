@@ -9,7 +9,8 @@ import BlockFactory from '../../BlockFactory';
 import mockDatabase from '../../../__fixtures__/mockDatabase';
 import { QueryOptions } from '../../../Database';
 import { Expr } from 'mwater-expressions';
-import { ActionFactory } from '../../actions';
+import { ActionLibrary } from '../../ActionLibrary';
+import { PageStack } from '../../../PageStack';
 
 // Outer context vars
 const rowsetCV = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -45,7 +46,8 @@ beforeEach(() => {
    contextVars: contextVars,
    database: database,
    getContextVarExprValue: jest.fn(),
-   actionFactory: {} as ActionFactory,
+   actionLibrary: {} as ActionLibrary,
+   pageStack: {} as PageStack,
    // Simple filter
    getContextVarValue: () => ({ type: "field", table: "t1", column: "boolean" }),
    getFilters: () => [],

@@ -3,7 +3,8 @@ import { ContextVar, RenderInstanceProps, BlockDef, Filter } from '../blocks';
 import { WidgetDef } from '../widgets';
 import { Database } from '../../Database';
 import { Expr, Schema } from 'mwater-expressions';
-import { ActionFactory } from '../actions';
+import { ActionLibrary } from '../ActionLibrary';
+import { PageStack } from '../../PageStack';
 
 const createBlock = jest.fn()
 const lookupWidget = jest.fn()
@@ -76,7 +77,8 @@ describe("renderInstance", () => {
       database: {} as Database,
       schema: {} as Schema,
       contextVars: contextVars, 
-      actionFactory: {} as ActionFactory,
+      actionLibrary: {} as ActionLibrary,
+      pageStack: {} as PageStack,
       getContextVarValue: (id) => id,
       getContextVarExprValue: (id) => id,
       onSelectContextVar: jest.fn(),

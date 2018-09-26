@@ -4,15 +4,15 @@ import { CreateBlock, RenderInstanceProps, Filter, BlockDef } from "./widgets/bl
 import { Schema, Expr } from "mwater-expressions";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
-import { ActionFactory } from "./widgets/actions";
 import { LookupWidget } from "./widgets/widgets";
+import { ActionLibrary } from "./widgets/ActionLibrary";
 
 interface Props {
   initialPage: Page
   createBlock: CreateBlock
   locale: string
   schema: Schema
-  actionFactory: ActionFactory
+  actionLibrary: ActionLibrary
   lookupWidget: LookupWidget
 }
 
@@ -90,7 +90,8 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       locale: this.props.locale,
       database: page.database,
       schema: this.props.schema,
-      actionFactory: this.props.actionFactory,
+      actionLibrary: this.props.actionLibrary,
+      pageStack: this,
       contextVars: [],
       getContextVarValue: (contextVarId: string) => { throw new Error("Non-existant context variable") },
       getContextVarExprValue: (contextVarId: string, expr: Expr) => { throw new Error("Non-existant context variable") },
