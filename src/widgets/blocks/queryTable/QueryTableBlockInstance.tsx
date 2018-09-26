@@ -13,9 +13,13 @@ interface Props {
 interface State {
   rows?: Row[]
   refreshing: boolean
+
+  /** Current query options to determine if refresh needed */
+  queryOptions?: QueryOptions 
 }
 
 // TODO handle db refresh
+// TODO use AsyncLoadComponent to prevent one-behind errors
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -24,11 +28,18 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   componentDidMount() {
-    this.performQuery()
+    this.performQuery(this.createQuery())
   }
 
-  performQuery() {
-    this.setState({ refreshing: true })
+  componentDidUpdate(prevProps: Props) {
+    // Redo query if changed
+    const newQueryOptions = this.createQuery()
+    if (!_.isEqual(newQueryOptions, this.state.queryOptions)) {
+      this.performQuery(newQueryOptions)
+    }
+  }
+
+  createQuery(): QueryOptions {
     const rips = this.props.renderInstanceProps
     const block = this.props.block
 
@@ -65,7 +76,13 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       queryOptions.select["e" + index] = expr
     })
 
-    rips.database.query(queryOptions).then(rows => {
+    return queryOptions
+  }
+
+  performQuery(queryOptions: QueryOptions) {
+    this.setState({ refreshing: true, queryOptions: queryOptions })
+
+    this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
       this.setState({ rows, refreshing: false })
     }).catch(error => {
       // TODO handle errors
@@ -117,17 +134,10 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
           pageStack: rowRIProps.pageStack
         })
       }
-      const rowsetCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.block.blockDef.rowset)!
-      const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars)
-
-      // Row context variable value
-      const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.renderInstanceProps.schema, rowsetCV)
-
-
     }
 
     return (
-      <tr>
+      <tr key={rowIndex}>
         { this.props.block.blockDef.contents.map((b, colIndex) => {
           return (
             <td key={colIndex} onClick={handleRowClick}>

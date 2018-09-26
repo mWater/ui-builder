@@ -119,7 +119,7 @@ export interface ValidateBlockOptions {
 /** A filter that applies to a particular rowset context variable */
 export interface Filter {
   id: string, // Unique id of the filter
-  expr: Expr  // Boolean filter expression on the rowset
+  expr: Expr | null  // Boolean filter expression on the rowset. null to clear a filter
   memo?: any,  // For internal use by the block. Will be passed back unchanged.
 }
 

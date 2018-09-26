@@ -23,6 +23,7 @@ interface State {
   exprValues: { [exprJson: string]: any }
 }
 
+// TODO use async loading component to prevent reloads!
 /** Injects one context variable into the inner render instance props. 
  * Holds state of the filters that are applied to rowset-type context vars
  * Computes values of expressions for row and rowset types
@@ -112,7 +113,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
           type: "op",
           table: table,
           op: "and",
-          exprs: _.compact([queryOptions.where].concat(this.state.filters.map(f => f.expr)))
+          exprs: _.compact([queryOptions.where].concat(_.compact(this.state.filters.map(f => f.expr))))
         }
       }
 

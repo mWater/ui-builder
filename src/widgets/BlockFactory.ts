@@ -10,7 +10,7 @@ import { DropdownInputBlock, DropdownInputBlockDef } from './blocks/dropdownInpu
 import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
 import { ExpressionBlock, ExpressionBlockDef } from './blocks/expression';
 import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable/queryTable';
-import { SearchBlock, SearchBlockDef } from './blocks/search';
+import { SearchBlock, SearchBlockDef } from './blocks/search/search';
 import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 
 export default class BlockFactory {
