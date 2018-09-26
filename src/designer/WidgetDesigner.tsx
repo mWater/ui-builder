@@ -285,4 +285,3 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     )
   }
 }
-

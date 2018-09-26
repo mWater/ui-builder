@@ -20,7 +20,7 @@ export interface ControlBlockDef extends BlockDef {
 
 export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
 
-  abstract renderControl(props: { value: any, onChange: (value: any) => void }): React.ReactElement<any>
+  abstract renderControl(props: { value: any, onChange: (value: any) => void, locale: string }): React.ReactElement<any>
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   abstract renderControlEditor(props: RenderEditorProps): React.ReactElement<any> | null
@@ -33,7 +33,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     return (
       <div>
         { this.renderRequired() }
-        { this.renderControl({ value: null, onChange: () => { return }}) }
+        { this.renderControl({ value: null, onChange: () => { return }, locale: props.locale }) }
       </div>
     ) 
   }
@@ -55,7 +55,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     return (
       <div>
         { this.renderRequired() }
-        { this.renderControl({ value: value, onChange: handleChange}) }
+        { this.renderControl({ value: value, onChange: handleChange, locale: props.locale}) }
       </div>
     )
   }
@@ -87,7 +87,8 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
         <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="required">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Required</Checkbox>}
         </PropertyEditor>
-
+        
+        {this.renderControlEditor(props)}
       </div>
     )
   }
