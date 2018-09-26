@@ -96,8 +96,14 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       renderInstanceProps={outerRenderInstanceProps}
       schema={this.props.schema}>
         {(innerRenderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
-          // TODO loading/refreshing display
-          return block.renderInstance(innerRenderInstanceProps)
+          if (loading) {
+            return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+          }
+          return (
+            <div style={{ opacity: refreshing ? 0.4 : undefined }}>
+              { block.renderInstance(innerRenderInstanceProps) }
+            </div>
+          )
         }}
       </ContextVarsInjector>
   }
