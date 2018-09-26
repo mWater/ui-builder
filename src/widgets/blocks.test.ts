@@ -18,10 +18,12 @@ test("findBlockAncestry", () => {
   const blockDef = {
     id: "a1",
     type: "horizontal",
+    align: "justify",
     items: [
       { 
         id: "b1", 
         type: "horizontal",
+        align: "justify",
         items: [{ id: "c1", type: "horizontal", items: [] }]
       }
     ]
@@ -44,7 +46,8 @@ test("getBlockTree", () => {
       { 
         id: "b1", 
         type: "horizontal",
-        items: [{ id: "c1", type: "horizontal", items: [] }]
+        align: "justify",
+        items: [{ id: "c1", type: "horizontal", align: "justify", items: [] }]
       }
     ]
   }

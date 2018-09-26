@@ -149,9 +149,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
             })
           }
         })
-
         return { type: "op", op: "and", table: rowsetCV.table!, exprs: ands }
-
     }
   }
 
