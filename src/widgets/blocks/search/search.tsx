@@ -2,13 +2,17 @@ import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps } from '../../blocks'
 import { Expr, ExprValidator } from 'mwater-expressions';
-import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor } from '../../propertyEditors';
+import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import SearchBlockInstance from './SearchBlockInstance';
 import ListEditor from '../../ListEditor';
 import { ExprComponent } from 'mwater-expressions-ui';
+import { LocalizedString, localize } from '../../localization';
 
 export interface SearchBlockDef extends BlockDef {
   type: "search"
+
+  /** Placeholder in box */
+  placeholder: LocalizedString | null
 
   /** Id of context variable of rowset for table to use */
   rowset: string | null
@@ -52,7 +56,12 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
     return (
       <div className="input-group" style={{ padding: 5 }}>
         <span className="input-group-addon"><i className="fa fa-search"/></span>
-        <input type="text" className="form-control input-sm" style={{maxWidth: "20em"}} />
+        <input 
+          type="text" 
+          className="form-control input-sm" 
+          style={{maxWidth: "20em"}} 
+          placeholder={localize(this.blockDef.placeholder, props.locale)} 
+        />
       </div>
     )
   }
@@ -97,6 +106,12 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         : null}
+
+        <LabeledProperty label="Placeholder">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="placeholder">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }

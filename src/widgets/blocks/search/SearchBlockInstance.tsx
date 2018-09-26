@@ -3,6 +3,7 @@ import { SearchBlockDef, SearchBlock } from "./search";
 import { RenderInstanceProps, ContextVar } from "../../blocks";
 import { Row, Expr } from "mwater-expressions";
 import * as _ from "lodash";
+import { localize } from "../../localization";
 
 interface Props {
   blockDef: SearchBlockDef
@@ -72,6 +73,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
           style={{maxWidth: "20em"}} 
           value={this.state.searchText} 
           onChange={this.handleChange}
+          placeholder={localize(this.props.blockDef.placeholder, this.props.renderInstanceProps.locale)} 
           />
       </div>
     )

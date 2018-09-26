@@ -5,7 +5,10 @@ export interface LocalizedString {
   [language: string]: string  // Localizations
 }
 
-export function localize(str: LocalizedString, locale?: string): string {
+export function localize(str: LocalizedString | null, locale?: string): string {
+  if (!str) {
+    return ""
+  }
   if (str[locale || "en"]) {
     return str[locale || "en"]
   }

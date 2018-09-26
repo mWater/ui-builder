@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
-import { LabeledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors'
+import { LabeledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors'
 import { LocalizedString, localize } from '../localization'
 
 export interface TextBlockDef extends BlockDef {
@@ -29,14 +29,11 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     return (
       <div>
         <LabeledProperty label="Text">
-          <LocalizedTextPropertyEditor 
-            obj={this.blockDef}
-            onChange={props.onChange}
-            property="text"
-            locale={props.locale}
-            placeholder="Lorem ipsum"
-            multiline
-          />
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="text">
+            {(value, onChange) => 
+              <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+            }
+          </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Style">
           <DropdownPropertyEditor 

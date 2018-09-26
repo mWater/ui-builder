@@ -4,6 +4,7 @@ import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
+import { LocalizedString } from "mwater-expressions";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -40,10 +41,9 @@ export class PropertyEditor<T, K extends keyof T> extends React.Component<{
 }
 
 export class LocalizedTextPropertyEditor extends React.Component<{ 
-    obj: object, 
-    onChange: (obj: object) => void, 
+    value: LocalizedString | null, 
+    onChange: (value: LocalizedString | null) => void, 
     locale: string, 
-    property: string,
     placeholder?: string,
     multiline?: boolean,
     allowCR?: boolean
@@ -56,15 +56,20 @@ export class LocalizedTextPropertyEditor extends React.Component<{
       str = str.replace(/[\r\n]+/g, " ")
     }
 
-    const value = Object.assign({}, this.props.obj[this.props.property] || {})
+    if (!str) {
+      this.props.onChange(null)
+      return 
+    }
+
+    const value = Object.assign({}, this.props.value || {}) as LocalizedString
     value._base = this.props.locale
     value[locale] = str
 
-    this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
+    this.props.onChange(value)
   }
 
   render() {
-    const value = this.props.obj[this.props.property] || {}
+    const value = this.props.value || { _base: "en" }
     const locale = this.props.locale || "en"
     let str = ""
     if (value[locale]) {

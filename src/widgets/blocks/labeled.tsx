@@ -3,7 +3,7 @@ import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import { LocalizedString, localize } from '../localization';
-import { LabeledProperty, LocalizedTextPropertyEditor } from '../propertyEditors';
+import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
 import BlockPlaceholder from '../BlockPlaceholder';
 
 export interface LabeledBlockDef extends BlockDef {
@@ -60,14 +60,9 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
     return (
       <div>
         <LabeledProperty label="Label">
-          <LocalizedTextPropertyEditor 
-            obj={this.blockDef}
-            onChange={props.onChange}
-            property="label"
-            locale={props.locale}
-            placeholder="Lorem ipsum"
-            multiline
-          />
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="label">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} multiline />}
+          </PropertyEditor>
         </LabeledProperty>
       </div>
     )
