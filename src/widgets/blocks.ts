@@ -106,19 +106,21 @@ export interface RenderEditorProps {
   onChange(blockDef: BlockDef): void
 }
 
+export interface ValidateBlockOptions {
+  schema: Schema
+  contextVars: ContextVar[]
+
+  actionLibrary: ActionLibrary
+
+  /** Widget library that lists all available widgets */
+  widgetLibrary: WidgetLibrary
+}
+
 /** A filter that applies to a particular rowset context variable */
 export interface Filter {
   id: string, // Unique id of the filter
   expr: Expr  // Boolean filter expression on the rowset
   memo?: any,  // For internal use by the block. Will be passed back unchanged.
-}
-
-export interface ValidationError {
-  message: string
-}
-
-export interface BlockInstance extends React.Component {
-  validate?(): ValidationError[] // TODO needed??
 }
 
 /** Child of a block. Specifies the child block def and also any new context variables passed to it */
@@ -152,7 +154,7 @@ export abstract class Block<T extends BlockDef> {
   abstract getChildren(contextVars: ContextVar[]): ChildBlock[]
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-  abstract validate(schema: Schema, contextVars: ContextVar[]): string | null
+  abstract validate(options: ValidateBlockOptions): string | null
 
   /** 
    * Processes entire tree, starting at bottom. Allows 

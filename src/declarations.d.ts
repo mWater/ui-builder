@@ -1,5 +1,5 @@
 declare module 'mwater-expressions/lib/MWaterDataSource' {
-  import { DataSource } from "mwater-expressions";
+  import { DataSource, JsonQL } from "mwater-expressions";
 
   export default class MWaterDataSource extends DataSource {
     /**
@@ -12,7 +12,7 @@ declare module 'mwater-expressions/lib/MWaterDataSource' {
 }
 
 declare module 'mwater-expressions-ui' {
-  import { Schema, DataSource, Expr, LocalizedString, AggrStatus } from 'mwater-expressions'
+  import { Schema, DataSource, JsonQL, Expr, LocalizedString, AggrStatus } from 'mwater-expressions'
 
   class ExprComponent extends React.Component<{
     schema: Schema
@@ -28,6 +28,34 @@ declare module 'mwater-expressions-ui' {
     preferLiteral?: boolean
     aggrStatuses?: Array<AggrStatus>
     placeholder?: string
+  }> {}
+
+  class IdLiteralComponent extends React.Component<{
+    /** String value of primary key or array of primary keys */
+    value: string | string[] | null
+
+    /** Called with primary key or array of primary keys */
+    onChange: (value: string | string[] | null) => void
+
+    idTable: string
+
+    /** Schema of the database */
+    schema: Schema
+
+    /** Data source to use to get values */
+    dataSource: DataSource
+
+    /** Placeholder to display */
+    placeholder?: string
+
+    /** Optional extra orderings. Put "main" as tableAlias. JsonQL */
+    orderBy?: any // TODO
+
+    /** Allow multiple values (id[] type) */
+    multi?: boolean
+
+    /** Optional extra filter. Put "main" as tableAlias. JsonQL   */
+    filter?: JsonQL
   }> {}
 }
 

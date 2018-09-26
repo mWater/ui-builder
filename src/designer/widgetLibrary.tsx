@@ -90,6 +90,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
       const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
 
       return <WidgetTab
+        key={widgetDef.id}
         widgetDef={widgetDef}
         createBlock={this.props.blockFactory.createBlock.bind(null, this.lookupWidget)}
         schema={this.props.schema}

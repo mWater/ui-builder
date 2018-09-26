@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps } from '../actions';
+import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
 import { Expr } from 'mwater-expressions';
 import * as _ from 'lodash'
 
@@ -22,6 +22,11 @@ export interface AddRowActionDef extends ActionDef {
 export class AddRowAction extends Action<AddRowActionDef> {
   performAction(options: PerformActionOptions): Promise<void> {
     throw new Error("Method not implemented.");
+  }
+
+  validate(options: ValidateActionOptions) {
+    // TODO
+    return null
   }
 
   /** Get any context variables expressions that this action needs */

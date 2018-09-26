@@ -7,7 +7,7 @@ import { Select } from "react-library/lib/bootstrap";
 import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
 import { produce } from "immer";
-import { ExprComponent } from "mwater-expressions-ui";
+import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 
 interface WidgetEditorProps {
   widgetDef: WidgetDef
@@ -128,12 +128,10 @@ class ContextVarPreviewValue extends React.Component<{
 
   renderValue(value: any) {
     if (this.props.contextVar.type === "row") {
-      return <ExprComponent 
+      return <IdLiteralComponent 
         schema={this.props.schema} 
         dataSource={this.props.dataSource}
-        table={this.props.contextVar.table!}
-        types={["id"]}
-        idTable={this.props.contextVar.table}
+        idTable={this.props.contextVar.table!}
         value={value}
         onChange={this.handleChange}
         />

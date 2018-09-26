@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
 import { LabeledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors'
 import { LocalizedString, localize } from '../localization'
 

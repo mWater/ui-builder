@@ -32,11 +32,14 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   openPage(page: Page): void {
-    throw new Error("Method not implemented.");
+    this.setState({ pages: this.state.pages.concat(page) })
   }
 
   closePage(): void {
-    throw new Error("Method not implemented.");
+    // TODO validate and prevent popping last page
+    const pages = this.state.pages.slice()
+    pages.splice(pages.length - 1, 1)
+    this.setState({ pages })
   }
 
   renderChildBlock = (page: Page, props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string) => {
@@ -53,27 +56,29 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   handleClose = () => {
-    // TODO
+    this.closePage()
   }
 
-  renderPageContents(page: Page, isTop: boolean, contents: React.ReactElement<any>) {
+  renderPage(page: Page, index: number) {
+    const contents = this.renderPageContents(page)
+
     switch (page.type) {
       case "normal":
         return (
-          <NormalPage isTop={isTop} onClose={this.handleClose}>
+          <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index}>
             {contents}
           </NormalPage>
         )
       case "modal":
         return (
-          <ModalPage onClose={this.handleClose}>
+          <ModalPage onClose={this.handleClose} key={index}>
             {contents}
           </ModalPage>
         )
     }
   }
 
-  renderPage(page: Page, index: number) {
+  renderPageContents(page: Page) {
     // Lookup widget
     const widgetDef = this.props.lookupWidget(page.widgetId)!
 
@@ -103,7 +108,6 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
     // Wrap in context var injector
     return <ContextVarsInjector 
-      key={index}
       contextVars={widgetDef.contextVars}
       createBlock={this.props.createBlock}
       innerBlock={widgetDef.blockDef}
@@ -122,7 +126,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 }
 
-class NormalPage extends React.Component<{ isTop: boolean, onClose: () => void }> {
+class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void }> {
   // TODO page header
   render() {
     return this.props.children

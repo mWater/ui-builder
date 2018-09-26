@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock } from '../../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { Row } from '../../../Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
@@ -40,14 +40,14 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     return headerChildren.concat(contentChildren)
   }
 
-  validate(schema: Schema, contextVars: ContextVar[]) { 
+  validate(options: ValidateBlockOptions) { 
     // Validate rowset
-    const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowset && cv.type === "rowset")
+    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowset && cv.type === "rowset")
     if (!rowsetCV) {
       return "Rowset required"
     }
 
-    const exprValidator = new ExprValidator(schema)
+    const exprValidator = new ExprValidator(options.schema)
     let error: string | null
     
     // Validate where
@@ -56,7 +56,21 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       return error
     }
 
-    // TODO validate action
+    // Validate action
+    if (this.blockDef.rowClickAction) {
+      const action = options.actionLibrary.createAction(this.blockDef.rowClickAction)
+
+      // Create row context variable
+      const rowCV = this.createRowContextVar(rowsetCV)
+      error = action.validate({
+        schema: options.schema,
+        contextVars: options.contextVars.concat(rowCV),
+        widgetLibrary: options.widgetLibrary
+      })
+      if (error) {
+        return error
+      }
+    }
 
     return null
   }

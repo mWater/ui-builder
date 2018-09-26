@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar } from '../blocks'
-import { TextPropertyEditor, PropertyEditor, ContextVarPropertyEditor, LabeledProperty } from '../propertyEditors';
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks'
+import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty } from '../propertyEditors';
 import { Expr, ExprUtils, Schema, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 
@@ -20,14 +20,14 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     return (contextVarId === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
   }
 
-  validate(schema: Schema, contextVars: ContextVar[]) {
+  validate(options: ValidateBlockOptions) {
     // Validate cv
-    const contextVar = contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
+    const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
     if (!contextVar) {
       return "Context var required"
     }
 
-    const exprValidator = new ExprValidator(schema)
+    const exprValidator = new ExprValidator(options.schema)
     let error: string | null
     
     // Validate expr

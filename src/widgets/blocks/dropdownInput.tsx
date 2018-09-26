@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, BlockInstance, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
 import { TextPropertyEditor } from '../propertyEditors';
 
 export interface DropdownInputBlockDef extends BlockDef {

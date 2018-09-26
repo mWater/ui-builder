@@ -4,6 +4,7 @@ import { Database } from '../Database';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { PageStack } from '../PageStack';
 import { ActionLibrary } from './ActionLibrary';
+import { Schema } from 'mwater-expressions';
 
 // Action definition
 export interface ActionDef {
@@ -40,6 +41,14 @@ export interface PerformActionOptions {
   getContextVarValue(contextVarId: string): any
 }
 
+export interface ValidateActionOptions {
+  schema: Schema
+  contextVars: ContextVar[]
+
+  /** Widget library that lists all available widgets */
+  widgetLibrary: WidgetLibrary
+}
+
 /** Actions are how blocks interact with things outside of themselves */
 export abstract class Action<T extends ActionDef> {
   actionDef: T
@@ -47,6 +56,9 @@ export abstract class Action<T extends ActionDef> {
   constructor(actionDef: T) {
     this.actionDef = actionDef
   }
+
+  /** Determine if action is valid. null means valid, string is error message */
+  abstract validate(options: ValidateActionOptions): string | null
 
   /** Get any context variables expressions that this action needs TODO needed? */
   // getContextVarExprs(contextVarId: string): Expr[] { return [] }

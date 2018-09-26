@@ -116,7 +116,12 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       const renderChildBlock = (props: RenderDesignProps, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void) => {
         if (childBlockDef) {
           const childBlock = this.props.createBlock(childBlockDef)
-          const validationError = childBlock.validate(this.props.schema, props.contextVars)
+          const validationError = childBlock.validate({
+            schema: this.props.schema, 
+            contextVars: props.contextVars,
+            actionLibrary: this.props.actionLibrary,
+            widgetLibrary: this.props.widgetLibrary
+          })
       
           return (
             <BlockWrapper 
@@ -186,11 +191,16 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         const selectedBlock = this.props.createBlock(selectedChildBlock.blockDef)
 
         // Check for errors
-        const validationError = selectedBlock.validate(this.props.schema, contextVars)
+        const validationError = selectedBlock.validate({
+          schema: this.props.schema, 
+          contextVars: props.contextVars,
+          actionLibrary: this.props.actionLibrary,
+          widgetLibrary: this.props.widgetLibrary
+        })
 
         return (
           <div className="widget-designer-editor">
-            { validationError ? <div className="alert alert-danger">{validationError}</div> : null }
+            { validationError ? <div className="text-danger">{validationError}</div> : null }
             {selectedBlock.renderEditor(props)}
           </div>
         )

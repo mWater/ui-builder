@@ -1,12 +1,10 @@
-import * as React from 'react';
-import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps } from '../actions';
-import { Expr } from 'mwater-expressions';
 import * as _ from 'lodash'
+import * as React from 'react';
+import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../propertyEditors';
-import { NumberInput, Select } from 'react-library/lib/bootstrap';
+import { Select } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
-import { PageStack } from '../../PageStack';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -30,7 +28,34 @@ export interface OpenPageActionDef extends ActionDef {
 }
 
 export class OpenPageAction extends Action<OpenPageActionDef> {
-  async performAction(options: PerformActionOptions): Promise<void> {
+  validate(options: ValidateActionOptions) {
+    // Find widget
+    if (!this.actionDef.widgetId) {
+      return "Widget required"
+    }
+
+    // Ensure that widget exists 
+    const widget = options.widgetLibrary.widgets[this.actionDef.widgetId]
+    if (!widget) {
+      return "Invalid widget"
+    }
+
+    // Ensure that all context variables are mapped
+    for (const widgetCV of widget.contextVars) {
+      if (!this.actionDef.contextVarValues[widgetCV.id]) {
+        return "Missing mapping for " + widgetCV.name
+      }
+      // Ensure that mapping is to available context var
+      if (!options.contextVars.find(cv => cv.id === this.actionDef.contextVarValues[widgetCV.id].contextVarId)) {
+        return "Invalid context variable"
+      }
+      // TODO Check type and table
+    }
+
+    return null
+  }
+
+  performAction(options: PerformActionOptions): Promise<void> {
     const contextVarValues = {}
 
     // Perform mappings TODO test
@@ -38,13 +63,14 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       contextVarValues[cvid] = options.getContextVarValue(this.actionDef.contextVarValues[cvid].contextVarId)
     }
 
-
     options.pageStack.openPage({
       type: this.actionDef.pageType,
       database: options.database,
       widgetId: this.actionDef.widgetId!,
       contextVarValues: contextVarValues
     })
+
+    return Promise.resolve()
   }
   
   /** Render an optional property editor for the action. This may use bootstrap */
