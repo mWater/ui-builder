@@ -2,10 +2,16 @@ import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { Select, Toggle } from 'react-library/lib/bootstrap';
+import { LabeledProperty, PropertyEditor, DropdownPropertyEditor } from '../propertyEditors';
 
 export interface HorizontalBlockDef extends BlockDef {
   type: "horizontal"
+
   items: BlockDef[]
+
+  /** How to align child blocks */
+  align: "justify" | "right" | "left" | "center" // TODO implement
 }
 
 export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
@@ -46,18 +52,63 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     })
   }
 
-  renderChildDesign(props: RenderDesignProps, childBlockDef: BlockDef) {
-    return (
-      <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%", verticalAlign: "top" }}>
-        { props.renderChildBlock(props, childBlockDef) }
-      </div>
-    )
+  renderBlock(children: React.ReactNode[]) {
+    switch (this.blockDef.align || "justify") {
+      case "justify":
+        return (
+          <div>
+            { children.map((child, index) => {
+              return (
+                <div key={index} style={{ display: "inline-block", width: (100/children.length) + "%", verticalAlign: "top" }}>
+                  {child}
+                </div>
+              )})
+            }
+          </div>
+        )
+      case "left":
+        return (
+          <div>
+            { children.map((child, index) => {
+              return (
+                <div key={index} style={{ display: "inline-block", verticalAlign: "top" }}>
+                  {child}
+                </div>
+              )})
+            }
+          </div>
+        )
+      case "right":
+        return (
+          <div style={{ textAlign: "right" }}>
+            { children.map((child, index) => {
+              return (
+                <div key={index} style={{ display: "inline-block", verticalAlign: "top" }}>
+                  {child}
+                </div>
+              )})
+            }
+          </div>
+        )
+      case "center":
+        return (
+          <div style={{ textAlign: "center" }}>
+            { children.map((child, index) => {
+              return (
+                <div key={index} style={{ display: "inline-block", verticalAlign: "top" }}>
+                  {child}
+                </div>
+              )})
+            }
+          </div>
+        )
+    }
   }
 
   renderDesign(props: RenderDesignProps) {
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        { this.blockDef.items.map(childBlock => this.renderChildDesign(props, childBlock)) }
+        { this.renderBlock(this.blockDef.items.map(childBlock => props.renderChildBlock(props, childBlock))) }
       </div>
     )
   }
@@ -65,13 +116,29 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
   renderInstance(props: RenderInstanceProps) {
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        { this.blockDef.items.map(childBlockDef => {
-          return (
-            <div key={childBlockDef.id} style={{ display: "inline-block", width: (100/this.blockDef.items.length) + "%", verticalAlign: "top" }}>
-              {props.renderChildBlock(props, childBlockDef)}
-            </div>
-          )})
-        }
+        { this.renderBlock(this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef))) }
+      </div>
+    )
+  }
+
+  renderEditor(props: RenderEditorProps) {
+    return (
+      <div>
+        <LabeledProperty label="Alignment">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
+            {(value, onChange) => 
+              <Toggle 
+                value={value || "justify"} 
+                onChange={onChange} 
+                options={[
+                  { value: "justify", label: <i className="fa fa-align-justify"/> },
+                  { value: "left", label: <i className="fa fa-align-left"/> },
+                  { value: "center", label: <i className="fa fa-align-center"/> },
+                  { value: "right", label: <i className="fa fa-align-right"/> }
+                ]} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }
