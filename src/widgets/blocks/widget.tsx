@@ -96,6 +96,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         locale: props.locale,
         database: props.database,
         schema: props.schema,
+        actionFactory: props.actionFactory,
         contextVars: widgetDef.contextVars,
         getContextVarValue: (contextVarId: string) => {
           // Lookup outer id

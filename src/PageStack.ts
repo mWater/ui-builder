@@ -5,7 +5,7 @@ export interface Page {
   /** Whether page is a normal page or a modal */
   type: "modal" | "normal"
 
-  widgetDef: WidgetDef 
+  widgetId: string
 
   database: Database
 

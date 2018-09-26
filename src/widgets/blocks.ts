@@ -49,26 +49,27 @@ export interface RenderInstanceProps {
   locale: string,
   database: Database,
   schema: Schema,
-  contextVars: ContextVar[],
+  contextVars: ContextVar[]
+  actionFactory: ActionFactory
 
   /** Gets the value of a context variable */
-  getContextVarValue(contextVarId: string): any,
+  getContextVarValue(contextVarId: string): any
 
   /**
    * Gets the value of an expression based off of a context variable
    * @param contextVarId id of context variable
    * @param expr expression to get value of
    */
-  getContextVarExprValue(contextVarId: string, expr: Expr): any,
+  getContextVarExprValue(contextVarId: string, expr: Expr): any
 
   /** Selection call on context var (when type = "rowset" and selectable) */
-  onSelectContextVar(contextVarId: string, primaryKey: any): void; 
+  onSelectContextVar(contextVarId: string, primaryKey: any): void
 
   /** Set a filter on a rowset context variable */
-  setFilter(contextVarId: string, filter: Filter): void;
+  setFilter(contextVarId: string, filter: Filter): void
 
   /** Get any filters set on a rowset context variable  */
-  getFilters(contextVarId: string): Filter[];
+  getFilters(contextVarId: string): Filter[]
 
   /** All sub-block elements must rendered using this function. 
    * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string 

@@ -140,6 +140,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
       locale: outer.locale,
       database: outer.database,
       schema: outer.schema,
+      actionFactory: outer.actionFactory,
       onSelectContextVar: outer.onSelectContextVar,
       renderChildBlock: outer.renderChildBlock,
       contextVars: outer.contextVars.concat(this.props.contextVar),

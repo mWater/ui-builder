@@ -6,13 +6,14 @@ import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../pr
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
+import { PageStack } from '../../PageStack';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
   type: "ref"
   
   /** Context variable whose value should be used */
-  contextVarId: string | null,
+  contextVarId: string
 }
 
 /** Action which opens a page */
@@ -29,9 +30,28 @@ export interface OpenPageActionDef extends ActionDef {
 }
 
 export class OpenPageAction extends Action<OpenPageActionDef> {
+  pageStack: PageStack
 
-  performAction(options: PerformActionOptions): Promise<void> {
-    throw new Error("Method not implemented.");
+  constructor(actionDef: OpenPageActionDef, pageStack: PageStack) {
+    super(actionDef)
+    this.pageStack = pageStack
+  }
+
+  async performAction(options: PerformActionOptions): Promise<void> {
+    const contextVarValues = {}
+
+    // Perform mappings TODO test
+    for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
+      contextVarValues[cvid] = options.getContextVarValue(this.actionDef.contextVarValues[cvid].contextVarId)
+    }
+
+
+    this.pageStack.openPage({
+      type: this.actionDef.pageType,
+      database: options.database,
+      widgetId: this.actionDef.widgetId!,
+      contextVarValues: contextVarValues
+    })
   }
   
   /** Render an optional property editor for the action. This may use bootstrap */

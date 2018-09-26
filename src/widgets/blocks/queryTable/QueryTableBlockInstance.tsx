@@ -103,11 +103,33 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   renderRow(row: Row, rowIndex: number) {
     const rowRIProps = this.createRowRenderInstanceProps(rowIndex)
 
+    const handleRowClick = () => {
+      // Run action
+      if (this.props.block.blockDef.rowClickAction) {
+        const actionDef = this.props.block.blockDef.rowClickAction
+        const action = this.props.renderInstanceProps.actionFactory.createAction(actionDef)
+
+        action.performAction({
+          contextVars: rowRIProps.contextVars,
+          database: rowRIProps.database,
+          locale: rowRIProps.locale,
+          getContextVarValue: rowRIProps.getContextVarValue
+        })
+      }
+      const rowsetCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.block.blockDef.rowset)!
+      const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars)
+
+      // Row context variable value
+      const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.renderInstanceProps.schema, rowsetCV)
+
+
+    }
+
     return (
       <tr>
         { this.props.block.blockDef.contents.map((b, colIndex) => {
           return (
-            <td key={colIndex}>
+            <td key={colIndex} onClick={handleRowClick}>
               {rowRIProps.renderChildBlock(rowRIProps, b)}
             </td>
           )

@@ -60,9 +60,9 @@ export abstract class Action<T extends ActionDef> {
   }
 
   /** Get any context variables expressions that this action needs TODO needed? */
-  getContextVarExprs(contextVarId: string): Expr[] { return [] }
+  // getContextVarExprs(contextVarId: string): Expr[] { return [] }
 
-  /** Perform the aciton, returning a promise that fulfills when complete */
+  /** Perform the action, returning a promise that fulfills when complete */
   abstract performAction(options: PerformActionOptions): Promise<void>
   
   /** Render an optional property editor for the action. This may use bootstrap */

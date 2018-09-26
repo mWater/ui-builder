@@ -1,12 +1,16 @@
 import { ActionFactory, ActionDef, Action } from "./actions";
 import { OpenPageAction, OpenPageActionDef } from "./actions/openPage";
 import { AddRowAction, AddRowActionDef } from "./actions/addRow";
+import { LookupWidget } from "./widgets";
+import { PageStack } from "../PageStack";
 
 
 export class BasicActionFactory implements ActionFactory {
+  pageStack: PageStack
   newActionDefs: { [type: string]: ActionDef }
 
-  constructor() {
+  constructor(pageStack: PageStack) {
+    this.pageStack = pageStack
     this.newActionDefs = {}
   }
 
@@ -14,7 +18,7 @@ export class BasicActionFactory implements ActionFactory {
   createAction(actionDef: ActionDef): Action<ActionDef> {
     switch(actionDef.type) {
       case "openPage":
-        return new OpenPageAction(actionDef as OpenPageActionDef)
+        return new OpenPageAction(actionDef as OpenPageActionDef, this.pageStack)
       case "addRow":
         return new AddRowAction(actionDef as AddRowActionDef)
     }

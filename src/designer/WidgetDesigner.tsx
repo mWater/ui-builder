@@ -228,14 +228,23 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     const database = new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)) // TODO make non-live
 
+    const lookupWidget = (widgetId: string) => this.props.widgetLibrary.widgets[widgetId]
+
     // Create normal page to display
     const page: Page = {
       type: "normal",
       contextVarValues: this.props.widgetDef.contextVarPreviewValues,
       database: database,
-      widgetDef: this.props.widgetDef
+      widgetId: this.props.widgetDef.id
     }
-    const pageElem = <PageStackDisplay initialPage={page} locale="en" schema={this.props.schema} createBlock={this.props.createBlock} />
+    const pageElem = <PageStackDisplay 
+      initialPage={page} 
+      locale="en" 
+      schema={this.props.schema} 
+      createBlock={this.props.createBlock} 
+      actionFactory={this.props.actionFactory} 
+      lookupWidget={lookupWidget}
+      />
 
     return [
       (<div className="widget-designer-palette"/>),

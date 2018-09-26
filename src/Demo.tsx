@@ -123,12 +123,14 @@ const waterPointWidgetDef: WidgetDef = {
   contextVarPreviewValues: {}
 }
 
-const initialWidgetLibrary : WidgetLibrary = {
+const defaultWidgetLibrary : WidgetLibrary = {
   widgets: {
     "1234": waterPointsWidgetDef,
     "1235": waterPointWidgetDef
   }
 }
+
+const initialWidgetLibrary: WidgetLibrary = JSON.parse(window.localStorage.getItem("demo") || "null") || defaultWidgetLibrary
 
 const schema = new Schema({
   tables: [
@@ -160,6 +162,7 @@ export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLib
 
   handleWidgetLibraryChange = (widgetLibrary: WidgetLibrary) => {
     this.setState({ widgetLibrary })
+    window.localStorage.setItem("demo", JSON.stringify(widgetLibrary))
   }
   
   render() {

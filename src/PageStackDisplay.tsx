@@ -4,12 +4,16 @@ import { CreateBlock, RenderInstanceProps, Filter, BlockDef } from "./widgets/bl
 import { Schema, Expr } from "mwater-expressions";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
+import { ActionFactory } from "./widgets/actions";
+import { LookupWidget } from "./widgets/widgets";
 
 interface Props {
   initialPage: Page
   createBlock: CreateBlock
   locale: string
   schema: Schema
+  actionFactory: ActionFactory
+  lookupWidget: LookupWidget
 }
 
 interface State {
@@ -70,19 +74,23 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   renderPage(page: Page, index: number) {
+    // Lookup widget
+    const widgetDef = this.props.lookupWidget(page.widgetId)!
+
     // Case of empty widget
-    if (!page.widgetDef.blockDef) {
+    if (!widgetDef.blockDef) {
       return null
     }
 
     // Create block
-    const block = this.props.createBlock(page.widgetDef.blockDef)
+    const block = this.props.createBlock(widgetDef.blockDef)
 
     // Create outer renderInstanceProps. Context variables will be injected after
     const outerRenderInstanceProps: RenderInstanceProps = {
       locale: this.props.locale,
       database: page.database,
       schema: this.props.schema,
+      actionFactory: this.props.actionFactory,
       contextVars: [],
       getContextVarValue: (contextVarId: string) => { throw new Error("Non-existant context variable") },
       getContextVarExprValue: (contextVarId: string, expr: Expr) => { throw new Error("Non-existant context variable") },
@@ -95,9 +103,9 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     // Wrap in context var injector
     return <ContextVarsInjector 
       key={index}
-      contextVars={page.widgetDef.contextVars}
+      contextVars={widgetDef.contextVars}
       createBlock={this.props.createBlock}
-      innerBlock={page.widgetDef.blockDef}
+      innerBlock={widgetDef.blockDef}
       contextVarValues={page.contextVarValues}
       renderInstanceProps={outerRenderInstanceProps}
       schema={this.props.schema}>

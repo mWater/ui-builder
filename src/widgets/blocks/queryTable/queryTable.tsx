@@ -56,6 +56,8 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       return error
     }
 
+    // TODO validate action
+
     return null
   }
 
