@@ -9,6 +9,7 @@ import { localize } from "../widgets/localization";
 import { produce } from "immer";
 import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import ListEditor from "../widgets/ListEditor";
+import * as _ from "lodash";
 
 interface WidgetEditorProps {
   widgetDef: WidgetDef
@@ -77,7 +78,7 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
   }
 
   render() {
-    const contextVarOptions : Array<{ value: ContextVar, label: string }> = [];
+    let contextVarOptions : Array<{ value: ContextVar, label: string }> = [];
 
     for (const table of this.props.schema.getTables()) {
       contextVarOptions.push({
@@ -100,6 +101,8 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
         label: localize(table.name) + " Rowset"
       })
     }
+
+    contextVarOptions = _.sortBy(contextVarOptions, "label")
 
     return (
       <div>

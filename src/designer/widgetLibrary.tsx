@@ -19,11 +19,13 @@ interface Props {
   dataSource: DataSource
   actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary
+  /** Ids of widgets in open tabs */
+  openTabs: string[]
+  onOpenTabsChange(openTabs: string[]): void
   onWidgetLibraryChange(widgetLibrary: WidgetLibrary): void
 }
 
 interface State {
-  openTabs: string[]         // Ids of widgets in open tabs
   activeTabIndex: number     // Index of active tab. Can be one past end for new tab
 }
 
@@ -32,7 +34,6 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
   constructor(props: Props) {
     super(props)
     this.state = {
-      openTabs: ["1234", "1235"],
       activeTabIndex: 0
     }
   }
@@ -56,21 +57,21 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
       draft.widgets[widgetDef.id] = widgetDef
     })
     this.props.onWidgetLibraryChange(widgetLibrary)
-    this.setState({ openTabs: this.state.openTabs.concat(widgetDef.id)})
+    this.props.onOpenTabsChange(this.props.openTabs.concat(widgetDef.id))
   }
 
   handleCloseTab = (index: number) => {
-    const openTabs = this.state.openTabs.slice()
+    const openTabs = this.props.openTabs.slice()
     openTabs.splice(index, 1)
-    this.setState({ openTabs: openTabs })
+    this.props.onOpenTabsChange(openTabs)
   }
 
   handleOpenWidget = (widgetId: string) => {
-    this.setState({ openTabs: this.state.openTabs.concat(widgetId)})
+    this.props.onOpenTabsChange(this.props.openTabs.concat(widgetId))
   }
 
   renderTab(tab: string, index: number) {
-    const activeTabId = this.state.openTabs[index]
+    const activeTabId = this.props.openTabs[index]
     const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
 
     return (
@@ -85,8 +86,8 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
   }
 
   renderActiveTabContents() {
-    if (this.state.activeTabIndex < this.state.openTabs.length) {
-      const activeTabId = this.state.openTabs[this.state.activeTabIndex]
+    if (this.state.activeTabIndex < this.props.openTabs.length) {
+      const activeTabId = this.props.openTabs[this.state.activeTabIndex]
       const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
 
       return <WidgetTab
@@ -109,10 +110,10 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     return (
       <div style={{ height: "100%" }}>
         <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
-          {this.state.openTabs.map((tab, index) => this.renderTab(tab, index))}
+          {this.props.openTabs.map((tab, index) => this.renderTab(tab, index))}
           <li 
-            className={(this.state.activeTabIndex >= this.state.openTabs.length) ? "active" : ""}>
-              <a onClick={this.handleSelectTab.bind(null, this.state.openTabs.length)}>
+            className={(this.state.activeTabIndex >= this.props.openTabs.length) ? "active" : ""}>
+              <a onClick={this.handleSelectTab.bind(null, this.props.openTabs.length)}>
                 <i className="fa fa-plus"/>
               </a>
           </li>

@@ -57,7 +57,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         return this.props.createBlock(b).canonicalize()
       })
     }
-    console.log(JSON.stringify({ ...this.props.widgetDef, blockDef }, null, 2))
     this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 

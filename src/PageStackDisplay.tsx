@@ -7,6 +7,8 @@ import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { LookupWidget } from "./widgets/widgets";
 import { ActionLibrary } from "./widgets/ActionLibrary";
 
+import './PageStackDisplay.css'
+
 interface Props {
   initialPage: Page
   createBlock: CreateBlock
@@ -147,9 +149,19 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 }
 
 class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void }> {
-  // TODO page header
   render() {
-    return this.props.children
+    return (
+      <div className="normal-page">
+        <div className="normal-page-header">
+          { !this.props.isFirst ?
+            <i className="fa fa-arrow-left" onClick={this.props.onClose} />
+          : null }
+        </div>
+        <div className="normal-page-contents">
+          {this.props.children}
+        </div>
+      </div>
+    )
   }
 }
 
