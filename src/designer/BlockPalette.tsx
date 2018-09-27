@@ -40,6 +40,7 @@ export default class BlockPalette extends React.Component<Props> {
         title: "Query Table",
         blockDef: { 
           id: "", 
+          mode: "singleRow",
           type: "queryTable", 
           headers: [
             { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },

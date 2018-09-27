@@ -8,6 +8,7 @@ import { Schema } from 'mwater-expressions';
 import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
 import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
 import { ActionLibrary } from './widgets/ActionLibrary';
+import * as _ from 'lodash';
 const basicBlockFactory = new BlockFactory()
 
 // const defaultWidgetLibrary : WidgetLibrary = {
@@ -251,7 +252,7 @@ export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLib
 
     this.state = {
       widgetLibrary: initialWidgetLibrary,
-      openTabs: JSON.parse(window.localStorage.getItem("openTabs") || "null") || []
+      openTabs: _.intersection(JSON.parse(window.localStorage.getItem("openTabs") || "null") || [], _.keys(initialWidgetLibrary.widgets))
     }
   }
 

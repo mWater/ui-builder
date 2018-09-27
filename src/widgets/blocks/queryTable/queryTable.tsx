@@ -90,6 +90,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       case "multiRow":
         return { id: this.getRowContextVarId(), name: "Table row rowset", type: "rowset", table: rowsetCV.table }
     }
+    throw new Error("Unknown mode")
   }
 
   getRowContextVarId() {
