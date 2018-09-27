@@ -80,5 +80,5 @@ test("getBlockTree", () => {
     ]
   }
   
-  expect(blocks.getBlockTree(blockDef, createBlock, []).map(b => b.id)).toEqual(["a1", "b1", "c1"])
+  expect(blocks.getBlockTree(blockDef, createBlock, []).map(b => b.blockDef.id)).toEqual(["a1", "b1", "c1"])
 })

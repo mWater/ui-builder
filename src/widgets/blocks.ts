@@ -253,16 +253,16 @@ export function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlo
 }
 
 /** Get the entire tree of blocks from a root, including context variables for each */
-export function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): Array<Block<BlockDef>> {
-  const rootBlock = createBlock(rootBlockDef)
+export function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[] {
+  const rootChildBlock: ChildBlock = { blockDef: rootBlockDef, contextVars: contextVars }
 
   // Create list including children
-  let list = [rootBlock]
+  let list = [rootChildBlock]
 
   // For each child
-  for (const childBlock of rootBlock.getChildren(contextVars)) {
+  for (const childBlock of createBlock(rootBlockDef).getChildren(contextVars)) {
     if (childBlock.blockDef) {
-      const childTree = getBlockTree(childBlock.blockDef, createBlock, contextVars.concat(childBlock.contextVars))
+      const childTree = getBlockTree(childBlock.blockDef, createBlock, childBlock.contextVars)
       list = list.concat(childTree)
     }
   }

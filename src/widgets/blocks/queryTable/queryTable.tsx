@@ -116,8 +116,8 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     for (const contentBlockDef of this.blockDef.contents) {
       // Get block tree, compiling expressions for each one
       if (contentBlockDef) {
-        for (const descBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
-          exprs = exprs.concat(descBlock.getContextVarExprs(rowCV))
+        for (const descChildBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
+          exprs = exprs.concat(this.createBlock(descChildBlock.blockDef).getContextVarExprs(rowCV))
         }
       }
     }

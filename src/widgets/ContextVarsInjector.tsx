@@ -27,7 +27,10 @@ export default class ContextVarsInjector extends React.Component<Props> {
 
     for (const contextVar of this.props.contextVars) {
       // Get context var exprs
-      const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, this.props.contextVars).map(b => b.getContextVarExprs(contextVar)))
+      const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, this.props.contextVars).map(cb => {
+        const block = this.props.createBlock(cb.blockDef)
+        return block.getContextVarExprs(contextVar)
+      }))
 
       const currentElem = elem
       elem = (outerProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => (

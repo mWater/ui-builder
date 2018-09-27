@@ -1,7 +1,7 @@
 import BlockWrapper from "./BlockWrapper"
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, RenderDesignProps } from "../widgets/blocks"
+import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, RenderDesignProps, getBlockTree } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
 import { Schema, DataSource } from "mwater-expressions";
@@ -209,6 +209,26 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 
   handleSetMode = (mode: Mode) => { 
+    if (!this.props.widgetDef.blockDef) {
+      return
+    }
+
+    // Verify before allowing preview
+    if (mode === Mode.Preview) {
+      for (const childBlock of getBlockTree(this.props.widgetDef.blockDef, this.props.createBlock, this.props.widgetDef.contextVars)) {
+        const block = this.props.createBlock(childBlock.blockDef)
+        
+        if (block.validate({ 
+          schema: this.props.schema, 
+          actionLibrary: this.props.actionLibrary, 
+          widgetLibrary: this.props.widgetLibrary,
+          contextVars: childBlock.contextVars
+         })) {
+           alert("Correct errors first")
+           return
+         }
+      }
+    }
     this.setState({mode})
   }
 
