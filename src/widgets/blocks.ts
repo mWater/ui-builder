@@ -124,7 +124,7 @@ export interface Filter {
   memo?: any,  // For internal use by the block. Will be passed back unchanged.
 }
 
-/** Child of a block. Specifies the child block def and also any new context variables passed to it */
+/** Child of a block. Specifies the child block def and also any context variables passed to it */
 export interface ChildBlock {
   blockDef: BlockDef
   contextVars: ContextVar[]
@@ -236,15 +236,15 @@ export function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlo
 
   // Return self if true
   if (rootBlock.id === blockId) {
-    return [{ blockDef: rootBlockDef, contextVars: [] }]
+    return [{ blockDef: rootBlockDef, contextVars: contextVars }]
   }
 
   // For each child
   for (const childBlock of rootBlock.getChildren(contextVars)) {
     if (childBlock.blockDef) {
-      const childAncestry: ChildBlock[] | null = findBlockAncestry(childBlock.blockDef, createBlock, contextVars.concat(childBlock.contextVars), blockId)
+      const childAncestry: ChildBlock[] | null = findBlockAncestry(childBlock.blockDef, createBlock, childBlock.contextVars, blockId)
       if (childAncestry) {
-        return [{ blockDef: rootBlockDef, contextVars: childBlock.contextVars } as ChildBlock].concat(childAncestry)
+        return [{ blockDef: rootBlockDef, contextVars: contextVars } as ChildBlock].concat(childAncestry)
       }
     }
   }
@@ -252,7 +252,7 @@ export function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlo
   return null
 }
 
-/** Get the entire tree of blocks from a root */
+/** Get the entire tree of blocks from a root, including context variables for each */
 export function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): Array<Block<BlockDef>> {
   const rootBlock = createBlock(rootBlockDef)
 

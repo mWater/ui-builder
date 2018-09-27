@@ -14,7 +14,7 @@
 }
 
 .block-wrapper.validation-error {
-  border: dashed 2px red;
+  border: dashed 1px #d80c0c;
 }
 
 .block-wrapper .delete-block {

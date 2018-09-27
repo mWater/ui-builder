@@ -17,8 +17,8 @@ export interface HorizontalBlockDef extends BlockDef {
 export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
   get id() { return this.blockDef.id }
 
-  getChildren(): ChildBlock[] {
-    return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: [] }))
+  getChildren(contextVars: ContextVar[]): ChildBlock[] {
+    return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: contextVars }))
   }
 
   validate() { return null }

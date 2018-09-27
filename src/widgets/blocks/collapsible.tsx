@@ -12,8 +12,8 @@ export interface CollapsibleBlockDef extends BlockDef {
 }
 
 export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
-  getChildren(): ChildBlock[] {
-    return _.compact([this.blockDef.label, this.blockDef.content]).map(bd => ({ blockDef: bd, contextVars: [] }))
+  getChildren(contextVars: ContextVar[]): ChildBlock[] {
+    return _.compact([this.blockDef.label, this.blockDef.content]).map(bd => ({ blockDef: bd, contextVars: contextVars }))
   }
 
   validate() { return null }

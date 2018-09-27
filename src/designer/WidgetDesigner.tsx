@@ -1,18 +1,15 @@
-    import BlockWrapper from "./BlockWrapper"
-
+import BlockWrapper from "./BlockWrapper"
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, ContextVar, RenderDesignProps, RenderInstanceProps, Filter } from "../widgets/blocks"
+import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, RenderDesignProps } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
-import { Schema, Expr, DataSource } from "mwater-expressions";
+import { Schema, DataSource } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
-import { MockDatabase } from "../Database"
 import { WidgetEditor } from "./WidgetEditor";
 import { DataSourceDatabase } from "../DataSourceDatabase";
 import { QueryCompiler } from "../QueryCompiler";
-import ContextVarsInjector from "../widgets/ContextVarsInjector";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
 import { WidgetLibrary } from "./widgetLibrary";
@@ -163,19 +160,15 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       const store = this.createBlockStore()
 
       // Find selected block ancestry
-      let contextVars = this.props.widgetDef.contextVars
+      const contextVars = this.props.widgetDef.contextVars
       const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, contextVars, this.state.selectedBlockId)
 
       // Create props
       if (selectedBlockAncestry) {
         const selectedChildBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
 
-        for (let i = 0; i < selectedBlockAncestry.length - 1 ; i++) {
-          contextVars = contextVars.concat(selectedBlockAncestry[i].contextVars)
-        }
-
         const props : RenderEditorProps = {
-          contextVars: contextVars,
+          contextVars: selectedChildBlock.contextVars,
           locale: "en",
           schema: this.props.schema,
           dataSource: this.props.dataSource,
@@ -199,7 +192,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
         return (
           <div className="widget-designer-editor">
-            { validationError ? <div className="text-danger">{validationError}</div> : null }
+            { validationError ? 
+              <div className="text-danger"><i className="fa fa-exclamation-circle"/> {validationError}</div> 
+            : null }
             {selectedBlock.renderEditor(props)}
           </div>
         )

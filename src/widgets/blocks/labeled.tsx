@@ -13,8 +13,8 @@ export interface LabeledBlockDef extends BlockDef {
 }
 
 export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
-  getChildren(): ChildBlock[] {
-    return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: [] }] : []
+  getChildren(contextVars: ContextVar[]): ChildBlock[] {
+    return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }
 
   validate() { return null }

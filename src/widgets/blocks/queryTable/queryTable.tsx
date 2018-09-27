@@ -35,8 +35,8 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     // Get rowset context variable
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
-    const headerChildren: ChildBlock[] = _.compact(this.blockDef.headers).map(bd => ({ blockDef: bd, contextVars: [] }))
-    const contentChildren: ChildBlock[] = _.compact(this.blockDef.contents).map(bd => ({ blockDef: bd, contextVars: rowsetCV ? [this.createRowContextVar(rowsetCV)] : [] }))
+    const headerChildren: ChildBlock[] = _.compact(this.blockDef.headers).map(bd => ({ blockDef: bd, contextVars: contextVars }))
+    const contentChildren: ChildBlock[] = _.compact(this.blockDef.contents).map(bd => ({ blockDef: bd, contextVars: rowsetCV ? contextVars.concat(this.createRowContextVar(rowsetCV)) : contextVars }))
     return headerChildren.concat(contentChildren)
   }
 

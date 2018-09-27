@@ -11,8 +11,8 @@ export interface VerticalBlockDef extends BlockDef {
 export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
   get id() { return this.blockDef.id }
 
-  getChildren(): ChildBlock[] {
-    return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: [] }))
+  getChildren(contextVars: ContextVar[]): ChildBlock[] {
+    return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: contextVars }))
   }
 
   validate() { return null }
