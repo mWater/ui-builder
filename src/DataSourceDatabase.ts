@@ -1,4 +1,4 @@
-import { Database, QueryOptions, Row, DatabaseChangeListener } from "./Database";
+import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
 import { DataSource, JsonQL, ExprUtils, Schema, ExprCompiler } from "mwater-expressions";
 import { QueryCompiler } from "./QueryCompiler";
 
@@ -39,17 +39,7 @@ export class DataSourceDatabase implements Database {
     // TODO
   }
 
-  /** Adds a row, returning the primary key as a promise */
-  addRow(table: string, updates: { [column: string]: any }): Promise<any> {
-    throw new Error("TODO")
+  transaction(): Transaction {
+    throw new Error("Not implemented")
   }
-
-  updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void> {
-    throw new Error("TODO")
-  }
-  
-  removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void> {
-    throw new Error("TODO")
-  }
-
 }

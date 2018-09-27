@@ -18,13 +18,6 @@ export interface QueryOptions {
   limit?: number | null
 }
 
-// export interface QueryOneOptions {
-//   select: { [alias: string]: Expr },
-//   from: string,       // Table that this is from
-//   where?: Expr,       // Where clause
-//   order?: Order[]
-// }
-
 export interface Row {
   [alias: string]: any 
 }
@@ -38,6 +31,10 @@ export interface Database {
   addChangeListener(changeListener: DatabaseChangeListener): void;
   removeChangeListener(changeListener: DatabaseChangeListener): void;
 
+  transaction(): Transaction
+}
+
+export interface Transaction {
   /** Adds a row, returning the primary key as a promise */
   addRow(table: string, updates: { [column: string]: any }): Promise<any>;
 
@@ -45,7 +42,7 @@ export interface Database {
   
   removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
 
-  // batch(): DatabaseBatch;
+  commit(): Promise<any>;
 }
 
 // interface DatabaseBatch {
@@ -65,10 +62,16 @@ export class MockDatabase implements Database {
   addChangeListener(changeListener: DatabaseChangeListener) { return }
   removeChangeListener(changeListener: DatabaseChangeListener) { return }
 
+  transaction() { return new MockTransaction() }
+}
+
+class MockTransaction implements Transaction {
   /** Adds a row, returning the primary key as a promise */
   async addRow(table: string, updates: { [column: string]: any }) { return null }
 
   async updateRow(table: string, primaryKey: any, updates: { [column: string]: any }) { return }
   
   async removeRow(table: string, primaryKey: any, updates: { [column: string]: any }) { return }
+
+  async commit() { return }
 }

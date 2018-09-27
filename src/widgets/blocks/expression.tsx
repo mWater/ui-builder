@@ -44,9 +44,9 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
     return (
       <div>
-        <span className="text-muted">[</span>
+        <span className="text-muted">&lt;</span>
         {summary}
-        <span className="text-muted">]</span>
+        <span className="text-muted">&gt;</span>
       </div>
     )     
   }
