@@ -6,3 +6,9 @@
   position: relative;
   right: 2px;
 }
+
+.save-cancel-footer {
+  text-align: right;
+  padding: 10px;
+  border-top: solid 1px #DDD;
+}

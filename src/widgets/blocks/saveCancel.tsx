@@ -36,16 +36,12 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     // const labelText = localize(this.blockDef.label, props.locale)
 
     return (
-      <div className="panel panel-default">
-        <div className="panel-body">
-          { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
-        </div>
-        <div className="panel-footer">
-          <div style={{ textAlign: "right" }}>
-            <button type="button" className="btn btn-primary">Save</button>
-            &nbsp;
-            <button type="button" className="btn btn-default">Cancel</button>
-          </div>
+      <div>
+        { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
+        <div className="save-cancel-footer">
+          <button type="button" className="btn btn-primary">Save</button>
+          &nbsp;
+          <button type="button" className="btn btn-default">Cancel</button>
         </div>
       </div>
     )
@@ -53,16 +49,12 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
 
   renderInstance(props: RenderInstanceProps) {
     return (
-      <div className="panel panel-default">
-        <div className="panel-body">
-          { props.renderChildBlock(props, this.blockDef.child) }
-        </div>
-        <div className="panel-footer">
-          <div style={{ textAlign: "right" }}>
-            <button type="button" className="btn btn-primary">Save</button>
-            &nbsp;
-            <button type="button" className="btn btn-default">Cancel</button>
-          </div>
+      <div>
+        { props.renderChildBlock(props, this.blockDef.child) }
+        <div className="save-cancel-footer">
+          <button type="button" className="btn btn-primary">Save</button>
+          &nbsp;
+          <button type="button" className="btn btn-default">Cancel</button>
         </div>
       </div>
     )
