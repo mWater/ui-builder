@@ -12,6 +12,7 @@ import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable/queryTa
 import { SearchBlock, SearchBlockDef } from './blocks/search/search';
 import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 import { TextboxBlock, TextboxBlockDef } from './blocks/controls/textbox';
+import { SaveCancelBlock, SaveCancelBlockDef } from './blocks/saveCancel';
 
 export default class BlockFactory {
   createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block<BlockDef> => {
@@ -41,6 +42,8 @@ export default class BlockFactory {
         return new SearchBlock(blockDef as SearchBlockDef)
       case "button":
         return new ButtonBlock(blockDef as ButtonBlockDef)
+      case "saveCancel":
+        return new SaveCancelBlock(blockDef as SaveCancelBlockDef, internalCreateBlock)
     }
     throw new Error("Type not found")
   }

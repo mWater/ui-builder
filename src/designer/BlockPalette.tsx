@@ -57,6 +57,16 @@ export default class BlockPalette extends React.Component<Props> {
       {
         title: "Button",
         blockDef: { id: "", type: "button", label: { _base: "en", en: "Button" }, style: "default", size: "normal" }
+      },
+      {
+        title: "Save/Cancel",
+        blockDef: { 
+          id: "", 
+          type: "saveCancel", 
+          saveLabel: { _base: "en", en: "Save" },
+          cancelLabel: { _base: "en", en: "Cancel" },
+          child: null
+        }
       }
     ]
 

@@ -1,10 +1,9 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import { LocalizedString, localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
-import BlockPlaceholder from '../BlockPlaceholder';
 
 export interface LabeledBlockDef extends BlockDef {
   type: "labeled"
@@ -51,7 +50,7 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
         <div style={{fontWeight: "bold"}}>
           {localize(this.blockDef.label, props.locale)}
         </div>
-        { this.blockDef.child ? this.createBlock(this.blockDef.child).renderInstance(props) : null }
+        { props.renderChildBlock(props, this.blockDef.child) }
       </div>
     )
   }

@@ -40,16 +40,18 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       return "Invalid widget"
     }
 
-    // Ensure that all context variables are mapped
+    // Ensure that all context variables are correctly mapped
     for (const widgetCV of widget.contextVars) {
+      // Allow unmapped variables
       if (!this.actionDef.contextVarValues[widgetCV.id]) {
-        return "Missing mapping for " + widgetCV.name
+        continue
       }
+
       // Ensure that mapping is to available context var
-      if (!options.contextVars.find(cv => cv.id === this.actionDef.contextVarValues[widgetCV.id].contextVarId)) {
+      const srcCV = options.contextVars.find(cv => cv.id === this.actionDef.contextVarValues[widgetCV.id].contextVarId)
+      if (!srcCV || srcCV.table !== widgetCV.table || srcCV.type !== widgetCV.type) {
         return "Invalid context variable"
       }
-      // TODO Check type and table
     }
 
     return null
