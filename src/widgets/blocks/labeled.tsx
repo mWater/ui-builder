@@ -60,7 +60,7 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
       <div>
         <LabeledProperty label="Label">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="label">
-            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} multiline />}
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
       </div>
