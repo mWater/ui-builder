@@ -7,7 +7,7 @@ import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '..
 
 export interface LabeledBlockDef extends BlockDef {
   type: "labeled"
-  label: LocalizedString,
+  label: LocalizedString | null,
   child: BlockDef | null
 }
 

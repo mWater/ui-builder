@@ -7,15 +7,13 @@ import { ActionDef } from '../actions';
 
 export interface ButtonBlockDef extends BlockDef {
   type: "button"
-  label: LocalizedString
+  label: LocalizedString | null
 
   /** Action to perform when button is clicked */
   actionDef: ActionDef | null
 
-  /** default, primary  */
-  style: string 
-  /** normal, small, large */
-  size: string
+  style: "default" | "primary"
+  size: "normal" | "small" | "large"
 }
 
 export class ButtonBlock extends LeafBlock<ButtonBlockDef> {

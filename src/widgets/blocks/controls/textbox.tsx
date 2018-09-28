@@ -8,7 +8,7 @@ import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '..
 export interface TextboxBlockDef extends ControlBlockDef {
   type: "textbox"
 
-  placeholder: LocalizedString
+  placeholder: LocalizedString | null
 }
 
 export class TextboxBlock extends ControlBlock<TextboxBlockDef> {

@@ -7,8 +7,8 @@ import BlockPlaceholder from '../BlockPlaceholder';
 
 // Block which contains a widget
 export interface WidgetBlockDef extends BlockDef {
-  widgetId: string;   // Id of the widget
-  contextVarMap: { [contextVarId: string]: string };  // Maps each internal widgets' context variable id to an external one
+  widgetId: string | null   // Id of the widget
+  contextVarMap: { [contextVarId: string]: string }  // Maps each internal widgets' context variable id to an external one
 }
 
 export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
@@ -22,6 +22,9 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   }
 
   validate() { 
+    if (!this.blockDef.widgetId) {
+      return "Widget required"
+    }
     // TODO!!!
     return null 
   }
@@ -50,6 +53,10 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   }
 
   renderDesign(props: RenderDesignProps) {
+    if (!this.blockDef.widgetId) {
+      return <div/>
+    }
+
     // Find the widget
     const widgetDef = this.lookupWidget(this.blockDef.widgetId)
     if (widgetDef && widgetDef.blockDef) {
@@ -88,7 +95,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     // Find the widget
-    const widgetDef = this.lookupWidget(this.blockDef.widgetId)
+    const widgetDef = this.lookupWidget(this.blockDef.widgetId!)
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 

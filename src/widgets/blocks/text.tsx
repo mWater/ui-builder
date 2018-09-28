@@ -6,10 +6,11 @@ import { LocalizedString, localize } from '../localization'
 
 export interface TextBlockDef extends BlockDef {
   type: "text"
+  
   /** Text content */
-  text: LocalizedString,
-  /** style ("p", "div", "h1", "h2", "h3", "h4") */
-  style: string  
+  text: LocalizedString | null
+
+  style: "p" | "div" | "h1" | "h2" | "h3" | "h4"
 }
 
 export class TextBlock extends LeafBlock<TextBlockDef> {

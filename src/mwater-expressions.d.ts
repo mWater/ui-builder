@@ -226,11 +226,11 @@ declare module 'mwater-expressions' {
   class ExprUtils {
     constructor(schema: Schema)
 
-    summarizeExpr(expr: Expr, locale?: string): string
+    summarizeExpr(expr: Expr | null, locale?: string): string
 
-    getExprType(expr: Expr): string | null
+    getExprType(expr: Expr | null): string | null
 
-    getExprAggrStatus(expr: Expr): AggrStatus | null
+    getExprAggrStatus(expr: Expr | null): AggrStatus | null
 
     /** Converts a literal value related to an expression to a string, using name of enums. preferEnumCodes tries to use code over name */
     stringifyExprLiteral(expr: Expr, literal: any, locale?: string, preferEnumCodes?: boolean): string

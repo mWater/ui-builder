@@ -7,8 +7,8 @@ import { LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors'
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
-  saveLabel: LocalizedString,
-  cancelLabel: LocalizedString,
+  saveLabel: LocalizedString | null
+  cancelLabel: LocalizedString | null
   child: BlockDef | null
 }
 

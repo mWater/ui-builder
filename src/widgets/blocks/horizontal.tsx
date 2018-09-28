@@ -11,7 +11,7 @@ export interface HorizontalBlockDef extends BlockDef {
   items: BlockDef[]
 
   /** How to align child blocks */
-  align: "justify" | "right" | "left" | "center" // TODO implement
+  align: "justify" | "right" | "left" | "center"
 }
 
 export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {

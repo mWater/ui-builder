@@ -9,15 +9,15 @@ export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
   
   /** Context variable (row or rowset) to use for expression */
-  contextVarId: string
+  contextVarId: string | null
 
   /** Expression to be displayed */
-  expr: Expr
+  expr: Expr | null
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   getContextVarExprs(contextVar: ContextVar): Expr[] { 
-    return (contextVar.id === this.blockDef.contextVarId) ? [this.blockDef.expr] : [] 
+    return (contextVar.id === this.blockDef.contextVarId && this.blockDef.expr) ? [this.blockDef.expr] : [] 
   }
 
   validate(options: ValidateBlockOptions) {

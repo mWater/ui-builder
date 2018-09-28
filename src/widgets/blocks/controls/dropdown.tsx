@@ -9,7 +9,7 @@ import ReactSelect from "react-select"
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
 
-  placeholder: LocalizedString
+  placeholder: LocalizedString | null
 }
 
 export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
