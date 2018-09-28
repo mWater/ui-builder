@@ -98,8 +98,14 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
   }
 
   async performQueries() {
-    // Query database if row TODO null value?
+    // Query database if row 
     if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
+      // Special case of null row value
+      if (this.props.value == null) {
+        this.setState({ exprValues: {}, loading: false, refreshing: false })
+        return
+      }
+
       this.setState({ refreshing: true })
       const table: string = this.props.contextVar.table!
 

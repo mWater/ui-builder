@@ -25,16 +25,16 @@ export default class BlockPalette extends React.Component<Props> {
         blockDef: { id: "", type: "collapsible", label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" }, content: null },
       },
       {
-        title: "Text Box",
+        title: "TextBox Control",
         blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null },
+      },
+      {
+        title: "Dropdown Control",
+        blockDef: { id: "", type: "dropdown", rowContextVarId: null, column: null },
       },
       {
         title: "Expression",
         blockDef: { id: "", type: "expression", expr: null },
-      },
-      {
-        title: "Dropdown",
-        blockDef: { id: "", type: "dropdownInput", column: null },
       },
       {
         title: "Query Table",

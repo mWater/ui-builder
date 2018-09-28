@@ -109,6 +109,40 @@ test("exprs are computed for row variables", (done) => {
   })
 })
 
+test("exprs are null for null row variables", (done) => {
+  const contextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
+  const value = null
+  const contextVarExprs : Expr[] = [
+    { type: "field", table: "t1", column: "c1" }
+  ]
+
+  let innerRenderProps: RenderInstanceProps
+    
+  const x = shallow((
+    <ContextVarInjector 
+      renderInstanceProps={outerRenderProps} 
+      schema={schema}
+      contextVar={contextVar} 
+      value={value}
+      contextVarExprs={contextVarExprs}>
+      { (renderInstanceProps: RenderInstanceProps) => {
+          innerRenderProps = renderInstanceProps
+          return <div/>
+      }}
+    </ContextVarInjector>))
+  
+  setImmediate(() => {
+    // Query should not have been made
+    const queryOptions = expect((database.query as jest.Mock).mock.calls.length).toBe(0)
+  
+    // Should get the value as undefined
+    expect(innerRenderProps!.getContextVarExprValue(contextVar.id, contextVarExprs[0])).toBeUndefined()
+  
+    done()
+  })
+})
+
+
 test("exprs are computed for rowset variables, excluding non-aggregates", (done) => {
   const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }

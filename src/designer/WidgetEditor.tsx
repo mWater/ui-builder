@@ -3,12 +3,12 @@ import * as uuid from 'uuid/v4'
 import { LabeledProperty, TextPropertyEditor } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
 import { ContextVar } from "../widgets/blocks";
-import { Select } from "react-library/lib/bootstrap";
 import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
 import { produce } from "immer";
 import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import ListEditor from "../widgets/ListEditor";
+import ReactSelect from "react-select"
 import * as _ from "lodash";
 
 interface WidgetEditorProps {
@@ -73,8 +73,8 @@ class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChang
 }
 
 class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
-  handleAddContextVar = (contextVar: ContextVar) => {
-    this.props.onChange(this.props.contextVars.concat(contextVar))
+  handleAddContextVar = (cv: { value: ContextVar, label: string }) => {
+    this.props.onChange(this.props.contextVars.concat(cv.value))
   }
 
   render() {
@@ -109,7 +109,7 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
         <ListEditor items={this.props.contextVars} onItemsChange={this.props.onChange}>
           { (contextVar, onContextVarChange) => <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange}/> }
         </ListEditor>
-        <Select value={null} nullLabel="+ Add Context Variable" options={contextVarOptions} onChange={this.handleAddContextVar} size="sm" />
+        <ReactSelect value={null} options={contextVarOptions} placeholder="+ Add Context Variable" onChange={this.handleAddContextVar} />
       </div>
     )
   }

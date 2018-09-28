@@ -5,7 +5,6 @@ import { WidgetBlock, WidgetBlockDef } from './blocks/widget';
 import { LookupWidget } from './widgets';
 import { TextBlock, TextBlockDef } from './blocks/text';
 import { LabeledBlock, LabeledBlockDef } from './blocks/labeled';
-import { DropdownInputBlock, DropdownInputBlockDef } from './blocks/dropdownInput';
 import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
 import { ExpressionBlock, ExpressionBlockDef } from './blocks/expression';
 import { QueryTableBlock, QueryTableBlockDef } from './blocks/queryTable/queryTable';
@@ -13,6 +12,7 @@ import { SearchBlock, SearchBlockDef } from './blocks/search/search';
 import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 import { TextboxBlock, TextboxBlockDef } from './blocks/controls/textbox';
 import { SaveCancelBlock, SaveCancelBlockDef } from './blocks/saveCancel';
+import { DropdownBlock, DropdownBlockDef } from './blocks/controls/dropdown';
 
 export default class BlockFactory {
   createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block<BlockDef> => {
@@ -30,8 +30,8 @@ export default class BlockFactory {
         return new LabeledBlock(blockDef as LabeledBlockDef, internalCreateBlock)
       case "textbox":
         return new TextboxBlock(blockDef as TextboxBlockDef)
-      case "dropdownInput":
-        return new DropdownInputBlock(blockDef as DropdownInputBlockDef)
+      case "dropdown":
+        return new DropdownBlock(blockDef as DropdownBlockDef)
       case "collapsible":
         return new CollapsibleBlock(blockDef as CollapsibleBlockDef, internalCreateBlock)
       case "expression":
@@ -45,6 +45,6 @@ export default class BlockFactory {
       case "saveCancel":
         return new SaveCancelBlock(blockDef as SaveCancelBlockDef, internalCreateBlock)
     }
-    throw new Error("Type not found")
+    throw new Error(`Type ${blockDef.type} not found`)
   }
 }

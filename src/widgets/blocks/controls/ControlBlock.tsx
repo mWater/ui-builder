@@ -2,7 +2,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, Va
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from "../../propertyEditors";
-import { Expr, Column } from "mwater-expressions";
+import { Expr, Column, Schema } from "mwater-expressions";
 import { ExprComponent } from "mwater-expressions-ui";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
@@ -18,9 +18,23 @@ export interface ControlBlockDef extends BlockDef {
   required: boolean
 }
 
+export interface RenderControlProps {
+  value: any
+  locale: string
+  schema: Schema
+
+  /** Context variable. Can be undefined in design mode */
+  rowContextVar?: ContextVar
+
+  /** True if control should be disabled */
+  disabled: boolean
+
+  onChange: (value: any) => void
+}
+
 export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
 
-  abstract renderControl(props: { value: any, onChange: (value: any) => void, locale: string }): React.ReactElement<any>
+  abstract renderControl(props: RenderControlProps): React.ReactElement<any>
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   abstract renderControlEditor(props: RenderEditorProps): React.ReactElement<any> | null
@@ -29,11 +43,19 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   abstract filterColumn(column: Column): boolean
 
   renderDesign(props: RenderDesignProps) {
+
     // Simply render empty control
     return (
       <div>
         { this.renderRequired() }
-        { this.renderControl({ value: null, onChange: () => { return }, locale: props.locale }) }
+        { this.renderControl({ 
+          value: null, 
+          rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
+          onChange: () => { return }, 
+          locale: props.locale,
+          schema: props.schema,
+          disabled: false
+        }) }
       </div>
     ) 
   }
@@ -46,8 +68,10 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
 
     const handleChange = (newValue: T | null) => {
-      console.warn("TODO")
+      console.warn("TODO: " + JSON.stringify(newValue))
     }
+
+    const id = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Get current value
     const value = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: this.blockDef.column! })
@@ -55,7 +79,14 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     return (
       <div>
         { this.renderRequired() }
-        { this.renderControl({ value: value, onChange: handleChange, locale: props.locale}) }
+        { this.renderControl({ 
+          value: value, 
+          rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
+          onChange: handleChange, 
+          locale: props.locale,
+          schema: props.schema,
+          disabled: id == null // Disable if no primary key
+        }) }
       </div>
     )
   }

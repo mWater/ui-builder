@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { BlockDef, RenderEditorProps } from '../../blocks';
-import { ControlBlock, ControlBlockDef } from './ControlBlock';
+import { RenderEditorProps } from '../../blocks';
+import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column } from 'mwater-expressions';
 import { LocalizedString, localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
@@ -12,13 +12,14 @@ export interface TextboxBlockDef extends ControlBlockDef {
 }
 
 export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
-  renderControl(props: { value: any, onChange: (value: any) => void, locale: string }) {
+  renderControl(props: RenderControlProps) {
     const handleChange = (v: string) => props.onChange(v || null)
 
     return <Textbox
       value={props.value as (string | null) || ""} 
       onChange={handleChange}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
+      disabled={props.disabled}
       />
   }
 
@@ -43,6 +44,7 @@ interface TextboxProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  disabled: boolean
 }
 
 /** Text box that updates only on blur */
@@ -60,9 +62,9 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
     }
   }
 
-  handleFocus = (ev: React.ChangeEvent<HTMLInputElement>) => {
+  handleFocus = () => {
     // Start tracking state internally
-    this.setState({ text: this.props.value })
+    this.setState({ text: this.props.value });
   }
 
   handleBlur = (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,6 +84,7 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
         className="form-control"
         type="text"
         placeholder={this.props.placeholder}
+        disabled={this.props.disabled}
         value={ this.state.text != null ? this.state.text : this.props.value }
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
