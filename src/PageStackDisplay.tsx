@@ -6,6 +6,7 @@ import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { LookupWidget } from "./widgets/widgets";
 import { ActionLibrary } from "./widgets/ActionLibrary";
+import { WidgetLibrary } from "./designer/widgetLibrary";
 
 import './PageStackDisplay.css'
 
@@ -15,7 +16,7 @@ interface Props {
   locale: string
   schema: Schema
   actionLibrary: ActionLibrary
-  lookupWidget: LookupWidget
+  widgetLibrary: WidgetLibrary
 }
 
 interface State {
@@ -63,7 +64,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
   renderPageContents(page: Page) {
     // Lookup widget
-    const widgetDef = this.props.lookupWidget(page.widgetId)!
+    const widgetDef = this.props.widgetLibrary.widgets[page.widgetId!]
 
     // Case of empty widget
     if (!widgetDef.blockDef) {
@@ -79,6 +80,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       database: page.database,
       schema: this.props.schema,
       actionLibrary: this.props.actionLibrary,
+      widgetLibrary: this.props.widgetLibrary,
       pageStack: this,
       contextVars: [],
       getContextVarValue: (contextVarId: string) => { throw new Error("Non-existant context variable") },

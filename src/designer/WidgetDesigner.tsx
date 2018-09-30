@@ -141,6 +141,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         selectedId: this.state.selectedBlockId,
+        widgetLibrary: this.props.widgetLibrary,
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
         store,
@@ -252,8 +253,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     const database = new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)) // TODO make non-live
 
-    const lookupWidget = (widgetId: string) => this.props.widgetLibrary.widgets[widgetId]
-
     // Create normal page to display
     const page: Page = {
       type: "normal",
@@ -267,7 +266,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       schema={this.props.schema} 
       createBlock={this.props.createBlock} 
       actionLibrary={this.props.actionLibrary} 
-      lookupWidget={lookupWidget}
+      widgetLibrary={this.props.widgetLibrary}
       />
 
     return [

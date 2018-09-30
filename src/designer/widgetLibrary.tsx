@@ -44,10 +44,6 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     }))
   }
 
-  lookupWidget(widgetId: string): WidgetDef | null {
-    return this.props.widgetLibrary.widgets[widgetId]
-  }
-
   handleSelectTab = (index: number) => {
     this.setState({ activeTabIndex: index })
   }
@@ -93,7 +89,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
       return <WidgetTab
         key={widgetDef.id}
         widgetDef={widgetDef}
-        createBlock={this.props.blockFactory.createBlock.bind(null, this.lookupWidget)}
+        createBlock={this.props.blockFactory.createBlock}
         schema={this.props.schema}
         dataSource={this.props.dataSource}
         actionLibrary={this.props.actionLibrary}

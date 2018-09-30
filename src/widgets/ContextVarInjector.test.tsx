@@ -25,6 +25,7 @@ beforeEach(() => {
     schema: {} as Schema,
     contextVars: [],
     actionLibrary: {} as ActionLibrary,
+    widgetLibrary: { widgets: {} },
     pageStack: {} as PageStack,
     getContextVarValue: jest.fn(),
     getContextVarExprValue:  jest.fn(),

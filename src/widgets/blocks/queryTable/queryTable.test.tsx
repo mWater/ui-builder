@@ -20,7 +20,7 @@ const qtbdSingle: QueryTableBlockDef = {
   rowClickAction: null
 }
 
-const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
+const createBlock = new BlockFactory().createBlock
 
 const qtbSingle = new QueryTableBlock(qtbdSingle, createBlock)
 

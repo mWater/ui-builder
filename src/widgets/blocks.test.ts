@@ -13,7 +13,7 @@ test("drops left", () => {
 
 
 test("findBlockAncestry", () => {
-  const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
+  const createBlock = new BlockFactory().createBlock
 
   // Create simple tree
   const blockDef = {
@@ -37,7 +37,7 @@ test("findBlockAncestry", () => {
 })
 
 test("findBlockAncestry with queryTable", () => {
-  const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
+  const createBlock = new BlockFactory().createBlock
 
   // Root cv
   const rootContextVars: ContextVar[] = [
@@ -64,7 +64,7 @@ test("findBlockAncestry with queryTable", () => {
 })
 
 test("getBlockTree", () => {
-  const createBlock = new BlockFactory().createBlock.bind(null, jest.fn())
+  const createBlock = new BlockFactory().createBlock
 
   // Create simple tree
   const blockDef = {

@@ -12,7 +12,7 @@ export interface ButtonBlockDef extends BlockDef {
   /** Action to perform when button is clicked */
   actionDef: ActionDef | null
 
-  style: "default" | "primary"
+  style: "default" | "primary" | "link"
   size: "normal" | "small" | "large"
 }
 
@@ -97,6 +97,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
             options={[
               { value: "default", label: "Default"},
               { value: "primary", label: "Primary"},
+              { value: "link", label: "Link"},
             ]}
           />
         </LabeledProperty>

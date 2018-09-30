@@ -24,7 +24,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     // Validate cv
     const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
     if (!contextVar) {
-      return "Context var required"
+      return "Context variable required"
     }
 
     const exprValidator = new ExprValidator(options.schema)
@@ -71,7 +71,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
     return (
       <div>
-        <LabeledProperty label="Context Variable">
+        <LabeledProperty label="Row/Rowset Variable">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="contextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
           </PropertyEditor>

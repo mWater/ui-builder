@@ -29,7 +29,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       <LabeledProperty label="Name">
         <TextPropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="name" />
       </LabeledProperty>
-      <LabeledProperty label="Context Variables">
+      <LabeledProperty label="Variables">
         <ContextVarsEditor contextVars={this.props.widgetDef.contextVars} onChange={this.handleContextVarsChange} schema={this.props.schema} />
       </LabeledProperty>
       <LabeledProperty label="Preview Variable Values">
@@ -66,7 +66,7 @@ class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChang
     return (
       <div>
         <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
-        &nbsp;({this.props.contextVar.type} {this.props.contextVar.table ? `of ${this.props.contextVar.table}` : ""}
+        &nbsp;({this.props.contextVar.type} {this.props.contextVar.table ? `of ${this.props.contextVar.table}` : ""})
       </div>
     )
   }
@@ -80,7 +80,7 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
   render() {
     let contextVarOptions : Array<{ value: ContextVar, label: string }> = [];
 
-    for (const table of this.props.schema.getTables()) {
+    for (const table of this.props.schema.getTables().filter(t => !t.deprecated)) {
       contextVarOptions.push({
         value: {
           id: uuid(),
@@ -109,7 +109,7 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
         <ListEditor items={this.props.contextVars} onItemsChange={this.props.onChange}>
           { (contextVar, onContextVarChange) => <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange}/> }
         </ListEditor>
-        <ReactSelect value={null} options={contextVarOptions} placeholder="+ Add Context Variable" onChange={this.handleAddContextVar} />
+        <ReactSelect value={null} options={contextVarOptions} placeholder="+ Add Variable" onChange={this.handleAddContextVar} />
       </div>
     )
   }

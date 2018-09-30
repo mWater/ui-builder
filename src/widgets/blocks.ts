@@ -6,6 +6,7 @@ import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
 import "./blocks.css"
+import { LookupWidget } from './widgets';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -53,6 +54,7 @@ export interface RenderInstanceProps {
   schema: Schema,
   contextVars: ContextVar[]
   actionLibrary: ActionLibrary
+  widgetLibrary: WidgetLibrary
   pageStack: PageStack
 
   /** Gets the value of a context variable */
@@ -88,6 +90,7 @@ export interface RenderDesignProps {
   store: BlockStore,
   schema: Schema,
   dataSource: DataSource
+  widgetLibrary: WidgetLibrary
 
   /** Selected block id as some blocks may display differently when selected */
   selectedId: string | null,

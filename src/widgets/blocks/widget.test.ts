@@ -5,9 +5,9 @@ import { Database } from '../../Database';
 import { Expr, Schema } from 'mwater-expressions';
 import { ActionLibrary } from '../ActionLibrary';
 import { PageStack } from '../../PageStack';
+import { WidgetLibrary } from '../../designer/widgetLibrary';
 
 const createBlock = jest.fn()
-const lookupWidget = jest.fn()
 const widgetDef : WidgetDef= {
   id: "w1",
   name: "W1",
@@ -18,7 +18,6 @@ const widgetDef : WidgetDef= {
   ],
   contextVarPreviewValues: {}
 }
-lookupWidget.mockReturnValue(widgetDef)
 
 const blockDef : WidgetBlockDef = {
   id: "a",
@@ -62,7 +61,7 @@ describe("renderInstance", () => {
  
   // Render instance
   beforeEach(() => {
-    const widgetBlock = new WidgetBlock(blockDef, createBlock, lookupWidget)
+    const widgetBlock = new WidgetBlock(blockDef, createBlock)
 
     const innerBlock = {
       renderInstance: jest.fn()
@@ -78,6 +77,7 @@ describe("renderInstance", () => {
       schema: {} as Schema,
       contextVars: contextVars, 
       actionLibrary: {} as ActionLibrary,
+      widgetLibrary: { widgets: { w1: widgetDef }},
       pageStack: {} as PageStack,
       getContextVarValue: (id) => id,
       getContextVarExprValue: (id) => id,

@@ -136,7 +136,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           <Select value={actionDef.widgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
         </LabeledProperty>
 
-        <LabeledProperty label="Context Variables">
+        <LabeledProperty label="Variables">
           {renderContextVarValues()}
         </LabeledProperty>
       </div>

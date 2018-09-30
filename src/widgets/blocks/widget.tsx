@@ -13,12 +13,10 @@ export interface WidgetBlockDef extends BlockDef {
 
 export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   createBlock: CreateBlock
-  lookupWidget: LookupWidget
 
-  constructor(blockDef: WidgetBlockDef, createBlock: CreateBlock, lookupWidget: LookupWidget) {
+  constructor(blockDef: WidgetBlockDef, createBlock: CreateBlock) {
     super(blockDef)
     this.createBlock = createBlock
-    this.lookupWidget = lookupWidget
   }
 
   validate() { 
@@ -58,7 +56,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
 
     // Find the widget
-    const widgetDef = this.lookupWidget(this.blockDef.widgetId)
+    const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId]
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
@@ -69,6 +67,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         selectedId: null,
         locale: props.locale,
         contextVars: widgetDef.contextVars,
+        widgetLibrary: props.widgetLibrary,
         store: new NullBlockStore(),
         renderChildBlock: (childProps, childBlockDef) => { 
           if (childBlockDef) {
@@ -95,7 +94,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     // Find the widget
-    const widgetDef = this.lookupWidget(this.blockDef.widgetId!)
+    const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 

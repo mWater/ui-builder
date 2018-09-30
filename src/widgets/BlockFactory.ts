@@ -15,35 +15,34 @@ import { SaveCancelBlock, SaveCancelBlockDef } from './blocks/saveCancel';
 import { DropdownBlock, DropdownBlockDef } from './blocks/controls/dropdown';
 
 export default class BlockFactory {
-  createBlock = (lookupWidget: LookupWidget, blockDef: BlockDef): Block<BlockDef> => {
-    const internalCreateBlock = this.createBlock.bind(null, lookupWidget)
+  createBlock = (blockDef: BlockDef): Block<BlockDef> => {
     switch (blockDef.type) {
       case "horizontal":
-        return new HorizontalBlock(blockDef as HorizontalBlockDef, internalCreateBlock)
+        return new HorizontalBlock(blockDef as HorizontalBlockDef, this.createBlock)
       case "vertical":
-        return new VerticalBlock(blockDef as VerticalBlockDef, internalCreateBlock)
+        return new VerticalBlock(blockDef as VerticalBlockDef, this.createBlock)
       case "widget":
-        return new WidgetBlock(blockDef as WidgetBlockDef, internalCreateBlock, lookupWidget)
+        return new WidgetBlock(blockDef as WidgetBlockDef, this.createBlock)
       case "text":
         return new TextBlock(blockDef as TextBlockDef)
       case "labeled":
-        return new LabeledBlock(blockDef as LabeledBlockDef, internalCreateBlock)
+        return new LabeledBlock(blockDef as LabeledBlockDef, this.createBlock)
       case "textbox":
         return new TextboxBlock(blockDef as TextboxBlockDef)
       case "dropdown":
         return new DropdownBlock(blockDef as DropdownBlockDef)
       case "collapsible":
-        return new CollapsibleBlock(blockDef as CollapsibleBlockDef, internalCreateBlock)
+        return new CollapsibleBlock(blockDef as CollapsibleBlockDef, this.createBlock)
       case "expression":
         return new ExpressionBlock(blockDef as ExpressionBlockDef)
       case "queryTable":
-        return new QueryTableBlock(blockDef as QueryTableBlockDef, internalCreateBlock)
+        return new QueryTableBlock(blockDef as QueryTableBlockDef, this.createBlock)
       case "search":
         return new SearchBlock(blockDef as SearchBlockDef)
       case "button":
         return new ButtonBlock(blockDef as ButtonBlockDef)
       case "saveCancel":
-        return new SaveCancelBlock(blockDef as SaveCancelBlockDef, internalCreateBlock)
+        return new SaveCancelBlock(blockDef as SaveCancelBlockDef, this.createBlock)
     }
     throw new Error(`Type ${blockDef.type} not found`)
   }

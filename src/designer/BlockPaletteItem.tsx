@@ -36,6 +36,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
       schema: this.props.schema,
       dataSource: this.props.dataSource,
       locale: "en", // TODO hardcoded
+      widgetLibrary: { widgets: {} },
       contextVars: [],
       store: {
         alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null) { return }
