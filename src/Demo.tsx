@@ -257,7 +257,7 @@ export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLib
   }
 
   componentDidMount() {
-    fetch("https://api.mwater.co/v3/jsonql/schema").then(req => req.json()).then(json => {
+    fetch("https://api.mwater.co/v3/schema").then(req => req.json()).then(json => {
       this.setState({ schema: new Schema(json) })
     })
   }
