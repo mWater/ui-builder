@@ -7,7 +7,7 @@ import QueryTableBlockInstance from "./QueryTableBlockInstance";
 import simpleSchema from "../../../__fixtures__/schema";
 import BlockFactory from '../../BlockFactory';
 import mockDatabase from '../../../__fixtures__/mockDatabase';
-import { QueryOptions } from '../../../Database';
+import { QueryOptions, OrderByDir } from '../../../Database';
 import { Expr } from 'mwater-expressions';
 import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';
@@ -27,6 +27,7 @@ const qtbdSingle: QueryTableBlockDef = {
   headers: [],
   contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: exprText }],
   rowsetContextVarId: "cv1",
+  orderBy: null,
   limit: 10,
   where: null,
   rowClickAction: null
@@ -82,11 +83,17 @@ test("creates query", () => {
   })
 })
 
-test("adds filters and where", () => {
+test("adds filters, orderBy and where", () => {
   (database.query as jest.Mock).mockResolvedValue([])
 
   rips.getFilters = () => [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: true }}]
-  const qtb = createBlock({ ...qtbdSingle, where: { type: "literal", valueType: "boolean", value: false }}) as QueryTableBlock
+  const qtb = createBlock({ 
+    ...qtbdSingle, 
+    where: { type: "literal", valueType: "boolean", value: false },
+    orderBy: [
+      { expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }
+    ]
+  }) as QueryTableBlock
   const inst = mount(<QueryTableBlockInstance block={qtb} renderInstanceProps={rips} />)
 
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions
@@ -106,6 +113,9 @@ test("adds filters and where", () => {
         { type: "literal", valueType: "boolean", value: false }
       ]
     },
+    orderBy: [
+      { expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }
+    ],
     limit: 10
   })
 

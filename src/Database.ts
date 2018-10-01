@@ -6,7 +6,7 @@ export enum OrderByDir {
 }
 
 export interface OrderBy {
-  expr: Expr,
+  expr: Expr | null
   dir: OrderByDir
 }
 

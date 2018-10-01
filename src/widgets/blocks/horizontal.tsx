@@ -3,7 +3,7 @@ import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import { Select, Toggle } from 'react-library/lib/bootstrap';
-import { LabeledProperty, PropertyEditor, DropdownPropertyEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 
 export interface HorizontalBlockDef extends BlockDef {
   type: "horizontal"

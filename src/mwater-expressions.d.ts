@@ -256,7 +256,7 @@ declare module 'mwater-expressions' {
   class ExprCompiler {
     constructor(schema: Schema)
 
-    compileExpr(options: { expr: Expr, tableAlias: string }): JsonQLExpr
+    compileExpr(options: { expr: Expr | null, tableAlias: string }): JsonQLExpr
     compileTable(table: string, alias: string): JsonQLFrom
   }
 }

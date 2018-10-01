@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as uuid from 'uuid/v4'
-import { LabeledProperty, TextPropertyEditor } from "../widgets/propertyEditors"
+import { LabeledProperty, PropertyEditor } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
 import { ContextVar } from "../widgets/blocks";
 import { Schema, DataSource } from "mwater-expressions";
@@ -10,6 +10,7 @@ import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import ListEditor from "../widgets/ListEditor";
 import ReactSelect from "react-select"
 import * as _ from "lodash";
+import { TextInput } from "react-library/lib/bootstrap";
 
 interface WidgetEditorProps {
   widgetDef: WidgetDef
@@ -27,10 +28,14 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
   render() {
     return (<div>
       <LabeledProperty label="Name">
-        <TextPropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="name" />
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="name"> 
+          { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
+        </PropertyEditor>
       </LabeledProperty>
       <LabeledProperty label="Variables">
-        <ContextVarsEditor contextVars={this.props.widgetDef.contextVars} onChange={this.handleContextVarsChange} schema={this.props.schema} />
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
+          { (value, onChange) => <ContextVarsEditor contextVars={value} onChange={onChange} schema={this.props.schema} /> }
+        </PropertyEditor>
       </LabeledProperty>
       <LabeledProperty label="Preview Variable Values">
         {this.props.widgetDef.contextVars.map((contextVar) => {

@@ -4,7 +4,10 @@ import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
-import { LocalizedString } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr } from "mwater-expressions";
+import { OrderBy, OrderByDir } from "../Database";
+import ListEditor from "./ListEditor";
+import { ExprComponent } from "mwater-expressions-ui";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -83,36 +86,6 @@ export class LocalizedTextPropertyEditor extends React.Component<{
         <input className="form-control" type="text" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
     )
   }
-}
-
-export class TextPropertyEditor extends React.Component<{ 
-  obj: object, 
-  onChange: (obj: object) => void, 
-  property: string,
-  placeholder?: string,
-  multiline?: boolean,
-  allowCR?: boolean
- }> {
-
-handleChange = (e: any) => {
-  let str = e.target.value
-  if (!this.props.allowCR) {
-    str = str.replace(/[\r\n]+/g, " ")
-  }
-
-  this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: str }))
-}
-
-render() {
-  const value = this.props.obj[this.props.property] || ""
-
-  return (this.props.multiline 
-    ?      
-      <textarea className="form-control" value={value} onChange={this.handleChange} placeholder={this.props.placeholder} />
-    :
-      <input className="form-control" type="text" value={value} onChange={this.handleChange} placeholder={this.props.placeholder} />
-  )
-}
 }
 
 interface Option {
@@ -209,5 +182,70 @@ export class ActionDefEditor extends React.Component<{
       </div>
     )
     
+  }
+}
+
+export class OrderByArrayEditor extends React.Component<{
+  value?: OrderBy[]
+  onChange: (value: OrderBy[]) => void
+  table: string
+  schema: Schema
+  dataSource: DataSource
+}> {
+
+  handleAddOrderByExpr = () => {
+    this.props.onChange((this.props.value || []).concat([{ expr: null, dir: OrderByDir.asc }]))
+  }
+
+  render() {
+    return (
+      <div>
+        <ListEditor items={this.props.value || []} onItemsChange={this.props.onChange}>
+          { (orderBy: OrderBy, onOrderByChange) => (
+            <OrderByEditor value={orderBy} schema={this.props.schema} dataSource={this.props.dataSource} onChange={onOrderByChange} table={this.props.table} />
+          )}
+        </ListEditor>
+        <button type="button" className="btn btn-link btn-sm" onClick={this.handleAddOrderByExpr}>
+          + Add Order By
+        </button>
+      </div>
+    )
+  }
+}
+
+export class OrderByEditor extends React.Component<{
+  value: OrderBy
+  onChange: (value: OrderBy) => void
+  table: string
+  schema: Schema
+  dataSource: DataSource
+}> {
+
+  handleExprChange = (expr: Expr | null) => {
+    this.props.onChange({ ...this.props.value, expr: expr })
+  }
+
+  handleDirToggle = () => {
+    this.props.onChange({ ...this.props.value, dir: (this.props.value.dir === OrderByDir.asc) ? OrderByDir.desc : OrderByDir.asc })
+  }
+
+  render() {
+    return (
+      <div>
+        <div style={{ float: "left" }}>
+          <a onClick={this.handleDirToggle}>
+            { this.props.value.dir === OrderByDir.asc ? <i className="fa fa-arrow-up"/> : <i className="fa fa-arrow-down"/> }
+          </a>
+        </div>
+        <ExprComponent 
+          schema={this.props.schema} 
+          dataSource={this.props.dataSource}
+          types={["text", "number", "enum", "boolean", "date", "datetime"]}
+          table={this.props.table}
+          value={this.props.value.expr}
+          onChange={this.handleExprChange}
+        />
+      </div>
+    )
   }
 }

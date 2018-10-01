@@ -16,7 +16,6 @@ interface State {
 }
 
 // TODO handle db refresh
-// TODO use AsyncLoadComponent to prevent one-behind errors
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
   /** Current query options to determine if refresh needed */
   queryOptions?: QueryOptions 
@@ -66,6 +65,11 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       from: rowsetCV.table!,
       where: where,
       limit: block.blockDef.limit
+    }
+    
+    // Add order by
+    if (block.blockDef.orderBy) {
+      queryOptions.orderBy = block.blockDef.orderBy
     }
 
     // Add expressions

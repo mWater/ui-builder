@@ -4,9 +4,9 @@ import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
-import { Row } from '../../../Database';
+import { Row, OrderBy } from '../../../Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor } from '../../propertyEditors';
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor } from '../../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
@@ -24,7 +24,7 @@ export interface QueryTableBlockDef extends BlockDef {
 
   limit: number | null
   where: Expr | null
-  // order?
+  orderBy: OrderBy[] | null
 
   /** Action to be executed when row is clicked */
   rowClickAction: ActionDef | null
@@ -250,6 +250,20 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
                 )}
             </PropertyEditor>
           </LabeledProperty>
+        : null }
+
+        { rowCV ? 
+        <LabeledProperty label="Ordering">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="orderBy">
+            {(value, onChange) => 
+              <OrderByArrayEditor 
+                value={value} 
+                onChange={onChange} 
+                schema={props.schema} 
+                dataSource={props.dataSource} 
+                table={rowsetCV!.table!} /> }
+          </PropertyEditor>
+        </LabeledProperty>
         : null }
 
         <LabeledProperty label="Maximum rows">

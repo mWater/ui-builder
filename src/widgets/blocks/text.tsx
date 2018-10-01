@@ -1,8 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
-import { LabeledProperty, DropdownPropertyEditor, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors'
+import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors'
 import { LocalizedString, localize } from '../localization'
+import { Select } from 'react-library/lib/bootstrap';
 
 export interface TextBlockDef extends BlockDef {
   type: "text"
@@ -37,19 +38,20 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Style">
-          <DropdownPropertyEditor 
-            obj={this.blockDef}
-            onChange={props.onChange}
-            property="style"
-            options={[
-              { value: "div", label: "Plain Text"},
-              { value: "p", label: "Paragraph"},
-              { value: "h1", label: "Heading 1"},
-              { value: "h2", label: "Heading 2"},
-              { value: "h3", label: "Heading 3"},
-              { value: "h4", label: "Heading 4"}
-            ]}
-          />
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="style">
+            {(value, onChange) => 
+              <Select 
+                value={value} 
+                onChange={onChange}
+                options={[
+                  { value: "div", label: "Plain Text"},
+                  { value: "p", label: "Paragraph"},
+                  { value: "h1", label: "Heading 1"},
+                  { value: "h2", label: "Heading 2"},
+                  { value: "h3", label: "Heading 3"},
+                  { value: "h4", label: "Heading 4"}
+            ]} /> }
+          </PropertyEditor>
         </LabeledProperty>
       </div>
     )

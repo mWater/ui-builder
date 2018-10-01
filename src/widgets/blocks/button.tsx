@@ -1,9 +1,10 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions } from '../blocks'
-import { TextPropertyEditor, LabeledProperty, LocalizedTextPropertyEditor, DropdownPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
+import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { localize, LocalizedString } from '../localization';
 import { ActionDef } from '../actions';
+import { Select } from 'react-library/lib/bootstrap';
 
 export interface ButtonBlockDef extends BlockDef {
   type: "button"
@@ -90,28 +91,27 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Style">
-          <DropdownPropertyEditor 
-            obj={this.blockDef}
-            onChange={props.onChange}
-            property="style"
-            options={[
-              { value: "default", label: "Default"},
-              { value: "primary", label: "Primary"},
-              { value: "link", label: "Link"},
-            ]}
-          />
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="style">
+            {(value, onChange) => 
+            <Select value={value} onChange={onChange}
+              options={[
+                { value: "default", label: "Default"},
+                { value: "primary", label: "Primary"},
+                { value: "link", label: "Link"},
+              ]}
+            /> }
+          </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Size">
-          <DropdownPropertyEditor 
-            obj={this.blockDef}
-            onChange={props.onChange}
-            property="size"
-            options={[
-              { value: "normal", label: "Default"},
-              { value: "small", label: "Small"},
-              { value: "large", label: "Large"}
-            ]}
-          />
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="size">
+            {(value, onChange) => 
+            <Select value={value} onChange={onChange}
+              options={[
+                { value: "normal", label: "Default"},
+                { value: "small", label: "Small"},
+                { value: "large", label: "Large"}
+            ]}/> }
+          </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="When button clicked">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="actionDef">

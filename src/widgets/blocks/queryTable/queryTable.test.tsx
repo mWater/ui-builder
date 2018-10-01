@@ -15,6 +15,7 @@ const qtbdSingle: QueryTableBlockDef = {
   headers: [],
   contents: [],
   rowsetContextVarId: "cv1",
+  orderBy: null,
   limit: 10,
   where: null,
   rowClickAction: null
@@ -31,6 +32,7 @@ const qtbdMultiple: QueryTableBlockDef = {
   headers: [],
   contents: [],
   rowsetContextVarId: "cv1",
+  orderBy: null,
   limit: 10,
   where: null,
   rowClickAction: null
