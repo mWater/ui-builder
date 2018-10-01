@@ -232,6 +232,8 @@ declare module 'mwater-expressions' {
 
     getExprAggrStatus(expr: Expr | null): AggrStatus | null
 
+    getExprEnumValues(expr: Expr | null): EnumValue[] | null
+  
     /** Converts a literal value related to an expression to a string, using name of enums. preferEnumCodes tries to use code over name */
     stringifyExprLiteral(expr: Expr, literal: any, locale?: string, preferEnumCodes?: boolean): string
   }

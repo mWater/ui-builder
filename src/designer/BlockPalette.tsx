@@ -55,6 +55,10 @@ export default class BlockPalette extends React.Component<Props> {
         blockDef: { id: "", type: "search", searchExprs: [], placeholder: null },
       },
       {
+        title: "Dropdown Filter",
+        blockDef: { id: "", type: "dropdownFilter", filterExpr: null, placeholder: null },
+      },
+      {
         title: "Button",
         blockDef: { id: "", type: "button", label: { _base: "en", en: "Button" }, style: "default", size: "normal" }
       },

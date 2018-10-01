@@ -21,15 +21,16 @@ Non-features:
 - Does not include a scripting language. Custom work should be done as custom components
 
 ## Outstanding issues
-- How to create context-specific palette for deep objects? (search tree and get created context vars)
-
-- Maybe store widget instance state separate from widget instance? Allow widget to manipulate? Easy state capturing?
 
 - How do required fields get enforced? Is it a widget resposibility or a table responsibility? 
 
 - How to get context vars across widget boundaries? Can they be other than row or rowset?
 
+## How to add a new block type
 
+- Create block def and block in the blocks folder
+- Add to BlockFactory
+- Add to palette
 
 ## Actions
 

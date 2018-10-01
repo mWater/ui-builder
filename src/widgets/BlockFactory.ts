@@ -13,6 +13,7 @@ import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 import { TextboxBlock, TextboxBlockDef } from './blocks/controls/textbox';
 import { SaveCancelBlock, SaveCancelBlockDef } from './blocks/saveCancel';
 import { DropdownBlock, DropdownBlockDef } from './blocks/controls/dropdown';
+import { DropdownFilterBlock, DropdownFilterBlockDef } from './blocks/dropdownFilter';
 
 export default class BlockFactory {
   createBlock = (blockDef: BlockDef): Block<BlockDef> => {
@@ -39,6 +40,8 @@ export default class BlockFactory {
         return new QueryTableBlock(blockDef as QueryTableBlockDef, this.createBlock)
       case "search":
         return new SearchBlock(blockDef as SearchBlockDef)
+      case "dropdownFilter":
+        return new DropdownFilterBlock(blockDef as DropdownFilterBlockDef)
       case "button":
         return new ButtonBlock(blockDef as ButtonBlockDef)
       case "saveCancel":
