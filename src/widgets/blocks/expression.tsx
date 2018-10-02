@@ -1,9 +1,11 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks'
-import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty } from '../propertyEditors';
+import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, FormatEditor } from '../propertyEditors';
 import { Expr, ExprUtils, Schema, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
+import * as _ from 'lodash';
+import { format } from 'd3-format'
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
@@ -13,6 +15,9 @@ export interface ExpressionBlockDef extends BlockDef {
 
   /** Expression to be displayed */
   expr: Expr | null
+
+  /** d3 format of expression for numbers */
+  format: string | null
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
@@ -53,13 +58,19 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
-    // TODO validate
     if (!this.blockDef.contextVarId || !this.blockDef.expr) {
       return <div/>
     }
 
     const value = props.getContextVarExprValue(this.blockDef.contextVarId, this.blockDef.expr)
-    const str = new ExprUtils(props.schema).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
+
+    let str
+    if (_.isNumber(value)) {
+      str = format(this.blockDef.format || "")(value)
+    }
+    else {
+      str = new ExprUtils(props.schema).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
+    }
 
     return (
       <div>{str}</div>
@@ -68,6 +79,8 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
   renderEditor(props: RenderEditorProps) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)
+
+    const exprType = new ExprUtils(props.schema).getExprType(this.blockDef.expr)
 
     return (
       <div>
@@ -94,6 +107,20 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           </LabeledProperty>
           : null
         }
+
+        { exprType === "number" ?
+          <LabeledProperty label="Format">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
+              {(value: string, onChange) => (
+                <FormatEditor
+                  value={value} 
+                  onChange={onChange} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+
       </div>
     )
   }

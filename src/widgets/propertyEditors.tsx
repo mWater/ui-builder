@@ -185,6 +185,7 @@ export class ActionDefEditor extends React.Component<{
   }
 }
 
+/** Edits an array of order by expressions */
 export class OrderByArrayEditor extends React.Component<{
   value?: OrderBy[]
   onChange: (value: OrderBy[]) => void
@@ -246,6 +247,26 @@ export class OrderByEditor extends React.Component<{
           onChange={this.handleExprChange}
         />
       </div>
+    )
+  }
+}
+
+/** Edits a d3 format */
+export class FormatEditor extends React.Component<{ value: string | null, onChange: (value: string) => void }> {
+  render() {
+    return (
+      <Select 
+        value={this.props.value || ""} 
+        onChange={this.props.onChange}
+        options={[
+          { value: ",", label: "Normal: 1,234.567" },
+          { value: "", label: "Plain: 1234.567" },
+          { value: ",.0f", label: "Rounded: 1,234" },
+          { value: ",.2f", label: "Two decimals: 1,234.56" },
+          { value: "$,.2f", label: "Currency: $1,234.56" },
+          { value: "$,.0f", label: "Currency rounded: $1,234" },
+          { value: ".0%", label: "Percent rounded: 12%" }
+        ]} />
     )
   }
 }
