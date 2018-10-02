@@ -23,7 +23,7 @@ export interface QueryTableBlockDef extends BlockDef {
   rowsetContextVarId: string | null
 
   limit: number | null
-  where: Expr | null
+  where: Expr
   orderBy: OrderBy[] | null
 
   /** Action to be executed when row is clicked */

@@ -18,8 +18,8 @@ declare module 'mwater-expressions-ui' {
     schema: Schema
     dataSource: DataSource
     table: string
-    value: Expr | null
-    onChange: (expr: Expr | null) => void
+    value: Expr
+    onChange: (expr: Expr) => void
 
     /** If specified, the types (value type) of expression required. e.g. ["boolean"] */
     types?: string[]

@@ -17,7 +17,7 @@ export interface DropdownFilterBlockDef extends BlockDef {
   rowsetContextVarId: string | null
 
   /** Expression to filter on  */
-  filterExpr: Expr | null
+  filterExpr: Expr
 }
 
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {

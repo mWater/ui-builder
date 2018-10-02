@@ -18,7 +18,7 @@ export interface SearchBlockDef extends BlockDef {
   rowsetContextVarId: string | null
 
   /** Text expressions to search on  */
-  searchExprs: Array<Expr | null>
+  searchExprs: Expr[]
 }
 
 export class SearchBlock extends LeafBlock<SearchBlockDef> {

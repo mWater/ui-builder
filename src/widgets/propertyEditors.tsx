@@ -11,7 +11,7 @@ import { ExprComponent } from "mwater-expressions-ui";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
-export class LabeledProperty extends React.Component<{ label: string }> {
+export class LabeledProperty extends React.Component<{ label: string, help?: string }> {
   render() {
     return (
       <div className="form-group">
@@ -19,6 +19,9 @@ export class LabeledProperty extends React.Component<{ label: string }> {
         <div style={{ paddingLeft: 5 }}>
           {this.props.children}
         </div>
+        <p className="help-block" style={{ marginLeft: 5 }}>
+          {this.props.help}
+        </p>
       </div>
     )
   }
@@ -222,7 +225,7 @@ export class OrderByEditor extends React.Component<{
   dataSource: DataSource
 }> {
 
-  handleExprChange = (expr: Expr | null) => {
+  handleExprChange = (expr: Expr) => {
     this.props.onChange({ ...this.props.value, expr: expr })
   }
 

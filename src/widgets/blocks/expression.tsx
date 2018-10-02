@@ -14,7 +14,7 @@ export interface ExpressionBlockDef extends BlockDef {
   contextVarId: string | null
 
   /** Expression to be displayed */
-  expr: Expr | null
+  expr: Expr
 
   /** d3 format of expression for numbers */
   format: string | null

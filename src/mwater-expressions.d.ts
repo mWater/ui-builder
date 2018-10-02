@@ -137,7 +137,8 @@ declare module 'mwater-expressions' {
     getColumns(tableId: string): Column[]
   }
 
-  type Expr = LiteralExpr | FieldExpr | OpExpr | IdExpr
+  /** Expression. Can be null */
+  type Expr = LiteralExpr | FieldExpr | OpExpr | IdExpr | null
 
   interface LiteralExpr {
     type: "literal"
@@ -226,13 +227,13 @@ declare module 'mwater-expressions' {
   class ExprUtils {
     constructor(schema: Schema)
 
-    summarizeExpr(expr: Expr | null, locale?: string): string
+    summarizeExpr(expr: Expr, locale?: string): string
 
-    getExprType(expr: Expr | null): string | null
+    getExprType(expr: Expr): string | null
 
-    getExprAggrStatus(expr: Expr | null): AggrStatus | null
+    getExprAggrStatus(expr: Expr): AggrStatus | null
 
-    getExprEnumValues(expr: Expr | null): EnumValue[] | null
+    getExprEnumValues(expr: Expr): EnumValue[] | null
   
     /** Converts a literal value related to an expression to a string, using name of enums. preferEnumCodes tries to use code over name */
     stringifyExprLiteral(expr: Expr, literal: any, locale?: string, preferEnumCodes?: boolean): string
@@ -250,13 +251,13 @@ declare module 'mwater-expressions' {
      *   idTable: table that type of id must be from
      *   aggrStatuses: statuses of aggregation to allow. list of "individual", "literal", "aggregate". Default: ["individual", "literal"]
      */
-    validateExpr(expr: Expr | null, options: { table?: string, types?: string[], enumValueIds?: string[], idTable?: string, aggrStatuses?: AggrStatus[] }): string | null
+    validateExpr(expr: Expr, options: { table?: string, types?: string[], enumValueIds?: string[], idTable?: string, aggrStatuses?: AggrStatus[] }): string | null
   }
 
   class ExprCompiler {
     constructor(schema: Schema)
 
-    compileExpr(options: { expr: Expr | null, tableAlias: string }): JsonQLExpr
+    compileExpr(options: { expr: Expr, tableAlias: string }): JsonQLExpr
     compileTable(table: string, alias: string): JsonQLFrom
   }
 }
