@@ -1,9 +1,9 @@
-import { QueryCompiler } from "./QueryCompiler";
+import { QueryCompiler } from "../QueryCompiler";
 import { Schema, DataSource, Row } from "mwater-expressions";
 import { DataSourceDatabase } from "./DataSourceDatabase";
 import { QueryOptions } from "./Database";
 
-jest.mock("./QueryCompiler")
+jest.mock("../QueryCompiler")
 
 const mockDataSource = {
   performQuery: (query, cb) => { cb(null, [{ c_x: 5, o0: 1 }])}

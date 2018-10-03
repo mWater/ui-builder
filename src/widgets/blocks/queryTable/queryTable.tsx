@@ -4,7 +4,7 @@ import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
-import { Row, OrderBy } from '../../../Database';
+import { Row, OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor } from '../../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';

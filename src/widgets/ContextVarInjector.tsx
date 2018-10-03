@@ -1,7 +1,7 @@
 import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter } from "./blocks";
 import * as React from "react";
 import { Expr, ExprUtils, Schema } from "mwater-expressions";
-import { QueryOptions } from "../Database";
+import { QueryOptions } from "../database/Database";
 import * as canonical from 'canonical-json'
 import * as _ from "lodash";
 

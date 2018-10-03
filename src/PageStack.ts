@@ -1,5 +1,5 @@
 import { WidgetDef } from "./widgets/widgets";
-import { Database } from "./Database";
+import { Database } from "./database/Database";
 
 export interface Page {
   /** Whether page is a normal page or a modal */

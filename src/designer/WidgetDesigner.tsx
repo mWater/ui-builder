@@ -8,7 +8,7 @@ import { Schema, DataSource } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
-import { DataSourceDatabase } from "../DataSourceDatabase";
+import { DataSourceDatabase } from "../database/DataSourceDatabase";
 import { QueryCompiler } from "../QueryCompiler";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";

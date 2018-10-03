@@ -2,7 +2,7 @@ import * as React from "react";
 import { QueryTableBlockDef, QueryTableBlock } from "./queryTable";
 import { RenderInstanceProps, ContextVar } from "../../blocks";
 import { Row, Expr } from "mwater-expressions";
-import { QueryOptions } from "../../../Database";
+import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
 
 interface Props {

@@ -1,5 +1,5 @@
 import { JsonQL, Schema, ExprUtils, ExprCompiler } from "mwater-expressions";
-import { QueryOptions } from "./Database";
+import { QueryOptions } from "./database/Database";
 import * as _ from "lodash";
 
 export class QueryCompiler {

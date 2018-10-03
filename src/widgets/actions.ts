@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ContextVar } from './blocks';
-import { Database } from '../Database';
+import { Database } from '../database/Database';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { PageStack } from '../PageStack';
 import { ActionLibrary } from './ActionLibrary';

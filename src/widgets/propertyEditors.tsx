@@ -5,7 +5,7 @@ import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
 import { LocalizedString, Schema, DataSource, Expr } from "mwater-expressions";
-import { OrderBy, OrderByDir } from "../Database";
+import { OrderBy, OrderByDir } from "../database/Database";
 import ListEditor from "./ListEditor";
 import { ExprComponent } from "mwater-expressions-ui";
 

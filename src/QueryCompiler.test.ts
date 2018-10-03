@@ -1,4 +1,4 @@
-import { QueryOptions, OrderByDir } from './Database'
+import { QueryOptions, OrderByDir } from './database/Database'
 import { QueryCompiler } from './QueryCompiler';
 import simpleSchema from './__fixtures__/schema';
 

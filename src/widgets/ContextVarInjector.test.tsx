@@ -1,7 +1,7 @@
 import ContextVarInjector from "./ContextVarInjector";
 import { shallow, mount } from 'enzyme'
 import { RenderInstanceProps, Filter } from "./blocks";
-import { Database, QueryOptions } from "../Database";
+import { Database, QueryOptions } from "../database/Database";
 import * as React from "react";
 import { Expr, Schema } from "mwater-expressions";
 import mockDatabase from "../__fixtures__/mockDatabase";

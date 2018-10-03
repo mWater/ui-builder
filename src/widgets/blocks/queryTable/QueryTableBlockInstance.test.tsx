@@ -7,7 +7,7 @@ import QueryTableBlockInstance from "./QueryTableBlockInstance";
 import simpleSchema from "../../../__fixtures__/schema";
 import BlockFactory from '../../BlockFactory';
 import mockDatabase from '../../../__fixtures__/mockDatabase';
-import { QueryOptions, OrderByDir } from '../../../Database';
+import { QueryOptions, OrderByDir } from '../../../database/Database';
 import { Expr } from 'mwater-expressions';
 import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';

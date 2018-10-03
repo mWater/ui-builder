@@ -1,7 +1,7 @@
 import { WidgetBlock, WidgetBlockDef } from './widget'
 import { ContextVar, RenderInstanceProps, BlockDef, Filter } from '../blocks';
 import { WidgetDef } from '../widgets';
-import { Database } from '../../Database';
+import { Database } from '../../database/Database';
 import { Expr, Schema } from 'mwater-expressions';
 import { ActionLibrary } from '../ActionLibrary';
 import { PageStack } from '../../PageStack';
