@@ -99,7 +99,10 @@ declare module 'mwater-expressions' {
 
   interface Join {
     type: "1-n" | "n-1" | "n-n" | "1-1"
+    /** Table which join is to */
     toTable: string
+    /** Inverse join column id in the case of 1-n joins (but optionally for all joins) */
+    inverse?: string
     /** jsonql expression with aliases {from} and {to} */
     jsonql?: JsonQL
     /** table column to start join from or jsonql with alias {alias} */
@@ -259,6 +262,29 @@ declare module 'mwater-expressions' {
 
     compileExpr(options: { expr: Expr, tableAlias: string }): JsonQLExpr
     compileTable(table: string, alias: string): JsonQLFrom
+  }
+  
+  /** a row is a plain object that has the following functions as properties */
+  interface ExprEvaluatorRow {
+    /** gets primary key of row. callback is called with (error, value) */
+    getPrimaryKey(callback: (error: any, value?: any) => void): void
+
+    /** gets the value of a column. callback is called with (error, value) 
+     * For joins, getField will get array of rows for 1-n and n-n joins and a row for n-1 and 1-1 joins
+     */
+    getField(columnId: string, callback: (error: any, value?: any) => void): void
+  }
+
+  interface ExprEvaluatorContext {
+    /** current row. Optional for aggr expressions */
+    row?: ExprEvaluatorRow
+    /** array of rows (for aggregate expressions) */
+    rows?: ExprEvaluatorRow[]
+  }
+
+  class ExprEvaluator {
+    constructor(schema: Schema, locale?: string)
+    evaluate(expr: Expr, context: ExprEvaluatorContext, callback: (error: any, value?: any) => void): void
   }
 }
 
