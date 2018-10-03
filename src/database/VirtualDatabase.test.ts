@@ -23,7 +23,7 @@ const t2Where: Expr = {
 
 beforeEach(() => {
   db = mockDatabase()
-  vdb = new VirtualDatabase(db, schema)
+  vdb = new VirtualDatabase(db, schema, "en")
 })
 
 test("shouldIncludeColumn includes regular columns and joins without inverse", () => {
@@ -65,7 +65,7 @@ describe("select, order, limit", () => {
       let rows: any[] = rawRowsByTable[qo.from]
 
       // Prepend c_ to non-id columns
-      rows = rows.map((row: any) => _.mapKeys(row, (v, k) => k === "id" ? "id" : "c_" + k))
+      rows = rows.map((row: any) => _.mapKeys(row, (v, k: string) => k === "id" ? "id" : "c_" + k))
 
       return Promise.resolve(rows)
     }) as any
@@ -85,5 +85,46 @@ describe("select, order, limit", () => {
       { x: "abc" }
     ])
   })
+
+  test("aggr count expr", async () => {
+    const qopts: QueryOptions = {
+      select: { 
+        x: { type: "field", table: "t1", column: "text" },
+        y: { type: "op", table: "t1", op: "count", exprs: [] }
+      },
+      from: "t1"
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: 1, text: "abc" },
+      { id: 2, text: "abc" },
+      { id: 3, text: "def" }
+    ] }, qopts)
+
+    expect(rows).toEqual([
+      { x: "abc", y: 2 },
+      { x: "def", y: 1 }
+    ])
+  })
+
+  test("orderby query with limit", async () => {
+    const qopts: QueryOptions = {
+      select: { x: { type: "field", table: "t1", column: "text" }},
+      from: "t1",
+      orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }],
+      limit: 2
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: 1, text: "a", number: 1 },
+      { id: 2, text: "b", number: 2 },
+      { id: 3, text: "c", number: 3 }
+    ] }, qopts)
+    expect(rows).toEqual([
+      { x: "c" },
+      { x: "b" }
+    ])
+  })
+
 
 })

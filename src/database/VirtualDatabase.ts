@@ -1,6 +1,7 @@
 import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
-import { Schema, Column, ExprEvaluator } from "mwater-expressions";
+import { Schema, Column, ExprEvaluator, ExprUtils } from "mwater-expressions";
 import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
+import * as _ from "lodash";
 
 /** Amazingly, this seems to work really good */
 export default class VirtualDatabase implements Database {
@@ -45,24 +46,108 @@ export default class VirtualDatabase implements Database {
     // Perform query
     const rows = await this.database.query(queryOptions)
     
-    // Order by
+    // Convert to rows as expr evaluator expects
+    let evalRows: any[] = rows.map(row => ({
+      row: {
+        getPrimaryKey: () => Promise.resolve(row.id),
+        getField: (columnId: string) => Promise.resolve(row["c_" + columnId])
+      } as PromiseExprEvaluatorRow
+    }))
+
+    const exprUtils = new ExprUtils(this.schema)
     
-    // Limit
+    // Get list of selects in { id, expr, isAggr } format
+    const selects = Object.keys(options.select).map(id => ({
+      id: id,
+      expr: options.select[id],
+      isAggr: exprUtils.getExprAggrStatus(options.select[id]) === "aggregate"
+    }))
+
+    // Get list of orderBys in { expr, isAggr } format
+    const orderBys = (options.orderBy || []).map(orderBy => ({
+      expr: orderBy.expr,
+      isAggr: exprUtils.getExprAggrStatus(orderBy.expr) === "aggregate"
+    }))
 
     const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale))
+    
+    // Evaluate all non-aggr selects and non-aggr orderbys
+    for (const evalRow of evalRows) {
+      for (let i = 0 ; i < selects.length ; i++) {
+        if (!selects[i].isAggr) {
+          evalRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: evalRow.row })
+        }
+      }
+
+      for (let i = 0 ; i < orderBys.length ; i++) {
+        if (!orderBys[i].isAggr) {
+          evalRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: evalRow.row })
+        }
+      }
+    }
+
+    // If any aggregate expressions, perform transform to aggregate
+    if (selects.find(s => s.isAggr) || orderBys.find(o => o.isAggr)) {
+      // Group by all non-aggregate selects and non-aggregate order bys
+      const groups = _.groupBy(evalRows, evalRow => {
+        // Concat stringified version of all non-aggr values
+        let key = ""
+        for (let i = 0 ; i < selects.length ; i++) {
+          if (!selects[i].isAggr) {
+            key += ":" + evalRow["s" + i]
+          }
+        }
+
+        for (let i = 0 ; i < orderBys.length ; i++) {
+          if (!orderBys[i].isAggr) {
+            key += ":" + evalRow["o" + i]
+          }
+        }
+        return key
+      })
+
+      // Evaluate each group, adding aggregate expressions to first item of each group
+      for (const group of Object.values(groups)) {
+        const evalRow = group[0]
+
+        // Evaluate all aggr selects and aggr orderbys
+        for (let i = 0 ; i < selects.length ; i++) {
+          if (selects[i].isAggr) {
+            evalRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: evalRow.row, rows: group.map(r => r.row) })
+          }
+        }
+
+        for (let i = 0 ; i < orderBys.length ; i++) {
+          if (orderBys[i].isAggr) {
+            evalRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: evalRow.row, rows: group.map(r => r.row) })
+          }
+        }
+      }
+
+      // Flatten groups into single rows each
+      evalRows = _.map(Object.values(groups), (group) => group[0])
+    }
+
+    // Order by
+    if (options.orderBy && options.orderBy.length > 0) {
+      evalRows = _.sortByOrder(evalRows, 
+        options.orderBy.map((orderBy, i) => (evalRow: any) => evalRow["o" + i]),
+        options.orderBy.map(orderBy => orderBy.dir))
+    }
+
+    // Limit
+    if (options.limit) {
+      evalRows = _.take(evalRows, options.limit)
+    }
 
     // Create selects
     const projectedRows = []
-    for (const row of rows) {
-      const evalRow: PromiseExprEvaluatorRow = {
-        getPrimaryKey: () => Promise.resolve(row.id),
-        getField: (columnId: string) => Promise.resolve(row["c_" + columnId])
-      }
+    for (const evalRow of evalRows) {
       const projectedRow = {}
 
       // Project each one
-      for (const key of Object.keys(options.select)) {
-        projectedRow[key] = await exprEval.evaluate(options.select[key], { row: evalRow })
+      for (let i = 0 ; i < selects.length ; i++) {
+        projectedRow[selects[i].id] = evalRow["s" + i]
       }
 
       projectedRows.push(projectedRow)

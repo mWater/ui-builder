@@ -19,7 +19,7 @@ export interface PromiseExprEvaluatorContext {
 }
 
 export class PromiseExprEvaluator {
-  exprEvaluator: ExprEvaluator
+  private exprEvaluator: ExprEvaluator
 
   constructor(exprEvaluator: ExprEvaluator) {
     this.exprEvaluator = exprEvaluator
