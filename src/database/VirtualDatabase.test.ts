@@ -33,7 +33,7 @@ test("shouldIncludeColumn includes regular columns and joins without inverse", (
 
 test("queries with where clause and included columns", async () => {
   (db.query as jest.Mock).mockResolvedValue([])
-  
+
   await vdb.query({
     select: {
       x: { type: "field", table: "t2", column: "text" }
@@ -62,7 +62,13 @@ describe("select, order, limit", () => {
     // This simulates a real database call
     db.query = ((qo: QueryOptions) => {
       // Get rows
-      let rows: any[] = rawRowsByTable[qo.from]
+      let rows: any[]
+      if (_.isFunction(rawRowsByTable[qo.from])) {
+        rows = rawRowsByTable[qo.from](qo)
+      }
+      else {
+        rows = rawRowsByTable[qo.from]
+      }
 
       // Prepend c_ to non-id columns
       rows = rows.map((row: any) => _.mapKeys(row, (v, k: string) => k === "id" ? "id" : "c_" + k))
@@ -159,6 +165,34 @@ describe("select, order, limit", () => {
     ])
   })
 
+  test("1-n scalar", async () => {
+    const qopts: QueryOptions = {
+      select: { x: { type: "scalar", joins: ["1-2"], table: "t1", expr: {
+        type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t2", column: "number" }] } } },
+      from: "t1"
+    }
 
+    const t2Func = (qo: QueryOptions) => {
+      if ((qo.where as any).exprs![1].value === 1) {
+        return [
+          { id: 101, "2-1": 1, number: 1 },
+          { id: 102, "2-1": 1, number: 2 }
+        ]
+      }
+      else {
+        return [
+          { id: 103, "2-1": 2, number: 4 }
+        ]
+      }
+     }
 
+    const rows = await performQuery({ t1: [
+      { id: 1 },
+      { id: 2 }
+    ], t2: t2Func }, qopts)
+    expect(rows).toEqual([
+      { x: 3 },
+      { x: 4 }
+    ])
+  })
 })

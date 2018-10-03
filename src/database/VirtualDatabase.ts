@@ -191,7 +191,27 @@ export default class VirtualDatabase implements Database {
           return joinRows[0] || null
         }
 
-        throw new Error("TODO")
+        // For non-inverse 1-n and n-n, create rows based on key
+        if (column.join!.type !== "1-n" || !column.join!.inverse) {
+          const joinRows = await this.createEvalRows(column.join!.toTable, {
+            type: "op", op: "=", table: column.join!.toTable, exprs: [
+              { type: "id", table: column.join!.toTable },
+              { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
+          ]})
+          return joinRows
+        }
+
+        // Inverse 1-n
+        if (column.join!.type === "1-n" && column.join!.inverse) {
+          const joinRows = await this.createEvalRows(column.join!.toTable, {
+            type: "op", op: "=", table: column.join!.toTable, exprs: [
+              { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
+              { type: "literal", valueType: "id", idTable: from, value: row.id }
+            ]})
+          return joinRows
+        }
+
+        throw new Error("Not implemented")
       }
     } as PromiseExprEvaluatorRow))
   }
