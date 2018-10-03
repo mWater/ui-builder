@@ -1,4 +1,5 @@
 import { ExprEvaluator, ExprEvaluatorContext, Expr, ExprEvaluatorRow } from "mwater-expressions";
+import * as _ from "lodash";
 
 /** Represents a row to be evaluated */
 export interface PromiseExprEvaluatorRow {
@@ -34,7 +35,17 @@ export class PromiseExprEvaluator {
           row.getPrimaryKey().then((value) => callback(null, value), (error) => callback(error))
         },
         getField: (columnId: string, callback: (error: any, value?: any) => void) => {
-          row.getField(columnId).then((value) => callback(null, value), (error) => callback(error))
+          row.getField(columnId).then((value) => {
+            // If value is row, callbackify
+            if (value && value.getPrimaryKey) {
+              value = callbackifyRow(value)
+            }
+            else if (_.isArray(value) && value.length > 0 && (value[0] as any).getPrimaryKey) {
+              value = (value as any[]).map(r => callbackifyRow(r))
+            }
+            
+            callback(null, value)
+          }, (error) => callback(error))
         }
       }
     }

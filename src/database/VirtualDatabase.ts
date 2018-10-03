@@ -1,9 +1,8 @@
 import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
-import { Schema, Column, ExprEvaluator, ExprUtils } from "mwater-expressions";
+import { Schema, Column, ExprEvaluator, ExprUtils, Expr } from "mwater-expressions";
 import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
 import * as _ from "lodash";
 
-/** Amazingly, this seems to work really good */
 export default class VirtualDatabase implements Database {
   database: Database
   schema: Schema
@@ -15,44 +14,9 @@ export default class VirtualDatabase implements Database {
     this.locale = locale
   }
 
-  /** Determine if a column should be included in the underlying query */
-  shouldIncludeColumn(column: Column): boolean {
-    if (column.type !== "join" && !column.expr) {
-      return true
-    }
-    if (column.type === "join" && !column.join!.inverse) {
-      return true
-    }
-    return false
-  }
-
   async query(options: QueryOptions): Promise<Row[]> {
-    // Create query with c_ for all columns, id and just the where clause
-    const queryOptions: QueryOptions = {
-      select: {
-        id: { type: "id", table: options.from }
-      },
-      from: options.from,
-      where: options.where
-    }
-
-    // Add a select for each column
-    for (const column of this.schema.getColumns(options.from)) {
-      if (this.shouldIncludeColumn(column)) {
-        queryOptions.select["c_" + column.id] = { type: "field", table: options.from, column: column.id }
-      }
-    }
-
-    // Perform query
-    const rows = await this.database.query(queryOptions)
-    
-    // Convert to rows as expr evaluator expects
-    let evalRows: any[] = rows.map(row => ({
-      row: {
-        getPrimaryKey: () => Promise.resolve(row.id),
-        getField: (columnId: string) => Promise.resolve(row["c_" + columnId])
-      } as PromiseExprEvaluatorRow
-    }))
+    // Create rows to evaluate
+    let evalRows: any[] = (await this.createEvalRows(options.from, options.where)).map(r => ({ row: r }))
 
     const exprUtils = new ExprUtils(this.schema)
     
@@ -172,6 +136,64 @@ export default class VirtualDatabase implements Database {
   /** Commit the changes that have been applied to this virtual database to the real underlying database */
   commit(): void {
     return
+  }
+
+  // Create the rows as needed by ExprEvaluator for a query
+  /** Determine if a column should be included in the underlying query */
+  shouldIncludeColumn(column: Column): boolean {
+    if (column.type !== "join" && !column.expr) {
+      return true
+    }
+    if (column.type === "join" && (!column.join!.inverse || column.join!.type !== "1-n")) {
+      return true
+    }
+    return false
+  }
+
+  private async createEvalRows(from: string, where?: Expr): Promise<PromiseExprEvaluatorRow[]> {
+    // Create query with c_ for all columns, id and just the where clause
+    const queryOptions: QueryOptions = {
+      select: {
+        id: { type: "id", table: from }
+      },
+      from: from,
+      where: where
+    }
+
+    // Add a select for each column
+    for (const column of this.schema.getColumns(from)) {
+      if (this.shouldIncludeColumn(column)) {
+        queryOptions.select["c_" + column.id] = { type: "field", table: from, column: column.id }
+      }
+    }
+
+    // Perform query
+    const rows = await this.database.query(queryOptions)
+
+    // Convert to rows as expr evaluator expects
+    return rows.map(row => ({
+      getPrimaryKey: () => Promise.resolve(row.id),
+      getField: async (columnId: string) => {
+        const column = this.schema.getColumn(from, columnId)!
+
+        // For non-joins, return simple value
+        if (column.type !== "join") {
+          return row["c_" + columnId]
+        }
+
+        // For n-1 and 1-1 joins, create row
+        if (column.join!.type === "n-1" || column.join!.type === "1-1") {
+          const joinRows = await this.createEvalRows(column.join!.toTable, {
+            type: "op", op: "=", table: column.join!.toTable, exprs: [
+              { type: "id", table: column.join!.toTable },
+              { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
+          ]})
+          return joinRows[0] || null
+        }
+
+        throw new Error("TODO")
+      }
+    } as PromiseExprEvaluatorRow))
   }
 }
 

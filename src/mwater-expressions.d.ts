@@ -141,7 +141,7 @@ declare module 'mwater-expressions' {
   }
 
   /** Expression. Can be null */
-  type Expr = LiteralExpr | FieldExpr | OpExpr | IdExpr | null
+  type Expr = LiteralExpr | FieldExpr | OpExpr | IdExpr | ScalarExpr | null
 
   interface LiteralExpr {
     type: "literal"
@@ -166,6 +166,19 @@ declare module 'mwater-expressions' {
     table: string
     op: string
     exprs: Expr[]
+  }
+
+  interface ScalarExpr {
+    type: "scalar"
+
+    /** Table id of start table */
+    table: string
+
+    /** Array of join columns to follow to get to table of expr. All must be `join` type */
+    joins: string[]
+    
+    /** Expression from final table to get value */
+    expr: Expr
   }
 
   interface JsonQL {

@@ -1,6 +1,4 @@
 import VirtualDatabase from "./VirtualDatabase";
-
-
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
 import { Database, OrderByDir, QueryOptions } from "./Database";
@@ -8,7 +6,7 @@ import { Expr } from "mwater-expressions";
 import * as _ from "lodash";
 
 const schema = simpleSchema()
-let db = mockDatabase()
+let db: any
 let vdb: VirtualDatabase
 
 const t2Where: Expr = {
@@ -33,8 +31,10 @@ test("shouldIncludeColumn includes regular columns and joins without inverse", (
   expect(vdb.shouldIncludeColumn(schema.getColumn("t2", "2-1")!)).toBe(true)
 })
 
-test("queries with where clause and included columns", () => {
-  vdb.query({
+test("queries with where clause and included columns", async () => {
+  (db.query as jest.Mock).mockResolvedValue([])
+  
+  await vdb.query({
     select: {
       x: { type: "field", table: "t2", column: "text" }
     },
@@ -125,6 +125,40 @@ describe("select, order, limit", () => {
       { x: "b" }
     ])
   })
+
+  test("n-1 join", async () => {
+    const qopts: QueryOptions = {
+      select: { x: { type: "field", table: "t2", column: "2-1" }},
+      from: "t2"
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: "a", text: "a", number: 1 }
+    ], t2: [
+      { id: 1, text: "a", number: 1, "2-1": "a" }
+    ] }, qopts)
+
+    expect(rows).toEqual([
+      { x: "a" }
+    ])
+  })
+
+  test("n-1 scalar", async () => {
+    const qopts: QueryOptions = {
+      select: { x: { type: "scalar", joins: ["2-1"], table: "t2", expr: { type: "field", table: "t1", column: "text" } } },
+      from: "t2"
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: 1, text: "abc" }
+    ], t2: [
+      { id: 101, "2-1": 1 }
+    ] }, qopts)
+    expect(rows).toEqual([
+      { x: "abc" }
+    ])
+  })
+
 
 
 })
