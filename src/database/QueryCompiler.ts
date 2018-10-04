@@ -1,4 +1,4 @@
-import { JsonQL, Schema, ExprUtils, ExprCompiler, Expr } from "mwater-expressions";
+import { JsonQL, Schema, ExprUtils, ExprCompiler, Expr, Row } from "mwater-expressions";
 import { QueryOptions } from "./Database";
 import * as _ from "lodash";
 
@@ -9,7 +9,11 @@ export class QueryCompiler {
     this.schema = schema
   }
   
-  compileQuery(options: QueryOptions): JsonQL {
+  /** Compiles a query to JsonQL and also returns a function to map the returned
+   * rows to the ones requested by the query. This is necessary due to invalid select aliases
+   * that queries may have, so we normalize to c0, c1, etc. in the query
+   */
+  compileQuery(options: QueryOptions): { jsonql: JsonQL, rowMapper: (row: Row) => Row } {
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
 
@@ -44,7 +48,7 @@ export class QueryCompiler {
       query.selects.push({
         type: "select",
         expr: compiledExpr,
-        alias: "c_" + colKey
+        alias: "c_" + colIndex
       })
 
       // Add group by if not aggregate
@@ -60,7 +64,7 @@ export class QueryCompiler {
         query.selects.push({
           type: "select",
           expr: exprCompiler.compileExpr({ expr: order.expr, tableAlias: "main" }),
-          alias: `o${index}`
+          alias: `o_${index}`
         })
 
         query.orderBy.push({ ordinal: colKeys.length + index + 1, direction: order.dir, nulls: (order.dir === "desc" ? "last" : "first") })
@@ -81,7 +85,17 @@ export class QueryCompiler {
     if (options.where) {
       query.where = exprCompiler.compileExpr({ expr: options.where, tableAlias: "main" })
     }
+
+    // Create row mapper
+    const rowMapper = (row: Row) => {
+      // Transform rows to change c_N to columns keys
+      const pairs = Object.entries(row)
+        .filter((pair: any[]) => pair[0].startsWith("c_"))
+        .map(pair => [colKeys[parseInt(pair[0].substr(2))], pair[1]])
+
+      return _.zipObject(pairs)
+    }
     
-    return query
+    return { jsonql: query, rowMapper }
   }
 }

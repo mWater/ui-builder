@@ -11,17 +11,19 @@ test("compiles simple query", () => {
     from: "t1",
   }
 
-  const query = compiler.compileQuery(options)
+  const { jsonql, rowMapper } = compiler.compileQuery(options)
 
-  expect(query).toEqual({
+  expect(jsonql).toEqual({
     type: "query",
     selects: [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_x" }
+      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" }
     ],
     from: { type: "table", table: "t1", alias: "main" },
     groupBy: [],
     orderBy: []
   })
+
+  expect(rowMapper({ c_0: "abc", o_0: "xyz" })).toEqual({ x: "abc" })
 })
 
 test("compiles aggregated, limited query", () => {
@@ -34,19 +36,21 @@ test("compiles aggregated, limited query", () => {
     limit: 10
   }
 
-  const query = compiler.compileQuery(options)
+  const { jsonql, rowMapper } = compiler.compileQuery(options)
 
-  expect(query).toEqual({
+  expect(jsonql).toEqual({
     type: "query",
     selects: [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_x" },
-      { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "c_y" }
+      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" },
+      { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "c_1" }
     ],
     from: { type: "table", table: "t1", alias: "main" },
     groupBy: [1],
     orderBy: [],
     limit: 10
   })
+
+  expect(rowMapper({ c_0: "abc", c_1: "xyz" })).toEqual({ x: "abc", y: "xyz" })
 })
 
 test("compiles ordered where query", () => {
@@ -57,13 +61,13 @@ test("compiles ordered where query", () => {
     orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }]
   }
 
-  const query = compiler.compileQuery(options)
+  const { jsonql, rowMapper } = compiler.compileQuery(options)
 
-  expect(query).toEqual({
+  expect(jsonql).toEqual({
     type: "query",
     selects: [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_x" },
-      { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "o0" }
+      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" },
+      { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "o_0" }
     ],
     from: { type: "table", table: "t1", alias: "main" },
     where: { type: "field", tableAlias: "main", column: "boolean" },
