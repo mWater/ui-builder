@@ -4,6 +4,11 @@ import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEval
 import * as _ from "lodash";
 import * as uuid from 'uuid/v4'
 
+/**
+ * Database which is backed by a real database, but can accept changes such as adds, updates or removes
+ * without sending them to the real database until commit is called.
+ * The query results obtained from the database incorporate the changes that have been made to it (mutations).
+ */
 export default class VirtualDatabase implements Database {
   database: Database
   schema: Schema
