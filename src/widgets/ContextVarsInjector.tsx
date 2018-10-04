@@ -3,12 +3,14 @@ import * as React from "react";
 import ContextVarInjector from './ContextVarInjector'
 import * as _ from "lodash";
 import { Schema } from "mwater-expressions";
+import { Database } from "../database/Database";
 
 interface Props {
   contextVars: ContextVar[]
   contextVarValues: { [contextVarId: string]: any }
   renderInstanceProps: RenderInstanceProps
   schema: Schema
+  database: Database
 
   /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
   innerBlock: BlockDef
@@ -37,6 +39,7 @@ export default class ContextVarsInjector extends React.Component<Props> {
         <ContextVarInjector 
             contextVar={contextVar} 
             schema={this.props.schema}
+            database={this.props.database}
             value={this.props.contextVarValues[contextVar.id]} 
             renderInstanceProps={outerProps}
             contextVarExprs={contextVarExprs}>

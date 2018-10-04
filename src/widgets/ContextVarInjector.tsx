@@ -1,7 +1,7 @@
 import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter } from "./blocks";
 import * as React from "react";
 import { Expr, ExprUtils, Schema } from "mwater-expressions";
-import { QueryOptions } from "../database/Database";
+import { QueryOptions, Database } from "../database/Database";
 import * as canonical from 'canonical-json'
 import * as _ from "lodash";
 
@@ -12,6 +12,7 @@ interface Props {
   contextVarExprs?: Expr[]
   initialFilters?: Filter[]
   schema: Schema
+  database: Database
   children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>
 }
 
@@ -41,12 +42,23 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
 
   componentDidMount() {
     this.performQueries()
+
+    // Listen for changes to database
+    this.props.database.addChangeListener(this.handleDatabaseChange)
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (!_.isEqual(prevProps.value, this.props.value) || !_.isEqual(prevState.filters, this.state.filters)) {
       this.performQueries()
     }
+  }
+
+  componentWillUnmount() {
+    this.props.database.removeChangeListener(this.handleDatabaseChange)
+  }
+
+  handleDatabaseChange = () => {
+    this.performQueries()
   }
 
   createRowQueryOptions(table: string) {

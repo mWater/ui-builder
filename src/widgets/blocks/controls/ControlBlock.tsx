@@ -43,7 +43,6 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   abstract filterColumn(column: Column): boolean
 
   renderDesign(props: RenderDesignProps) {
-
     // Simply render empty control
     return (
       <div>
@@ -65,16 +64,19 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   }
 
   renderInstance(props: RenderInstanceProps) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
-
-    const handleChange = (newValue: T | null) => {
-      console.warn("TODO: " + JSON.stringify(newValue))
-    }
+    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)!
 
     const id = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Get current value
     const value = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: this.blockDef.column! })
+
+    const handleChange = async (newValue: T | null) => {
+      // Update database
+      const txn = props.database.transaction()
+      await txn.updateRow(contextVar.table!, id, { [this.blockDef.column!]: newValue })
+      await txn.commit()
+    }
 
     return (
       <div>

@@ -98,7 +98,8 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       innerBlock={widgetDef.blockDef}
       contextVarValues={page.contextVarValues}
       renderInstanceProps={outerRenderInstanceProps}
-      schema={this.props.schema}>
+      schema={this.props.schema}
+      database={page.database}>
         {(innerRenderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
           if (loading) {
             return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
