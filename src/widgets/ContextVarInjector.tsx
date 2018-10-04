@@ -91,7 +91,7 @@ export default class ContextVarsInjector extends React.Component<Props, State> {
         type: "op",
         table: table,
         op: "and",
-        exprs: _.compact([queryOptions.where].concat(_.compact(this.state.filters.map(f => f.expr))))
+        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map(f => f.expr))))
       }
     }
     return queryOptions

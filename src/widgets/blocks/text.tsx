@@ -36,7 +36,10 @@ export interface TextBlockDef extends BlockDef {
 
 export class TextBlock extends LeafBlock<TextBlockDef> {
   getContextVarExprs(contextVar: ContextVar): Expr[] { 
-    return _.compact(_.map(this.blockDef.embeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null))
+    if (this.blockDef.embeddedExprs) {
+      return _.compact(_.map(this.blockDef.embeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null))
+    }
+    return []
   }
 
   validate(options: ValidateBlockOptions) {
@@ -72,7 +75,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     let text = localize(this.blockDef.text, props.locale)
 
     // Get any embedded expression values
-    const exprValues = _.map(this.blockDef.embeddedExprs, ee => props.getContextVarExprValue(ee.contextVarId!, ee.expr))
+    const exprValues = _.map(this.blockDef.embeddedExprs || [], ee => props.getContextVarExprValue(ee.contextVarId!, ee.expr))
 
     // Format and replace
     for (let i = 0 ; i < exprValues.length ; i++) {

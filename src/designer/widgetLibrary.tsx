@@ -139,6 +139,7 @@ class WidgetTab extends React.Component<{
       actionLibrary={this.props.actionLibrary}
       widgetLibrary={this.props.widgetLibrary}
       onWidgetDefChange={this.props.onWidgetDefChange}
+      locale="en"
     />
   }
 }
@@ -163,7 +164,7 @@ class NewTab extends React.Component<{
   }
 
   renderExistingWidgets() {
-    const widgets = _.sortBy(_.values(this.props.widgetLibrary.widgets), "name")
+    const widgets: WidgetDef[] = _.sortBy(Object.values(this.props.widgetLibrary.widgets), "name")
 
     return (
       <div className="list-group">

@@ -14,6 +14,8 @@ import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
 import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
+import VirtualDatabase from "../database/VirtualDatabase";
+import { Database } from "../database/Database";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -21,6 +23,7 @@ interface WidgetDesignerProps {
   schema: Schema
   dataSource: DataSource
   actionLibrary: ActionLibrary
+  locale: string
   widgetLibrary: WidgetLibrary
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
@@ -251,7 +254,10 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return null 
     }
 
-    const database = new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)) // TODO make non-live
+    let database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)) 
+
+    // Make non-live
+    database = new VirtualDatabase(database, this.props.schema, this.props.locale)
 
     // Create normal page to display
     const page: Page = {

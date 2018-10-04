@@ -33,7 +33,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
   /** Get any context variables expressions that this action needs */
   getContextVarExprs(contextVar: ContextVar) {
     // Get ones for the specified context var
-    return _.values(this.actionDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
+    return Object.values(this.actionDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
   }
   
   renderEditor(props: RenderActionEditorProps) {

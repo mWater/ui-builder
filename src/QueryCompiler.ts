@@ -1,4 +1,4 @@
-import { JsonQL, Schema, ExprUtils, ExprCompiler } from "mwater-expressions";
+import { JsonQL, Schema, ExprUtils, ExprCompiler, Expr } from "mwater-expressions";
 import { QueryOptions } from "./database/Database";
 import * as _ from "lodash";
 
@@ -25,7 +25,7 @@ export class QueryCompiler {
     const colKeys = _.keys(options.select)
 
     // Determine if any aggregate
-    const isAggr = _.values(options.select).some(expr => exprUtils.getExprAggrStatus(expr) === "aggregate") 
+    const isAggr = Object.values(options.select).some(expr => exprUtils.getExprAggrStatus(expr) === "aggregate") 
       || (options.orderBy || []).some(order => exprUtils.getExprAggrStatus(order.expr) === "aggregate")
 
     // For each column
