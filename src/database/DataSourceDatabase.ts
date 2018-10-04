@@ -1,6 +1,6 @@
 import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
 import { DataSource, Schema } from "mwater-expressions";
-import { QueryCompiler } from "../QueryCompiler";
+import { QueryCompiler } from "./QueryCompiler";
 
 
 export class DataSourceDatabase implements Database {

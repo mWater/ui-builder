@@ -1,4 +1,4 @@
-import { QueryCompiler } from "../QueryCompiler";
+import { QueryCompiler } from "./QueryCompiler";
 import { Schema, DataSource, Row } from "mwater-expressions";
 import { DataSourceDatabase } from "./DataSourceDatabase";
 import { QueryOptions } from "./Database";

@@ -9,7 +9,7 @@ import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
 import { DataSourceDatabase } from "../database/DataSourceDatabase";
-import { QueryCompiler } from "../QueryCompiler";
+import { QueryCompiler } from "../database/QueryCompiler";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
 import { WidgetLibrary } from "./widgetLibrary";

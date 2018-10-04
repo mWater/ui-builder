@@ -1,6 +1,6 @@
-import { QueryOptions, OrderByDir } from './database/Database'
+import { QueryOptions, OrderByDir } from './Database'
 import { QueryCompiler } from './QueryCompiler';
-import simpleSchema from './__fixtures__/schema';
+import simpleSchema from '../__fixtures__/schema';
 
 const schema = simpleSchema()
 const compiler = new QueryCompiler(schema)
