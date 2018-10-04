@@ -1,7 +1,7 @@
 import VirtualDatabase from "./VirtualDatabase";
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
-import { Database, OrderByDir, QueryOptions } from "./Database";
+import { OrderByDir, QueryOptions, Transaction } from "./Database";
 import { Expr, ExprEvaluator } from "mwater-expressions";
 import * as _ from "lodash";
 import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
@@ -210,8 +210,19 @@ describe("select, order, limit", () => {
       orderBy: [{ expr: numberField, dir: OrderByDir.asc }]
     }
 
-    test("insert relevant row", async () => {
+    test("waits until transaction committed", async () => {
       vdb.transaction().addRow("t1", { number: 6 })
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 5 }
+      ])
+    })
+
+    test("insert relevant row", async () => {
+      const txn = vdb.transaction()
+      txn.addRow("t1", { number: 6 })
+      txn.commit()
   
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
       expect(rows).toEqual([
@@ -221,13 +232,136 @@ describe("select, order, limit", () => {
     })
 
     test("insert irrelevant rows", async () => {
-      vdb.transaction().addRow("t1", { number: 1 })
-      vdb.transaction().addRow("t2", { number: 6 })
+      const txn = vdb.transaction()
+      txn.addRow("t1", { number: 1 })
+      txn.addRow("t2", { number: 6 })
+      txn.commit()
   
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
       expect(rows).toEqual([
         { x: 5 }
       ])
+    })
+
+    test("update relevant row", async () => {
+      const txn = vdb.transaction()
+      txn.updateRow("t1", 1, { number: 7 })
+      txn.commit()
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 5 }, { id: 2, number: 6 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 6 },
+        { x: 7 }
+      ])
+    })
+
+    test("update relevant row to become irrelevant", async () => {
+      const txn = vdb.transaction()
+      txn.updateRow("t1", 1, { number: 2 })
+      txn.commit()
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 5 }, { id: 2, number: 6 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 6 }
+      ])
+    })
+
+    test("remove relevant row", async () => {
+      const txn = vdb.transaction()
+      txn.removeRow("t1", 1)
+      txn.commit()
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 5 }, { id: 2, number: 6 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 6 }
+      ])
+    })
+
+    test("notifies change listener", async () => {
+      const changeListener = jest.fn()
+      vdb.addChangeListener(changeListener)
+
+      const txn = vdb.transaction()
+      txn.removeRow("t1", 1)
+      expect(changeListener.mock.calls.length).toBe(0)
+      txn.commit()
+      expect(changeListener.mock.calls.length).toBe(1)
+    })
+
+    test("commits changes", async () => {
+      // Create changes
+      const txn = vdb.transaction()
+      const pk = txn.addRow("t1", { number: 1 })
+      txn.removeRow("t1", 1)
+      txn.commit()
+
+      // Mock underlying transaction
+      const mockTransaction = {
+        addRow: jest.fn(),
+        updateRow: jest.fn(),
+        removeRow: jest.fn(),
+        commit: jest.fn()
+      };
+
+      (db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+
+      // Commit to underlying database
+      await vdb.commit()
+
+      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1}])
+      expect(mockTransaction.removeRow.mock.calls[0]).toEqual(["t1", 1])
+    })
+
+    test("substitutes temporary primary keys", async () => {
+      // Create changes
+      const txn = vdb.transaction()
+      const pk = await txn.addRow("t1", { number: 1 })
+      const pk2 = await txn.addRow("t2", { "2-1": pk })
+      await txn.commit()
+
+      // Mock underlying transaction
+      const mockTransaction = {
+        addRow: jest.fn(),
+        updateRow: jest.fn(),
+        removeRow: jest.fn(),
+        commit: jest.fn()
+      };
+      (db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+
+      // Mock return pks
+      mockTransaction.addRow.mockResolvedValueOnce("PKA")
+      mockTransaction.addRow.mockResolvedValueOnce("PKB")
+
+      // Commit to underlying database
+      await vdb.commit()
+
+      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1 }])
+      expect(mockTransaction.addRow.mock.calls[1]).toEqual(["t2", { "2-1": "PKA" }])
+    })
+
+    test("removes virtual rows locally", async () => {
+      // Create changes
+      const txn = vdb.transaction()
+      const pk = await txn.addRow("t1", { number: 1 })
+      await txn.updateRow("t1", pk, { number: 2 })
+      await txn.removeRow("t2", pk)
+      await txn.commit()
+
+      // Mock underlying transaction
+      const mockTransaction = {
+        addRow: jest.fn(),
+        updateRow: jest.fn(),
+        removeRow: jest.fn(),
+        commit: jest.fn()
+      };
+      (db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+
+      // Commit to underlying database
+      await vdb.commit()
+
+      expect(mockTransaction.addRow.mock.calls.length).toBe(0)
+      expect(mockTransaction.updateRow.mock.calls.length).toBe(0)
+      expect(mockTransaction.removeRow.mock.calls.length).toBe(0)
     })
   })
 })

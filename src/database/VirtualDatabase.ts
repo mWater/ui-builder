@@ -9,6 +9,10 @@ export default class VirtualDatabase implements Database {
   schema: Schema
   locale: string
   mutations: Mutation[]
+  changeListeners: DatabaseChangeListener[]
+
+  /** Array of temporary primary keys that will be replaced by real ones when the insertions are committed */
+  tempPrimaryKeys: string[]
 
   constructor(database: Database, schema: Schema, locale: string) {
     this.database = database
@@ -16,6 +20,8 @@ export default class VirtualDatabase implements Database {
     this.locale = locale
 
     this.mutations = []
+    this.changeListeners = []
+    this.tempPrimaryKeys = []
   }
 
   async query(options: QueryOptions): Promise<Row[]> {
@@ -126,55 +132,62 @@ export default class VirtualDatabase implements Database {
   
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener) {
-    return
+    this.changeListeners = _.union(this.changeListeners, [changeListener])
   }
 
   removeChangeListener(changeListener: DatabaseChangeListener) {
-    return
+    this.changeListeners = _.difference(this.changeListeners, [changeListener])
   }
 
   transaction(): Transaction {
-    // TODO
-    return {
-      addRow: (table: string, values: { [column: string]: any }) => {
-        const primaryKey = uuid()
-        // TODO
-        this.mutations.push({
-          type: "add",
-          table: table,
-          primaryKey: primaryKey,
-          values: values
-        })
-        return Promise.resolve(primaryKey)
-      },
-      updateRow: (table: string, primaryKey: any, updates: { [column: string]: any }) => {
-        this.mutations.push({
-          type: "update",
-          table: table,
-          primaryKey: primaryKey,
-          updates: updates
-        })
-        return Promise.resolve()
-      },
-      removeRow: (table: string, primaryKey: any) => {
-        this.mutations.push({
-          type: "remove",
-          table: table,
-          primaryKey: primaryKey
-        })
-        return Promise.resolve()
-      },
-      commit: () => Promise.resolve()
-    }
+    return new VirtualDatabaseTransaction(this)
   }
 
   /** Commit the changes that have been applied to this virtual database to the real underlying database */
-  commit(): void {
-    // TODO
-    return
+  async commit(): Promise<void> {
+    if (this.mutations.length === 0) {
+      return
+    }
+
+    // Apply mutations in one transaction
+    const txn = this.database.transaction()
+
+    // Store mapping from temp to real primary keys
+    const pkMapping = {}
+
+    for (const mutation of this.mutations) {
+      switch (mutation.type) {
+        case "add":
+          // Map any primary keys
+          mutation.values = this.replaceTempPrimaryKeys(mutation.values, (pk) => {
+            if (pkMapping[pk]) {
+              return pkMapping[pk]
+            }
+            throw new Error("Missing mapping for " + pk)
+          })
+
+          const primaryKey = await txn.addRow(mutation.table, mutation.values)
+          pkMapping[mutation.primaryKey] = primaryKey
+          break
+        case "update":
+          // Map any primary keys
+          mutation.updates = this.replaceTempPrimaryKeys(mutation.updates, (pk) => {
+            if (pkMapping[pk]) {
+              return pkMapping[pk]
+            }
+            throw new Error("Missing mapping for " + pk)
+          })
+
+          await txn.updateRow(mutation.table, mutation.primaryKey, mutation.updates)
+          break
+        case "remove":
+          await txn.removeRow(mutation.table, mutation.primaryKey)
+          break
+      }
+    }
+    await txn.commit()
   }
 
-  // Create the rows as needed by ExprEvaluator for a query
   /** Determine if a column should be included in the underlying query */
   shouldIncludeColumn(column: Column): boolean {
     if (column.type !== "join" && !column.expr) {
@@ -185,10 +198,11 @@ export default class VirtualDatabase implements Database {
     }
     return false
   }
-
+  
+  /** Create the rows as needed by ExprEvaluator for a query */
   private async queryEvalRows(from: string, where?: Expr): Promise<PromiseExprEvaluatorRow[]> {
     // Create query with c_ for all columns, id and just the where clause
-    const queryOptions: QueryOptions = {
+    let queryOptions: QueryOptions = {
       select: {
         id: { type: "id", table: from }
       },
@@ -203,6 +217,9 @@ export default class VirtualDatabase implements Database {
       }
     }
 
+    // Replace any temporary primary keys with null to avoid text/integer conflicts in queries
+    queryOptions = this.replaceTempPrimaryKeys(queryOptions, () => null)
+
     // Perform query
     let rows = await this.database.query(queryOptions)
 
@@ -213,6 +230,19 @@ export default class VirtualDatabase implements Database {
     return rows.map(row => this.createEvalRow(row, from))
   }
 
+  /** Replace temporary primary keys with different value */
+  private replaceTempPrimaryKeys(input: any, replaceWith: (tempPk: string) => any): any {
+    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
+    let json = JSON.stringify(input)
+    for (const tempPk of this.tempPrimaryKeys) {
+      json = json.replace(new RegExp(escapeRegex(JSON.stringify(tempPk)), "g"), () => JSON.stringify(replaceWith(tempPk)))
+    }
+    console.log(json)
+    return JSON.parse(json)
+  }
+
+  /** Create a single row structured for evaluation from a row in format { id: <primary key>, c_<column id>: value, ... } */
   private createEvalRow(row: Row, from: string): PromiseExprEvaluatorRow {
     return {
       getPrimaryKey: () => Promise.resolve(row.id),
@@ -261,6 +291,9 @@ export default class VirtualDatabase implements Database {
 
   /** Apply all known mutations to a set of rows */
   private async mutateRows(rows: Row[], from: string, where?: Expr): Promise<Row[]> {
+    // Copy rows to be mutated safely
+    rows = rows.slice()
+
     for (const mutation of this.mutations) {
       // Only from correct table
       if (mutation.table !== from) {
@@ -273,6 +306,20 @@ export default class VirtualDatabase implements Database {
           id: mutation.primaryKey,
           ...newRow
         })
+      }
+
+      // TODO: This is O(nxm) where n is number of rows and m
+      if (mutation.type === "update") {
+        for (let i = 0 ; i < rows.length ; i++) {
+          if (rows[i].id === mutation.primaryKey) {
+            const update = _.mapKeys(mutation.updates, (v, k) => "c_" + k)
+            rows[i] = { ...rows[i], ...update }
+          }
+        }
+      }
+
+      if (mutation.type === "remove") {
+        rows = rows.filter(row => row.id !== mutation.primaryKey)
       }
     }
 
@@ -291,6 +338,71 @@ export default class VirtualDatabase implements Database {
     }
 
     return rows
+  }
+}
+
+class VirtualDatabaseTransaction implements Transaction {
+  virtualDatabase: VirtualDatabase
+
+  /** Uncommitted mutations */
+  mutations: Mutation[]
+
+  constructor(virtualDatabase: VirtualDatabase) {
+    this.virtualDatabase = virtualDatabase
+    this.mutations = []
+  }
+
+  addRow(table: string, values: { [column: string]: any }) {
+    const primaryKey = uuid()
+    
+    // Save temporary primary key
+    this.virtualDatabase.tempPrimaryKeys.push(primaryKey)
+
+    this.mutations.push({
+      type: "add",
+      table: table,
+      primaryKey: primaryKey,
+      values: values
+    })
+    return Promise.resolve(primaryKey)
+  }
+
+  updateRow(table: string, primaryKey: any, updates: { [column: string]: any }) {
+    this.mutations.push({
+      type: "update",
+      table: table,
+      primaryKey: primaryKey,
+      updates: updates
+    })
+    return Promise.resolve()
+  }
+
+  removeRow(table: string, primaryKey: any) {
+    // Remove locally if local
+    if (this.virtualDatabase.tempPrimaryKeys.includes(primaryKey)) {
+      this.mutations = this.mutations.filter(m => m.primaryKey !== primaryKey)
+      this.virtualDatabase.mutations = this.virtualDatabase.mutations.filter(m => m.primaryKey !== primaryKey)
+      return Promise.resolve()
+    }
+
+    this.mutations.push({
+      type: "remove",
+      table: table,
+      primaryKey: primaryKey
+    })
+    return Promise.resolve()
+  }
+
+  commit(): Promise<void> {
+    // Clear mutations and transfer to main database
+    this.virtualDatabase.mutations = this.virtualDatabase.mutations.concat(this.mutations)
+    this.mutations = []
+
+    for (const changeListener of this.virtualDatabase.changeListeners) {
+      changeListener()
+    }
+
+    return Promise.resolve()
   }
 }
 
