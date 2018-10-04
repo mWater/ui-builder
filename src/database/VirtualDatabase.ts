@@ -30,6 +30,11 @@ export default class VirtualDatabase implements Database {
   }
 
   async query(options: QueryOptions): Promise<Row[]> {
+    // Passthrough if no mutations
+    if (this.mutations.length === 0) {
+      return this.database.query(options)
+    }
+
     // Create rows to evaluate
     let evalRows: any[] = (await this.queryEvalRows(options.from, options.where)).map(r => ({ row: r }))
 

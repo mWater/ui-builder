@@ -32,9 +32,32 @@ test("shouldIncludeColumn includes regular columns and joins without inverse", (
   expect(vdb.shouldIncludeColumn(schema.getColumn("t2", "2-1")!)).toBe(true)
 })
 
+test("pass through if no mutations", async () => {
+  (db.query as jest.Mock).mockResolvedValue([])
+
+  const queryOptions: QueryOptions = {
+    select: {
+      x: { type: "field", table: "t2", column: "text" }
+    },
+    from: "t2",
+    where: t2Where,
+    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: OrderByDir.desc }],
+    limit: 10
+  }
+
+  await vdb.query(queryOptions)
+
+  expect(db.query.mock.calls[0][0]).toEqual(queryOptions)
+})
+
 test("queries with where clause and included columns", async () => {
   (db.query as jest.Mock).mockResolvedValue([])
 
+  // Mutate to prevent passthrough
+  const txn = vdb.transaction()
+  await txn.removeRow("t1", "xyzzy")
+  await txn.commit()
+  
   await vdb.query({
     select: {
       x: { type: "field", table: "t2", column: "text" }
@@ -58,7 +81,7 @@ test("queries with where clause and included columns", async () => {
 })
 
 describe("select, order, limit", () => {
-  const performQuery = (rawRowsByTable: any, queryOptions: QueryOptions): Promise<any[]> => {
+  const performQuery = async (rawRowsByTable: any, queryOptions: QueryOptions): Promise<any[]> => {
     // Set up mock database to return raw rows with c_ prefixed on column names
     // This simulates a real database call
     db.query = (async (qo: QueryOptions) => {
@@ -87,6 +110,11 @@ describe("select, order, limit", () => {
 
       return rows
     }) as any
+
+    // Mutate to prevent passthrough
+    const txn = vdb.transaction()
+    await txn.removeRow("t1", "xyzzy")
+    await txn.commit()
 
     // Perform query
     return vdb.query(queryOptions)
