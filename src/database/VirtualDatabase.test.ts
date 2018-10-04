@@ -2,8 +2,9 @@ import VirtualDatabase from "./VirtualDatabase";
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
 import { Database, OrderByDir, QueryOptions } from "./Database";
-import { Expr } from "mwater-expressions";
+import { Expr, ExprEvaluator } from "mwater-expressions";
 import * as _ from "lodash";
+import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
 
 const schema = simpleSchema()
 let db: any
@@ -60,20 +61,31 @@ describe("select, order, limit", () => {
   const performQuery = (rawRowsByTable: any, queryOptions: QueryOptions): Promise<any[]> => {
     // Set up mock database to return raw rows with c_ prefixed on column names
     // This simulates a real database call
-    db.query = ((qo: QueryOptions) => {
+    db.query = (async (qo: QueryOptions) => {
       // Get rows
       let rows: any[]
-      if (_.isFunction(rawRowsByTable[qo.from])) {
-        rows = rawRowsByTable[qo.from](qo)
-      }
-      else {
-        rows = rawRowsByTable[qo.from]
+      rows = rawRowsByTable[qo.from]
+      
+      // Filter rows by where
+      if (qo.where) {
+        const exprEval = new PromiseExprEvaluator(new ExprEvaluator(schema))
+        const filteredRows: any[] = []
+        for (const row of rows) {
+          const evalRow: PromiseExprEvaluatorRow = {
+            getPrimaryKey: () => Promise.resolve(row.id),
+            getField: (columnId) => Promise.resolve(row[columnId])
+          }
+          if (await exprEval.evaluate(qo.where, { row: evalRow })) {
+            filteredRows.push(row)
+          }
+        }
+        rows = filteredRows
       }
 
       // Prepend c_ to non-id columns
       rows = rows.map((row: any) => _.mapKeys(row, (v, k: string) => k === "id" ? "id" : "c_" + k))
 
-      return Promise.resolve(rows)
+      return rows
     }) as any
 
     // Perform query
@@ -189,7 +201,11 @@ describe("select, order, limit", () => {
     const rows = await performQuery({ t1: [
       { id: 1 },
       { id: 2 }
-    ], t2: t2Func }, qopts)
+    ], t2: [
+      { id: 101, "2-1": 1, number: 1 },
+      { id: 102, "2-1": 1, number: 2 },
+      { id: 103, "2-1": 2, number: 4 }
+    ]}, qopts)
     expect(rows).toEqual([
       { x: 3 },
       { x: 4 }
