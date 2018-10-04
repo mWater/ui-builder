@@ -36,24 +36,14 @@ export interface Database {
 
 export interface Transaction {
   /** Adds a row, returning the primary key as a promise */
-  addRow(table: string, updates: { [column: string]: any }): Promise<any>;
+  addRow(table: string, values: { [column: string]: any }): Promise<any>;
 
   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
   
-  removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
+  removeRow(table: string, primaryKey: any): Promise<void>;
 
   commit(): Promise<any>;
 }
-
-// interface DatabaseBatch {
-//   addRow(table: string, updates: { [column: string]: any }): Promise<any>;
-
-//   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
-  
-//   removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
-
-//   complete(): void;
-// }
 
 export class MockDatabase implements Database {
   async query(options: QueryOptions) { return [] }
@@ -67,11 +57,11 @@ export class MockDatabase implements Database {
 
 class MockTransaction implements Transaction {
   /** Adds a row, returning the primary key as a promise */
-  async addRow(table: string, updates: { [column: string]: any }) { return null }
+  async addRow(table: string, values: { [column: string]: any }) { return null }
 
   async updateRow(table: string, primaryKey: any, updates: { [column: string]: any }) { return }
   
-  async removeRow(table: string, primaryKey: any, updates: { [column: string]: any }) { return }
+  async removeRow(table: string, primaryKey: any) { return }
 
   async commit() { return }
 }

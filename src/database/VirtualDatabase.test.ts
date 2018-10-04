@@ -184,20 +184,6 @@ describe("select, order, limit", () => {
       from: "t1"
     }
 
-    const t2Func = (qo: QueryOptions) => {
-      if ((qo.where as any).exprs![1].value === 1) {
-        return [
-          { id: 101, "2-1": 1, number: 1 },
-          { id: 102, "2-1": 1, number: 2 }
-        ]
-      }
-      else {
-        return [
-          { id: 103, "2-1": 2, number: 4 }
-        ]
-      }
-     }
-
     const rows = await performQuery({ t1: [
       { id: 1 },
       { id: 2 }
@@ -210,5 +196,38 @@ describe("select, order, limit", () => {
       { x: 3 },
       { x: 4 }
     ])
+  })
+
+  describe("transactions", () => {
+    const numberField: Expr = { type: "field", table: "t1", column: "number" }
+    const qopts: QueryOptions = {
+      select: { x: numberField },
+      from: "t1",
+      where: { type: "op", op: ">", table: "t1", exprs: [
+        numberField,
+        { type: "literal", valueType: "number", value: 3 }
+      ]},
+      orderBy: [{ expr: numberField, dir: OrderByDir.asc }]
+    }
+
+    test("insert relevant row", async () => {
+      vdb.transaction().addRow("t1", { number: 6 })
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 5 },
+        { x: 6 }
+      ])
+    })
+
+    test("insert irrelevant rows", async () => {
+      vdb.transaction().addRow("t1", { number: 1 })
+      vdb.transaction().addRow("t2", { number: 6 })
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 5 }
+      ])
+    })
   })
 })

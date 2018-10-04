@@ -2,21 +2,25 @@ import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from
 import { Schema, Column, ExprEvaluator, ExprUtils, Expr } from "mwater-expressions";
 import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
 import * as _ from "lodash";
+import * as uuid from 'uuid/v4'
 
 export default class VirtualDatabase implements Database {
   database: Database
   schema: Schema
   locale: string
+  mutations: Mutation[]
 
   constructor(database: Database, schema: Schema, locale: string) {
     this.database = database
     this.schema = schema
     this.locale = locale
+
+    this.mutations = []
   }
 
   async query(options: QueryOptions): Promise<Row[]> {
     // Create rows to evaluate
-    let evalRows: any[] = (await this.createEvalRows(options.from, options.where)).map(r => ({ row: r }))
+    let evalRows: any[] = (await this.queryEvalRows(options.from, options.where)).map(r => ({ row: r }))
 
     const exprUtils = new ExprUtils(this.schema)
     
@@ -130,11 +134,43 @@ export default class VirtualDatabase implements Database {
   }
 
   transaction(): Transaction {
-    throw new Error("Not implemented")
+    // TODO
+    return {
+      addRow: (table: string, values: { [column: string]: any }) => {
+        const primaryKey = uuid()
+        // TODO
+        this.mutations.push({
+          type: "add",
+          table: table,
+          primaryKey: primaryKey,
+          values: values
+        })
+        return Promise.resolve(primaryKey)
+      },
+      updateRow: (table: string, primaryKey: any, updates: { [column: string]: any }) => {
+        this.mutations.push({
+          type: "update",
+          table: table,
+          primaryKey: primaryKey,
+          updates: updates
+        })
+        return Promise.resolve()
+      },
+      removeRow: (table: string, primaryKey: any) => {
+        this.mutations.push({
+          type: "remove",
+          table: table,
+          primaryKey: primaryKey
+        })
+        return Promise.resolve()
+      },
+      commit: () => Promise.resolve()
+    }
   }
 
   /** Commit the changes that have been applied to this virtual database to the real underlying database */
   commit(): void {
+    // TODO
     return
   }
 
@@ -150,7 +186,7 @@ export default class VirtualDatabase implements Database {
     return false
   }
 
-  private async createEvalRows(from: string, where?: Expr): Promise<PromiseExprEvaluatorRow[]> {
+  private async queryEvalRows(from: string, where?: Expr): Promise<PromiseExprEvaluatorRow[]> {
     // Create query with c_ for all columns, id and just the where clause
     const queryOptions: QueryOptions = {
       select: {
@@ -168,10 +204,17 @@ export default class VirtualDatabase implements Database {
     }
 
     // Perform query
-    const rows = await this.database.query(queryOptions)
+    let rows = await this.database.query(queryOptions)
+
+    // Apply mutations
+    rows = await this.mutateRows(rows, from, where)
 
     // Convert to rows as expr evaluator expects
-    return rows.map(row => ({
+    return rows.map(row => this.createEvalRow(row, from))
+  }
+
+  private createEvalRow(row: Row, from: string): PromiseExprEvaluatorRow {
+    return {
       getPrimaryKey: () => Promise.resolve(row.id),
       getField: async (columnId: string) => {
         const column = this.schema.getColumn(from, columnId)!
@@ -183,7 +226,7 @@ export default class VirtualDatabase implements Database {
 
         // For n-1 and 1-1 joins, create row
         if (column.join!.type === "n-1" || column.join!.type === "1-1") {
-          const joinRows = await this.createEvalRows(column.join!.toTable, {
+          const joinRows = await this.queryEvalRows(column.join!.toTable, {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "id", table: column.join!.toTable },
               { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
@@ -193,7 +236,7 @@ export default class VirtualDatabase implements Database {
 
         // For non-inverse 1-n and n-n, create rows based on key
         if (column.join!.type !== "1-n" || !column.join!.inverse) {
-          const joinRows = await this.createEvalRows(column.join!.toTable, {
+          const joinRows = await this.queryEvalRows(column.join!.toTable, {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "id", table: column.join!.toTable },
               { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
@@ -203,7 +246,7 @@ export default class VirtualDatabase implements Database {
 
         // Inverse 1-n
         if (column.join!.type === "1-n" && column.join!.inverse) {
-          const joinRows = await this.createEvalRows(column.join!.toTable, {
+          const joinRows = await this.queryEvalRows(column.join!.toTable, {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
               { type: "literal", valueType: "id", idTable: from, value: row.id }
@@ -213,18 +256,62 @@ export default class VirtualDatabase implements Database {
 
         throw new Error("Not implemented")
       }
-    } as PromiseExprEvaluatorRow))
+    }
+  }
+
+  /** Apply all known mutations to a set of rows */
+  private async mutateRows(rows: Row[], from: string, where?: Expr): Promise<Row[]> {
+    for (const mutation of this.mutations) {
+      // Only from correct table
+      if (mutation.table !== from) {
+        continue
+      }
+
+      if (mutation.type === "add") {
+        const newRow = _.mapKeys(mutation.values, (v, k) => "c_" + k)
+        rows.push({
+          id: mutation.primaryKey,
+          ...newRow
+        })
+      }
+    }
+
+    // Re-filter rows
+    if (where) {
+      const filteredRows: Row[] = []
+
+      const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema))
+      for (const row of rows) {
+        const evalRow = this.createEvalRow(row, from)
+        if (await exprEval.evaluate(where, { row: evalRow })) {
+          filteredRows.push(row)
+        }
+      }
+      rows = filteredRows
+    }
+
+    return rows
   }
 }
 
-// export interface Transaction {
-//   /** Adds a row, returning the primary key as a promise */
-//   addRow(table: string, updates: { [column: string]: any }): Promise<any>;
+type Mutation = AddMutation | UpdateMutation | RemoveMutation
 
-//   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
-  
-//   removeRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
+interface AddMutation {
+  type: "add",
+  table: string,
+  primaryKey: any,
+  values: { [column: string]: any }
+}
 
-//   commit(): Promise<any>;
-// }
+interface UpdateMutation {
+  type: "update",
+  table: string,
+  primaryKey: any,
+  updates: { [column: string]: any }
+}
 
+interface RemoveMutation {
+  type: "remove",
+  table: string,
+  primaryKey: any
+}
