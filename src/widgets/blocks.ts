@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as uuid from 'uuid/v4'
+import {v4 as uuid} from 'uuid'
 import { Database } from '../database/Database'
 import { Schema, Expr, DataSource } from 'mwater-expressions'
 import { WidgetLibrary } from '../designer/widgetLibrary';

@@ -2,8 +2,7 @@ import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from
 import { Schema, Column, ExprEvaluator, ExprUtils, Expr } from "mwater-expressions";
 import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
 import * as _ from "lodash";
-import * as uuid from 'uuid/v4'
-
+import { v4 as uuid } from 'uuid'
 /**
  * Database which is backed by a real database, but can accept changes such as adds, updates or removes
  * without sending them to the real database until commit is called.

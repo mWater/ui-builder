@@ -1,5 +1,5 @@
 import * as React from "react"
-import * as uuid from 'uuid/v4'
+import {v4 as uuid} from 'uuid'
 import { WidgetDef } from "../widgets/widgets";
 import { Schema, DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
