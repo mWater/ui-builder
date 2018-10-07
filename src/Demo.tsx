@@ -9,9 +9,9 @@ import { ActionLibrary } from './widgets/ActionLibrary';
 import * as _ from 'lodash';
 
 import 'font-awesome/css/font-awesome.css'
+import * as ReactDOM from 'react-dom';
 
 const basicBlockFactory = new BlockFactory()
-
 
 const defaultWidgetLibrary : WidgetLibrary = {
   widgets: {}
@@ -24,7 +24,7 @@ const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { loc
 const actionLibrary = new ActionLibrary()
 
 @DragDropContext(HTML5Backend)
-export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[] }> {
+class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[] }> {
   constructor(props: object) {
     super(props)
 
@@ -71,3 +71,8 @@ export default class Demo extends React.Component<{}, { widgetLibrary: WidgetLib
     )
   }
 }
+
+ReactDOM.render(
+  <Demo />,
+  document.getElementById('root') as HTMLElement
+);

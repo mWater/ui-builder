@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "build/dist",
+    "outDir": "lib",
     "module": "esnext",
     "target": "es2017",
     "lib": ["es2017", "dom"],
     "sourceMap": true,
-    "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
@@ -19,13 +18,10 @@
     // "noUnusedLocals": true,
     "experimentalDecorators": true
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "webpack",
-    "jest",
-    "src/setupTests.ts"
+    "node_modules"        
   ]
 }
