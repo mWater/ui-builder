@@ -248,7 +248,6 @@ export default class VirtualDatabase implements Database {
     for (const tempPk of this.tempPrimaryKeys) {
       json = json.replace(new RegExp(escapeRegex(JSON.stringify(tempPk)), "g"), () => JSON.stringify(replaceWith(tempPk)))
     }
-    console.log(json)
     return JSON.parse(json)
   }
 
