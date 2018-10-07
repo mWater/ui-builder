@@ -16,6 +16,8 @@ import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import VirtualDatabase from "../database/VirtualDatabase";
 import { Database } from "../database/Database";
+import { DragDropContext } from "react-dnd";
+import HTML5Backend from 'react-dnd-html5-backend'
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -36,6 +38,7 @@ interface State {
 }
 
 /** Design mode for a single widget */
+@DragDropContext(HTML5Backend)
 export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
   constructor(props: WidgetDesignerProps) {
     super(props)
@@ -100,7 +103,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 
   renderPalette() {
-    return <BlockPalette createBlock={this.props.createBlock} schema={this.props.schema} dataSource={this.props.dataSource} />
+    return <BlockPalette key="palette" createBlock={this.props.createBlock} schema={this.props.schema} dataSource={this.props.dataSource} />
   }
 
   renderDesignBlock() {
@@ -195,7 +198,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         })
 
         return (
-          <div className="widget-designer-editor">
+          <div key="editor" className="widget-designer-editor">
             { validationError ? 
               <div className="text-danger"><i className="fa fa-exclamation-circle"/> {validationError}</div> 
             : null }
@@ -206,7 +209,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     }
 
     return (
-      <div className="widget-designer-editor">
+      <div key="editor" className="widget-designer-editor">
         <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} schema={this.props.schema} dataSource={this.props.dataSource}/>
       </div>
     )
@@ -240,7 +243,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     return [
       this.renderPalette(),
       (
-        <div className="widget-designer-block" onClick={this.handleUnselect}>
+        <div key="designer" className="widget-designer-block" onClick={this.handleUnselect}>
           {this.renderDesignBlock()}
         </div>
       ),
@@ -276,11 +279,11 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       />
 
     return [
-      (<div className="widget-designer-palette"/>),
-      (<div className="widget-designer-preview">
+      (<div key="palette" className="widget-designer-palette"/>),
+      (<div key="preview" className="widget-designer-preview">
         {pageElem}
       </div>),
-      (<div className="widget-designer-editor"/>)
+      (<div key="editor" className="widget-designer-editor"/>)
     ]
   }
 

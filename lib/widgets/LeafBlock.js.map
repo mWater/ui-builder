@@ -1,0 +1,1 @@
+{"version":3,"file":"LeafBlock.js","sourceRoot":"","sources":["../../src/widgets/LeafBlock.ts"],"names":[],"mappings":"AAAA,OAAO,EAA+B,KAAK,EAA2C,MAAM,UAAU,CAAC;AAEvG,+CAA+C;AAC/C,MAAM,CAAC,OAAO,gBAA8C,SAAQ,KAAQ;IAC1E,WAAW,KAAK,OAAO,EAAE,CAAA,CAAC,CAAC;IAE3B,eAAe,CAAC,MAA2C,IAAc,OAAO,IAAI,CAAC,QAAQ,CAAA,CAAC,CAAC;CAChG"}

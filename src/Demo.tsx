@@ -1,6 +1,4 @@
 import * as React from 'react';
-import HTML5Backend from 'react-dnd-html5-backend'
-import { DragDropContext } from 'react-dnd'
 import BlockFactory from './widgets/BlockFactory';
 import { Schema } from 'mwater-expressions';
 import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
@@ -23,7 +21,6 @@ const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { loc
 
 const actionLibrary = new ActionLibrary()
 
-@DragDropContext(HTML5Backend)
 class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[] }> {
   constructor(props: object) {
     super(props)

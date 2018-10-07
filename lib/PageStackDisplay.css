@@ -1,0 +1,11 @@
+.normal-page-header {
+  height: 35px;
+  border-bottom: solid 1px #CCC;
+  padding: 3px;
+  font-size: 20px;
+  color: #888;
+}
+
+.normal-page-contents {
+  padding: 5px;
+}

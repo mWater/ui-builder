@@ -71,11 +71,11 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
 
     return (
-      <li className={(index === this.state.activeTabIndex) ? "active" : ""}>
+      <li className={(index === this.state.activeTabIndex) ? "active" : ""} key={index}>
         <a onClick={this.handleSelectTab.bind(null, index)}>
           {widgetDef.name}
           &nbsp;
-          { (index === this.state.activeTabIndex) ? <a onClick={this.handleCloseTab.bind(null, index)}><i className="fa fa-remove text-muted"/></a> : null }
+          { (index === this.state.activeTabIndex) ? <i onClick={this.handleCloseTab.bind(null, index)} className="fa fa-remove text-muted"/> : null }
         </a>
       </li>
     )
@@ -108,7 +108,8 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
           {this.props.openTabs.map((tab, index) => this.renderTab(tab, index))}
           <li 
-            className={(this.state.activeTabIndex >= this.props.openTabs.length) ? "active" : ""}>
+            className={(this.state.activeTabIndex >= this.props.openTabs.length) ? "active" : ""}
+            key="new">
               <a onClick={this.handleSelectTab.bind(null, this.props.openTabs.length)}>
                 <i className="fa fa-plus"/>
               </a>

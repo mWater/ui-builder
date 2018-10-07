@@ -1,0 +1,26 @@
+.block-wrapper {
+  border: solid 1px transparent;
+  padding: 3px;
+  margin: 1px;
+  position: relative;
+}
+
+.block-wrapper:hover {
+  border: solid 1px #e8e8e8;
+}
+
+.block-wrapper.selected {
+  border: dashed 1px #38D;
+}
+
+.block-wrapper.validation-error {
+  border: dashed 1px #d80c0c;
+}
+
+.block-wrapper .delete-block {
+  position: absolute;
+  color: #38D;
+  top: -11px;
+  right: -6px;
+  cursor: pointer;
+}

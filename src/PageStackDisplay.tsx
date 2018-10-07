@@ -4,7 +4,6 @@ import { CreateBlock, RenderInstanceProps, Filter, BlockDef } from "./widgets/bl
 import { Schema, Expr } from "mwater-expressions";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
-import { LookupWidget } from "./widgets/widgets";
 import { ActionLibrary } from "./widgets/ActionLibrary";
 import { WidgetLibrary } from "./designer/widgetLibrary";
 
