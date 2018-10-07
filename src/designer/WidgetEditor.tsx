@@ -132,7 +132,7 @@ class ContextVarPreviewValue extends React.Component<{
   handleChange = (value: any) => {
     this.props.onWidgetDefChange(produce(this.props.widgetDef, (draft) => {
       draft.contextVarPreviewValues[this.props.contextVar.id] = value
-    }))
+    })) 
   }
 
   renderValue(value: any) {
