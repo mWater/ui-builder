@@ -8,6 +8,7 @@ import BlockFactory from "../widgets/BlockFactory";
 import { CreateBlock } from "../widgets/blocks";
 import * as _ from "lodash";
 import { ActionLibrary } from "../widgets/ActionLibrary";
+import { BlockPaletteEntry } from "./blockPaletteEntry";
 
 export interface WidgetLibrary {
   widgets: { [id: string]: WidgetDef }
@@ -21,6 +22,7 @@ interface Props {
   widgetLibrary: WidgetLibrary
   /** Ids of widgets in open tabs */
   openTabs: string[]
+  blockPaletteEntries: BlockPaletteEntry[]
   onOpenTabsChange(openTabs: string[]): void
   onWidgetLibraryChange(widgetLibrary: WidgetLibrary): void
 }
@@ -94,6 +96,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         dataSource={this.props.dataSource}
         actionLibrary={this.props.actionLibrary}
         widgetLibrary={this.props.widgetLibrary}
+        blockPaletteEntries={this.props.blockPaletteEntries}
         onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
       />
     }
@@ -128,6 +131,7 @@ class WidgetTab extends React.Component<{
     dataSource: DataSource
     actionLibrary: ActionLibrary
     widgetLibrary: WidgetLibrary
+    blockPaletteEntries: BlockPaletteEntry[]
     onWidgetDefChange(widgetDef: WidgetDef): void
   }> {
 
@@ -140,6 +144,7 @@ class WidgetTab extends React.Component<{
       actionLibrary={this.props.actionLibrary}
       widgetLibrary={this.props.widgetLibrary}
       onWidgetDefChange={this.props.onWidgetDefChange}
+      blockPaletteEntries={this.props.blockPaletteEntries}
       locale="en"
     />
   }

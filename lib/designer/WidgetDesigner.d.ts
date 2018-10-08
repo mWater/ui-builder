@@ -5,6 +5,7 @@ import "./WidgetDesigner.css";
 import { Schema, DataSource } from "mwater-expressions";
 import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
+import { BlockPaletteEntry } from "./blockPaletteEntry";
 interface WidgetDesignerProps {
     widgetDef: WidgetDef;
     createBlock: CreateBlock;
@@ -13,6 +14,7 @@ interface WidgetDesignerProps {
     actionLibrary: ActionLibrary;
     locale: string;
     widgetLibrary: WidgetLibrary;
+    blockPaletteEntries: BlockPaletteEntry[];
     onWidgetDefChange(widgetDef: WidgetDef): void;
 }
 declare enum Mode {

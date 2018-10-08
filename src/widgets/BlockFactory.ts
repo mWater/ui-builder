@@ -16,6 +16,16 @@ import { DropdownBlock, DropdownBlockDef } from './blocks/controls/dropdown';
 import { DropdownFilterBlock, DropdownFilterBlockDef } from './blocks/dropdownFilter';
 
 export default class BlockFactory {
+  customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
+
+  constructor() {
+    this.customBlocks = {}
+  }
+
+  registerCustomBlock(type: string, factory: (blockDef: BlockDef) => Block<BlockDef>) {
+    this.customBlocks[type] = factory
+  }
+
   createBlock = (blockDef: BlockDef): Block<BlockDef> => {
     switch (blockDef.type) {
       case "horizontal":
@@ -47,6 +57,12 @@ export default class BlockFactory {
       case "saveCancel":
         return new SaveCancelBlock(blockDef as SaveCancelBlockDef, this.createBlock)
     }
+
+    // Use custom blocks
+    if (this.customBlocks[blockDef.type]) {
+      return this.customBlocks[blockDef.type](blockDef)
+    }
+
     throw new Error(`Type ${blockDef.type} not found`)
   }
 }

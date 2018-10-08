@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import './Demo.css'
 import 'font-awesome/css/font-awesome.css'
 import * as ReactDOM from 'react-dom';
+import { defaultBlockPaletteEntries } from './designer/blockPaletteEntry';
 
 const basicBlockFactory = new BlockFactory()
 
@@ -64,7 +65,9 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
           actionLibrary={actionLibrary}
           schema={this.state.schema}
           dataSource={dataSource}
-          onWidgetLibraryChange={this.handleWidgetLibraryChange} />
+          onWidgetLibraryChange={this.handleWidgetLibraryChange} 
+          blockPaletteEntries={defaultBlockPaletteEntries}
+          />
       </div>
     )
   }

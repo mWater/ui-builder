@@ -1,10 +1,10 @@
 import * as React from "react";
-import { BlockDef, CreateBlock } from "../widgets/blocks";
+import { CreateBlock } from "../widgets/blocks";
 import { ConnectDragSource } from "react-dnd";
 import { Schema, DataSource } from "mwater-expressions";
+import { BlockPaletteEntry } from "./blockPaletteEntry";
 interface Props {
-    title?: string;
-    blockDef: BlockDef;
+    entry: BlockPaletteEntry;
     createBlock: CreateBlock;
     schema: Schema;
     dataSource: DataSource;

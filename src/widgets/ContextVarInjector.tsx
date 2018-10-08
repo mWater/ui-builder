@@ -2,7 +2,7 @@ import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter } from "
 import * as React from "react";
 import { Expr, ExprUtils, Schema } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
-import * as canonical from 'canonical-json'
+import canonical from 'canonical-json'
 import * as _ from "lodash";
 
 interface Props {

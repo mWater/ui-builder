@@ -18,6 +18,7 @@ import VirtualDatabase from "../database/VirtualDatabase";
 import { Database } from "../database/Database";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
+import { BlockPaletteEntry } from "./blockPaletteEntry";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -27,6 +28,7 @@ interface WidgetDesignerProps {
   actionLibrary: ActionLibrary
   locale: string
   widgetLibrary: WidgetLibrary
+  blockPaletteEntries: BlockPaletteEntry[]
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
@@ -103,7 +105,13 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 
   renderPalette() {
-    return <BlockPalette key="palette" createBlock={this.props.createBlock} schema={this.props.schema} dataSource={this.props.dataSource} />
+    return <BlockPalette 
+      key="palette" 
+      createBlock={this.props.createBlock} 
+      schema={this.props.schema} 
+      dataSource={this.props.dataSource} 
+      entries={this.props.blockPaletteEntries}
+      />
   }
 
   renderDesignBlock() {

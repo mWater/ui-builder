@@ -4,10 +4,10 @@ import { ConnectDragSource, DragSource } from "react-dnd"
 import { Schema, DataSource } from "mwater-expressions"
 import {v4 as uuid} from 'uuid'
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
+import { BlockPaletteEntry } from "./blockPaletteEntry";
 
 interface Props {
-  title?: string
-  blockDef: BlockDef
+  entry: BlockPaletteEntry
   createBlock: CreateBlock
   schema: Schema
   dataSource: DataSource
@@ -17,7 +17,7 @@ interface Props {
 const blockSourceSpec = {
   beginDrag(props: Props) {
     // Create deep clone
-    const block = props.createBlock(props.blockDef)
+    const block = props.createBlock(props.entry.blockDef)
     return {
       blockDef: block.process(props.createBlock, (b) => Object.assign({}, b, { id: uuid() }))
     }
@@ -29,7 +29,11 @@ const blockSourceSpec = {
 }))
 export default class BlockPaletteItem extends React.Component<Props> {
   renderContents() {
-    const block = this.props.createBlock(this.props.blockDef)
+    if (this.props.entry.elem) {
+      return this.props.entry.elem
+    }
+
+    const block = this.props.createBlock(this.props.entry.blockDef)
 
     return block.renderDesign({
       selectedId: null,
@@ -56,7 +60,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
   render() {
     return (
       <div style={{padding: 5, position: "relative", backgroundColor: "white", border: "solid 1px #AAA", margin: 5 }}>
-        <div style={{ position: "relative", textAlign: "center", top: -5, fontSize: 10, marginBottom: -5 }}>{this.props.title}</div>
+        <div style={{ position: "relative", textAlign: "center", top: -5, fontSize: 10, marginBottom: -5 }}>{this.props.entry.title}</div>
         {this.renderContents()}
         {this.props.connectDragSource!(<div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}/>)}
       </div>

@@ -3,6 +3,7 @@ import { WidgetDef } from "../widgets/widgets";
 import { Schema, DataSource } from "mwater-expressions";
 import BlockFactory from "../widgets/BlockFactory";
 import { ActionLibrary } from "../widgets/ActionLibrary";
+import { BlockPaletteEntry } from "./blockPaletteEntry";
 export interface WidgetLibrary {
     widgets: {
         [id: string]: WidgetDef;
@@ -16,6 +17,7 @@ interface Props {
     widgetLibrary: WidgetLibrary;
     /** Ids of widgets in open tabs */
     openTabs: string[];
+    blockPaletteEntries: BlockPaletteEntry[];
     onOpenTabsChange(openTabs: string[]): void;
     onWidgetLibraryChange(widgetLibrary: WidgetLibrary): void;
 }
