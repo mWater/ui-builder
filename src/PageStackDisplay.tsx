@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Page, PageStack } from "./PageStack";
 import { CreateBlock, RenderInstanceProps, Filter, BlockDef } from "./widgets/blocks";
-import { Schema, Expr } from "mwater-expressions";
+import { Schema, Expr, DataSource } from "mwater-expressions";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { ActionLibrary } from "./widgets/ActionLibrary";
@@ -14,6 +14,7 @@ interface Props {
   createBlock: CreateBlock
   locale: string
   schema: Schema
+  dataSource: DataSource
   actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary
 }
@@ -78,6 +79,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       locale: this.props.locale,
       database: page.database,
       schema: this.props.schema,
+      dataSource: this.props.dataSource,
       actionLibrary: this.props.actionLibrary,
       widgetLibrary: this.props.widgetLibrary,
       pageStack: this,

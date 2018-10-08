@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Page, PageStack } from "./PageStack";
 import { CreateBlock, RenderInstanceProps, BlockDef } from "./widgets/blocks";
-import { Schema } from "mwater-expressions";
+import { Schema, DataSource } from "mwater-expressions";
 import { ActionLibrary } from "./widgets/ActionLibrary";
 import { WidgetLibrary } from "./designer/widgetLibrary";
 import './PageStackDisplay.css';
@@ -10,6 +10,7 @@ interface Props {
     createBlock: CreateBlock;
     locale: string;
     schema: Schema;
+    dataSource: DataSource;
     actionLibrary: ActionLibrary;
     widgetLibrary: WidgetLibrary;
 }

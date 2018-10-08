@@ -8,7 +8,7 @@ import simpleSchema from "../../../__fixtures__/schema";
 import BlockFactory from '../../BlockFactory';
 import mockDatabase from '../../../__fixtures__/mockDatabase';
 import { QueryOptions, OrderByDir } from '../../../database/Database';
-import { Expr } from 'mwater-expressions';
+import { Expr, DataSource } from 'mwater-expressions';
 import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';
 
@@ -56,6 +56,7 @@ beforeEach(() => {
    locale: "en",
    onSelectContextVar: jest.fn(),
    schema: schema,
+   dataSource: {} as DataSource,
    renderChildBlock: jest.fn(),
    widgetLibrary: { widgets: {} }
  }

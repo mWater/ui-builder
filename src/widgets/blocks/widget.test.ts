@@ -2,7 +2,7 @@ import { WidgetBlock, WidgetBlockDef } from './widget'
 import { ContextVar, RenderInstanceProps, BlockDef, Filter } from '../blocks';
 import { WidgetDef } from '../widgets';
 import { Database } from '../../database/Database';
-import { Expr, Schema } from 'mwater-expressions';
+import { Expr, Schema, DataSource } from 'mwater-expressions';
 import { ActionLibrary } from '../ActionLibrary';
 import { PageStack } from '../../PageStack';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
@@ -75,6 +75,7 @@ describe("renderInstance", () => {
       locale: "en",
       database: {} as Database,
       schema: {} as Schema,
+      dataSource: {} as DataSource,
       contextVars: contextVars, 
       actionLibrary: {} as ActionLibrary,
       widgetLibrary: { widgets: { w1: widgetDef }},

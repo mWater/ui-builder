@@ -3,7 +3,7 @@ import { shallow, mount } from 'enzyme'
 import { RenderInstanceProps, Filter } from "./blocks";
 import { Database, QueryOptions } from "../database/Database";
 import * as React from "react";
-import { Expr, Schema } from "mwater-expressions";
+import { Expr, Schema, DataSource } from "mwater-expressions";
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
 import { ActionLibrary } from "./ActionLibrary";
@@ -23,6 +23,7 @@ beforeEach(() => {
     locale: "en",
     database: database,
     schema: {} as Schema,
+    dataSource: {} as DataSource,
     contextVars: [],
     actionLibrary: {} as ActionLibrary,
     widgetLibrary: { widgets: {} },

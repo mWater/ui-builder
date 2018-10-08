@@ -8,7 +8,12 @@ interface Props {
     dataSource: DataSource;
     entries: BlockPaletteEntry[];
 }
-export default class BlockPalette extends React.Component<Props> {
+interface State {
+    searchText: string;
+}
+export default class BlockPalette extends React.Component<Props, State> {
+    constructor(props: Props);
+    handleSearchChange: (ev: any) => void;
     render(): JSX.Element;
 }
 export {};

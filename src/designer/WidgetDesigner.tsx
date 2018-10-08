@@ -281,6 +281,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       initialPage={page} 
       locale="en" 
       schema={this.props.schema} 
+      dataSource={this.props.dataSource}
       createBlock={this.props.createBlock} 
       actionLibrary={this.props.actionLibrary} 
       widgetLibrary={this.props.widgetLibrary}

@@ -7,3 +7,4 @@ export { DataSourceDatabase } from './database/DataSourceDatabase';
 export { defaultBlockPaletteEntries } from './designer/blockPaletteEntry';
 export { Block, BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps } from './widgets/blocks';
 export { default as LeafBlock } from './widgets/LeafBlock';
+export * from './widgets/propertyEditors';

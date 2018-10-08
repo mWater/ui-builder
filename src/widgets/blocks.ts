@@ -52,6 +52,7 @@ export interface RenderInstanceProps {
   locale: string,
   database: Database,
   schema: Schema,
+  dataSource: DataSource
   contextVars: ContextVar[]
   actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary
