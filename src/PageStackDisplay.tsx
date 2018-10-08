@@ -142,9 +142,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
         )
     }
   }
-
-
-  
+ 
   render() {
     return this.state.pages.map((page, index) => this.renderPage(page, index))
   }
@@ -154,12 +152,12 @@ class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void
   render() {
     return (
       <div className="normal-page">
-        <div className="normal-page-header">
+        <div key="header" className="normal-page-header">
           { !this.props.isFirst ?
             <i className="fa fa-arrow-left" onClick={this.props.onClose} />
           : null }
         </div>
-        <div className="normal-page-contents">
+        <div key="contents" className="normal-page-contents">
           {this.props.children}
         </div>
       </div>

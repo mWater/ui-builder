@@ -1,9 +1,10 @@
 .normal-page-header {
-  height: 35px;
-  border-bottom: solid 1px #CCC;
+  /* height: 35px; */
+  /* border-bottom: solid 1px #CCC; */
   padding: 3px;
   font-size: 20px;
-  color: #888;
+  padding-left: 8px;
+  color: #337AB7;
 }
 
 .normal-page-contents {
