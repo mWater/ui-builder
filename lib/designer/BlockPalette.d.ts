@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CreateBlock } from "../widgets/blocks";
 import { Schema, DataSource } from "mwater-expressions";
-import { BlockPaletteEntry } from "./blockPaletteEntry";
+import { BlockPaletteEntry } from "./blockPaletteEntries";
 interface Props {
     createBlock: CreateBlock;
     schema: Schema;

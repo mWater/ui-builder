@@ -3,6 +3,9 @@ import { Schema, Column, ExprEvaluator, ExprUtils, Expr } from "mwater-expressio
 import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
 import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
+import LRU, { Cache } from 'lru-cache'
+import canonical from 'canonical-json'
+
 /**
  * Database which is backed by a real database, but can accept changes such as adds, updates or removes
  * without sending them to the real database until commit is called.
@@ -22,6 +25,8 @@ export default class VirtualDatabase implements Database {
   /** True when database is destroyed by commit or rollback */
   destroyed: boolean
 
+  cache: Cache<string, Row[]>
+
   constructor(database: Database, schema: Schema, locale: string) {
     this.database = database
     this.schema = schema
@@ -31,6 +36,7 @@ export default class VirtualDatabase implements Database {
     this.changeListeners = []
     this.tempPrimaryKeys = []
     this.destroyed = false
+    this.cache = new LRU<string, Row[]>()
 
     database.addChangeListener(this.handleChange)
   }
@@ -251,7 +257,14 @@ export default class VirtualDatabase implements Database {
     queryOptions = this.replaceTempPrimaryKeys(queryOptions, () => null)
 
     // Perform query
-    let rows = await this.database.query(queryOptions)
+    let rows: Row[] | undefined
+    
+    const queryOptionsKey = canonical(queryOptions)
+    rows = this.cache.get(queryOptionsKey)
+    if (!rows) {
+      rows = await this.database.query(queryOptions)
+      this.cache.set(queryOptionsKey, rows)
+    }
 
     // Apply mutations
     rows = await this.mutateRows(rows, from, where)

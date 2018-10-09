@@ -4,7 +4,7 @@ import { ConnectDragSource, DragSource } from "react-dnd"
 import { Schema, DataSource } from "mwater-expressions"
 import {v4 as uuid} from 'uuid'
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
-import { BlockPaletteEntry } from "./blockPaletteEntry";
+import { BlockPaletteEntry } from "./blockPaletteEntries";
 
 interface Props {
   entry: BlockPaletteEntry

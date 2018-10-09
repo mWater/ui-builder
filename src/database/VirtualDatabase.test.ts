@@ -236,6 +236,17 @@ describe("select, order, limit", () => {
     ])
   })
 
+  test("caches backend queries", async () => {
+    const qopts: QueryOptions = {
+      select: { x: { type: "field", table: "t1", column: "text" }},
+      from: "t1"
+    }
+
+    await performQuery({ t1: [{ id: 1, text: "abc" }] }, qopts)
+    // Should not crash as uses cached query
+    await performQuery(null, qopts)
+  })
+
   describe("transactions", () => {
     const numberField: Expr = { type: "field", table: "t1", column: "number" }
     const qopts: QueryOptions = {

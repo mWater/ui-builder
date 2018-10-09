@@ -1,5 +1,6 @@
 import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
 import { Schema, Column } from "mwater-expressions";
+import { Cache } from 'lru-cache';
 /**
  * Database which is backed by a real database, but can accept changes such as adds, updates or removes
  * without sending them to the real database until commit is called.
@@ -16,6 +17,7 @@ export default class VirtualDatabase implements Database {
     tempPrimaryKeys: string[];
     /** True when database is destroyed by commit or rollback */
     destroyed: boolean;
+    cache: Cache<string, Row[]>;
     constructor(database: Database, schema: Schema, locale: string);
     query(options: QueryOptions): Promise<Row[]>;
     /** Adds a listener which is called with each change to the database */

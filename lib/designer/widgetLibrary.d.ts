@@ -3,7 +3,7 @@ import { WidgetDef } from "../widgets/widgets";
 import { Schema, DataSource } from "mwater-expressions";
 import BlockFactory from "../widgets/BlockFactory";
 import { ActionLibrary } from "../widgets/ActionLibrary";
-import { BlockPaletteEntry } from "./blockPaletteEntry";
+import { BlockPaletteEntry } from "./blockPaletteEntries";
 export interface WidgetLibrary {
     widgets: {
         [id: string]: WidgetDef;

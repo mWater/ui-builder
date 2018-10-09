@@ -1,9 +1,9 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import { LocalizedString, localize } from '../localization';
-import { LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
+import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '../propertyEditors';
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -33,34 +33,51 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
       }), addedBlockDef.id)
     }
 
-    // const labelText = localize(this.blockDef.label, props.locale)
+    const saveLabelText = localize(this.blockDef.saveLabel, props.locale)
+    const cancelLabelText = localize(this.blockDef.cancelLabel, props.locale)
 
     return (
       <div>
         { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
         <div className="save-cancel-footer">
-          <button type="button" className="btn btn-primary">Save</button>
+          <button type="button" className="btn btn-primary">{saveLabelText}</button>
           &nbsp;
-          <button type="button" className="btn btn-default">Cancel</button>
+          <button type="button" className="btn btn-default">{cancelLabelText}</button>
         </div>
       </div>
     )
   }
 
   renderInstance(props: RenderInstanceProps) {
+    const saveLabelText = localize(this.blockDef.saveLabel, props.locale)
+    const cancelLabelText = localize(this.blockDef.cancelLabel, props.locale)
+
     return (
       <div>
         { props.renderChildBlock(props, this.blockDef.child) }
         <div className="save-cancel-footer">
-          <button type="button" className="btn btn-primary">Save</button>
+          <button type="button" className="btn btn-primary">{saveLabelText}</button>
           &nbsp;
-          <button type="button" className="btn btn-default">Cancel</button>
+          <button type="button" className="btn btn-default">{cancelLabelText}</button>
         </div>
       </div>
     )
   }
   
   renderEditor(props: RenderEditorProps) {
-    return null
+    return (
+      <div>
+        <LabeledProperty label="Save Label">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="saveLabel">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
+        <LabeledProperty label="Cancel Label">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="cancelLabel">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
+      </div>
+    )
   }
 }

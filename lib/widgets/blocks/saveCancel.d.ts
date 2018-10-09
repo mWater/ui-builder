@@ -14,5 +14,5 @@ export declare class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
-    renderEditor(props: RenderEditorProps): null;
+    renderEditor(props: RenderEditorProps): JSX.Element;
 }

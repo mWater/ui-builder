@@ -18,7 +18,7 @@ import VirtualDatabase from "../database/VirtualDatabase";
 import { Database } from "../database/Database";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
-import { BlockPaletteEntry } from "./blockPaletteEntry";
+import { BlockPaletteEntry } from "./blockPaletteEntries";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef

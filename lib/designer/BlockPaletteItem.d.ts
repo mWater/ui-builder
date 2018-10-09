@@ -2,7 +2,7 @@ import * as React from "react";
 import { CreateBlock } from "../widgets/blocks";
 import { ConnectDragSource } from "react-dnd";
 import { Schema, DataSource } from "mwater-expressions";
-import { BlockPaletteEntry } from "./blockPaletteEntry";
+import { BlockPaletteEntry } from "./blockPaletteEntries";
 interface Props {
     entry: BlockPaletteEntry;
     createBlock: CreateBlock;

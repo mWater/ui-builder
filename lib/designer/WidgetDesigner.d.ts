@@ -5,7 +5,7 @@ import "./WidgetDesigner.css";
 import { Schema, DataSource } from "mwater-expressions";
 import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
-import { BlockPaletteEntry } from "./blockPaletteEntry";
+import { BlockPaletteEntry } from "./blockPaletteEntries";
 interface WidgetDesignerProps {
     widgetDef: WidgetDef;
     createBlock: CreateBlock;
