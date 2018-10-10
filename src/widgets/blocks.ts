@@ -58,8 +58,8 @@ export interface RenderInstanceProps {
   widgetLibrary: WidgetLibrary
   pageStack: PageStack
 
-  /** Gets the value of a context variable */
-  getContextVarValue(contextVarId: string): any
+  /** Values of context variables */
+  contextVarValues: { [contextVarId: string]: any }
 
   /**
    * Gets the value of an expression based off of a context variable

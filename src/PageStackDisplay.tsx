@@ -84,7 +84,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       widgetLibrary: this.props.widgetLibrary,
       pageStack: this,
       contextVars: [],
-      getContextVarValue: (contextVarId: string) => { throw new Error("Non-existant context variable") },
+      contextVarValues: {},
       getContextVarExprValue: (contextVarId: string, expr: Expr) => { throw new Error("Non-existant context variable") },
       onSelectContextVar: (contextVarId: string, primaryKey: any) => { throw new Error("Non-existant context variable") },
       setFilter: (contextVarId: string, filter: Filter) => { throw new Error("Non-existant context variable") },

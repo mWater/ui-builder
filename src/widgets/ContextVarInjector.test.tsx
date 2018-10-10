@@ -28,7 +28,7 @@ beforeEach(() => {
     actionLibrary: {} as ActionLibrary,
     widgetLibrary: { widgets: {} },
     pageStack: {} as PageStack,
-    getContextVarValue: jest.fn(),
+    contextVarValues: {},
     getContextVarExprValue:  jest.fn(),
     onSelectContextVar: jest.fn(),
     setFilter: jest.fn(),

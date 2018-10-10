@@ -50,7 +50,7 @@ beforeEach(() => {
    actionLibrary: {} as ActionLibrary,
    pageStack: {} as PageStack,
    // Simple filter
-   getContextVarValue: () => ({ type: "field", table: "t1", column: "boolean" }),
+   contextVarValues: { cv1: { type: "field", table: "t1", column: "boolean" } },
    getFilters: () => [],
    setFilter: jest.fn(),
    locale: "en",
@@ -129,7 +129,7 @@ test("injects context variables", () => {
   inst.setState({ rows: [{ id: "r1", e0: "abc" }] })
   const rowRips = (inst.instance() as QueryTableBlockInstance).createRowRenderInstanceProps(0) as RenderInstanceProps
 
-  expect(rowRips.getContextVarValue("123_row")).toBe("r1")
+  expect(rowRips.contextVarValues["123_row"]).toBe("r1")
 
   expect(rowRips.getContextVarExprValue("123_row", exprText)).toBe("abc")
 })

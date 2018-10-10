@@ -62,7 +62,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     // Perform mappings TODO test
     for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
-      contextVarValues[cvid] = options.getContextVarValue(this.actionDef.contextVarValues[cvid].contextVarId)
+      contextVarValues[cvid] = options.contextVarValues[this.actionDef.contextVarValues[cvid].contextVarId]
     }
 
     options.pageStack.openPage({

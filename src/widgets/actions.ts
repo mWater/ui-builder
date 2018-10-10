@@ -37,8 +37,8 @@ export interface PerformActionOptions {
   /** Context variables for the action */
   contextVars: ContextVar[]
 
-  /** Gets the value of a context variable */
-  getContextVarValue(contextVarId: string): any
+  /** Values of context variables */
+  contextVarValues: { [contextVarId: string]: any }
 }
 
 export interface ValidateActionOptions {

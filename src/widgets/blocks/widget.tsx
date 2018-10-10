@@ -93,6 +93,19 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+    // Map context var values
+    const mappedContextVarValues = {} as object
+
+    for (const innerContextVarId of Object.keys(this.blockDef.contextVarMap)) {
+      const outerContextVarId = this.blockDef.contextVarMap[innerContextVarId]
+      if (outerContextVarId) {
+        mappedContextVarValues[innerContextVarId] = props.contextVarValues[outerContextVarId]
+      }
+      else {
+        mappedContextVarValues[innerContextVarId] = null
+      }
+    }
+
     // Find the widget
     const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
@@ -101,16 +114,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       const innerProps : RenderInstanceProps = {
         ...props,
         contextVars: widgetDef.contextVars,
-        getContextVarValue: (contextVarId: string) => {
-          // Lookup outer id
-          const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
-          if (outerContextVarId) {
-            return props.getContextVarValue(outerContextVarId)
-          }
-          else {
-            return
-          }
-        }, 
+        contextVarValues: { ...props.contextVarValues, ...mappedContextVarValues }, 
         getContextVarExprValue: (contextVarId: string, expr: Expr) => {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]

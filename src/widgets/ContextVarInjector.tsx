@@ -117,7 +117,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const variables = createExprVariables(allContextVars)
     const variableValues: { [variableId: string]: any } = {}
     for (const contextVar of this.props.renderInstanceProps.contextVars) {
-      variableValues[contextVar.id] = this.props.renderInstanceProps.getContextVarValue(contextVar.id)
+      variableValues[contextVar.id] = this.props.renderInstanceProps.contextVarValues[contextVar.id]
     }
 
     // Query database if row 
@@ -191,14 +191,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const innerProps: RenderInstanceProps = {
       ...outer,
       contextVars: outer.contextVars.concat(this.props.contextVar),
-      getContextVarValue: (contextVarId) => {
-        if (contextVarId === this.props.contextVar.id) {
-          return this.props.value
-        }
-        else {
-          return outer.getContextVarValue(contextVarId)
-        }
-      },
+      contextVarValues: { ...outer.contextVarValues, [this.props.contextVar.id]: this.props.value },
       getContextVarExprValue: (contextVarId, expr) => {
         if (contextVarId === this.props.contextVar.id) {
           return this.state.exprValues[canonical(expr)]
