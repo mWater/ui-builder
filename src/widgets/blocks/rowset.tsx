@@ -5,11 +5,11 @@ import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInst
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from 'src';
 import Select from 'react-select/lib/Select';
 import { localize } from '../localization';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
+import { PropertyEditor, LabeledProperty } from '../propertyEditors';
 
 /** Block which creates a new rowset context variable */
 export interface RowsetBlockDef extends BlockDef {

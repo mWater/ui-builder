@@ -2,7 +2,7 @@
   "name": "ui-builder",
   "version": "0.1.0",
   "private": true,
-  "main": "lib/index.js",
+  "main": "lib/library.js",
   "dependencies": {
     "bootstrap": "^3.3.7",
     "canonical-json": "0.0.4",
@@ -19,7 +19,7 @@
     "react-dom": "^16.5.2",
     "react-library": "github:mWater/react-library#react16",
     "react-scripts-ts": "^2.17.0",
-    "react-select": "^2.1.0",
+    "react-select": "github:mWater/react-select#fix_2682_built",
     "src": "^1.1.2",
     "uuid": "^3.3.2"
   },
