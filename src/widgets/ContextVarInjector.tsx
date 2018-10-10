@@ -1,4 +1,4 @@
-import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter } from "./blocks";
+import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter, createExprVariables } from "./blocks";
 import * as React from "react";
 import { Expr, ExprUtils, Schema } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
@@ -110,6 +110,16 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   async performQueries() {
+    // Get all context vars including self
+    const allContextVars = this.props.renderInstanceProps.contextVars.concat([this.props.contextVar])
+
+    // Create variables needed by expressions
+    const variables = createExprVariables(allContextVars)
+    const variableValues: { [variableId: string]: any } = {}
+    for (const contextVar of this.props.renderInstanceProps.contextVars) {
+      variableValues[contextVar.id] = this.props.renderInstanceProps.getContextVarValue(contextVar.id)
+    }
+
     // Query database if row 
     if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       // Special case of null row value
@@ -172,8 +182,9 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
     this.setState({ refreshing: false, loading: false })
   }
-  
-  render() {
+
+  /** Create props needed by inner component */
+  createInnerProps(): RenderInstanceProps {
     const outer = this.props.renderInstanceProps
 
     // Create inner props
@@ -216,6 +227,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         }
       },
     }
-    return this.props.children(innerProps, this.state.loading, this.state.refreshing)
+
+    return innerProps
+  }
+  
+  render() {
+    return this.props.children(this.createInnerProps(), this.state.loading, this.state.refreshing)
   }
 }

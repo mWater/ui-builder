@@ -286,3 +286,5 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
     return { id: cv.id, type: (cv.type as any) as LiteralType, name: { _base: "en", en: cv.name } }
   })
 }
+
+/** Create variable values */

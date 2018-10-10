@@ -1,12 +1,14 @@
-import { JsonQL, Schema, ExprUtils, ExprCompiler, Expr, Row } from "mwater-expressions";
+import { JsonQL, Schema, ExprUtils, ExprCompiler, Expr, Row, Variable } from "mwater-expressions";
 import { QueryOptions } from "./Database";
 import * as _ from "lodash";
 
 export class QueryCompiler {
   schema: Schema
+  variables: Variable[]
 
-  constructor(schema: Schema) {
+  constructor(schema: Schema, variables: Variable[]) {
     this.schema = schema
+    this.variables = variables
   }
   
   /** Compiles a query to JsonQL and also returns a function to map the returned
@@ -14,8 +16,8 @@ export class QueryCompiler {
    * that queries may have, so we normalize to c0, c1, etc. in the query
    */
   compileQuery(options: QueryOptions): { jsonql: JsonQL, rowMapper: (row: Row) => Row } {
-    const exprUtils = new ExprUtils(this.schema)
-    const exprCompiler = new ExprCompiler(this.schema)
+    const exprUtils = new ExprUtils(this.schema, this.variables)
+    const exprCompiler = new ExprCompiler(this.schema, this.variables)
 
     // Create shell of query
     const query: JsonQL = {
