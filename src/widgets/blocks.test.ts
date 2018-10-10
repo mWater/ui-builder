@@ -82,3 +82,17 @@ test("getBlockTree", () => {
   
   expect(blocks.getBlockTree(blockDef, createBlock, []).map(b => b.blockDef.id)).toEqual(["a1", "b1", "c1"])
 })
+
+test("createExprVariables", () => {
+  expect(blocks.createExprVariables([{ id: "cv1", type: "row", name: "Cv1", table: "t1" }])).toEqual([
+    { id: "cv1", type: "id", name: { _base: "en", en: "Cv1" }, idTable: "t1" }
+  ])
+
+  expect(blocks.createExprVariables([{ id: "cv1", type: "text", name: "Cv1" }])).toEqual([
+    { id: "cv1", type: "text", name: { _base: "en", en: "Cv1" } }
+  ])
+
+  expect(blocks.createExprVariables([{ id: "cv1", type: "rowset", name: "Cv1", table: "t1" }])).toEqual([
+    { id: "cv1", type: "boolean", name: { _base: "en", en: "Cv1" }, table: "t1" }
+  ])
+})

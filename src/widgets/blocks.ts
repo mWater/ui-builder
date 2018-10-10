@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {v4 as uuid} from 'uuid'
 import { Database } from '../database/Database'
-import { Schema, Expr, DataSource } from 'mwater-expressions'
+import { Schema, Expr, DataSource, Variable, LiteralType } from 'mwater-expressions'
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
@@ -272,4 +272,17 @@ export function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, c
   }
 
   return list
+}
+
+/** Create the variables as needed by mwater-expressions */
+export function createExprVariables(contextVar: ContextVar[]): Variable[] {
+  return contextVar.map(cv => {
+    switch (cv.type) {
+      case "row":
+        return { id: cv.id, type: "id" as LiteralType, name: { _base: "en", en: cv.name }, idTable: cv.table }
+      case "rowset":
+        return { id: cv.id, type: "boolean" as LiteralType, name: { _base: "en", en: cv.name }, table: cv.table }
+    }
+    return { id: cv.id, type: (cv.type as any) as LiteralType, name: { _base: "en", en: cv.name } }
+  })
 }

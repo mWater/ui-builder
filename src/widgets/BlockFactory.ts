@@ -14,6 +14,7 @@ import { TextboxBlock, TextboxBlockDef } from './blocks/controls/textbox';
 import { SaveCancelBlock, SaveCancelBlockDef } from './blocks/saveCancel';
 import { DropdownBlock, DropdownBlockDef } from './blocks/controls/dropdown';
 import { DropdownFilterBlock, DropdownFilterBlockDef } from './blocks/dropdownFilter';
+import { RowsetBlock, RowsetBlockDef } from './blocks/rowset';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -56,6 +57,8 @@ export default class BlockFactory {
         return new ButtonBlock(blockDef as ButtonBlockDef)
       case "saveCancel":
         return new SaveCancelBlock(blockDef as SaveCancelBlockDef, this.createBlock)
+      case "rowset":
+        return new RowsetBlock(blockDef as RowsetBlockDef, this.createBlock)
     }
 
     // Use custom blocks

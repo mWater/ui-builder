@@ -21,6 +21,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "collapsible", label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" }, content: null },
   },
   {
+    title: "Rowset",
+    blockDef: { id: "", type: "rowset", content: null, filter: null },
+  },
+  {
     title: "TextBox Control",
     blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null },
   },
