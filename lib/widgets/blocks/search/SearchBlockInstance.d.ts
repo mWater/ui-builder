@@ -1,4 +1,3 @@
-/// <reference path="../../../../src/mwater-expressions.d.ts" />
 import * as React from "react";
 import { SearchBlockDef } from "./search";
 import { RenderInstanceProps } from "../../blocks";
@@ -13,7 +12,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     constructor(props: Props);
     createFilter(searchText: string): {
         id: string;
-        expr: 'mwater-expressions'.OpExpr;
+        expr: import("mwater-expressions").OpExpr;
     } | {
         id: string;
         expr: null;

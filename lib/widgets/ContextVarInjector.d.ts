@@ -25,7 +25,7 @@ interface State {
  * Holds state of the filters that are applied to rowset-type context vars
  * Computes values of expressions for row and rowset types
  */
-export default class ContextVarsInjector extends React.Component<Props, State> {
+export default class ContextVarInjector extends React.Component<Props, State> {
     constructor(props: Props);
     componentDidMount(): void;
     componentDidUpdate(prevProps: Props, prevState: State): void;

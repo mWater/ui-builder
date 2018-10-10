@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Database } from '../database/Database';
-import { Schema, Expr, DataSource } from 'mwater-expressions';
+import { Schema, Expr, DataSource, Variable } from 'mwater-expressions';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
@@ -147,3 +147,5 @@ export declare function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: Blo
 export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[], blockId: string): ChildBlock[] | null;
 /** Get the entire tree of blocks from a root, including context variables for each */
 export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[];
+/** Create the variables as needed by mwater-expressions */
+export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
