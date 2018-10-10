@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, Filter } from '../blocks'
-import { Expr, ExprValidator, Schema, ExprUtils, EnumValue } from 'mwater-expressions';
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, Filter, ContextVar, createExprVariables } from '../blocks'
+import { Expr, ExprValidator, Schema, ExprUtils, EnumValue, Variable } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { LocalizedString, localize } from '../localization';
@@ -45,7 +45,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   }
 
   renderDesign(props: RenderDesignProps) {
-    return this.renderControl(props.schema, props.locale, null, () => { return })
+    return this.renderControl({ schema: props.schema, locale: props.locale, contextVars: props.contextVars, value: null, onChange: () => { return }})
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
@@ -63,23 +63,29 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       props.setFilter(this.blockDef.rowsetContextVarId!, newFilter)
     }
 
-    return this.renderControl(props.schema, props.locale, value, handleChange)
+    return this.renderControl({ schema: props.schema, locale: props.locale, contextVars: props.contextVars, value: value, onChange: handleChange})
   }
 
-  renderControl(schema: Schema, locale: string, value: any, onChange: (value: any) => void) {
-    const enumValues = this.blockDef.filterExpr ? new ExprUtils(schema).getExprEnumValues(this.blockDef.filterExpr) : null
+  renderControl(options: {
+    schema: Schema, 
+    locale: string, 
+    contextVars: ContextVar[],
+    value: any, 
+    onChange: (value: any) => void
+  }) {
+    const enumValues = this.blockDef.filterExpr ? new ExprUtils(options.schema, createExprVariables(options.contextVars)).getExprEnumValues(this.blockDef.filterExpr) : null
 
-    const enumValue = enumValues ? enumValues.find(ev => ev.id === value) : null
+    const enumValue = enumValues ? enumValues.find(ev => ev.id === options.value) : null
 
-    const getOptionLabel = (ev: EnumValue) => localize(ev.name, locale)
+    const getOptionLabel = (ev: EnumValue) => localize(ev.name, options.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
-    const handleChange = (ev: EnumValue | null) => onChange(ev ? ev.id : null)
+    const handleChange = (ev: EnumValue | null) => options.onChange(ev ? ev.id : null)
 
     return <ReactSelect
       value={enumValue} 
       onChange={handleChange}
       options={enumValues || undefined}
-      placeholder={localize(this.blockDef.placeholder, locale)}
+      placeholder={localize(this.blockDef.placeholder, options.locale)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       isClearable={true}

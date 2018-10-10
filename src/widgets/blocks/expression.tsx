@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
 import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, FormatEditor } from '../propertyEditors';
 import { Expr, ExprUtils, Schema, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
@@ -45,7 +45,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   }
 
   renderDesign(props: RenderDesignProps) {
-    const summary = new ExprUtils(props.schema).summarizeExpr(this.blockDef.expr, props.locale)
+    const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
 
     return (
       <div>
@@ -69,7 +69,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       str = format(this.blockDef.format || "")(value)
     }
     else {
-      str = new ExprUtils(props.schema).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
+      str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
     }
 
     return (
@@ -80,7 +80,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   renderEditor(props: RenderEditorProps) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)
 
-    const exprType = new ExprUtils(props.schema).getExprType(this.blockDef.expr)
+    const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
     return (
       <div>

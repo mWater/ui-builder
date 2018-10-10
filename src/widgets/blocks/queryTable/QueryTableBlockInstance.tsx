@@ -110,12 +110,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     // TODO move out of here to be faster
     const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars)
 
+    const innerContextVars = rips.contextVars.concat(rowcv)
+
     // Row context variable value
-    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.renderInstanceProps.schema, rowsetCV)
+    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.renderInstanceProps.schema, rowsetCV, innerContextVars)
 
     return {
       ...rips, 
-      contextVars: rips.contextVars.concat(rowcv),
+      contextVars: innerContextVars,
       contextVarValues: { ...rips.contextVarValues, [rowcv.id]: cvvalue },
       getContextVarExprValue: (cvid, expr) => {
         if (cvid !== rowcv.id) {

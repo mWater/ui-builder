@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions } from '../../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { Row, OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
@@ -127,13 +127,14 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   /** 
    * Get the value of the row context variable for a specific row. 
    * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
+   * contextVars: includes rowsetCV and row one
    */
-  getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar): any {
+  getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any {
     switch (this.blockDef.mode) {
       case "singleRow":
         return row.id
       case "multiRow":
-        const exprUtils = new ExprUtils(schema)
+        const exprUtils = new ExprUtils(schema, createExprVariables(contextVars))
 
         // Create "and" filter
         const ands: Expr[] = []

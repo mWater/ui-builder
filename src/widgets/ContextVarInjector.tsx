@@ -1,6 +1,6 @@
 import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter, createExprVariables } from "./blocks";
 import * as React from "react";
-import { Expr, ExprUtils, Schema } from "mwater-expressions";
+import { Expr, ExprUtils, Schema, Variable } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
 import canonical from 'canonical-json'
 import * as _ from "lodash";
@@ -81,7 +81,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     return queryOptions
   }
 
-  createRowsetQueryOptions(table: string) {
+  createRowsetQueryOptions(table: string, variables: Variable[]) {
     const queryOptions: QueryOptions = {
       select: {},
       from: table,
@@ -89,7 +89,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
 
     // Add expressions as selects (only if aggregate for rowset)
-    const exprUtils = new ExprUtils(this.props.schema)
+    const exprUtils = new ExprUtils(this.props.schema, variables)
     const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
 
     // Add expressions as selects
@@ -110,15 +110,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   async performQueries() {
-    // Get all context vars including self
-    const allContextVars = this.props.renderInstanceProps.contextVars.concat([this.props.contextVar])
+    const innerProps = this.createInnerProps()
 
-    // Create variables needed by expressions
-    const variables = createExprVariables(allContextVars)
-    const variableValues: { [variableId: string]: any } = {}
-    for (const contextVar of this.props.renderInstanceProps.contextVars) {
-      variableValues[contextVar.id] = this.props.renderInstanceProps.contextVarValues[contextVar.id]
-    }
+    // Determine variables and values for expressions
+    const variables = createExprVariables(innerProps.contextVars)
+    const variableValues = innerProps.contextVarValues
 
     // Query database if row 
     if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
@@ -158,15 +154,20 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       const table: string = this.props.contextVar.table!
       
       // Perform query
-      const queryOptions = this.createRowsetQueryOptions(table)
+      const queryOptions = this.createRowsetQueryOptions(table, variables)
       const rows = await this.props.renderInstanceProps.database.query(queryOptions)
 
-      // Ignore if out of date
-      if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table))) {
+      // Ignore if query options out of date
+      if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
         return
       }
 
-      const exprUtils = new ExprUtils(this.props.schema)
+      // Ignore if variable values out of date
+      if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
+        return
+      }
+      
+      const exprUtils = new ExprUtils(this.props.schema, variables)
       const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
 
       if (rows.length === 0) {

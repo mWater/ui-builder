@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar, createExprVariables } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, FormatEditor, ContextVarPropertyEditor } from '../propertyEditors'
 import { LocalizedString, localize } from '../localization'
 import { Select } from 'react-library/lib/bootstrap';
@@ -84,7 +84,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
         str = format(this.blockDef.embeddedExprs![i].format || "")(exprValues[i])
       }
       else {
-        str = new ExprUtils(props.schema).stringifyExprLiteral(this.blockDef.expr, exprValues[i], props.locale)
+        str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, exprValues[i], props.locale)
       }
       text = text.replace(`{${i}}`, str)
     }
@@ -156,7 +156,7 @@ class EmbeddedExprEditor extends React.Component<{
 }> {
   render() {
     const contextVar = this.props.contextVars.find(cv => cv.id === this.props.value.contextVarId)
-    const exprType = new ExprUtils(this.props.schema).getExprType(this.props.value.expr)
+    const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
 
     return (
       <div>
