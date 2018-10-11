@@ -155,6 +155,8 @@ class EmbeddedExprEditor extends React.Component<{
   dataSource: DataSource
 }> {
   render() {
+    // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
+
     const contextVar = this.props.contextVars.find(cv => cv.id === this.props.value.contextVarId)
     const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
 

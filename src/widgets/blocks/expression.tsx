@@ -82,6 +82,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
+    // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
     return (
       <div>
         <LabeledProperty label="Row/Rowset Variable">

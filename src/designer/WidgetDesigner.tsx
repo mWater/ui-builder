@@ -9,12 +9,10 @@ import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
 import { DataSourceDatabase } from "../database/DataSourceDatabase";
-import { QueryCompiler } from "../database/QueryCompiler";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
 import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
-import VirtualDatabase from "../database/VirtualDatabase";
 import { Database } from "../database/Database";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
@@ -38,6 +36,8 @@ enum Mode { Design, Preview }
 interface State {
   mode: Mode
   selectedBlockId: string | null
+  undoStack: WidgetDef[]
+  redoStack: WidgetDef[]
 }
 
 /** Design mode for a single widget */
@@ -47,13 +47,40 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     super(props)
     this.state = {
       mode: Mode.Design,
-      selectedBlockId: null
+      selectedBlockId: null,
+      undoStack: [],
+      redoStack: []
     }
   }
 
   handleSelect = (blockId: string) => {
     this.setState({ selectedBlockId: blockId })
   }
+
+  /** Handle change including undo stack  */
+  handleWidgetDefChange = (widgetDef: WidgetDef) => {
+    this.setState({ undoStack: this.state.undoStack.concat([this.props.widgetDef]), redoStack: [] })
+    this.props.onWidgetDefChange(widgetDef)
+  }
+
+  handleUndo = () => {
+    if (this.state.undoStack.length === 0) {
+      return
+    }
+    const undoValue = _.last(this.state.undoStack)
+    this.setState({ undoStack: _.initial(this.state.undoStack), redoStack: this.state.redoStack.concat([this.props.widgetDef]) })
+    this.props.onWidgetDefChange(undoValue)
+  }
+
+  handleRedo = () => {
+    if (this.state.redoStack.length === 0) {
+      return
+    }
+    const redoValue = _.last(this.state.redoStack)
+    this.setState({ redoStack: _.initial(this.state.redoStack), undoStack: this.state.undoStack.concat([this.props.widgetDef]) })
+    this.props.onWidgetDefChange(redoValue)
+  }
+
 
   // Set the widget block
   handleBlockDefChange = (blockDef: BlockDef | null) => {
@@ -63,7 +90,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         return this.props.createBlock(b).canonicalize()
       })
     }
-    this.props.onWidgetDefChange({ ...this.props.widgetDef, blockDef })
+    this.handleWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 
   handleUnselect = () => { this.setState({ selectedBlockId: null }) }
@@ -219,7 +246,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     return (
       <div key="editor" className="widget-designer-editor">
-        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.props.onWidgetDefChange} schema={this.props.schema} dataSource={this.props.dataSource}/>
+        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.handleWidgetDefChange} schema={this.props.schema} dataSource={this.props.dataSource}/>
       </div>
     )
   }
@@ -304,6 +331,12 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       <div style={{ height: "100%" }}>
         <div className="widget-designer-header">
           <div style={{float: "right"}}>
+            <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
+              <i className="fa fa-undo"/> Undo              
+            </button>
+            <button type="button" className="btn btn-link btn-sm" onClick={this.handleRedo} disabled={this.state.redoStack.length === 0}>
+              <i className="fa fa-repeat"/> Redo
+            </button>
             <Toggle 
               value={this.state.mode}
               options={[
