@@ -5,10 +5,12 @@ import * as _ from "lodash";
 export class QueryCompiler {
   schema: Schema
   variables: Variable[]
+  variableValues: { [variableId: string]: any }
 
-  constructor(schema: Schema, variables: Variable[]) {
+  constructor(schema: Schema, variables: Variable[], variableValues: { [variableId: string]: any }) {
     this.schema = schema
     this.variables = variables
+    this.variableValues = variableValues
   }
   
   /** Compiles a query to JsonQL and also returns a function to map the returned
@@ -17,7 +19,7 @@ export class QueryCompiler {
    */
   compileQuery(options: QueryOptions): { jsonql: JsonQL, rowMapper: (row: Row) => Row } {
     const exprUtils = new ExprUtils(this.schema, this.variables)
-    const exprCompiler = new ExprCompiler(this.schema, this.variables)
+    const exprCompiler = new ExprCompiler(this.schema, this.variables, this.variableValues)
 
     // Create shell of query
     const query: JsonQL = {

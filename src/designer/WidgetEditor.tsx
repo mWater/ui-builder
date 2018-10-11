@@ -71,7 +71,7 @@ class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChang
     return (
       <div>
         <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
-        &nbsp;({this.props.contextVar.type} {this.props.contextVar.table ? `of ${this.props.contextVar.table}` : ""})
+        &nbsp;({this.props.contextVar.type}{this.props.contextVar.table ? ` of ${this.props.contextVar.table}` : ""})
       </div>
     )
   }
@@ -108,6 +108,14 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
     }
 
     contextVarOptions = _.sortBy(contextVarOptions, "label")
+
+    contextVarOptions = [
+      { value: { id: uuid(), name: "Unnamed", type: "text" }, label: "Text" },
+      { value: { id: uuid(), name: "Unnamed", type: "number" }, label: "Number" },
+      { value: { id: uuid(), name: "Unnamed", type: "boolean" }, label: "Boolean" },
+      { value: { id: uuid(), name: "Unnamed", type: "date" }, label: "Date" },
+      { value: { id: uuid(), name: "Unnamed", type: "datetime" }, label: "Datetime" }
+    ].concat(contextVarOptions)
 
     return (
       <div>

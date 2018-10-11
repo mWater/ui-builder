@@ -1,21 +1,21 @@
 import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
 import { DataSource, Schema } from "mwater-expressions";
 import { QueryCompiler } from "./QueryCompiler";
+import { createExprVariables, ContextVar } from "../widgets/blocks";
 
 
 export class DataSourceDatabase implements Database {
   schema: Schema
   dataSource: DataSource
-  queryCompiler: QueryCompiler
 
-  constructor(schema: Schema, dataSource: DataSource, queryCompiler: QueryCompiler) {
+  constructor(schema: Schema, dataSource: DataSource) {
     this.schema = schema
     this.dataSource = dataSource
-    this.queryCompiler = queryCompiler
   }
   
-  query(options: QueryOptions) {
-    const { jsonql, rowMapper } = this.queryCompiler.compileQuery(options)
+  query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
+    const queryCompiler = new QueryCompiler(this.schema, createExprVariables(contextVars), contextVarValues)
+    const { jsonql, rowMapper } = queryCompiler.compileQuery(options)
     
     return new Promise<Row[]>((resolve, reject) => {
       this.dataSource.performQuery(jsonql, (error, rows) => {

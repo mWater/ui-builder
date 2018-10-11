@@ -265,7 +265,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return null 
     }
 
-    let database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource, new QueryCompiler(this.props.schema)) 
+    let database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource) 
 
     // Make non-live
     database = new VirtualDatabase(database, this.props.schema, this.props.locale)

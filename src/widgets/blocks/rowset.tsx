@@ -5,7 +5,7 @@ import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInst
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
-import Select from 'react-select/lib/Select';
+import ReactSelect from "react-select"
 import { localize } from '../localization';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
@@ -141,8 +141,9 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
                 onChange(table.id)
               }
             
-              return <Select 
+              return <ReactSelect 
                 value={tables.find(t => t.id === value)} 
+                options={tables}
                 onChange={handleTableChange} 
                 getOptionLabel={getOptionLabel}
                 getOptionValue={getOptionValue}

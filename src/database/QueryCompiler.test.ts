@@ -1,9 +1,13 @@
 import { QueryOptions, OrderByDir } from './Database'
 import { QueryCompiler } from './QueryCompiler';
 import simpleSchema from '../__fixtures__/schema';
+import { Variable } from 'mwater-expressions';
+
+const variables: Variable[] = [{ id: "varnumber", name: { _base: "en", en: "Varnumber"}, type: "number" }]
+const variableValues = { varnumber: 123 }
 
 const schema = simpleSchema()
-const compiler = new QueryCompiler(schema)
+const compiler = new QueryCompiler(schema, variables, variableValues)
 
 test("compiles simple query", () => {
   const options: QueryOptions = {
@@ -76,3 +80,23 @@ test("compiles ordered where query", () => {
   })
 })
 
+test("compiles variable query", () => {
+  const options: QueryOptions = {
+    select: { x: { type: "variable", variableId: "varnumber" } },
+    from: "t1",
+  }
+
+  const { jsonql, rowMapper } = compiler.compileQuery(options)
+
+  expect(jsonql).toEqual({
+    type: "query",
+    selects: [
+      { type: "select", expr: { type: "literal", value: 123 }, alias: "c_0" }
+    ],
+    from: { type: "table", table: "t1", alias: "main" },
+    groupBy: [],
+    orderBy: []
+  })
+
+  expect(rowMapper({ c_0: "abc", o_0: "xyz" })).toEqual({ x: "abc" })
+})
