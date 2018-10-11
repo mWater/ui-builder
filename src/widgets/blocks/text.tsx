@@ -52,7 +52,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
           return "Context variable required"
         }
 
-        const exprValidator = new ExprValidator(options.schema)
+        const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
         let error: string | null
         
         // Validate expr
@@ -177,6 +177,7 @@ class EmbeddedExprEditor extends React.Component<{
                   schema={this.props.schema} 
                   dataSource={this.props.dataSource} 
                   aggrStatuses={["individual", "aggregate", "literal"]}
+                  variables={createExprVariables(this.props.contextVars)}
                   table={contextVar.table!}/>
               )}
             </PropertyEditor>

@@ -32,7 +32,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       return "Context variable required"
     }
 
-    const exprValidator = new ExprValidator(options.schema)
+    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     let error: string | null
     
     // Validate expr
@@ -101,6 +101,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
                   schema={props.schema} 
                   dataSource={props.dataSource} 
                   aggrStatuses={["individual", "aggregate", "literal"]}
+                  variables={createExprVariables(props.contextVars)}
                   table={contextVar.table!}/>
               )}
             </PropertyEditor>

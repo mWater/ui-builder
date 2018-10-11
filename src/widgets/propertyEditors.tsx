@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Select } from "react-library/lib/bootstrap";
-import { ContextVar } from "./blocks";
+import { ContextVar, createExprVariables } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
@@ -195,6 +195,7 @@ export class OrderByArrayEditor extends React.Component<{
   table: string
   schema: Schema
   dataSource: DataSource
+  contextVars: ContextVar[]
 }> {
 
   handleAddOrderByExpr = () => {
@@ -206,7 +207,7 @@ export class OrderByArrayEditor extends React.Component<{
       <div>
         <ListEditor items={this.props.value || []} onItemsChange={this.props.onChange}>
           { (orderBy: OrderBy, onOrderByChange) => (
-            <OrderByEditor value={orderBy} schema={this.props.schema} dataSource={this.props.dataSource} onChange={onOrderByChange} table={this.props.table} />
+            <OrderByEditor value={orderBy} schema={this.props.schema} dataSource={this.props.dataSource} onChange={onOrderByChange} table={this.props.table} contextVars={this.props.contextVars} />
           )}
         </ListEditor>
         <button type="button" className="btn btn-link btn-sm" onClick={this.handleAddOrderByExpr}>
@@ -223,6 +224,7 @@ export class OrderByEditor extends React.Component<{
   table: string
   schema: Schema
   dataSource: DataSource
+  contextVars: ContextVar[]
 }> {
 
   handleExprChange = (expr: Expr) => {
@@ -247,6 +249,7 @@ export class OrderByEditor extends React.Component<{
           types={["text", "number", "enum", "boolean", "date", "datetime"]}
           table={this.props.table}
           value={this.props.value.expr}
+          variables={createExprVariables(this.props.contextVars)}
           onChange={this.handleExprChange}
         />
       </div>

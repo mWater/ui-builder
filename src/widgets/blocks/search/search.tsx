@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps } from '../../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import SearchBlockInstance from './SearchBlockInstance';
@@ -33,7 +33,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
       return "Search expression required"
     }
 
-    const exprValidator = new ExprValidator(options.schema)
+    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     
     for (const searchExpr of this.blockDef.searchExprs) {
       if (!searchExpr) {

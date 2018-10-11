@@ -2,7 +2,7 @@ import * as React from "react";
 import {v4 as uuid} from 'uuid'
 import { LabeledProperty, PropertyEditor } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
-import { ContextVar } from "../widgets/blocks";
+import { ContextVar, createExprVariables } from "../widgets/blocks";
 import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
 import { produce } from "immer";

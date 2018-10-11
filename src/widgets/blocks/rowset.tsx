@@ -45,7 +45,7 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
   }
 
   validate(options: ValidateBlockOptions) { 
-    const exprValidator = new ExprValidator(options.schema)
+    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     let error: string | null
 
     if (!this.blockDef.table) {

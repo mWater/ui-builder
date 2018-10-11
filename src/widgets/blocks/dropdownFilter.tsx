@@ -32,7 +32,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       return "Filter expression required"
     }
 
-    const exprValidator = new ExprValidator(options.schema)
+    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
 
     // Validate expr
     let error

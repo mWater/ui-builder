@@ -3,7 +3,6 @@ import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from "../../propertyEditors";
 import { Expr, Column, Schema } from "mwater-expressions";
-import { ExprComponent } from "mwater-expressions-ui";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
 

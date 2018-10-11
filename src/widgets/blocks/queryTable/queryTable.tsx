@@ -47,7 +47,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       return "Rowset required"
     }
 
-    const exprValidator = new ExprValidator(options.schema)
+    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     let error: string | null
     
     // Validate where
@@ -247,6 +247,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
                     schema={props.schema} 
                     dataSource={props.dataSource} 
                     types={["boolean"]}
+                    variables={createExprVariables(props.contextVars)}
                     table={rowsetCV!.table!}/>
                 )}
             </PropertyEditor>
@@ -262,6 +263,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
                 onChange={onChange} 
                 schema={props.schema} 
                 dataSource={props.dataSource} 
+                contextVars={props.contextVars}
                 table={rowsetCV!.table!} /> }
           </PropertyEditor>
         </LabeledProperty>
