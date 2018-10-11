@@ -11,6 +11,22 @@ declare module 'react-library/lib/ModalPopupComponent' {
   export default ModalPopupComponent
 }
 
+declare module 'react-library/lib/ActionCancelModalComponent' {
+  class ActionCancelModalComponent extends React.Component<{
+    /** Title of modal */
+    title?: React.ReactNode
+    /** Action button. Defaults to "Save" */
+    actionLabel?: React.ReactNode
+    deleteLabel?: React.ReactNode
+    onAction?: () => void
+    onCancel?: () => void
+    onDelete?: () => void
+    size?: "large" | "full"
+  }> {}
+
+  export default ActionCancelModalComponent
+}
+
 declare module 'react-library/lib/bootstrap' {
   import { ReactNode } from "react";
 

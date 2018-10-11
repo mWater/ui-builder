@@ -3,8 +3,9 @@ import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
-import { LocalizedString, Schema, DataSource, Expr } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
+import * as PropTypes from 'prop-types';
 export declare class LabeledProperty extends React.Component<{
     label: string;
     help?: string;
@@ -98,5 +99,28 @@ export declare class FormatEditor extends React.Component<{
     onChange: (value: string) => void;
 }> {
     render(): JSX.Element;
+}
+interface TableSelectContext {
+    tableSelectElementFactory: (options: {
+        schema: Schema;
+        value: string | null;
+        onChange: (tableId: string) => void;
+    }) => React.ReactElement<any>;
+}
+/** Allow selecting a table */
+export declare class TableSelect extends React.Component<{
+    schema: Schema;
+    locale: string;
+    value: string | null;
+    onChange: (tableId: string) => void;
+}> {
+    static contextTypes: {
+        tableSelectElementFactory: PropTypes.Requireable<(...args: any[]) => any>;
+    };
+    context: TableSelectContext;
+    handleTableChange: (table: Table) => void;
+    getOptionLabel: (table: Table) => string;
+    getOptionValue: (table: Table) => string;
+    render(): React.ReactElement<any>;
 }
 export {};
