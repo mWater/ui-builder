@@ -69,9 +69,26 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     this.props.onOpenTabsChange(this.props.openTabs.concat(widgetId))
   }
 
+  handleRemoveWidget = (widgetId: string) => {
+    if (!confirm("Permanently delete widget?")) {
+      return
+    }
+
+    const widgetLibrary = produce(this.props.widgetLibrary, (draft) => {
+      delete draft.widgets[widgetId]
+    })
+    this.props.onOpenTabsChange(_.without(this.props.openTabs, widgetId))
+    this.props.onWidgetLibraryChange(widgetLibrary)
+  }
+
   renderTab(tab: string, index: number) {
     const activeTabId = this.props.openTabs[index]
     const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
+
+    // For immediately deleted tabs
+    if (!widgetDef) {
+      return null
+    }
 
     return (
       <li className={(index === this.state.activeTabIndex) ? "active" : ""} key={index}>
@@ -88,6 +105,10 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     if (this.state.activeTabIndex < this.props.openTabs.length) {
       const activeTabId = this.props.openTabs[this.state.activeTabIndex]
       const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
+      // For immediately deleted tabs
+      if (!widgetDef) {
+        return null
+      }
 
       return <WidgetTab
         key={widgetDef.id}
@@ -102,7 +123,12 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
       />
     }
     else {
-      return <NewTab widgetLibrary={this.props.widgetLibrary} onAddWidget={this.handleAddWidget} onOpenWidget={this.handleOpenWidget} />
+      return <NewTab 
+        widgetLibrary={this.props.widgetLibrary} 
+        onAddWidget={this.handleAddWidget} 
+        onOpenWidget={this.handleOpenWidget} 
+        onRemoveWidget={this.handleRemoveWidget}
+        />
     }
   }
 
@@ -156,6 +182,7 @@ class NewTab extends React.Component<{
   widgetLibrary: WidgetLibrary
   onAddWidget: (widgetDef: WidgetDef) => void,
   onOpenWidget: (widgetId: string) => void, 
+  onRemoveWidget: (widgetId: string) => void, 
 }> {
 
   /** Add a new blank widget */
@@ -174,11 +201,17 @@ class NewTab extends React.Component<{
     const widgets: WidgetDef[] = _.sortBy(Object.values(this.props.widgetLibrary.widgets), "name")
 
     return (
-      <div className="list-group">
+      <ul className="list-group">
         { widgets.map(widget => (
-          <a className="list-group-item" key={widget.id} onClick={this.props.onOpenWidget.bind(null, widget.id)}>{widget.name}</a>
+          <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={this.props.onOpenWidget.bind(null, widget.id)}>
+            <span style={{ float: "right"}} onClick={this.props.onRemoveWidget.bind(null, widget.id)}>
+              <i className="fa fa-remove"/>
+            </span>
+
+            {widget.name}
+          </li>
         )) }
-      </div>
+      </ul>
     )
   }
 
