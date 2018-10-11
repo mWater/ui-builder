@@ -4,10 +4,13 @@ import { ContextVar, createExprVariables } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
-import { LocalizedString, Schema, DataSource, Expr } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table } from "mwater-expressions";
 import { OrderBy, OrderByDir } from "../database/Database";
 import ListEditor from "./ListEditor";
 import { ExprComponent } from "mwater-expressions-ui";
+import * as PropTypes from 'prop-types'
+import ReactSelect from "react-select"
+import { localize } from "./localization";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -274,5 +277,51 @@ export class FormatEditor extends React.Component<{ value: string | null, onChan
           { value: ".0%", label: "Percent rounded: 12%" }
         ]} />
     )
+  }
+}
+
+interface TableSelectContext {
+  tableSelectElementFactory: (options: {
+    schema: Schema
+    value: string | null
+    onChange: (tableId: string) => void
+  }) => React.ReactElement<any>
+}
+
+/** Allow selecting a table */
+export class TableSelect extends React.Component<{
+  schema: Schema
+  locale: string
+  value: string | null
+  onChange: (tableId: string) => void
+}> {
+  static contextTypes = {
+    tableSelectElementFactory: PropTypes.func  // Can be overridden by setting tableSelectElementFactory in context that takes ({ schema, value, onChange, filter, onFilterChange })
+  }
+  
+  context: TableSelectContext
+
+  handleTableChange = (table: Table) => {
+    this.props.onChange(table.id)
+  }
+
+  getOptionLabel = (table: Table) => localize(table.name, this.props.locale)
+
+  getOptionValue = (table: Table) => table.id
+
+  render() {
+    if (this.context.tableSelectElementFactory) {
+      return this.context.tableSelectElementFactory({ schema: this.props.schema, value: this.props.value, onChange: this.props.onChange })
+    }
+    
+    const tables = _.sortBy(this.props.schema.getTables(), (table) => localize(table.name, this.props.locale))
+
+    return <ReactSelect 
+      value={tables.find(t => t.id === this.props.value)} 
+      options={tables}
+      onChange={this.handleTableChange} 
+      getOptionLabel={this.getOptionLabel}
+      getOptionValue={this.getOptionValue}
+    />
   }
 }

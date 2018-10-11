@@ -9,7 +9,7 @@ import ReactSelect from "react-select"
 import { localize } from '../localization';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
-import { PropertyEditor, LabeledProperty } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 
 /** Block which creates a new rowset context variable */
 export interface RowsetBlockDef extends BlockDef {
@@ -125,27 +125,14 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
   }
 
   renderEditor(props: RenderEditorProps) {
-    const tables = props.schema.getTables()
-    const getOptionLabel = (table: Table) => localize(table.name, props.locale)
-    const getOptionValue = (table: Table) => table.id
-
     return (
       <div>
+        <h3>Rowset</h3>
         <LabeledProperty label="Table">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="table">
-            {(value, onChange) => {
-              const handleTableChange = (table: Table) => {
-                onChange(table.id)
-              }
-            
-              return <ReactSelect 
-                value={tables.find(t => t.id === value)} 
-                options={tables}
-                onChange={handleTableChange} 
-                getOptionLabel={getOptionLabel}
-                getOptionValue={getOptionValue}
-              />
-            }}
+            {(value, onChange) => 
+              <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange}/>
+            }
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Name">
