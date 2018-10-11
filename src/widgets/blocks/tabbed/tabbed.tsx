@@ -24,7 +24,7 @@ export interface TabbedBlockDef extends BlockDef {
 /** Tabbed control */
 export class TabbedBlock extends CompoundBlock<TabbedBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
-    return this.blockDef.tabs.map(tab => ({ blockDef: this.blockDef.child, contextVars: contextVars}))
+    return this.blockDef.tabs.filter(tab => tab.content).map(tab => ({ blockDef: tab.content!, contextVars: contextVars}))
   }
 
   validate() { return null }

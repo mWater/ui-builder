@@ -32,8 +32,9 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     handleAddWidget: (widgetDef: WidgetDef) => void;
     handleCloseTab: (index: number) => void;
     handleOpenWidget: (widgetId: string) => void;
-    renderTab(tab: string, index: number): JSX.Element;
-    renderActiveTabContents(): JSX.Element;
+    handleRemoveWidget: (widgetId: string) => void;
+    renderTab(tab: string, index: number): JSX.Element | null;
+    renderActiveTabContents(): JSX.Element | null;
     render(): JSX.Element;
 }
 export {};
