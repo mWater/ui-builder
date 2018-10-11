@@ -24,11 +24,17 @@ declare enum Mode {
 interface State {
     mode: Mode;
     selectedBlockId: string | null;
+    undoStack: WidgetDef[];
+    redoStack: WidgetDef[];
 }
 /** Design mode for a single widget */
 export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
     constructor(props: WidgetDesignerProps);
     handleSelect: (blockId: string) => void;
+    /** Handle change including undo stack  */
+    handleWidgetDefChange: (widgetDef: WidgetDef) => void;
+    handleUndo: () => void;
+    handleRedo: () => void;
     handleBlockDefChange: (blockDef: BlockDef | null) => void;
     handleUnselect: () => void;
     handleRemoveBlock: (blockId: string) => void;
