@@ -60,24 +60,6 @@ interface ContextVarsEditorProps {
   schema: Schema
 }
 
-class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChange: (contextVar: ContextVar) => void}> { 
-  handleNameChange = () => {
-    const name = window.prompt("Enter name", this.props.contextVar.name)
-    if (name) {
-      this.props.onChange({ ...this.props.contextVar, name })
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
-        &nbsp;({this.props.contextVar.type}{this.props.contextVar.table ? ` of ${this.props.contextVar.table}` : ""})
-      </div>
-    )
-  }
-}
-
 class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
   modalElem: AddContextVarModal | null
 
@@ -97,12 +79,36 @@ class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
     return (
       <div>
         <ListEditor items={this.props.contextVars} onItemsChange={this.props.onChange}>
-          { (contextVar, onContextVarChange) => <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange}/> }
+          { (contextVar, onContextVarChange) => <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange} schema={this.props.schema}/> }
         </ListEditor>
         <AddContextVarModal schema={this.props.schema} locale="en" ref={this.handleModalRef} onAdd={this.handleAddContextVar} />
         <button type="button" className="btn btn-link" onClick={this.handleOpenAdd}>
           <i className="fa fa-plus"/> Add Variable
         </button>
+      </div>
+    )
+  }
+}
+
+class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChange: (contextVar: ContextVar) => void, schema: Schema}> { 
+  handleNameChange = () => {
+    const name = window.prompt("Enter name", this.props.contextVar.name)
+    if (name) {
+      this.props.onChange({ ...this.props.contextVar, name })
+    }
+  }
+
+  render() {
+    let desc = this.props.contextVar.type
+    if (this.props.contextVar.table) {
+      desc += " of "
+      desc += localize(this.props.schema.getTable(this.props.contextVar.table)!.name, "en")
+    }
+
+    return (
+      <div>
+        <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
+        &nbsp;({desc})
       </div>
     )
   }
