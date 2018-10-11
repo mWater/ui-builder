@@ -19,6 +19,7 @@ import { Database } from "../database/Database";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
 import { BlockPaletteEntry } from "./blockPaletteEntries";
+import ErrorBoundary from "./ErrorBoundary";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -265,10 +266,10 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return null 
     }
 
-    let database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource) 
+    const database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource) 
 
-    // Make non-live
-    database = new VirtualDatabase(database, this.props.schema, this.props.locale)
+    // Make non-live TODO needed? Could make big queries for counts/sums if mutated
+    // database = new VirtualDatabase(database, this.props.schema, this.props.locale)
 
     // Create normal page to display
     const page: Page = {
@@ -290,7 +291,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     return [
       (<div key="palette" className="widget-designer-palette"/>),
       (<div key="preview" className="widget-designer-preview">
-        {pageElem}
+        <ErrorBoundary>
+          {pageElem}
+        </ErrorBoundary>
       </div>),
       (<div key="editor" className="widget-designer-editor"/>)
     ]
