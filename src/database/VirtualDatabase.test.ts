@@ -55,7 +55,7 @@ test("pass through if no mutations", async () => {
     limit: 10
   }
 
-  await vdb.query(queryOptions)
+  await vdb.query(queryOptions, [], {})
 
   expect(db.query.mock.calls[0][0]).toEqual(queryOptions)
 })
@@ -76,7 +76,7 @@ test("queries with where clause and included columns", async () => {
     where: t2Where,
     orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: OrderByDir.desc }],
     limit: 10
-  })
+  }, [], {})
 
   expect(db.query.mock.calls[0][0]).toEqual({
     select: {
@@ -127,7 +127,7 @@ describe("select, order, limit", () => {
     await txn.commit()
 
     // Perform query
-    return vdb.query(queryOptions)
+    return vdb.query(queryOptions, [], {})
   }
 
   test("simple query", async () => {

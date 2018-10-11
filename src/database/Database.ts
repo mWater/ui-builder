@@ -1,4 +1,5 @@
 import { Expr } from 'mwater-expressions'
+import { ContextVar } from '../widgets/blocks';
 
 export enum OrderByDir {
   asc = "asc",
@@ -25,7 +26,7 @@ export interface Row {
 export type DatabaseChangeListener = () => void
 
 export interface Database {
-  query(options: QueryOptions): Promise<Row[]>;
+  query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]>;
   
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener): void;
@@ -46,7 +47,7 @@ export interface Transaction {
 }
 
 export class MockDatabase implements Database {
-  async query(options: QueryOptions) { return [] }
+  async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) { return [] }
   
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener) { return }

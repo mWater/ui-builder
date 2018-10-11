@@ -90,7 +90,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     // Mark as refreshing
     this.setState({ refreshing: true })
 
-    this.props.renderInstanceProps.database.query(queryOptions).then(rows => {
+    this.props.renderInstanceProps.database.query(queryOptions, this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.contextVarValues).then(rows => {
       // Check if still relevant
       if (_.isEqual(queryOptions, this.createQuery())) {
         this.setState({ rows, refreshing: false })

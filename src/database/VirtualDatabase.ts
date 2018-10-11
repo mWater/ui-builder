@@ -5,6 +5,7 @@ import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
 import LRU, { Cache } from 'lru-cache'
 import canonical from 'canonical-json'
+import { ContextVar, createExprVariables } from "../widgets/blocks";
 
 /**
  * Database which is backed by a real database, but can accept changes such as adds, updates or removes
@@ -41,16 +42,19 @@ export default class VirtualDatabase implements Database {
     database.addChangeListener(this.handleChange)
   }
 
-  async query(options: QueryOptions): Promise<Row[]> {
+  async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
     // Passthrough if no mutations
     if (this.mutations.length === 0) {
-      return this.database.query(options)
+      return this.database.query(options, contextVars, contextVarValues)
     }
 
-    // Create rows to evaluate
-    let evalRows: any[] = (await this.queryEvalRows(options.from, options.where)).map(r => ({ row: r }))
+    const variables = createExprVariables(contextVars)
+    const variableValues = contextVarValues
 
-    const exprUtils = new ExprUtils(this.schema)
+    // Create rows to evaluate
+    let evalRows: any[] = (await this.queryEvalRows(options.from, options.where || null, contextVars, contextVarValues)).map(r => ({ row: r }))
+
+    const exprUtils = new ExprUtils(this.schema, variables)
     
     // Get list of selects in { id, expr, isAggr } format
     const selects = Object.keys(options.select).map(id => ({
@@ -65,7 +69,7 @@ export default class VirtualDatabase implements Database {
       isAggr: exprUtils.getExprAggrStatus(orderBy.expr) === "aggregate"
     }))
 
-    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale))
+    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
     
     // Evaluate all non-aggr selects and non-aggr orderbys
     for (const evalRow of evalRows) {
@@ -236,7 +240,7 @@ export default class VirtualDatabase implements Database {
   }
   
   /** Create the rows as needed by ExprEvaluator for a query */
-  private async queryEvalRows(from: string, where?: Expr): Promise<PromiseExprEvaluatorRow[]> {
+  private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
     // Create query with c_ for all columns, id and just the where clause
     let queryOptions: QueryOptions = {
       select: {
@@ -259,18 +263,18 @@ export default class VirtualDatabase implements Database {
     // Perform query
     let rows: Row[] | undefined
     
-    const queryOptionsKey = canonical(queryOptions)
-    rows = this.cache.get(queryOptionsKey)
+    const queryCacheKey = canonical({ queryOptions: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
+    rows = this.cache.get(queryCacheKey)
     if (!rows) {
-      rows = await this.database.query(queryOptions)
-      this.cache.set(queryOptionsKey, rows)
+      rows = await this.database.query(queryOptions, contextVars, contextVarValues)
+      this.cache.set(queryCacheKey, rows)
     }
 
     // Apply mutations
-    rows = await this.mutateRows(rows, from, where)
+    rows = await this.mutateRows(rows, from, where, contextVars, contextVarValues)
 
     // Convert to rows as expr evaluator expects
-    return rows.map(row => this.createEvalRow(row, from))
+    return rows.map(row => this.createEvalRow(row, from, contextVars, contextVarValues))
   }
 
   /** Replace temporary primary keys with different value */
@@ -285,7 +289,7 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Create a single row structured for evaluation from a row in format { id: <primary key>, c_<column id>: value, ... } */
-  private createEvalRow(row: Row, from: string): PromiseExprEvaluatorRow {
+  private createEvalRow(row: Row, from: string, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): PromiseExprEvaluatorRow {
     return {
       getPrimaryKey: () => Promise.resolve(row.id),
       getField: async (columnId: string) => {
@@ -302,7 +306,7 @@ export default class VirtualDatabase implements Database {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "id", table: column.join!.toTable },
               { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
-          ]})
+          ]}, contextVars, contextVarValues)
           return joinRows[0] || null
         }
 
@@ -312,7 +316,7 @@ export default class VirtualDatabase implements Database {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "id", table: column.join!.toTable },
               { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
-          ]})
+          ]}, contextVars, contextVarValues)
           return joinRows
         }
 
@@ -322,7 +326,7 @@ export default class VirtualDatabase implements Database {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
               { type: "literal", valueType: "id", idTable: from, value: row.id }
-            ]})
+            ]}, contextVars, contextVarValues)
           return joinRows
         }
 
@@ -332,7 +336,7 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Apply all known mutations to a set of rows */
-  private async mutateRows(rows: Row[], from: string, where?: Expr): Promise<Row[]> {
+  private async mutateRows(rows: Row[], from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
     // Copy rows to be mutated safely
     rows = rows.slice()
 
@@ -371,7 +375,7 @@ export default class VirtualDatabase implements Database {
 
       const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema))
       for (const row of rows) {
-        const evalRow = this.createEvalRow(row, from)
+        const evalRow = this.createEvalRow(row, from, contextVars, contextVarValues)
         if (await exprEval.evaluate(where, { row: evalRow })) {
           filteredRows.push(row)
         }

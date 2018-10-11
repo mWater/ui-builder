@@ -129,7 +129,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
       // Perform query
       const queryOptions = this.createRowQueryOptions(table)
-      const rows = await this.props.renderInstanceProps.database.query(queryOptions)
+      const rows = await this.props.renderInstanceProps.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
       // Ignore if out of date
       if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
@@ -155,7 +155,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       
       // Perform query
       const queryOptions = this.createRowsetQueryOptions(table, variables)
-      const rows = await this.props.renderInstanceProps.database.query(queryOptions)
+      const rows = await this.props.renderInstanceProps.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
       // Ignore if query options out of date
       if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
