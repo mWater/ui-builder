@@ -44,8 +44,10 @@ export interface RenderInstanceProps {
     actionLibrary: ActionLibrary;
     widgetLibrary: WidgetLibrary;
     pageStack: PageStack;
-    /** Gets the value of a context variable */
-    getContextVarValue(contextVarId: string): any;
+    /** Values of context variables */
+    contextVarValues: {
+        [contextVarId: string]: any;
+    };
     /**
      * Gets the value of an expression based off of a context variable
      * @param contextVarId id of context variable
@@ -149,3 +151,4 @@ export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: C
 export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[];
 /** Create the variables as needed by mwater-expressions */
 export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
+/** Create variable values */ 

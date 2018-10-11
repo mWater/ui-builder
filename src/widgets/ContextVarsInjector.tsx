@@ -6,8 +6,8 @@ import { Schema } from "mwater-expressions";
 import { Database } from "../database/Database";
 
 interface Props {
-  contextVars: ContextVar[]
-  contextVarValues: { [contextVarId: string]: any }
+  injectedContextVars: ContextVar[]
+  injectedContextVarValues: { [contextVarId: string]: any }
   renderInstanceProps: RenderInstanceProps
   schema: Schema
   database: Database
@@ -27,9 +27,9 @@ export default class ContextVarsInjector extends React.Component<Props> {
     // Wrap once per child
     let elem = this.props.children
 
-    for (const contextVar of this.props.contextVars) {
+    for (const contextVar of this.props.injectedContextVars) {
       // Get context var exprs
-      const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, this.props.contextVars).map(cb => {
+      const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, this.props.injectedContextVars).map(cb => {
         const block = this.props.createBlock(cb.blockDef)
         return block.getContextVarExprs(contextVar)
       }))
@@ -37,10 +37,10 @@ export default class ContextVarsInjector extends React.Component<Props> {
       const currentElem = elem
       elem = (outerProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => (
         <ContextVarInjector 
-            contextVar={contextVar} 
+            injectedContextVar={contextVar} 
             schema={this.props.schema}
             database={this.props.database}
-            value={this.props.contextVarValues[contextVar.id]} 
+            value={this.props.injectedContextVarValues[contextVar.id]} 
             renderInstanceProps={outerProps}
             contextVarExprs={contextVarExprs}>
           {(renderProps, innerLoading, innerRefreshing) => currentElem(renderProps, innerLoading || loading, innerRefreshing || refreshing)}

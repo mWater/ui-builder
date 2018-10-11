@@ -30,8 +30,9 @@ export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     /**
      * Get the value of the row context variable for a specific row.
      * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
+     * contextVars: includes rowsetCV and row one
      */
-    getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar): any;
+    getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;

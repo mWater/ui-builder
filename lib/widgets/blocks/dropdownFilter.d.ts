@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps } from '../blocks';
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, ContextVar } from '../blocks';
 import { Expr, Schema } from 'mwater-expressions';
 import { LocalizedString } from '../localization';
 export interface DropdownFilterBlockDef extends BlockDef {
@@ -16,6 +16,12 @@ export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDe
     validate(options: ValidateBlockOptions): string | null;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderControl(schema: Schema, locale: string, value: any, onChange: (value: any) => void): JSX.Element;
+    renderControl(options: {
+        schema: Schema;
+        locale: string;
+        contextVars: ContextVar[];
+        value: any;
+        onChange: (value: any) => void;
+    }): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;
 }

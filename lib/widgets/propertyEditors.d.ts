@@ -75,6 +75,7 @@ export declare class OrderByArrayEditor extends React.Component<{
     table: string;
     schema: Schema;
     dataSource: DataSource;
+    contextVars: ContextVar[];
 }> {
     handleAddOrderByExpr: () => void;
     render(): JSX.Element;
@@ -85,6 +86,7 @@ export declare class OrderByEditor extends React.Component<{
     table: string;
     schema: Schema;
     dataSource: DataSource;
+    contextVars: ContextVar[];
 }> {
     handleExprChange: (expr: Expr) => void;
     handleDirToggle: () => void;

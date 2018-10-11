@@ -6,7 +6,7 @@ import canonical from 'canonical-json'
 import * as _ from "lodash";
 
 interface Props {
-  contextVar: ContextVar
+  injectedContextVar: ContextVar
   value: any
   renderInstanceProps: RenderInstanceProps
   contextVarExprs?: Expr[]
@@ -117,7 +117,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const variableValues = innerProps.contextVarValues
 
     // Query database if row 
-    if (this.props.contextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
+    if (this.props.injectedContextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       // Special case of null row value
       if (this.props.value == null) {
         this.setState({ exprValues: {}, loading: false, refreshing: false })
@@ -125,7 +125,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       }
 
       this.setState({ refreshing: true })
-      const table: string = this.props.contextVar.table!
+      const table: string = this.props.injectedContextVar.table!
 
       // Perform query
       const queryOptions = this.createRowQueryOptions(table)
@@ -149,9 +149,9 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
 
     // Query database if rowset
-    if (this.props.contextVar.type === "rowset" && this.props.contextVarExprs!.length > 0) {
+    if (this.props.injectedContextVar.type === "rowset" && this.props.contextVarExprs!.length > 0) {
       this.setState({ refreshing: true })
-      const table: string = this.props.contextVar.table!
+      const table: string = this.props.injectedContextVar.table!
       
       // Perform query
       const queryOptions = this.createRowsetQueryOptions(table, variables)
@@ -191,10 +191,10 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     // Create inner props
     const innerProps: RenderInstanceProps = {
       ...outer,
-      contextVars: outer.contextVars.concat(this.props.contextVar),
-      contextVarValues: { ...outer.contextVarValues, [this.props.contextVar.id]: this.props.value },
+      contextVars: outer.contextVars.concat(this.props.injectedContextVar),
+      contextVarValues: { ...outer.contextVarValues, [this.props.injectedContextVar.id]: this.props.value },
       getContextVarExprValue: (contextVarId, expr) => {
-        if (contextVarId === this.props.contextVar.id) {
+        if (contextVarId === this.props.injectedContextVar.id) {
           return this.state.exprValues[canonical(expr)]
         }
         else {
@@ -202,7 +202,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         }
       },
       setFilter: (contextVarId, filter) => {
-        if (contextVarId === this.props.contextVar.id) {
+        if (contextVarId === this.props.injectedContextVar.id) {
           // Remove existing with same id
           const filters = this.state.filters.filter(f => f.id !== filter.id)
           filters.push(filter)
@@ -213,7 +213,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         }
       },
       getFilters: (contextVarId) => {
-        if (contextVarId === this.props.contextVar.id) {
+        if (contextVarId === this.props.injectedContextVar.id) {
           return this.state.filters
         }
         else {

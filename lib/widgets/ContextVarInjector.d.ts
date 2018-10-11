@@ -1,9 +1,9 @@
 import { RenderInstanceProps, ContextVar, Filter } from "./blocks";
 import * as React from "react";
-import { Expr, Schema } from "mwater-expressions";
+import { Expr, Schema, Variable } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
 interface Props {
-    contextVar: ContextVar;
+    injectedContextVar: ContextVar;
     value: any;
     renderInstanceProps: RenderInstanceProps;
     contextVarExprs?: Expr[];
@@ -32,8 +32,10 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     componentWillUnmount(): void;
     handleDatabaseChange: () => void;
     createRowQueryOptions(table: string): QueryOptions;
-    createRowsetQueryOptions(table: string): QueryOptions;
+    createRowsetQueryOptions(table: string, variables: Variable[]): QueryOptions;
     performQueries(): Promise<void>;
+    /** Create props needed by inner component */
+    createInnerProps(): RenderInstanceProps;
     render(): React.ReactElement<any>;
 }
 export {};

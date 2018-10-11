@@ -3,8 +3,8 @@ import * as React from "react";
 import { Schema } from "mwater-expressions";
 import { Database } from "../database/Database";
 interface Props {
-    contextVars: ContextVar[];
-    contextVarValues: {
+    injectedContextVars: ContextVar[];
+    injectedContextVarValues: {
         [contextVarId: string]: any;
     };
     renderInstanceProps: RenderInstanceProps;

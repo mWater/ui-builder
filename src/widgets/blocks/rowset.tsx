@@ -100,15 +100,12 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
   }
 
   renderInstance(props: RenderInstanceProps) { 
-    const contentNode = this.blockDef.content ?
-    this.createBlock(this.blockDef.content).renderInstance(props) : <div/>
-
     const contextVar = this.createContextVar()!
     
-    // Inject context variable
+    // Inject context variable TODO
     return <ContextVarsInjector 
-      contextVars={[contextVar]} 
-      contextVarValues={{ [contextVar.id]: this.blockDef.filter }}
+      injectedContextVars={[contextVar]} 
+      injectedContextVarValues={{ [contextVar.id]: this.blockDef.filter }}
       createBlock={this.createBlock}
       database={props.database}
       innerBlock={this.blockDef.content!}
@@ -158,7 +155,7 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
         </LabeledProperty>
         { this.blockDef.table ? 
         <LabeledProperty label="Filter">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="name">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="filter">
             {(value, onChange) => 
               <FilterExprComponent 
                 value={value} 

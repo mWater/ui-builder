@@ -94,10 +94,10 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
     // Wrap in context var injector
     return <ContextVarsInjector 
-      contextVars={widgetDef.contextVars}
+      injectedContextVars={widgetDef.contextVars}
       createBlock={this.props.createBlock}
       innerBlock={widgetDef.blockDef}
-      contextVarValues={page.contextVarValues}
+      injectedContextVarValues={page.contextVarValues}
       renderInstanceProps={outerRenderInstanceProps}
       schema={this.props.schema}
       database={page.database}>

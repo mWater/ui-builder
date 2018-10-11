@@ -50,7 +50,7 @@ test("inner contains extra context vars", () => {
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
       schema={schema}
-      contextVar={contextVar} 
+      injectedContextVar={contextVar} 
       value={value}
       database={database}
       contextVarExprs={contextVarExprs}>
@@ -78,7 +78,7 @@ test("exprs are computed for row variables", (done) => {
       renderInstanceProps={outerRenderProps} 
       schema={schema}
       database={database}
-      contextVar={contextVar} 
+      injectedContextVar={contextVar} 
       value={value}
       contextVarExprs={contextVarExprs}>
       { (renderInstanceProps: RenderInstanceProps) => {
@@ -127,7 +127,7 @@ test("exprs are null for null row variables", (done) => {
       renderInstanceProps={outerRenderProps} 
       schema={schema}
       database={database}
-      contextVar={contextVar} 
+      injectedContextVar={contextVar} 
       value={value}
       contextVarExprs={contextVarExprs}>
       { (renderInstanceProps: RenderInstanceProps) => {
@@ -161,7 +161,7 @@ test("exprs are computed for rowset variables, excluding non-aggregates", (done)
   const x = shallow((
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
-      contextVar={contextVar} 
+      injectedContextVar={contextVar} 
       schema={schema}
       database={database}
       value={value}
@@ -210,7 +210,7 @@ test("filters are applied for rowset variables", (done) => {
   const x = mount((
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
-      contextVar={contextVar} 
+      injectedContextVar={contextVar} 
       value={value}
       schema={schema}
       database={database}
@@ -281,7 +281,7 @@ test("null filters are ignored for rowset variables", (done) => {
   const x = mount((
     <ContextVarInjector 
       renderInstanceProps={outerRenderProps} 
-      contextVar={contextVar} 
+      injectedContextVar={contextVar} 
       value={value}
       schema={schema}
       database={database}
