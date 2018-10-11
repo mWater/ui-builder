@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "outDir": "lib",
     "module": "esnext",
     "target": "es2017",

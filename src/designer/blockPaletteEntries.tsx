@@ -1,4 +1,5 @@
 import { BlockDef } from "../widgets/blocks";
+import uuid from "uuid/v4"
 
 export interface BlockPaletteEntry {
   title: string
@@ -71,5 +72,9 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       cancelLabel: { _base: "en", en: "Cancel" },
       child: null
     }
-  }
+  },
+  {
+    title: "Tabbed",
+    blockDef: { id: "", type: "tabbed", tabs: [{ id: uuid(), label: { _base: "en", en: "Tab1" }, content: null }]}
+  },
 ]
