@@ -130,12 +130,16 @@ export class ContextVarPropertyEditor extends React.Component<{
   onChange: (value: string) => void,
   contextVars: ContextVar[],
   types?: string[],
-  table?: string
+  table?: string, 
+  filter?: (contextVar: ContextVar) => boolean
 }> {
 
   render() {
     let contextVars = this.props.contextVars.filter(cv => !this.props.types || this.props.types.includes(cv.type))
     contextVars = contextVars.filter(cv => !this.props.table || this.props.table === cv.table)
+    if (this.props.filter) {
+      contextVars.filter(this.props.filter)
+    }
 
     return <Select
       value={this.props.value}
