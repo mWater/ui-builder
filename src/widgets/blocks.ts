@@ -153,7 +153,7 @@ export abstract class Block<T extends BlockDef> {
   renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }
 
   /** Get any context variables expressions that this block needs (not including child blocks) */
-  getContextVarExprs(contextVar: ContextVar): Expr[] { return [] }
+  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary): Expr[] { return [] }
 
   /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
   abstract getChildren(contextVars: ContextVar[]): ChildBlock[]

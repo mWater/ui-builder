@@ -9,7 +9,7 @@ interface EmbeddedExpr {
     contextVarId: string | null;
     /** Expression to be displayed */
     expr: Expr;
-    /** d3 format of expression for numbers */
+    /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
     format: string | null;
 }
 export interface TextBlockDef extends BlockDef {

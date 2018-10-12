@@ -11,6 +11,7 @@
     "immer": "^1.7.2",
     "lodash": "^3.10.1",
     "lru-cache": "^4.1.3",
+    "moment": "^2.22.2",
     "mwater-expressions": "github:mWater/mwater-expressions",
     "mwater-expressions-ui": "github:mWater/mwater-expressions-ui#react16",
     "prop-types": "^15.6.2",

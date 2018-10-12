@@ -1,14 +1,15 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar } from '../blocks'
-import { LookupWidget } from '../widgets';
+import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar, ValidateBlockOptions, getBlockTree } from '../blocks'
 import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
+import { WidgetLibrary } from '../../designer/widgetLibrary';
 
 // Block which contains a widget
 export interface WidgetBlockDef extends BlockDef {
   widgetId: string | null   // Id of the widget
-  contextVarMap: { [contextVarId: string]: string }  // Maps each internal widgets' context variable id to an external one
+  contextVarMap: { [internalContextVarId: string]: string }  // Maps each internal widgets' context variable id to an external one
 }
 
 export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
@@ -19,11 +20,18 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     this.createBlock = createBlock
   }
 
-  validate() { 
+  validate(options: ValidateBlockOptions) { 
     if (!this.blockDef.widgetId) {
       return "Widget required"
     }
-    // TODO!!!
+
+    // Ensure that all context variables exist
+    for (const internalContextVarId of Object.keys(this.blockDef.contextVarMap)) {
+      if (!options.contextVars.find(cv => cv.id === this.blockDef.contextVarMap[internalContextVarId])) {
+        return "Missing context variable in mapping"
+      }
+    }
+
     return null 
   }
 
@@ -45,9 +53,33 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   //   return []
   // }
 
-  getContextVarExprs(contextVar: ContextVar) {
-    // TODO!!
-    return []
+  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary) {
+    if (!this.blockDef.widgetId) {
+      return []
+    }
+
+    // Get inner widget
+    const widgetDef = widgetLibrary.widgets[this.blockDef.widgetId]
+
+    if (!widgetDef.blockDef) {
+      return []
+    }
+
+    // Map context variable
+    const innerContextVar = widgetDef.contextVars.find(cv => contextVar.id === this.blockDef.contextVarMap[cv.id])
+    if (!innerContextVar) {
+      return []
+    }
+
+    // Get complete context variables exprs of inner widget blocks
+    const contextVarExprs = _.flatten(getBlockTree(widgetDef.blockDef, this.createBlock, widgetDef.contextVars).map(cb => {
+      const block = this.createBlock(cb.blockDef)
+      return block.getContextVarExprs(innerContextVar, widgetLibrary)
+    }))
+
+    // Map any variables of expressions that cross widget boundary
+    
+    return contextVarExprs
   }
 
   renderDesign(props: RenderDesignProps) {
@@ -126,7 +158,6 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         }, 
         onSelectContextVar: (contextVarId: string, primaryKey: any) => {
-          // TODO
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
@@ -134,7 +165,6 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         },
         setFilter: (contextVarId: string, filter: Filter) => {
-          // TODO
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
@@ -142,7 +172,6 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         },
         getFilters: (contextVarId: string) => {
-          // TODO
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {

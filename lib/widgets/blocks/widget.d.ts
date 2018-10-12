@@ -1,17 +1,19 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, RenderEditorProps, ContextVar } from '../blocks';
+import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks';
+import { Expr } from 'mwater-expressions';
+import { WidgetLibrary } from '../../designer/widgetLibrary';
 export interface WidgetBlockDef extends BlockDef {
     widgetId: string | null;
     contextVarMap: {
-        [contextVarId: string]: string;
+        [internalContextVarId: string]: string;
     };
 }
 export declare class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     createBlock: CreateBlock;
     constructor(blockDef: WidgetBlockDef, createBlock: CreateBlock);
-    validate(): "Widget required" | null;
-    getContextVarExprs(contextVar: ContextVar): never[];
+    validate(options: ValidateBlockOptions): "Widget required" | "Missing context variable in mapping" | null;
+    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary): Expr[];
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
     renderEditor(props: RenderEditorProps): JSX.Element;

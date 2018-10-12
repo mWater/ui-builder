@@ -1,11 +1,12 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
-import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, FormatEditor } from '../propertyEditors';
+import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors';
 import { Expr, ExprUtils, Schema, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import { format } from 'd3-format'
+import moment from 'moment'
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
@@ -16,7 +17,7 @@ export interface ExpressionBlockDef extends BlockDef {
   /** Expression to be displayed */
   expr: Expr
 
-  /** d3 format of expression for numbers */
+  /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
   format: string | null
 }
 
@@ -63,10 +64,17 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     }
 
     const value = props.getContextVarExprValue(this.blockDef.contextVarId, this.blockDef.expr)
+    const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
     let str
-    if (_.isNumber(value)) {
+    if (exprType === "number" && value != null) {
       str = format(this.blockDef.format || "")(value)
+    }
+    else if (exprType === "date" && value != null) {
+      str = moment(value, moment.ISO_8601).format(this.blockDef.format || "ll")
+    }
+    else if (exprType === "datetime" && value != null) {
+      str = moment(value, moment.ISO_8601).format(this.blockDef.format || "lll")
     }
     else {
       str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
@@ -82,6 +90,11 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
+    const handleExprChange = (expr: Expr) => {
+      // Clear format
+      props.onChange({ ...this.blockDef, expr: expr, format: null })
+    }
+  
     // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
     return (
       <div>
@@ -94,27 +107,49 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
         { contextVar && contextVar.table 
           ?
           <LabeledProperty label="Expression">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="expr">
-              {(value: Expr, onChange) => (
-                <ExprComponent 
+            <ExprComponent 
+              value={this.blockDef.expr} 
+              onChange={handleExprChange} 
+              schema={props.schema} 
+              dataSource={props.dataSource} 
+              aggrStatuses={["individual", "aggregate", "literal"]}
+              variables={createExprVariables(props.contextVars)}
+              table={contextVar.table!}/>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "number" ?
+          <LabeledProperty label="Number Format">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
+              {(value: string, onChange) => (
+                <NumberFormatEditor
                   value={value} 
-                  onChange={onChange} 
-                  schema={props.schema} 
-                  dataSource={props.dataSource} 
-                  aggrStatuses={["individual", "aggregate", "literal"]}
-                  variables={createExprVariables(props.contextVars)}
-                  table={contextVar.table!}/>
+                  onChange={onChange} />
               )}
             </PropertyEditor>
           </LabeledProperty>
           : null
         }
 
-        { exprType === "number" ?
-          <LabeledProperty label="Format">
+        { exprType === "date" ?
+          <LabeledProperty label="Date Format">
             <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
               {(value: string, onChange) => (
-                <FormatEditor
+                <DateFormatEditor
+                  value={value} 
+                  onChange={onChange} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "datetime" ?
+          <LabeledProperty label="Date/time Format">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
+              {(value: string, onChange) => (
+                <DatetimeFormatEditor
                   value={value} 
                   onChange={onChange} />
               )}

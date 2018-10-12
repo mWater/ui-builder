@@ -94,7 +94,21 @@ export declare class OrderByEditor extends React.Component<{
     render(): JSX.Element;
 }
 /** Edits a d3 format */
-export declare class FormatEditor extends React.Component<{
+export declare class NumberFormatEditor extends React.Component<{
+    value: string | null;
+    onChange: (value: string) => void;
+}> {
+    render(): JSX.Element;
+}
+/** Edits a moment.js date format */
+export declare class DateFormatEditor extends React.Component<{
+    value: string | null;
+    onChange: (value: string) => void;
+}> {
+    render(): JSX.Element;
+}
+/** Edits a moment.js datetime format */
+export declare class DatetimeFormatEditor extends React.Component<{
     value: string | null;
     onChange: (value: string) => void;
 }> {

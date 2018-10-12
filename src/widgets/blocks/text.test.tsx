@@ -1,7 +1,7 @@
 import { TextBlockDef, TextBlock } from "./text";
 import { shallow } from "enzyme";
 import { RenderInstanceProps } from "../blocks";
-
+import simpleSchema from "../../__fixtures__/schema";
 
 const tbd: TextBlockDef = {
   type: "text",
@@ -25,7 +25,9 @@ test("gets expressions", () => {
 
 test("renders with format", () => {
   const props = {
-    getContextVarExprValue: jest.fn()
+    getContextVarExprValue: jest.fn(),
+    contextVars: [],
+    schema: simpleSchema()
   }
 
   props.getContextVarExprValue.mockReturnValue(1234)

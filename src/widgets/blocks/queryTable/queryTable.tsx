@@ -10,6 +10,7 @@ import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEdi
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
+import { WidgetLibrary } from '../../../designer/widgetLibrary';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -103,7 +104,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   }
 
   /** Get list of expressions used in a row by content blocks */
-  getRowExprs(contextVars: ContextVar[]): Expr[] {
+  getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary): Expr[] {
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {
       return []
@@ -117,7 +118,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       // Get block tree, compiling expressions for each one
       if (contentBlockDef) {
         for (const descChildBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
-          exprs = exprs.concat(this.createBlock(descChildBlock.blockDef).getContextVarExprs(rowCV))
+          exprs = exprs.concat(this.createBlock(descChildBlock.blockDef).getContextVarExprs(rowCV, widgetLibrary))
         }
       }
     }
