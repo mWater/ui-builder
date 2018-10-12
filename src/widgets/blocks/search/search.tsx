@@ -43,7 +43,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
       let error: string | null
       
       // Validate expr
-      error = exprValidator.validateExpr(searchExpr, { table: rowsetCV.table, types: ["text"] })
+      error = exprValidator.validateExpr(searchExpr, { table: rowsetCV.table, types: ["text", "enum", "enumset"] })
       if (error) {
         return error
       }
@@ -94,7 +94,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
                 <div>
                   <ListEditor items={value} onItemsChange={onItemsChange}>
                     { (expr: Expr, onExprChange) => (
-                      <ExprComponent value={expr} schema={props.schema} dataSource={props.dataSource} onChange={onExprChange} table={rowsetCV.table!} types={["text"]} />
+                      <ExprComponent value={expr} schema={props.schema} dataSource={props.dataSource} onChange={onExprChange} table={rowsetCV.table!} types={["text", "enum", "enumset"]} />
                     )}
                   </ListEditor>
                   <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>

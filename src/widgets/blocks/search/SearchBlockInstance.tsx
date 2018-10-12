@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SearchBlockDef, SearchBlock } from "./search";
-import { RenderInstanceProps, ContextVar } from "../../blocks";
-import { Row, Expr } from "mwater-expressions";
+import { RenderInstanceProps, ContextVar, createExprVariables } from "../../blocks";
+import { Row, Expr, ExprUtils } from "mwater-expressions";
 import * as _ from "lodash";
 import { localize } from "../../localization";
 
@@ -23,24 +23,12 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
 
   createFilter(searchText: string) {
     const blockDef = this.props.blockDef
-    
-    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
     // Get table
-    const table = this.props.renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowsetContextVarId)!.table!
-
+    const table = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!.table!
+    
     if (searchText) {
-      const searchExprs: Expr[] = blockDef.searchExprs.map(se => {
-        return {
-          type: "op",
-          op: "~*",
-          table: table,
-          exprs: [
-            se,
-            { type: "literal", valueType: "text", value: escapeRegex(searchText) }
-          ]
-        } as Expr
-      })
+      const searchExprs: Expr[] = blockDef.searchExprs.map(se => this.createExprFilter(se, searchText, table))
 
       const expr: Expr = {
         type: "op", 
@@ -54,6 +42,63 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     else {
       return { id: blockDef.id, expr: null }
     }
+  }
+
+  createExprFilter(expr: Expr, searchText: string, table: string) {
+    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
+    const exprUtils = new ExprUtils(this.props.renderInstanceProps.schema, createExprVariables(this.props.renderInstanceProps.contextVars))
+
+    // Get type of search expression
+    const exprType = exprUtils.getExprType(expr)
+
+    if (exprType === "text") {
+      return {
+        type: "op",
+        op: "~*",
+        table: table,
+        exprs: [
+          expr,
+          { type: "literal", valueType: "text", value: escapeRegex(searchText) }
+        ]
+      } as Expr
+    }
+
+    if (exprType === "enum") {
+      // Find matching enums
+      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.renderInstanceProps.locale).toLowerCase().includes(searchText.toLowerCase()))
+      if (enumValues.length === 0) {
+        return null
+      }
+      return {
+        type: "op",
+        op: "= any",
+        table: table,
+        exprs: [
+          expr,
+          { type: "literal", valueType: "enumset", value: enumValues.map(ev => ev.id) }
+        ]
+      } as Expr
+    }
+
+    if (exprType === "enumset") {
+      // Find matching enums
+      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.renderInstanceProps.locale).toLowerCase().includes(searchText.toLowerCase()))
+      if (enumValues.length === 0) {
+        return null
+      }
+      return {
+        type: "op",
+        op: "intersects",
+        table: table,
+        exprs: [
+          expr,
+          { type: "literal", valueType: "enumset", value: enumValues.map(ev => ev.id) }
+        ]
+      } as Expr
+    }
+  
+    throw new Error("Unsupported search type " + exprType) 
   }
 
   handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
