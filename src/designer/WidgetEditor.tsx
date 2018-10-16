@@ -102,7 +102,7 @@ class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChang
     let desc = this.props.contextVar.type
     if (this.props.contextVar.table) {
       desc += " of "
-      desc += localize(this.props.schema.getTable(this.props.contextVar.table)!.name, "en")
+      desc += this.props.schema.getTable(this.props.contextVar.table) ? localize(this.props.schema.getTable(this.props.contextVar.table)!.name, "en") : this.props.contextVar.table
     }
 
     return (
