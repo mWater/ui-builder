@@ -9,7 +9,6 @@ import { CreateBlock } from "../widgets/blocks";
 import * as _ from "lodash";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
-import ListEditor from "../widgets/ListEditor";
 
 export interface WidgetLibrary {
   widgets: { [id: string]: WidgetDef }

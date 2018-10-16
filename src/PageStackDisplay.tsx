@@ -66,6 +66,10 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     // Lookup widget
     const widgetDef = this.props.widgetLibrary.widgets[page.widgetId!]
 
+    if (!widgetDef) {
+      return <div className="alert alert-danger">Widget not found</div>
+    }
+
     // Case of empty widget
     if (!widgetDef.blockDef) {
       return null
