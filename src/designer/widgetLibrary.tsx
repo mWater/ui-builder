@@ -206,7 +206,6 @@ class NewTab extends React.Component<{
             <span style={{ float: "right"}} onClick={this.props.onRemoveWidget.bind(null, widget.id)}>
               <i className="fa fa-remove"/>
             </span>
-
             {widget.name}
           </li>
         )) }

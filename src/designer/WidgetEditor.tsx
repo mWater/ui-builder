@@ -50,6 +50,8 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             />
         })}
       </LabeledProperty>
+      <div style={{ color: "#EEE", fontSize: 9 }}>{this.props.widgetDef.id}</div>
+
     </div>)
   }
 }
