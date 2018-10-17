@@ -11,6 +11,9 @@ import 'font-awesome/css/font-awesome.css'
 import * as ReactDOM from 'react-dom';
 import { defaultBlockPaletteEntries } from './designer/blockPaletteEntries';
 
+import { DragDropContext } from "react-dnd";
+import HTML5Backend from 'react-dnd-html5-backend'
+
 const basicBlockFactory = new BlockFactory()
 
 const defaultWidgetLibrary : WidgetLibrary = {
@@ -23,6 +26,7 @@ const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { loc
 
 const actionLibrary = new ActionLibrary()
 
+@DragDropContext(HTML5Backend)
 class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[] }> {
   constructor(props: object) {
     super(props)

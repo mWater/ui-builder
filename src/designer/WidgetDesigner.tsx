@@ -14,8 +14,6 @@ import { Page } from "../PageStack";
 import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { Database } from "../database/Database";
-import { DragDropContext } from "react-dnd";
-import HTML5Backend from 'react-dnd-html5-backend'
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import ErrorBoundary from "./ErrorBoundary";
 
@@ -41,7 +39,6 @@ interface State {
 }
 
 /** Design mode for a single widget */
-@DragDropContext(HTML5Backend)
 export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
   constructor(props: WidgetDesignerProps) {
     super(props)
