@@ -1,3 +1,8 @@
+declare module 'react-library/lib/FillDownwardComponent' {
+  class FillDownwardComponent extends React.Component<{}> {}
+
+  export default FillDownwardComponent
+}
 
 declare module 'react-library/lib/ModalPopupComponent' {
   class ModalPopupComponent extends React.Component<{

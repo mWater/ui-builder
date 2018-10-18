@@ -16,6 +16,7 @@ import { ActionLibrary } from "../widgets/ActionLibrary";
 import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import ErrorBoundary from "./ErrorBoundary";
+import FillDownwardComponent from "react-library/lib/FillDownwardComponent";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -325,27 +326,31 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
   render() {
     return (
-      <div style={{ height: "100%" }}>
-        <div className="widget-designer-header">
-          <div style={{float: "right"}}>
-            <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
-              <i className="fa fa-undo"/> Undo              
-            </button>
-            <button type="button" className="btn btn-link btn-sm" onClick={this.handleRedo} disabled={this.state.redoStack.length === 0}>
-              <i className="fa fa-repeat"/> Redo
-            </button>
-            <Toggle 
-              value={this.state.mode}
-              options={[
-                { value: Mode.Design, label: [<i key="design" className="fa fa-pencil"/>, " Design"] }, 
-                { value: Mode.Preview, label: [<i key="design" className="fa fa-play"/>, " Preview"] }]}
-              onChange={this.handleSetMode}
-              size="sm"
-              />
+      <FillDownwardComponent>
+        <div style={{position: "relative", height: "100%"}}>
+          <div className="widget-designer-header">
+            <div style={{float: "right"}}>
+              <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
+                <i className="fa fa-undo"/> Undo              
+              </button>
+              <button type="button" className="btn btn-link btn-sm" onClick={this.handleRedo} disabled={this.state.redoStack.length === 0}>
+                <i className="fa fa-repeat"/> Redo
+              </button>
+              <Toggle 
+                value={this.state.mode}
+                options={[
+                  { value: Mode.Design, label: [<i key="design" className="fa fa-pencil"/>, " Design"] }, 
+                  { value: Mode.Preview, label: [<i key="design" className="fa fa-play"/>, " Preview"] }]}
+                onChange={this.handleSetMode}
+                size="sm"
+                />
+            </div>
+          </div>
+          <div style={{ height: "100%", paddingTop: 44 }}>
+            { this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview() }
           </div>
         </div>
-        { this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview() }
-      </div>
+      </FillDownwardComponent>
     )
   }
 }
