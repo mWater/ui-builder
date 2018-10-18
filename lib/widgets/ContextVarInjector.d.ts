@@ -20,6 +20,10 @@ interface State {
     exprValues: {
         [exprJson: string]: any;
     };
+    /** Context var values at last refresh. Used to detect changes */
+    contextVarValues: {
+        [contextVarId: string]: any;
+    };
 }
 /** Injects one context variable into the inner render instance props.
  * Holds state of the filters that are applied to rowset-type context vars

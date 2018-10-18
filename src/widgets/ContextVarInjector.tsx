@@ -22,6 +22,9 @@ interface State {
   refreshing: boolean
   /** Value of expressions. Index by canonicalized JSON */
   exprValues: { [exprJson: string]: any }
+
+  /** Context var values at last refresh. Used to detect changes */
+  contextVarValues: { [contextVarId: string]: any }
 }
 
 /** Injects one context variable into the inner render instance props. 
@@ -36,7 +39,8 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       filters: props.initialFilters || [],
       loading: true,
       refreshing: false,
-      exprValues: {}
+      exprValues: {},
+      contextVarValues: props.renderInstanceProps.contextVarValues
     }
   }
 
@@ -48,7 +52,12 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    if (!_.isEqual(prevProps.value, this.props.value) || !_.isEqual(prevState.filters, this.state.filters)) {
+    // If value change, filters change, or any context var values changes, refresh
+    // TODO context var value changes are only relevant if referenced as a variable. Could be optimized
+    if (!_.isEqual(prevProps.value, this.props.value) 
+      || !_.isEqual(prevState.filters, this.state.filters)
+      || !_.isEqual(this.props.renderInstanceProps.contextVarValues, this.state.contextVarValues)
+      ) {
       this.performQueries()
     }
   }
@@ -116,11 +125,13 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const variables = createExprVariables(innerProps.contextVars)
     const variableValues = innerProps.contextVarValues
 
+    this.setState({ refreshing: true, contextVarValues: this.props.renderInstanceProps.contextVarValues })
+
     // Query database if row 
     if (this.props.injectedContextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       // Special case of null row value
       if (this.props.value == null) {
-        this.setState({ exprValues: {}, loading: false, refreshing: false })
+        this.setState({ exprValues: {}, loading: false, refreshing: false, contextVarValues: this.props.renderInstanceProps.contextVarValues })
         return
       }
 
@@ -131,8 +142,13 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       const queryOptions = this.createRowQueryOptions(table)
       const rows = await this.props.renderInstanceProps.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
-      // Ignore if out of date
+      // Ignore if query options out of date
       if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
+        return
+      }
+
+      // Ignore if variable values out of date
+      if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
         return
       }
 
@@ -144,7 +160,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
           exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
         }
-        this.setState({ exprValues, loading: false })
+        this.setState({ exprValues })
       }
     }
 
@@ -188,11 +204,17 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   createInnerProps(): RenderInstanceProps {
     const outer = this.props.renderInstanceProps
 
+    // Get injected context variable value (rowset is special case that incorporates filters)
+    let value = this.props.value
+    if (this.props.injectedContextVar.type === "rowset" && this.state.filters.length > 0) {
+      value = { type: "op", op: "and", table: this.props.injectedContextVar.table!, exprs: _.compact([value].concat(this.state.filters.map(f => f.expr))) }
+    }
+
     // Create inner props
     const innerProps: RenderInstanceProps = {
       ...outer,
       contextVars: outer.contextVars.concat(this.props.injectedContextVar),
-      contextVarValues: { ...outer.contextVarValues, [this.props.injectedContextVar.id]: this.props.value },
+      contextVarValues: { ...outer.contextVarValues, [this.props.injectedContextVar.id]: value },
       getContextVarExprValue: (contextVarId, expr) => {
         if (contextVarId === this.props.injectedContextVar.id) {
           return this.state.exprValues[canonical(expr)]

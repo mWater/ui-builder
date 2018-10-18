@@ -334,3 +334,44 @@ test("null filters are ignored for rowset variables", (done) => {
     }, 10)
   })
 })
+
+test("filters are applied for rowset variables to variable value", (done) => {
+  const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
+  const value: Expr = { type: "literal", valueType: "boolean", value: false }
+  const contextVarExprs : Expr[] = [
+    { type: "op", table: "t1", op: "count", exprs: [] }
+  ]
+  const initialFilters: Filter[] = [
+    { id: "f1", expr: { type: "field", table: "t1", column: "c2" }}
+  ]
+
+  let innerRenderProps: RenderInstanceProps
+  let innerIsLoading = false
+    
+  // Need mount as shallow rendering fails to call lifecycle componentDidUpdate
+  const x = mount((
+    <ContextVarInjector 
+      renderInstanceProps={outerRenderProps} 
+      injectedContextVar={contextVar} 
+      value={value}
+      schema={schema}
+      database={database}
+      contextVarExprs={contextVarExprs}
+      initialFilters={initialFilters}>
+      { (renderInstanceProps: RenderInstanceProps, isLoading: boolean) => {
+          innerRenderProps = renderInstanceProps
+          innerIsLoading = isLoading
+          return <div/>
+      }}
+    </ContextVarInjector>))
+
+  setImmediate(() => {
+    expect(innerRenderProps.contextVarValues.cv1).toEqual({
+      type: "op", op: "and", table: "t1", exprs: [
+        value, initialFilters[0].expr
+      ]})
+    done()
+  })
+  
+})
+  
