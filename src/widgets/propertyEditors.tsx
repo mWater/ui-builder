@@ -206,7 +206,7 @@ export class OrderByArrayEditor extends React.Component<{
 }> {
 
   handleAddOrderByExpr = () => {
-    this.props.onChange((this.props.value || []).concat([{ expr: null, dir: OrderByDir.asc }]))
+    this.props.onChange((this.props.value || []).concat([{ expr: null, dir: "asc" }]))
   }
 
   render() {
@@ -239,7 +239,7 @@ export class OrderByEditor extends React.Component<{
   }
 
   handleDirToggle = () => {
-    this.props.onChange({ ...this.props.value, dir: (this.props.value.dir === OrderByDir.asc) ? OrderByDir.desc : OrderByDir.asc })
+    this.props.onChange({ ...this.props.value, dir: (this.props.value.dir === "asc") ? "desc" : "asc" })
   }
 
   render() {
@@ -247,7 +247,7 @@ export class OrderByEditor extends React.Component<{
       <div>
         <div style={{ float: "left" }}>
           <a onClick={this.handleDirToggle}>
-            { this.props.value.dir === OrderByDir.asc ? <i className="fa fa-arrow-up"/> : <i className="fa fa-arrow-down"/> }
+            { this.props.value.dir === "asc" ? <i className="fa fa-arrow-up"/> : <i className="fa fa-arrow-down"/> }
           </a>
         </div>
         <ExprComponent 

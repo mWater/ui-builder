@@ -30,6 +30,10 @@ export class QueryCompiler {
       orderBy: []
     }
 
+    if (options.distinct) {
+      query.distinct = true
+    }
+
     const colKeys = _.keys(options.select)
 
     // Determine if any aggregate

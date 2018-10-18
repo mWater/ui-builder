@@ -1,10 +1,7 @@
 import { Expr } from 'mwater-expressions'
 import { ContextVar } from '../widgets/blocks';
 
-export enum OrderByDir {
-  asc = "asc",
-  desc = "desc"
-}
+export type OrderByDir = "asc" | "desc"
 
 export interface OrderBy {
   expr: Expr
@@ -13,6 +10,7 @@ export interface OrderBy {
 
 export interface QueryOptions {
   select: { [alias: string]: Expr },
+  distinct?: boolean,
   from: string,       // Table that this is from
   where?: Expr,       // Where clause
   orderBy?: OrderBy[], 

@@ -51,7 +51,7 @@ test("pass through if no mutations", async () => {
     },
     from: "t2",
     where: t2Where,
-    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: OrderByDir.desc }],
+    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: "desc" }],
     limit: 10
   }
 
@@ -74,7 +74,7 @@ test("queries with where clause and included columns", async () => {
     },
     from: "t2",
     where: t2Where,
-    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: OrderByDir.desc }],
+    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: "desc" }],
     limit: 10
   }, [], {})
 
@@ -167,7 +167,7 @@ describe("select, order, limit", () => {
     const qopts: QueryOptions = {
       select: { x: { type: "field", table: "t1", column: "text" }},
       from: "t1",
-      orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }],
+      orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }],
       limit: 2
     }
 
@@ -256,7 +256,7 @@ describe("select, order, limit", () => {
         numberField,
         { type: "literal", valueType: "number", value: 3 }
       ]},
-      orderBy: [{ expr: numberField, dir: OrderByDir.asc }]
+      orderBy: [{ expr: numberField, dir: "asc" }]
     }
 
     test("waits until transaction committed", async () => {

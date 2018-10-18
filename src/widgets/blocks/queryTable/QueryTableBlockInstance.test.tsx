@@ -92,7 +92,7 @@ test("adds filters, orderBy and where", () => {
     ...qtbdSingle, 
     where: { type: "literal", valueType: "boolean", value: false },
     orderBy: [
-      { expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }
+      { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
     ]
   }) as QueryTableBlock
   const inst = mount(<QueryTableBlockInstance block={qtb} renderInstanceProps={rips} />)
@@ -115,7 +115,7 @@ test("adds filters, orderBy and where", () => {
       ]
     },
     orderBy: [
-      { expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }
+      { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
     ],
     limit: 10
   })

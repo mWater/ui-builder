@@ -30,6 +30,29 @@ test("compiles simple query", () => {
   expect(rowMapper({ c_0: "abc", o_0: "xyz" })).toEqual({ x: "abc" })
 })
 
+test("compiles distinct query", () => {
+  const options: QueryOptions = {
+    select: { x: { type: "field", table: "t1", column: "text" } },
+    distinct: true,
+    from: "t1",
+  }
+
+  const { jsonql, rowMapper } = compiler.compileQuery(options)
+
+  expect(jsonql).toEqual({
+    type: "query",
+    selects: [
+      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" }
+    ],
+    distinct: true,
+    from: { type: "table", table: "t1", alias: "main" },
+    groupBy: [],
+    orderBy: []
+  })
+
+  expect(rowMapper({ c_0: "abc", o_0: "xyz" })).toEqual({ x: "abc" })
+})
+
 test("compiles aggregated, limited query", () => {
   const options: QueryOptions = {
     select: { 
@@ -62,7 +85,7 @@ test("compiles ordered where query", () => {
     select: { x: { type: "field", table: "t1", column: "text" } },
     from: "t1",
     where: { type: "field", table: "t1", column: "boolean" },
-    orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: OrderByDir.desc }]
+    orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }]
   }
 
   const { jsonql, rowMapper } = compiler.compileQuery(options)

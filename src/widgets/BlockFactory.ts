@@ -13,7 +13,7 @@ import { ButtonBlock, ButtonBlockDef } from './blocks/button';
 import { TextboxBlock, TextboxBlockDef } from './blocks/controls/textbox';
 import { SaveCancelBlock, SaveCancelBlockDef } from './blocks/saveCancel';
 import { DropdownBlock, DropdownBlockDef } from './blocks/controls/dropdown';
-import { DropdownFilterBlock, DropdownFilterBlockDef } from './blocks/dropdownFilter';
+import { DropdownFilterBlock, DropdownFilterBlockDef } from './blocks/dropdownFilter/dropdownFilter';
 import { RowsetBlock, RowsetBlockDef } from './blocks/rowset';
 import { TabbedBlock, TabbedBlockDef } from './blocks/tabbed/tabbed';
 import { ImageBlock, ImageBlockDef } from './blocks/image';
