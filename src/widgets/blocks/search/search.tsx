@@ -54,11 +54,11 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
   
   renderDesign(props: RenderDesignProps) {
     return (
-      <div className="input-group" style={{ padding: 5 }}>
+      <div className="input-group">
         <span className="input-group-addon"><i className="fa fa-search"/></span>
         <input 
           type="text" 
-          className="form-control input-sm" 
+          className="form-control" 
           style={{maxWidth: "20em"}} 
           placeholder={localize(this.blockDef.placeholder, props.locale)} 
         />
