@@ -74,7 +74,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 })
     }
 
-    return <ReactSelect styles={styles}/>
+    return <div style={{ padding: 5 }}><ReactSelect styles={styles}/></div>
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
@@ -91,17 +91,20 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
     const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)
 
+    let elem: React.ReactElement<any>
+
     switch (valueType) {
       case "enum":
-        return <EnumInstance 
+        elem = <EnumInstance 
           blockDef={this.blockDef}
           schema={props.schema}
           contextVars={props.contextVars}
           value={value}
           onChange={handleChange}
           locale={props.locale} />
+        break
       case "text":
-        return <TextInstance 
+        elem = <TextInstance 
           blockDef={this.blockDef}
           schema={props.schema}
           contextVars={props.contextVars}
@@ -109,9 +112,12 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           database={props.database}
           onChange={handleChange}
           locale={props.locale} />
-      }
+        break
+      default:
+        elem = <div/>
+    }
 
-    return <ReactSelect/>
+    return <div style={{ padding: 5 }}>{elem}</div>
   }    
 
   renderEditor(props: RenderEditorProps) {

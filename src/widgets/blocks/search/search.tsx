@@ -54,7 +54,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
   
   renderDesign(props: RenderDesignProps) {
     return (
-      <div className="input-group">
+      <div className="input-group" style={{ padding: 5 }}>
         <span className="input-group-addon"><i className="fa fa-search"/></span>
         <input 
           type="text" 

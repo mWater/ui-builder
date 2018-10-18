@@ -112,7 +112,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
 
   render() {
     return (
-      <div className="input-group">
+      <div className="input-group" style={{ padding: 5 }}>
         <span className="input-group-addon"><i className="fa fa-search"/></span>
         <input 
           type="text" 

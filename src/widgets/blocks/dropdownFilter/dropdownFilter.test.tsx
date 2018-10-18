@@ -2,6 +2,8 @@ import simpleSchema from "../../../__fixtures__/schema";
 import { shallow } from "enzyme";
 import { DropdownFilterBlock, DropdownFilterBlockDef } from "./dropdownFilter";
 import { RenderInstanceProps } from "../../blocks";
+import EnumInstance from "./EnumInstance";
+import TextInstance from "./TextInstance";
 
 describe("enum filter", () => {
   const dropdownFilterBlockDef: DropdownFilterBlockDef = {
@@ -27,7 +29,7 @@ describe("enum filter", () => {
     const inst = shallow(dropdownFilterBlock.renderInstance((props as any) as RenderInstanceProps))
   
     // Set an option
-    inst.prop("onChange")({ id: "op1", name: { _base: "en", en: "Op1" }})
+    inst.find(EnumInstance).prop("onChange")("op1")
   
     expect(props.setFilter.mock.calls[0]).toEqual(["cv1", {
       id: "ddf1",
@@ -53,7 +55,7 @@ describe("enum filter", () => {
     const inst = shallow(dropdownFilterBlock.renderInstance((props as any) as RenderInstanceProps))
   
     // Set an option
-    inst.prop("onChange")(null)
+    inst.find(EnumInstance).prop("onChange")(null)
   
     expect(props.setFilter.mock.calls[0]).toEqual(["cv1", {
       id: "ddf1",
@@ -88,7 +90,7 @@ describe("text filter", () => {
     const inst = shallow(dropdownFilterBlock.renderInstance((props as any) as RenderInstanceProps))
   
     // Set an option
-    inst.prop("onChange")({ value: "op1", label: "op1" })
+    inst.find(TextInstance).prop("onChange")("op1")
   
     expect(props.setFilter.mock.calls[0]).toEqual(["cv1", {
       id: "ddf1",
@@ -114,7 +116,7 @@ describe("text filter", () => {
     const inst = shallow(dropdownFilterBlock.renderInstance((props as any) as RenderInstanceProps))
   
     // Set an option
-    inst.prop("onChange")(null)
+    inst.find(TextInstance).prop("onChange")(null)
   
     expect(props.setFilter.mock.calls[0]).toEqual(["cv1", {
       id: "ddf1",
