@@ -70,7 +70,11 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   }
 
   renderDesign(props: RenderDesignProps) {
-    return <ReactSelect/>
+    const styles = {
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 })
+    }
+
+    return <ReactSelect styles={styles}/>
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {

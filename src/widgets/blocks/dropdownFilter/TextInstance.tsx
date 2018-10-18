@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, EnumValue } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
@@ -58,6 +58,9 @@ export default class TextInstance extends React.Component<{
     const currentValue = this.props.value ? { value: this.props.value, label: this.props.value } : null
 
     const noOptionsMessage = () => "Type to search"
+    const styles = {
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 })
+    }
 
     // TODO key: JSON.stringify(@props.filters)  # Include to force a change when filters change
     return <Async 
@@ -69,6 +72,7 @@ export default class TextInstance extends React.Component<{
       onChange={this.handleChange}
       isClearable={true}
       noOptionsMessage={noOptionsMessage}
+      styles={styles}
     />
       // styles: { 
       //   # Keep menu above fixed data table headers

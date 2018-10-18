@@ -22,6 +22,9 @@ export default class EnumInstance extends React.Component<{
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, this.props.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
     const handleChange = (ev: EnumValue | null) => this.props.onChange(ev ? ev.id : null)
+    const styles = {
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 })
+    }
 
     return <ReactSelect
       value={enumValue} 
@@ -31,6 +34,7 @@ export default class EnumInstance extends React.Component<{
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       isClearable={true}
+      styles={styles}
       />
   }
 }
