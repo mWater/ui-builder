@@ -13,6 +13,7 @@
   display: inline-block;
   vertical-align: top;
   padding: 5px;
+  overflow-y: auto;
 }
 
 .widget-designer-editor {
