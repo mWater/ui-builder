@@ -45,7 +45,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
 
   handleWidgetLibraryChange = (widgetLibrary: WidgetLibrary) => {
     this.setState({ widgetLibrary })
-    console.log(JSON.stringify(widgetLibrary, null, 2))
+    // console.log(JSON.stringify(widgetLibrary, null, 2))
     window.localStorage.setItem("widgetLibrary", JSON.stringify(widgetLibrary))
   }
 
