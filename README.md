@@ -20,11 +20,33 @@ Non-features:
 
 - Does not include a scripting language. Custom work should be done as custom components
 
-## Outstanding issues
+## Concepts
 
-- How do required fields get enforced? Is it a widget resposibility or a table responsibility? 
+### Blocks
 
-- How to get context vars across widget boundaries? Can they be other than row or rowset?
+Blocks are the smallest item. They are a rectangular item on the screen such as a drop down box, text field, expression ,table, etc
+
+Blocks may contain other blocks, but the method of embedding the children blocks is entirely up to the parent block.
+
+### Context variables
+
+Contacts variables are variable values that are passed down through the tree of blocks. They may be of the type `row` indicating a single 
+row of a table. `rowset` is a Boolean expression determining which rows of a table are included in a set of rows. They can also be `text`,
+`number`, etc and other literals.
+
+A block may use one or more contacts variables. Furthermore, for row and rowset variables, the block may request the value of one or more
+expressions based on the variable. For example, a text box may request the value of a text column of a row so that it doesn't have to query
+it itself.
+
+### Widgets
+
+A widget contains a single block and has a human readable name. It also defines 0 or more contacts variables that will be passed to the block.
+
+The purpose of the UI Builder is primarily to create widgets which represent pages of the website or that represents smaller pieces that can be reused.
+
+### Widget Library
+
+Collection of widgets. Usually an app will have a single widget Library that is serializable to Json.
 
 ## How to add a new block type
 

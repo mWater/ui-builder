@@ -15,7 +15,7 @@ interface State {
   refreshing: boolean
 }
 
-// TODO handle db refresh
+/** Instance of a query table */
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
   /** Current query options to determine if refresh needed */
   queryOptions?: QueryOptions 
@@ -27,6 +27,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   componentDidMount() {
+    this.props.renderInstanceProps.database.addChangeListener(this.handleChange)
     this.performQuery()
   }
 
@@ -36,6 +37,15 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     if (!_.isEqual(newQueryOptions, this.queryOptions)) {
       this.performQuery()
     }
+  }
+
+  componentWillUnmount() {
+    this.props.renderInstanceProps.database.removeChangeListener(this.handleChange)
+  }
+
+  /** Change listener to refresh database */
+  handleChange = () => {
+    this.performQuery()
   }
 
   createQuery(): QueryOptions {

@@ -3,14 +3,20 @@ import { DataSource, Schema } from "mwater-expressions";
 import { QueryCompiler } from "./QueryCompiler";
 import { createExprVariables, ContextVar } from "../widgets/blocks";
 
+type TransactionHandler = () => Transaction
 
+/** Database which is driven from a data source. Changes must be handled externally and updates triggered manually */
 export class DataSourceDatabase implements Database {
   schema: Schema
   dataSource: DataSource
+  transactionHandler?: TransactionHandler
+  changeListeners: DatabaseChangeListener[]
 
-  constructor(schema: Schema, dataSource: DataSource) {
+  constructor(schema: Schema, dataSource: DataSource, transactionHandler?: TransactionHandler) {
     this.schema = schema
     this.dataSource = dataSource
+    this.transactionHandler = transactionHandler
+    this.changeListeners = []
   }
   
   query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
@@ -32,14 +38,24 @@ export class DataSourceDatabase implements Database {
   
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener) {
-    // TODO
+    this.changeListeners = _.union(this.changeListeners, [changeListener])
   }
 
-  removeChangeListener(changeListener: DatabaseChangeListener){
-    // TODO
+  removeChangeListener(changeListener: DatabaseChangeListener) {
+    this.changeListeners = _.difference(this.changeListeners, [changeListener])
+  }
+
+  /** Force change event to fire */
+  triggerChange() {
+    for (const changeListener of this.changeListeners) {
+      changeListener()
+    }
   }
 
   transaction(): Transaction {
-    throw new Error("Not implemented")
+    if (!this.transactionHandler) {
+      throw new Error("Not implemented")
+    }
+    return this.transactionHandler()
   }
 }
