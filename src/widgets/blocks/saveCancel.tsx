@@ -14,6 +14,9 @@ export interface SaveCancelBlockDef extends BlockDef {
   child: BlockDef | null
 }
 
+/** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
+ * When either is clicked, the page is closed.
+ */
 export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
@@ -85,6 +88,8 @@ interface SaveCancelInstanceProps {
 
 interface SaveCancelInstanceState {
   virtualDatabase: VirtualDatabase
+  /** True when control has been destroyed by save or cancel */
+  destroyed: boolean
 }
 
 /** Instance swaps out the database for a virtual database */
@@ -92,19 +97,29 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
   constructor(props: SaveCancelInstanceProps) {
     super(props)
     this.state = {
-      virtualDatabase: new VirtualDatabase(props.renderInstanceProps.database, props.renderInstanceProps.schema, props.renderInstanceProps.locale)
+      virtualDatabase: new VirtualDatabase(props.renderInstanceProps.database, props.renderInstanceProps.schema, props.renderInstanceProps.locale), 
+      destroyed: false
     }
   }
 
-  handleSave = () => {
-    // TODO
+  handleSave = async () => {
+    // TODO what about validation? Errors?
+    await this.state.virtualDatabase.commit()
+    this.setState({ destroyed: true })
+    this.props.renderInstanceProps.pageStack.closePage()
   }
 
   handleCancel = () => {
-    // TODO
+    this.state.virtualDatabase.rollback()
+    this.setState({ destroyed: true })
+    this.props.renderInstanceProps.pageStack.closePage()
   }
 
   render() {
+    if (this.state.destroyed) {
+      return null
+    }
+    
     const saveLabelText = localize(this.props.blockDef.saveLabel, this.props.renderInstanceProps.locale)
     const cancelLabelText = localize(this.props.blockDef.cancelLabel, this.props.renderInstanceProps.locale)
 
