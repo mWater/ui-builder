@@ -213,6 +213,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     // Create inner props
     const innerProps: RenderInstanceProps = {
       ...outer,
+      database: this.props.database,
       contextVars: outer.contextVars.concat(this.props.injectedContextVar),
       contextVarValues: { ...outer.contextVarValues, [this.props.injectedContextVar.id]: value },
       getContextVarExprValue: (contextVarId, expr) => {

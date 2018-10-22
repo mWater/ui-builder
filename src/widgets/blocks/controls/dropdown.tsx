@@ -25,14 +25,23 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return <ReactSelect/>
     }
 
+    switch (column.type) {
+      case "enum":
+        return this.renderEnum(props, column)
+      case "enumset":
+        return this.renderEnumset(props, column)
+    }
+    throw new Error("Unsupported type")
+  }
+
+  renderEnum(props: RenderControlProps, column: Column) {
     const enumValues = column.enumValues!
-    const enumValue = enumValues.find(ev => ev.id === props.value)
+    const enumValue = enumValues.find(ev => ev.id === props.value) || null
 
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
     const handleChange = (ev: EnumValue | null) => props.onChange(ev ? ev.id : null)
 
-    // TODO value null or undefined?
     return <ReactSelect
       value={enumValue} 
       onChange={handleChange}
@@ -45,6 +54,35 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       />
   }
 
+  renderEnumset(props: RenderControlProps, column: Column) {
+    const enumValues = column.enumValues!
+
+    // Map value to array
+    let value: EnumValue[] | null = null
+    if (props.value) {
+      value = _.compact(props.value.map((v: any) => enumValues.find(ev => ev.id === v)))
+    }
+
+    const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
+    const getOptionValue = (ev: EnumValue) => ev.id
+    const handleChange = (evs: EnumValue[] | null) => {
+      props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+    }
+
+    return <ReactSelect
+      value={value} 
+      onChange={handleChange}
+      options={column.enumValues}
+      placeholder={localize(this.blockDef.placeholder, props.locale)}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      isDisabled={props.disabled}
+      isClearable={true}
+      isMulti={true}
+      />
+  }
+
+
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   renderControlEditor(props: RenderEditorProps) {
     return (
@@ -56,8 +94,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     )
   }
 
-  /** Filter the columns that this control is for */
+  /** Filter the columns that this control is for. Can't be expression */
   filterColumn(column: Column) {
-    return column.type === "enum" // TODO enumset, id, id[]
+    if (column.expr) {
+      return false
+    }
+
+    return column.type === "enum" || column.type === "enumset" // TODO enumset, id, id[]
   }
 }
