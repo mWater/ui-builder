@@ -102,7 +102,7 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
   renderInstance(props: RenderInstanceProps) { 
     const contextVar = this.createContextVar()!
     
-    // Inject context variable TODO
+    // Inject context variable
     return <ContextVarsInjector 
       injectedContextVars={[contextVar]} 
       injectedContextVarValues={{ [contextVar.id]: this.blockDef.filter }}

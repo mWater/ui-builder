@@ -39,7 +39,7 @@ export default class BlockPaletteItem extends React.Component<Props> {
       selectedId: null,
       schema: this.props.schema,
       dataSource: this.props.dataSource,
-      locale: "en", // TODO hardcoded
+      locale: "en",
       widgetLibrary: { widgets: {} },
       contextVars: [],
       store: {
