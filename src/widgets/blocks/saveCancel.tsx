@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock, ValidatableInstance } from '../blocks'
 import { LocalizedString, localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
@@ -94,16 +94,37 @@ interface SaveCancelInstanceState {
 
 /** Instance swaps out the database for a virtual database */
 class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCancelInstanceState> {
+  instanceRefs: { [key: string]: React.Component<any> & ValidatableInstance }
+
   constructor(props: SaveCancelInstanceProps) {
     super(props)
     this.state = {
       virtualDatabase: new VirtualDatabase(props.renderInstanceProps.database, props.renderInstanceProps.schema, props.renderInstanceProps.locale), 
       destroyed: false
     }
+
+    this.instanceRefs = {}
   }
 
   handleSave = async () => {
-    // TODO what about validation? Errors?
+    // Validate all instances
+    const validationMessages: string[] = []
+
+    for (const key of Object.keys(this.instanceRefs)) {
+      const component = this.instanceRefs[key]
+      if (component.validate) {
+        const msg = component.validate()
+        if (msg) {
+          validationMessages.push(msg)
+        }
+      }
+    }
+
+    if (validationMessages.length > 0) {
+      alert(validationMessages.join("\n"))
+      return
+    }
+
     await this.state.virtualDatabase.commit()
     this.setState({ destroyed: true })
     this.props.renderInstanceProps.pageStack.closePage()
@@ -115,13 +136,48 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     this.props.renderInstanceProps.pageStack.closePage()
   }
 
+  refHandler = (key: string, component: React.Component<any> | null) => {
+    if (component) {
+      this.instanceRefs[key] = component
+    }
+    else {
+      delete this.instanceRefs[key]
+    }
+  }
+
+  /** All sub-block elements must rendered using this function. 
+   * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string 
+   * per instance 
+   */
+  renderChildBlock = (props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string) => {
+    // Create block
+    if (childBlockDef) {
+      const block = this.props.createBlock(childBlockDef)
+
+      const elem = block.renderInstance(props)
+
+      // Add ref to element
+      const key = instanceId ? childBlockDef.id + ":" + instanceId : childBlockDef.id
+      const refedElem = React.cloneElement(elem, { ...elem.props, ref: this.refHandler.bind(null, key) })
+      return refedElem
+    }
+    else {
+      return null
+    }
+  }
+
   render() {
     if (this.state.destroyed) {
       return null
     }
-    
+
     const saveLabelText = localize(this.props.blockDef.saveLabel, this.props.renderInstanceProps.locale)
     const cancelLabelText = localize(this.props.blockDef.cancelLabel, this.props.renderInstanceProps.locale)
+
+    // Replace renderChildBlock with function that keeps all instances for validation
+    const renderInstanceProps = { ...this.props.renderInstanceProps, 
+      renderChildBlock: this.renderChildBlock
+    }
 
     // Inject new database and re-inject all context variables. This is needed to allow computed expressions
     // to come from the virtual database
@@ -130,18 +186,18 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
         <ContextVarsInjector 
           createBlock={this.props.createBlock} 
           database={this.state.virtualDatabase}
-          injectedContextVars={this.props.renderInstanceProps.contextVars}
-          injectedContextVarValues={this.props.renderInstanceProps.contextVarValues}
+          injectedContextVars={renderInstanceProps.contextVars}
+          injectedContextVarValues={renderInstanceProps.contextVarValues}
           innerBlock={this.props.blockDef.child!}
-          renderInstanceProps={this.props.renderInstanceProps}
-          schema={this.props.renderInstanceProps.schema}>
-          { (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+          renderInstanceProps={renderInstanceProps}
+          schema={renderInstanceProps.schema}>
+          { (innerRenderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
             if (loading) {
               return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
             return (
               <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-                { renderInstanceProps.renderChildBlock(renderInstanceProps, this.props.blockDef.child) }
+                { innerRenderInstanceProps.renderChildBlock(innerRenderInstanceProps, this.props.blockDef.child) }
               </div>
             )
           }}

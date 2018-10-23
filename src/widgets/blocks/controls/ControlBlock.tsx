@@ -1,10 +1,10 @@
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar, ValidatableInstance } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from "../../propertyEditors";
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
 import { Expr, Column, Schema } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
-import { localize } from "../../localization";
+import { localize, LocalizedString } from "../../localization";
 
 export interface ControlBlockDef extends BlockDef {
   /** Row context variable id */
@@ -15,6 +15,9 @@ export interface ControlBlockDef extends BlockDef {
 
   /** True if value is required */
   required: boolean
+
+  /** Message to display if required is true and control is blank */
+  requiredMessage?: LocalizedString
 }
 
 export interface RenderControlProps {
@@ -42,24 +45,16 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   abstract filterColumn(column: Column): boolean
 
   renderDesign(props: RenderDesignProps) {
-    // Simply render empty control
-    return (
-      <div>
-        { this.renderRequired() }
-        { this.renderControl({ 
-          value: null, 
-          rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
-          onChange: () => { return }, 
-          locale: props.locale,
-          schema: props.schema,
-          disabled: false
-        }) }
-      </div>
-    ) 
-  }
-
-  renderRequired() {
-    return this.blockDef.required ? <div className="required-control">*</div> : null
+    const renderControlProps: RenderControlProps = {
+      value: null, 
+      rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
+      onChange: () => { return }, 
+      locale: props.locale,
+      schema: props.schema,
+      disabled: false
+    }
+    
+    return <ControlInstance renderControlProps={renderControlProps} block={this}/>      
   }
 
   renderInstance(props: RenderInstanceProps) {
@@ -77,19 +72,16 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       await txn.commit()
     }
 
-    return (
-      <div>
-        { this.renderRequired() }
-        { this.renderControl({ 
-          value: value, 
-          rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
-          onChange: handleChange, 
-          locale: props.locale,
-          schema: props.schema,
-          disabled: id == null // Disable if no primary key
-        }) }
-      </div>
-    )
+    const renderControlProps: RenderControlProps = {
+      value: value,
+      onChange: handleChange,
+      schema: props.schema,
+      locale: props.locale,
+      rowContextVar: contextVar,
+      disabled: id == null
+    }
+
+    return <ControlInstance renderControlProps={renderControlProps} block={this}/>      
   }
 
   renderEditor(props: RenderEditorProps) {
@@ -119,7 +111,15 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
         <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="required">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Required</Checkbox>}
         </PropertyEditor>
-        
+
+        { this.blockDef.required ?
+          <LabeledProperty label="Required Message">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="requiredMessage">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+
         {this.renderControlEditor(props)}
       </div>
     )
@@ -153,6 +153,39 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       return "Valid column required"
     }
 
+    if (this.blockDef.required && !this.blockDef.requiredMessage) {
+      return "Required message required"
+    }
+
     return null
   }
 }
+
+interface Props {
+  block: ControlBlock<ControlBlockDef>
+  renderControlProps: RenderControlProps
+}
+
+class ControlInstance extends React.Component<Props> implements ValidatableInstance {
+  /** Validate the instance. Returns null if correct, message if not */
+  validate = () => {
+    // Check for null
+    if (this.props.renderControlProps.value == null && this.props.block.blockDef.required) {
+      return localize(this.props.block.blockDef.requiredMessage!, this.props.renderControlProps.locale)
+    }
+    return null
+  }
+
+  renderRequired() {
+    return this.props.block.blockDef.required ? <div className="required-control">*</div> : null
+  }
+
+  render() {
+    return (
+      <div>
+        { this.renderRequired() }
+        { this.props.block.renderControl(this.props.renderControlProps) }
+      </div>
+    )
+  }
+} 

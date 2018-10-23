@@ -44,17 +44,17 @@ export interface Transaction {
   commit(): Promise<any>;
 }
 
-export class MockDatabase implements Database {
+export class NullDatabase implements Database {
   async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) { return [] }
   
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener) { return }
   removeChangeListener(changeListener: DatabaseChangeListener) { return }
 
-  transaction() { return new MockTransaction() }
+  transaction() { return new NullTransaction() }
 }
 
-class MockTransaction implements Transaction {
+class NullTransaction implements Transaction {
   /** Adds a row, returning the primary key as a promise */
   async addRow(table: string, values: { [column: string]: any }) { return null }
 

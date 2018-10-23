@@ -81,7 +81,7 @@ export interface RenderInstanceProps {
    * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string 
    * per instance 
    */
-  renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string): React.ReactElement<any>
+  renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string): React.ReactElement<any> | null
 }
 
 export interface RenderDesignProps {
@@ -190,6 +190,12 @@ export abstract class Block<T extends BlockDef> {
   canonicalize(): BlockDef | null {
     return this.blockDef
   }
+}
+
+/** Implemented by rendered block instances that require validation */
+export interface ValidatableInstance {
+  /** Validate the instance. Returns null if correct, message if not */
+  validate?(): string | null
 }
 
 // Handles logic of a simple dropping of a block on another

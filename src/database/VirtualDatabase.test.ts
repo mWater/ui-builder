@@ -42,32 +42,9 @@ test("trigger change if underlying database changed", () => {
   expect(changed).toBe(true)
 })
 
-test("pass through if no mutations", async () => {
-  (db.query as jest.Mock).mockResolvedValue([])
-
-  const queryOptions: QueryOptions = {
-    select: {
-      x: { type: "field", table: "t2", column: "text" }
-    },
-    from: "t2",
-    where: t2Where,
-    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: "desc" }],
-    limit: 10
-  }
-
-  await vdb.query(queryOptions, [], {})
-
-  expect(db.query.mock.calls[0][0]).toEqual(queryOptions)
-})
-
 test("queries with where clause and included columns", async () => {
   (db.query as jest.Mock).mockResolvedValue([])
 
-  // Mutate to prevent passthrough
-  const txn = vdb.transaction()
-  await txn.removeRow("t1", "xyzzy")
-  await txn.commit()
-  
   await vdb.query({
     select: {
       x: { type: "field", table: "t2", column: "text" }
@@ -120,11 +97,6 @@ describe("select, order, limit", () => {
 
       return rows
     }) as any
-
-    // Mutate to prevent passthrough
-    const txn = vdb.transaction()
-    await txn.removeRow("t1", "xyzzy")
-    await txn.commit()
 
     // Perform query
     return vdb.query(queryOptions, [], {})

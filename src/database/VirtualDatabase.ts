@@ -43,11 +43,6 @@ export default class VirtualDatabase implements Database {
   }
 
   async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
-    // Passthrough if no mutations
-    if (this.mutations.length === 0) {
-      return this.database.query(options, contextVars, contextVarValues)
-    }
-
     const variables = createExprVariables(contextVars)
     const variableValues = contextVarValues
 

@@ -32,6 +32,9 @@ interface State {
  * Computes values of expressions for row and rowset types
  */
 export default class ContextVarInjector extends React.Component<Props, State> {
+  /** True when component is unmounted */
+  unmounted: boolean
+
   constructor(props: Props) {
     super(props)
 
@@ -42,6 +45,8 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       exprValues: {},
       contextVarValues: props.renderInstanceProps.contextVarValues
     }
+
+    this.unmounted = false
   }
 
   componentDidMount() {
@@ -63,6 +68,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    this.unmounted = true
     this.props.database.removeChangeListener(this.handleDatabaseChange)
   }
 
@@ -152,6 +158,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         return
       }
 
+      // Ignore if unmounted
+      if (this.unmounted) {
+        return
+      }
+
       if (rows.length === 0) {
         this.setState({ exprValues: {} })
       }
@@ -180,6 +191,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
       // Ignore if variable values out of date
       if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
+        return
+      }
+
+      // Ignore if unmounted
+      if (this.unmounted) {
         return
       }
       
