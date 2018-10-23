@@ -13,11 +13,9 @@ export interface TextboxBlockDef extends ControlBlockDef {
 
 export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
   renderControl(props: RenderControlProps) {
-    const handleChange = (v: string) => props.onChange(v)
-
     return <Textbox
       value={props.value} 
-      onChange={handleChange}
+      onChange={props.onChange}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       disabled={props.disabled}
       />
@@ -42,7 +40,7 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
 
 interface TextboxProps {
   value: string | null
-  onChange: (value: string) => void
+  onChange: (value: string | null) => void
   placeholder?: string
   disabled: boolean
 }
@@ -74,7 +72,7 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
     // Only change if different
     const value = ev.target.value || null
     if (value !== this.props.value) {
-      this.props.onChange(ev.target.value)
+      this.props.onChange(value)
     }
   }
 
