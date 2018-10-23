@@ -6,12 +6,15 @@ import { LocalizedString, localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
 import ContextVarsInjector from '../ContextVarsInjector';
+import * as _ from 'lodash'
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
   saveLabel: LocalizedString | null
   cancelLabel: LocalizedString | null
   child: BlockDef | null
+  /** Message to confirm discarding changes */
+  confirmDiscardMessage: LocalizedString | null
 }
 
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
@@ -26,6 +29,19 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     if (!this.blockDef.child) {
       return "Contents required"
     }
+
+    if (!this.blockDef.saveLabel) {
+      return "Save label required"
+    }
+
+    if (!this.blockDef.cancelLabel) {
+      return "Cancel label required"
+    }
+
+    if (!this.blockDef.confirmDiscardMessage) {
+      return "Confirm discard message required"
+    }
+
     return null 
   }
  
@@ -75,6 +91,11 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
+        <LabeledProperty label="Confirm Discard Message">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="confirmDiscardMessage">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }
@@ -93,7 +114,7 @@ interface SaveCancelInstanceState {
 }
 
 /** Instance swaps out the database for a virtual database */
-class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCancelInstanceState> {
+class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCancelInstanceState> implements ValidatableInstance {
   instanceRefs: { [key: string]: React.Component<any> & ValidatableInstance }
 
   constructor(props: SaveCancelInstanceProps) {
@@ -106,6 +127,17 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     this.instanceRefs = {}
   }
 
+  validate = () => {
+    // Confirm if changes present
+    if (this.state.virtualDatabase.mutations.length > 0) {
+      if (!confirm(localize(this.props.blockDef.confirmDiscardMessage, this.props.renderInstanceProps.locale))) {
+        // Return empty string to block without message
+        return ""
+      }
+    }
+    return null
+  }
+
   handleSave = async () => {
     // Validate all instances
     const validationMessages: string[] = []
@@ -114,14 +146,17 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       const component = this.instanceRefs[key]
       if (component.validate) {
         const msg = component.validate()
-        if (msg) {
+        if (msg !== null) {
           validationMessages.push(msg)
         }
       }
     }
 
     if (validationMessages.length > 0) {
-      alert(validationMessages.join("\n"))
+      // "" just blocks
+      if (_.compact(validationMessages).length > 0) {
+        alert(_.compact(validationMessages).join("\n"))
+      }
       return
     }
 

@@ -194,7 +194,7 @@ export abstract class Block<T extends BlockDef> {
 
 /** Implemented by rendered block instances that require validation */
 export interface ValidatableInstance {
-  /** Validate the instance. Returns null if correct, message if not */
+  /** Validate the instance. Returns null if correct, message if not. Empty message ("") blocks but does not show */
   validate?(): string | null
 }
 
@@ -293,4 +293,3 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
   })
 }
 
-/** Create variable values */

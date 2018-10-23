@@ -70,6 +70,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       type: "saveCancel", 
       saveLabel: { _base: "en", en: "Save" },
       cancelLabel: { _base: "en", en: "Cancel" },
+      confirmDiscardMessage: { _base: "en", en: "Discard changes?" },
       child: null
     }
   },

@@ -13,10 +13,10 @@ export interface TextboxBlockDef extends ControlBlockDef {
 
 export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
   renderControl(props: RenderControlProps) {
-    const handleChange = (v: string) => props.onChange(v || null)
+    const handleChange = (v: string) => props.onChange(v)
 
     return <Textbox
-      value={props.value as (string | null) || ""} 
+      value={props.value} 
       onChange={handleChange}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       disabled={props.disabled}
@@ -41,7 +41,7 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
 }
 
 interface TextboxProps {
-  value: string
+  value: string | null
   onChange: (value: string) => void
   placeholder?: string
   disabled: boolean
@@ -71,7 +71,11 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
     // Stop tracking state internally
     this.setState({ text: null })
     
-    this.props.onChange(ev.target.value)
+    // Only change if different
+    const value = ev.target.value || null
+    if (value !== this.props.value) {
+      this.props.onChange(ev.target.value)
+    }
   }
 
   handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +89,7 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
         type="text"
         placeholder={this.props.placeholder}
         disabled={this.props.disabled}
-        value={ this.state.text != null ? this.state.text : this.props.value }
+        value={ this.state.text != null ? this.state.text : this.props.value || "" }
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
         onChange={this.handleChange}
