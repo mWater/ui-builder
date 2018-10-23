@@ -11,6 +11,7 @@ export interface TextboxBlockDef extends ControlBlockDef {
   placeholder: LocalizedString | null
 }
 
+/** Block that is a text input control linked to a specific field */
 export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
   renderControl(props: RenderControlProps) {
     return <Textbox
