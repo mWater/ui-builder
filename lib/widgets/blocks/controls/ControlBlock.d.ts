@@ -2,6 +2,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, Va
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { Expr, Column, Schema } from "mwater-expressions";
+import { LocalizedString } from "../../localization";
 export interface ControlBlockDef extends BlockDef {
     /** Row context variable id */
     rowContextVarId: string | null;
@@ -9,6 +10,8 @@ export interface ControlBlockDef extends BlockDef {
     column: string | null;
     /** True if value is required */
     required: boolean;
+    /** Message to display if required is true and control is blank */
+    requiredMessage?: LocalizedString;
 }
 export interface RenderControlProps {
     value: any;
@@ -27,10 +30,9 @@ export declare abstract class ControlBlock<T extends ControlBlockDef> extends Le
     /** Filter the columns that this control is for */
     abstract filterColumn(column: Column): boolean;
     renderDesign(props: RenderDesignProps): JSX.Element;
-    renderRequired(): JSX.Element | null;
     renderInstance(props: RenderInstanceProps): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;
     getContextVarExprs(contextVar: ContextVar): Expr[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-    validate(options: ValidateBlockOptions): "Row required" | "Column required" | "Valid column required" | null;
+    validate(options: ValidateBlockOptions): "Row required" | "Column required" | "Valid column required" | "Required message required" | null;
 }

@@ -7,10 +7,15 @@ export interface SaveCancelBlockDef extends BlockDef {
     saveLabel: LocalizedString | null;
     cancelLabel: LocalizedString | null;
     child: BlockDef | null;
+    /** Message to confirm discarding changes */
+    confirmDiscardMessage: LocalizedString | null;
 }
+/** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
+ * When either is clicked, the page is closed.
+ */
 export declare class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
-    validate(): null;
+    validate(): "Contents required" | "Save label required" | "Cancel label required" | "Confirm discard message required" | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;

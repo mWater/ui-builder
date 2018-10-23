@@ -30,6 +30,8 @@ interface State {
  * Computes values of expressions for row and rowset types
  */
 export default class ContextVarInjector extends React.Component<Props, State> {
+    /** True when component is unmounted */
+    unmounted: boolean;
     constructor(props: Props);
     componentDidMount(): void;
     componentDidUpdate(prevProps: Props, prevState: State): void;

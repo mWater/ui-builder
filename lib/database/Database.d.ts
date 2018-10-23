@@ -39,16 +39,16 @@ export interface Transaction {
     removeRow(table: string, primaryKey: any): Promise<void>;
     commit(): Promise<any>;
 }
-export declare class MockDatabase implements Database {
+export declare class NullDatabase implements Database {
     query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: {
         [contextVarId: string]: any;
     }): Promise<never[]>;
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;
-    transaction(): MockTransaction;
+    transaction(): NullTransaction;
 }
-declare class MockTransaction implements Transaction {
+declare class NullTransaction implements Transaction {
     /** Adds a row, returning the primary key as a promise */
     addRow(table: string, values: {
         [column: string]: any;

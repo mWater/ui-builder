@@ -11,12 +11,16 @@ interface State {
     rows?: Row[];
     refreshing: boolean;
 }
+/** Instance of a query table */
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
     /** Current query options to determine if refresh needed */
     queryOptions?: QueryOptions;
     constructor(props: Props);
     componentDidMount(): void;
     componentDidUpdate(prevProps: Props): void;
+    componentWillUnmount(): void;
+    /** Change listener to refresh database */
+    handleChange: () => void;
     createQuery(): QueryOptions;
     performQuery(): void;
     createRowRenderInstanceProps(rowIndex: number): RenderInstanceProps;

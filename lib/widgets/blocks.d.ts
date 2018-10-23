@@ -64,7 +64,7 @@ export interface RenderInstanceProps {
      * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string
      * per instance
      */
-    renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string): React.ReactElement<any>;
+    renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string): React.ReactElement<any> | null;
 }
 export interface RenderDesignProps {
     /** locale to use (e.g. "en") */
@@ -137,6 +137,11 @@ export declare abstract class Block<T extends BlockDef> {
     /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children */
     canonicalize(): BlockDef | null;
 }
+/** Implemented by rendered block instances that require validation */
+export interface ValidatableInstance {
+    /** Validate the instance. Returns null if correct, message if not. Empty message ("") blocks but does not show */
+    validate?(): string | null;
+}
 export declare function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, dropSide: DropSide): BlockDef;
 /**
  * Find the entire ancestry (root first) of a block with the specified id
@@ -151,4 +156,3 @@ export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: C
 export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[];
 /** Create the variables as needed by mwater-expressions */
 export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
-/** Create variable values */ 
