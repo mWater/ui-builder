@@ -11,6 +11,7 @@ import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
+import { ActionLibrary } from '../../ActionLibrary';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -104,7 +105,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   }
 
   /** Get list of expressions used in a row by content blocks */
-  getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary): Expr[] {
+  getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] {
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {
       return []
@@ -118,12 +119,29 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       // Get block tree, compiling expressions for each one
       if (contentBlockDef) {
         for (const descChildBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
-          exprs = exprs.concat(this.createBlock(descChildBlock.blockDef).getContextVarExprs(rowCV, widgetLibrary))
+          exprs = exprs.concat(this.createBlock(descChildBlock.blockDef).getContextVarExprs(rowCV, widgetLibrary, actionLibrary))
         }
       }
     }
+
+    // Get action expressions too
+    if (this.blockDef.rowClickAction) {
+      const action = actionLibrary.createAction(this.blockDef.rowClickAction)
+      exprs = exprs.concat(action.getContextVarExprs(rowCV, widgetLibrary))
+    }
     return exprs
   }
+
+  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { 
+    // Include action expressions
+    if (this.blockDef.rowClickAction) {
+      const action = actionLibrary.createAction(this.blockDef.rowClickAction)
+      return action.getContextVarExprs(contextVar, widgetLibrary)
+    }
+
+    return [] 
+  }
+
 
   /** 
    * Get the value of the row context variable for a specific row. 
@@ -284,6 +302,8 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
                   value={value} 
                   onChange={onChange} 
                   locale={props.locale}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
                   actionLibrary={props.actionLibrary} 
                   widgetLibrary={props.widgetLibrary}
                   contextVars={props.contextVars.concat(rowCV)} />

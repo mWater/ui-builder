@@ -5,6 +5,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBloc
 import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
+import { ActionLibrary } from '../ActionLibrary';
 
 // Block which contains a widget
 export interface WidgetBlockDef extends BlockDef {
@@ -53,7 +54,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   //   return []
   // }
 
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary) {
+  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary) {
     if (!this.blockDef.widgetId) {
       return []
     }
@@ -74,7 +75,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     // Get complete context variables exprs of inner widget blocks
     const contextVarExprs = _.flatten(getBlockTree(widgetDef.blockDef, this.createBlock, widgetDef.contextVars).map(cb => {
       const block = this.createBlock(cb.blockDef)
-      return block.getContextVarExprs(innerContextVar, widgetLibrary)
+      return block.getContextVarExprs(innerContextVar, widgetLibrary, actionLibrary)
     }))
 
     // Map any variables of expressions that cross widget boundary

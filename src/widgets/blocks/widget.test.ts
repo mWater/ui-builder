@@ -55,7 +55,7 @@ describe("getContextVarExprs", () => {
     const widgetBlock = new WidgetBlock(blockDef, createBlock)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], widgetLibrary)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], widgetLibrary, {} as ActionLibrary)
 
     expect(exprs).toEqual([
       { type: "field", table: "t1", column: "text" }

@@ -2,11 +2,10 @@ import React, { CSSProperties } from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, EnumValue } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
-import { Database } from "../../../library";
 import { localize } from "../../localization";
 import ReactSelect from "react-select"
 import Async from 'react-select/lib/Async'
-import { QueryOptions } from "../../../database/Database";
+import { QueryOptions, Database } from "../../../database/Database";
 
 /** Dropdown filter that is a text string. Should search in database for matches */
 export default class TextInstance extends React.Component<{

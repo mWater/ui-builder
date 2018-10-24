@@ -1,13 +1,14 @@
-import { RenderInstanceProps, ContextVar } from "../blocks";
+import { RenderInstanceProps, ContextVar, BlockDef } from "../blocks";
 import simpleSchema from "../../__fixtures__/schema";
 import { SaveCancelBlockDef, SaveCancelBlock } from "./saveCancel";
 import { DataSource } from 'mwater-expressions';
 import { PageStack } from '../../PageStack';
-import { BlockFactory, ActionLibrary, BlockDef } from "../../library";
 import { mount } from "enzyme";
 import React from "react";
 import VirtualDatabase from "../../database/VirtualDatabase";
 import { NullDatabase, Database } from "../../database/Database";
+import BlockFactory from "../BlockFactory";
+import { ActionLibrary } from "../ActionLibrary";
 
 // Outer context vars
 const rowCV = { id: "cv1", type: "row", name: "", table: "t1" }

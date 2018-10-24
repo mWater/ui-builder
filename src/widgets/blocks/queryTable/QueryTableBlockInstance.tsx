@@ -54,7 +54,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     // Get expressions
     const rowsetCV = rips.contextVars.find(cv => cv.id === block.blockDef.rowsetContextVarId)!
-    const rowExprs = block.getRowExprs(this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.widgetLibrary)
+    const rowExprs = block.getRowExprs(this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.widgetLibrary, this.props.renderInstanceProps.actionLibrary)
     const rowsetCVValue = rips.contextVarValues[rowsetCV.id]
 
     // Create where
@@ -118,7 +118,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const rowcv = this.props.block.createRowContextVar(rowsetCV!)
 
     // TODO move out of here to be faster
-    const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.widgetLibrary)
+    const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.widgetLibrary, this.props.renderInstanceProps.actionLibrary)
 
     const innerContextVars = rips.contextVars.concat(rowcv)
 
@@ -154,7 +154,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
           database: rowRIProps.database,
           locale: rowRIProps.locale,
           contextVarValues: rowRIProps.contextVarValues,
-          pageStack: rowRIProps.pageStack
+          pageStack: rowRIProps.pageStack, 
+          getContextVarExprValue: rowRIProps.getContextVarExprValue
         })
       }
     }

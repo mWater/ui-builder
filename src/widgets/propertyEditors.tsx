@@ -158,6 +158,8 @@ export class ActionDefEditor extends React.Component<{
   contextVars: ContextVar[]
   actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary
+  schema: Schema
+  dataSource: DataSource
 }> {
 
   handleChangeAction = (type: string | null) => {
@@ -186,7 +188,9 @@ export class ActionDefEditor extends React.Component<{
               actionDef: this.props.value!, 
               locale: this.props.locale, 
               contextVars: this.props.contextVars, 
-              onChange: this.props.onChange 
+              onChange: this.props.onChange,
+              schema: this.props.schema,
+              dataSource: this.props.dataSource
             }) 
           : null }
       </div>

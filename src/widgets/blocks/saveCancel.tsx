@@ -109,8 +109,12 @@ interface SaveCancelInstanceProps {
 
 interface SaveCancelInstanceState {
   virtualDatabase: VirtualDatabase
+
   /** True when control has been destroyed by save or cancel */
   destroyed: boolean
+
+  /** True when control is saving */
+  saving: boolean
 }
 
 /** Instance swaps out the database for a virtual database */
@@ -121,7 +125,8 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     super(props)
     this.state = {
       virtualDatabase: new VirtualDatabase(props.renderInstanceProps.database, props.renderInstanceProps.schema, props.renderInstanceProps.locale), 
-      destroyed: false
+      destroyed: false,
+      saving: false
     }
 
     this.instanceRefs = {}
@@ -160,8 +165,9 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       return
     }
 
+    this.setState({ saving: true })
     await this.state.virtualDatabase.commit()
-    this.setState({ destroyed: true })
+    this.setState({ saving: false, destroyed: true })
     this.props.renderInstanceProps.pageStack.closePage()
   }
 
@@ -239,9 +245,9 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
           </ContextVarsInjector>
 
         <div className="save-cancel-footer">
-          <button type="button" className="btn btn-primary" onClick={this.handleSave}>{saveLabelText}</button>
+          <button type="button" className="btn btn-primary" onClick={this.handleSave} disabled={this.state.saving}>{saveLabelText}</button>
           &nbsp;
-          <button type="button" className="btn btn-default" onClick={this.handleCancel}>{cancelLabelText}</button>
+          <button type="button" className="btn btn-default" onClick={this.handleCancel} disabled={this.state.saving}>{cancelLabelText}</button>
         </div>
       </div>
     )

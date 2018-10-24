@@ -4,7 +4,7 @@ import { Database } from '../database/Database';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { PageStack } from '../PageStack';
 import { ActionLibrary } from './ActionLibrary';
-import { Schema } from 'mwater-expressions';
+import { Schema, Expr, DataSource } from 'mwater-expressions';
 
 // Action definition
 export interface ActionDef {
@@ -13,6 +13,9 @@ export interface ActionDef {
 }
 
 export interface RenderActionEditorProps {
+  schema: Schema
+  dataSource: DataSource
+
   /** Context variables for the action */
   contextVars: ContextVar[]
 
@@ -39,6 +42,13 @@ export interface PerformActionOptions {
 
   /** Values of context variables */
   contextVarValues: { [contextVarId: string]: any }
+
+  /**
+   * Gets the value of an expression based off of a context variable
+   * @param contextVarId id of context variable
+   * @param expr expression to get value of
+   */
+  getContextVarExprValue(contextVarId: string, expr: Expr): any
 }
 
 export interface ValidateActionOptions {
@@ -65,4 +75,7 @@ export abstract class Action<T extends ActionDef> {
   
   /** Render an optional property editor for the action. This may use bootstrap */
   renderEditor(props: RenderActionEditorProps): React.ReactElement<any> | null { return null }
+
+  /** Get any context variables expressions that this action needs */
+  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary): Expr[] { return [] }
 }

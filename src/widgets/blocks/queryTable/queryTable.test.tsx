@@ -4,6 +4,7 @@ import simpleSchema from "../../../__fixtures__/schema";
 import { Expr } from "mwater-expressions";
 import BlockFactory from "../../BlockFactory";
 import { WidgetLibrary } from "../../../designer/widgetLibrary";
+import { ActionLibrary } from "../../ActionLibrary";
 
 // Outer context vars
 const rowsetCV = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -86,5 +87,5 @@ test("gets row expressions", () => {
   const expr = { type: "field", table: "t1", column: "text" }
   const qtbd = { ...qtbdSingle, contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: expr }] }
   const qtb = new QueryTableBlock(qtbd, createBlock)
-  expect(qtb.getRowExprs(contextVars, {} as WidgetLibrary)).toEqual([expr])
+  expect(qtb.getRowExprs(contextVars, {} as WidgetLibrary, {} as ActionLibrary)).toEqual([expr])
 })
