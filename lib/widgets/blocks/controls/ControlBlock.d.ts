@@ -1,7 +1,7 @@
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
-import { Expr, Column, Schema } from "mwater-expressions";
+import { Expr, Column, Schema, DataSource } from "mwater-expressions";
 import { LocalizedString } from "../../localization";
 export interface ControlBlockDef extends BlockDef {
     /** Row context variable id */
@@ -17,6 +17,7 @@ export interface RenderControlProps {
     value: any;
     locale: string;
     schema: Schema;
+    dataSource: DataSource;
     /** Context variable. Can be undefined in design mode */
     rowContextVar?: ContextVar;
     /** True if control should be disabled */
@@ -34,5 +35,5 @@ export declare abstract class ControlBlock<T extends ControlBlockDef> extends Le
     renderEditor(props: RenderEditorProps): JSX.Element;
     getContextVarExprs(contextVar: ContextVar): Expr[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-    validate(options: ValidateBlockOptions): "Row required" | "Column required" | "Valid column required" | "Required message required" | null;
+    validate(options: ValidateBlockOptions): string | null;
 }

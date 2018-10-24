@@ -118,7 +118,7 @@ export declare abstract class Block<T extends BlockDef> {
     /** Render an optional property editor for the block. This may use bootstrap */
     renderEditor(props: RenderEditorProps): React.ReactElement<any> | null;
     /** Get any context variables expressions that this block needs (not including child blocks) */
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary): Expr[];
+    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
     /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
     abstract getChildren(contextVars: ContextVar[]): ChildBlock[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */

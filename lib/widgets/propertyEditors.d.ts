@@ -66,6 +66,8 @@ export declare class ActionDefEditor extends React.Component<{
     contextVars: ContextVar[];
     actionLibrary: ActionLibrary;
     widgetLibrary: WidgetLibrary;
+    schema: Schema;
+    dataSource: DataSource;
 }> {
     handleChangeAction: (type: string | null) => void;
     render(): JSX.Element;

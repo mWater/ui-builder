@@ -5,6 +5,7 @@ import { Expr, Schema } from 'mwater-expressions';
 import { Row, OrderBy } from '../../../database/Database';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
+import { ActionLibrary } from '../../ActionLibrary';
 export interface QueryTableBlockDef extends BlockDef {
     type: "queryTable";
     /** Determines if one table row contains one or multiple database table rows */
@@ -27,7 +28,8 @@ export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     createRowContextVar(rowsetCV: ContextVar): ContextVar;
     getRowContextVarId(): string;
     /** Get list of expressions used in a row by content blocks */
-    getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary): Expr[];
+    getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
     /**
      * Get the value of the row context variable for a specific row.
      * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field

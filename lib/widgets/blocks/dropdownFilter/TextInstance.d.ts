@@ -2,7 +2,7 @@ import React from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema } from "mwater-expressions";
 import { ContextVar } from "../../blocks";
-import { Database } from "../../../library";
+import { Database } from "../../../database/Database";
 /** Dropdown filter that is a text string. Should search in database for matches */
 export default class TextInstance extends React.Component<{
     blockDef: DropdownFilterBlockDef;

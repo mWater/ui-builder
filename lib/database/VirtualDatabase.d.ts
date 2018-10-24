@@ -43,8 +43,8 @@ export default class VirtualDatabase implements Database {
     private mutateRows;
     private handleChange;
 }
-declare type Mutation = AddMutation | UpdateMutation | RemoveMutation;
-interface AddMutation {
+export declare type Mutation = AddMutation | UpdateMutation | RemoveMutation;
+export interface AddMutation {
     type: "add";
     table: string;
     primaryKey: any;
@@ -52,7 +52,7 @@ interface AddMutation {
         [column: string]: any;
     };
 }
-interface UpdateMutation {
+export interface UpdateMutation {
     type: "update";
     table: string;
     primaryKey: any;
@@ -60,9 +60,8 @@ interface UpdateMutation {
         [column: string]: any;
     };
 }
-interface RemoveMutation {
+export interface RemoveMutation {
     type: "remove";
     table: string;
     primaryKey: any;
 }
-export {};

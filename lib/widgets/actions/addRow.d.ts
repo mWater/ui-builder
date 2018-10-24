@@ -3,7 +3,7 @@ import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, Valid
 import { Expr } from 'mwater-expressions';
 import { ContextVar } from '../blocks';
 interface ContextVarExpr {
-    /** Optional context variable which expression is based on. Can be null for literal expression */
+    /** Context variable which expression is based on */
     contextVarId: string | null;
     /** Expression to generate column values */
     expr: Expr;
@@ -18,7 +18,8 @@ export interface AddRowActionDef extends ActionDef {
 }
 export declare class AddRowAction extends Action<AddRowActionDef> {
     performAction(options: PerformActionOptions): Promise<void>;
-    validate(options: ValidateActionOptions): null;
+    validate(options: ValidateActionOptions): string | null;
+    validateColumnValue(options: ValidateActionOptions, columnId: string): string | null;
     /** Get any context variables expressions that this action needs */
     getContextVarExprs(contextVar: ContextVar): Expr[];
     renderEditor(props: RenderActionEditorProps): JSX.Element;
