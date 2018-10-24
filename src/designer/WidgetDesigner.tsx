@@ -17,6 +17,7 @@ import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import ErrorBoundary from "./ErrorBoundary";
 import FillDownwardComponent from "react-library/lib/FillDownwardComponent";
+import VirtualDatabase from "../database/VirtualDatabase";
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -291,10 +292,14 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return null 
     }
 
-    const database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource) 
+    let database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource) 
 
-    // Make non-live TODO needed? Could make big queries for counts/sums if mutated
-    // database = new VirtualDatabase(database, this.props.schema, this.props.locale)
+    const virtualizeDatabase = true
+
+    if (virtualizeDatabase) {
+      // Make non-live TODO needed? Could make big queries for counts/sums if mutated
+      database = new VirtualDatabase(database, this.props.schema, this.props.locale)
+    }
 
     // Create normal page to display
     const page: Page = {

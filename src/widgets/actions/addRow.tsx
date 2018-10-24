@@ -7,6 +7,7 @@ import { LabeledProperty, PropertyEditor, TableSelect, ContextVarPropertyEditor 
 import { localize } from '../localization';
 import produce from 'immer';
 import { ExprComponent } from 'mwater-expressions-ui';
+import ReactSelect from 'react-select'
 
 interface ContextVarExpr {
   /** Context variable which expression is based on */
@@ -155,12 +156,20 @@ class ColumnValuesEditor extends React.Component<{
     }))
   }
 
+  handleAdd = (option?: { label: string, value: string }) => {
+    if (option) {
+      this.props.onChange(produce(this.props.value, (draft) => {
+        draft[option.value] = { contextVarId: null, expr: null }
+      }))
+    }
+  }
+
   renderColumn(columnId: string) {
     const column = this.props.schema.getColumn(this.props.table, columnId)
     if (!column) {
       return null
     }
-    const contextVarExpr: ContextVarExpr = this.props.value.columnValues[columnId]!
+    const contextVarExpr: ContextVarExpr = this.props.value[columnId]!
 
     const contextVar = this.props.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
 
@@ -193,21 +202,23 @@ class ColumnValuesEditor extends React.Component<{
         : null }
       </td>
       <td>
-        <i className="fa fa-remove" onClick={this.handleRemove.bind(null, columnId)}/>/>
+        <i className="fa fa-remove" onClick={this.handleRemove.bind(null, columnId)}/>
       </td>
     </tr>
   }
 
   render() {
+    const options = _.sortBy(this.props.schema.getColumns(this.props.table).map(column => ({ value: column.id, label: localize(column.name, this.props.locale)})), "label")
+
     // Render list of existing ones in order
     return <div>
       <table className="table table-bordered table-condensed">
         <tbody>
-          { Object.keys(this.props.value).sort().map(columnId => {
-            this.renderColumn(columnId)
-          })}
+          { Object.keys(this.props.value).sort().map(columnId => this.renderColumn(columnId)) }
         </tbody>
       </table>
+
+      <ReactSelect value={null} options={options} onChange={this.handleAdd} />
     </div>
   }
 }

@@ -89,3 +89,11 @@ test("gets row expressions", () => {
   const qtb = new QueryTableBlock(qtbd, createBlock)
   expect(qtb.getRowExprs(contextVars, {} as WidgetLibrary, {} as ActionLibrary)).toEqual([expr])
 })
+
+test("gets action expressions", () => {
+  // Create simple action
+  const expr = { type: "field", table: "t1", column: "text" }
+  const qtbd = { ...qtbdSingle, rowClickAction: { type: "addRow", table: "t1", columnValues: { text: { contextVarId: "123_row", expr: expr }}}}
+  const qtb = new QueryTableBlock(qtbd, createBlock)
+  expect(qtb.getRowExprs(contextVars, {} as WidgetLibrary, new ActionLibrary())).toEqual([expr])
+})

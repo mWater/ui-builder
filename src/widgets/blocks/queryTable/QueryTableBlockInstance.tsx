@@ -73,7 +73,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const queryOptions: QueryOptions = {
       select: {},
       from: rowsetCV.table!,
-      where: where,
+      where: where.exprs.length > 0 ? where : null,
       limit: block.blockDef.limit
     }
     

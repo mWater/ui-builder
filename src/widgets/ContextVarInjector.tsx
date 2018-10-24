@@ -100,12 +100,13 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const queryOptions: QueryOptions = {
       select: {},
       from: table,
-      where: this.props.value as Expr
+      where: this.props.value as Expr,
+      limit: 1
     }
 
     // Add expressions as selects (only if aggregate for rowset)
     const exprUtils = new ExprUtils(this.props.schema, variables)
-    const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
+    const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
 
     // Add expressions as selects
     for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
@@ -120,7 +121,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         op: "and",
         exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map(f => f.expr))))
       }
+      if (queryOptions.where.exprs.length === 0) {
+        queryOptions.where = null
+      }
     }
+
     return queryOptions
   }
 
@@ -200,7 +205,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       }
       
       const exprUtils = new ExprUtils(this.props.schema, variables)
-      const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate")
+      const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
 
       if (rows.length === 0) {
         this.setState({ exprValues: {} })

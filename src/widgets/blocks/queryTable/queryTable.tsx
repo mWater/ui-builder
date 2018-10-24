@@ -170,7 +170,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
             })
           }
         })
-        return { type: "op", op: "and", table: rowsetCV.table!, exprs: ands }
+        return (ands.length > 0) ? { type: "op", op: "and", table: rowsetCV.table!, exprs: ands } : null
     }
   }
 

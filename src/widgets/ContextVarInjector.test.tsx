@@ -179,7 +179,8 @@ test("exprs are computed for rowset variables, excluding non-aggregates", (done)
       e0: contextVarExprs[1]
     },
     from: "t1",
-    where: value
+    where: value,
+    limit: 1
   }
 
   setImmediate(() => {
@@ -230,7 +231,8 @@ test("filters are applied for rowset variables", (done) => {
       e0: contextVarExprs[0]
     },
     from: "t1",
-    where: { type: "op", table: "t1", op: "and", exprs: [value, initialFilters[0].expr!] }
+    where: { type: "op", table: "t1", op: "and", exprs: [value, initialFilters[0].expr!] },
+    limit: 1
   }
   // TODO test properly isLoading
   // expect(innerIsLoading).toBe(true)
@@ -251,7 +253,8 @@ test("filters are applied for rowset variables", (done) => {
           e0: contextVarExprs[0]
         },
         from: "t1",
-        where: { type: "op", table: "t1", op: "and", exprs: [value, newFilter.expr!] }
+        where: { type: "op", table: "t1", op: "and", exprs: [value, newFilter.expr!] },
+        limit: 1
       }
       
       // Should perform the query
@@ -301,7 +304,8 @@ test("null filters are ignored for rowset variables", (done) => {
       e0: contextVarExprs[0]
     },
     from: "t1",
-    where: { type: "op", table: "t1", op: "and", exprs: [value] }
+    where: { type: "op", table: "t1", op: "and", exprs: [value] },
+    limit: 1
   }
   // TODO test properly isLoading
   // expect(innerIsLoading).toBe(true)
@@ -322,7 +326,8 @@ test("null filters are ignored for rowset variables", (done) => {
           e0: contextVarExprs[0]
         },
         from: "t1",
-        where: { type: "op", table: "t1", op: "and", exprs: [value, newFilter.expr!] }
+        where: { type: "op", table: "t1", op: "and", exprs: [value, newFilter.expr!] },
+        limit: 1
       }
       
       // Should perform the query
