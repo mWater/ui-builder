@@ -2,7 +2,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, Va
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
-import { Expr, Column, Schema } from "mwater-expressions";
+import { Expr, Column, Schema, DataSource } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize, LocalizedString } from "../../localization";
 
@@ -24,6 +24,7 @@ export interface RenderControlProps {
   value: any
   locale: string
   schema: Schema
+  dataSource: DataSource
 
   /** Context variable. Can be undefined in design mode */
   rowContextVar?: ContextVar
@@ -51,37 +52,20 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       onChange: () => { return }, 
       locale: props.locale,
       schema: props.schema,
+      dataSource: props.dataSource,
       disabled: false
     }
     
-    return <ControlInstance renderControlProps={renderControlProps} block={this}/>      
+    return (
+      <div>
+        {this.blockDef.required ? <div className="required-control">*</div> : null}
+        {this.renderControl(renderControlProps)}
+      </div>
+    )
   }
 
   renderInstance(props: RenderInstanceProps) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)!
-
-    const id = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
-
-    // Get current value
-    const value = props.getContextVarExprValue(this.blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: this.blockDef.column! })
-
-    const handleChange = async (newValue: T | null) => {
-      // Update database
-      const txn = props.database.transaction()
-      await txn.updateRow(contextVar.table!, id, { [this.blockDef.column!]: newValue })
-      await txn.commit()
-    }
-
-    const renderControlProps: RenderControlProps = {
-      value: value,
-      onChange: handleChange,
-      schema: props.schema,
-      locale: props.locale,
-      rowContextVar: contextVar,
-      disabled: id == null
-    }
-
-    return <ControlInstance renderControlProps={renderControlProps} block={this}/>      
+    return <ControlInstance renderInstanceProps={props} block={this}/>      
   }
 
   renderEditor(props: RenderEditorProps) {
@@ -138,7 +122,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   }
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-  validate(options: ValidateBlockOptions) {
+  validate(options: ValidateBlockOptions): string | null {
     // Validate row
     const rowCV = options.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId && cv.type === "row")
     if (!rowCV) {
@@ -163,17 +147,38 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
 
 interface Props {
   block: ControlBlock<ControlBlockDef>
-  renderControlProps: RenderControlProps
+  renderInstanceProps: RenderInstanceProps
 }
 
 class ControlInstance extends React.Component<Props> implements ValidatableInstance {
+  getValue() {
+    const renderInstanceProps = this.props.renderInstanceProps
+    const blockDef = this.props.block.blockDef
+    const contextVar = renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+
+    // Get current value
+    return renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: blockDef.column! })
+  }
+
   /** Validate the instance. Returns null if correct, message if not */
   validate = () => {
     // Check for null
-    if (this.props.renderControlProps.value == null && this.props.block.blockDef.required) {
-      return localize(this.props.block.blockDef.requiredMessage!, this.props.renderControlProps.locale)
+    if (this.getValue() == null && this.props.block.blockDef.required) {
+      return localize(this.props.block.blockDef.requiredMessage!, this.props.renderInstanceProps.locale)
     }
     return null
+  }
+
+  handleChange = async (newValue: any) => {
+    const renderInstanceProps = this.props.renderInstanceProps
+    const blockDef = this.props.block.blockDef
+    const contextVar = renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const id = renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
+
+    // Update database
+    const txn = this.props.renderInstanceProps.database.transaction()
+    await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
+    await txn.commit()
   }
 
   renderRequired() {
@@ -181,10 +186,25 @@ class ControlInstance extends React.Component<Props> implements ValidatableInsta
   }
 
   render() {
+    const renderInstanceProps = this.props.renderInstanceProps
+    const blockDef = this.props.block.blockDef
+    const contextVar = renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const id = renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
+
+    const renderControlProps: RenderControlProps = {
+      value: this.getValue(),
+      onChange: this.handleChange,
+      schema: this.props.renderInstanceProps.schema,
+      dataSource: this.props.renderInstanceProps.dataSource,
+      locale: this.props.renderInstanceProps.locale,
+      rowContextVar: contextVar,
+      disabled: id == null
+    }
+
     return (
       <div>
         { this.renderRequired() }
-        { this.props.block.renderControl(this.props.renderControlProps) }
+        { this.props.block.renderControl(renderControlProps) }
       </div>
     )
   }
