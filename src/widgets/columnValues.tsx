@@ -9,17 +9,21 @@ import ReactSelect from 'react-select'
 
 /** Expression based on a context variable */
 export interface ContextVarExpr {
-  /** Context variable which expression is based on */
+  /** Context variable which expression is based on. Null for literal-only */
   contextVarId: string | null,
   
   /** Expression to generate column values */
   expr: Expr
 }
 
+export interface ColumnValues { 
+  [columnId: string]: ContextVarExpr 
+}
+
 /** Allows editing list of column values for add */
 export class ColumnValuesEditor extends React.Component<{
-  value: { [columnId: string]: ContextVarExpr }
-  onChange: (value: { [columnId: string]: ContextVarExpr }) => void
+  value: ColumnValues
+  onChange: (value: ColumnValues) => void
   schema: Schema
   dataSource: DataSource
   table: string
@@ -73,22 +77,21 @@ export class ColumnValuesEditor extends React.Component<{
             contextVars={this.props.contextVars} 
             value={contextVarExpr.contextVarId} 
             onChange={this.handleContextVarChange.bind(null, columnId)}
+            allowNone={true}
             types={["row", "rowset"]}
             />
         </LabeledProperty>
-        { contextVar ? 
-          <LabeledProperty label="Expression">
-            <ExprComponent 
-              schema={this.props.schema} 
-              dataSource={this.props.dataSource}
-              idTable={column.idTable || (column.type === "join" ? column.join!.toTable : undefined)}
-              enumValues={column.enumValues}
-              table={contextVar.table!}
-              value={contextVarExpr.expr}
-              onChange={this.handleExprChange.bind(null, columnId)}
-            />
-          </LabeledProperty>
-        : null }
+        <LabeledProperty label="Expression">
+          <ExprComponent 
+            schema={this.props.schema} 
+            dataSource={this.props.dataSource}
+            idTable={column.idTable || (column.type === "join" ? column.join!.toTable : undefined)}
+            enumValues={column.enumValues}
+            table={contextVar ? contextVar.table! : null}
+            value={contextVarExpr.expr}
+            onChange={this.handleExprChange.bind(null, columnId)}
+          />
+        </LabeledProperty>
       </td>
       <td>
         <i className="fa fa-remove" onClick={this.handleRemove.bind(null, columnId)}/>

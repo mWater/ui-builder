@@ -75,6 +75,15 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     }
   },
   {
+    title: "Add Row",
+    blockDef: { 
+      id: "", 
+      type: "addRow", 
+      columnValues: {},
+      content: null
+    }
+  },
+  {
     title: "Tabbed",
     blockDef: { id: "", type: "tabbed", tabs: [{ id: uuid(), label: { _base: "en", en: "Tab1" }, content: null }]}
   },

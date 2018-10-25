@@ -17,6 +17,7 @@ import { DropdownFilterBlock, DropdownFilterBlockDef } from './blocks/dropdownFi
 import { RowsetBlock, RowsetBlockDef } from './blocks/rowset';
 import { TabbedBlock, TabbedBlockDef } from './blocks/tabbed/tabbed';
 import { ImageBlock, ImageBlockDef } from './blocks/image';
+import { AddRowBlock, AddRowBlockDef } from './blocks/addRow';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -61,6 +62,8 @@ export default class BlockFactory {
         return new SaveCancelBlock(blockDef as SaveCancelBlockDef, this.createBlock)
       case "rowset":
         return new RowsetBlock(blockDef as RowsetBlockDef, this.createBlock)
+      case "addRow":
+        return new AddRowBlock(blockDef as AddRowBlockDef, this.createBlock)
       case "tabbed":
         return new TabbedBlock(blockDef as TabbedBlockDef, this.createBlock)
       case "image":

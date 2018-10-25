@@ -131,6 +131,8 @@ export class ContextVarPropertyEditor extends React.Component<{
   contextVars: ContextVar[],
   types?: string[],
   table?: string, 
+  /** Makes null say "None", not "Select..." */
+  allowNone?: boolean, 
   filter?: (contextVar: ContextVar) => boolean
 }> {
 
@@ -144,7 +146,7 @@ export class ContextVarPropertyEditor extends React.Component<{
     return <Select
       value={this.props.value}
       onChange={this.props.onChange}
-      nullLabel="Select..."
+      nullLabel={this.props.allowNone ? "None" : "Select..."}
       options={contextVars.map(cv => ({ label: cv.name, value: cv.id }))}
     />
   }

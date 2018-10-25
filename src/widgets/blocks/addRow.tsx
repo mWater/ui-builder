@@ -3,7 +3,7 @@ import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables, CreateBlock } from '../blocks'
 import * as _ from 'lodash';
-import { ExprValidator, Schema } from 'mwater-expressions';
+import { ExprValidator, Schema, LiteralExpr } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
@@ -79,18 +79,25 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
 
     // Check context var
     const contextVarExpr: ContextVarExpr = this.blockDef.columnValues[columnId]
-    if (!contextVarExpr.contextVarId) {
-      return "Context variable required"
-    }
+    let contextVar: ContextVar | undefined
 
-    const contextVar = options.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
-    if (!contextVar || !contextVar.table) {
-      return "Context variable not found"
+    if (contextVarExpr.contextVarId) {
+      contextVar = options.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
+      if (!contextVar || !contextVar.table) {
+        return "Context variable not found"
+      }
+    }
+    else {
+      contextVar = undefined
+      // Must be literal
+      if (contextVarExpr.expr && contextVarExpr.expr.type !== "literal") {
+        return "Literal value required"
+      }
     }
 
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar.table, types: [columnType] })
+    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [columnType] })
     if (error) {
       return error
     }
@@ -220,7 +227,12 @@ class AddRowInstance extends React.Component<Props, State> {
     for (const columnId of Object.keys(this.props.blockDef.columnValues)) {
       const contextVarExpr: ContextVarExpr = this.props.blockDef.columnValues[columnId]
 
-      row[columnId] = this.props.renderInstanceProps.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr)
+      if (contextVarExpr.contextVarId != null) {
+        row[columnId] = this.props.renderInstanceProps.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
+      }
+      else {
+        row[columnId] = contextVarExpr.expr ? (contextVarExpr.expr as LiteralExpr).value : null
+      }
     }
 
     const txn = this.props.database.transaction()

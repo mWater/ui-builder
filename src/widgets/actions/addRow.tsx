@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash'
 import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
-import { ExprValidator } from 'mwater-expressions';
+import { ExprValidator, LiteralExpr } from 'mwater-expressions';
 import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
 import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
@@ -22,7 +22,12 @@ export class AddRowAction extends Action<AddRowActionDef> {
     for (const columnId of Object.keys(this.actionDef.columnValues)) {
       const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
 
-      row[columnId] = options.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr)
+      if (contextVarExpr.contextVarId != null) {
+        row[columnId] = options.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
+      }
+      else {
+        row[columnId] = contextVarExpr.expr ? (contextVarExpr.expr as LiteralExpr).value : null
+      }
     }
 
     const txn = options.database.transaction()
@@ -60,18 +65,25 @@ export class AddRowAction extends Action<AddRowActionDef> {
 
     // Check context var
     const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
-    if (!contextVarExpr.contextVarId) {
-      return "Context variable required"
-    }
+    let contextVar: ContextVar | undefined
 
-    const contextVar = options.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
-    if (!contextVar || !contextVar.table) {
-      return "Context variable not found"
+    if (contextVarExpr.contextVarId) {
+      contextVar = options.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
+      if (!contextVar || !contextVar.table) {
+        return "Context variable not found"
+      }
+    }
+    else {
+      contextVar = undefined
+      // Must be literal
+      if (contextVarExpr.expr && contextVarExpr.expr.type !== "literal") {
+        return "Literal value required"
+      }
     }
 
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar.table, types: [columnType] })
+    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [columnType] })
     if (error) {
       return error
     }

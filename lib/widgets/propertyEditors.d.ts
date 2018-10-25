@@ -54,6 +54,8 @@ export declare class ContextVarPropertyEditor extends React.Component<{
     contextVars: ContextVar[];
     types?: string[];
     table?: string;
+    /** Makes null say "None", not "Select..." */
+    allowNone?: boolean;
     filter?: (contextVar: ContextVar) => boolean;
 }> {
     render(): JSX.Element;

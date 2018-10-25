@@ -29,7 +29,38 @@ test("gets context var exprs", () => {
 })
 
 
-test("performs action", async () => {
+test("performs non-literal action", async () => {
+  const ad : AddRowActionDef = {
+    type: "addRow",
+    table: "t1",
+    columnValues: {
+      "number": { 
+        contextVarId: "cv1",
+        expr: { type: "literal", valueType: "number", value: 123 }
+      }
+    }
+  }
+
+  const schema = simpleSchema()
+  const database = new VirtualDatabase(new NullDatabase(), schema, "en")
+
+  const action = new AddRowAction(ad)
+  await action.performAction({
+    locale: "en",
+    database: database,
+    pageStack: {} as PageStack,
+    contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
+    contextVarValues: { cv1: "123" },
+    getContextVarExprValue: (cvid: string, expr: Expr) => 123
+  })
+
+  expect(database.mutations.length).toBe(1)
+  expect((database.mutations[0] as AddMutation).values).toEqual({
+    number: 123
+  })
+})
+
+test("performs literal action", async () => {
   const ad : AddRowActionDef = {
     type: "addRow",
     table: "t1",
@@ -51,7 +82,7 @@ test("performs action", async () => {
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: (cvid: string, expr: Expr) => 123
+    getContextVarExprValue: (cvid: string, expr: Expr) => { throw new Error("Not used") }
   })
 
   expect(database.mutations.length).toBe(1)

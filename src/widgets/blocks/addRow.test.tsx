@@ -1,20 +1,16 @@
-import { RenderInstanceProps, ContextVar, BlockDef } from "../blocks";
+import { RenderInstanceProps, BlockDef } from "../blocks";
 import simpleSchema from "../../__fixtures__/schema";
-import { SaveCancelBlockDef, SaveCancelBlock } from "./saveCancel";
 import { DataSource } from 'mwater-expressions';
 import { PageStack } from '../../PageStack';
 import { mount } from "enzyme";
 import React from "react";
 import VirtualDatabase from "../../database/VirtualDatabase";
-import { NullDatabase, Database } from "../../database/Database";
+import { NullDatabase } from "../../database/Database";
 import BlockFactory from "../BlockFactory";
 import { ActionLibrary } from "../ActionLibrary";
 import { AddRowBlockDef, AddRowBlock } from "./addRow";
 
 // Outer context vars
-const rowCV = { id: "cv1", type: "rowset", name: "", table: "t1" }
-const contextVars: ContextVar[] = [rowCV]
-
 const schema = simpleSchema()
 
 const createBlock = new BlockFactory().createBlock
@@ -27,19 +23,19 @@ beforeEach(() => {
 
   // Create render instance props
   rips = {
-   contextVars: contextVars,
+   contextVars: [],
    database: database,
    getContextVarExprValue: jest.fn(),
    actionLibrary: {} as ActionLibrary,
    pageStack: {} as PageStack,
-   contextVarValues: { cv1: null },
+   contextVarValues: { },
    getFilters: jest.fn(),
    setFilter: jest.fn(),
    locale: "en",
    onSelectContextVar: jest.fn(),
    schema: schema,
    dataSource: {} as DataSource,
-   renderChildBlock: (props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string) => {
+   renderChildBlock: (props: RenderInstanceProps, childBlockDef: BlockDef | null) => {
      if (childBlockDef) {
        const childBlock = createBlock(childBlockDef)
        return childBlock.renderInstance(props)
@@ -50,7 +46,7 @@ beforeEach(() => {
  }
 })
 
-const pause = () => new Promise((resolve, reject) => setImmediate(resolve))
+const pause = () => new Promise((resolve) => setImmediate(resolve))
 
 // Create add row block with textbox of added value
 const addRowBlockDef: AddRowBlockDef = {
@@ -58,7 +54,7 @@ const addRowBlockDef: AddRowBlockDef = {
   type: "addRow",
   table: "t1",
   columnValues: {
-    text: { contextVarId: "cv1", expr: { type: "literal", valueType: "text", value: "abc" }}
+    text: { contextVarId: null, expr: { type: "literal", valueType: "text", value: "abc" }}
   },
   content: { 
     type: "textbox", 
