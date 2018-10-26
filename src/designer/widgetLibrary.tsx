@@ -9,6 +9,7 @@ import { CreateBlock } from "../widgets/blocks";
 import * as _ from "lodash";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
+import { Database } from "../database/Database";
 
 export interface WidgetLibrary {
   widgets: { [id: string]: WidgetDef }
@@ -16,6 +17,7 @@ export interface WidgetLibrary {
 
 interface Props {
   blockFactory: BlockFactory
+  database: Database
   schema: Schema
   dataSource: DataSource
   actionLibrary: ActionLibrary
@@ -113,6 +115,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         key={widgetDef.id}
         widgetDef={widgetDef}
         createBlock={this.props.blockFactory.createBlock}
+        database={this.props.database}
         schema={this.props.schema}
         dataSource={this.props.dataSource}
         actionLibrary={this.props.actionLibrary}
@@ -153,6 +156,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
 class WidgetTab extends React.Component<{
     widgetDef: WidgetDef
     createBlock: CreateBlock
+    database: Database
     schema: Schema
     dataSource: DataSource
     actionLibrary: ActionLibrary
@@ -167,6 +171,7 @@ class WidgetTab extends React.Component<{
       createBlock={this.props.createBlock}
       schema={this.props.schema}
       dataSource={this.props.dataSource}
+      database={this.props.database}
       actionLibrary={this.props.actionLibrary}
       widgetLibrary={this.props.widgetLibrary}
       onWidgetDefChange={this.props.onWidgetDefChange}

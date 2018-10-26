@@ -8,7 +8,6 @@ import { Schema, DataSource } from "mwater-expressions";
 import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
-import { DataSourceDatabase } from "../database/DataSourceDatabase";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
 import { WidgetLibrary } from "./widgetLibrary";
@@ -22,6 +21,7 @@ import VirtualDatabase from "../database/VirtualDatabase";
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
   createBlock: CreateBlock
+  database: Database
   schema: Schema
   dataSource: DataSource
   actionLibrary: ActionLibrary
@@ -292,9 +292,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return null 
     }
 
-    let database: Database = new DataSourceDatabase(this.props.schema, this.props.dataSource) 
+    let database: Database = this.props.database
 
-    const virtualizeDatabase = true
+    const virtualizeDatabase = false
 
     if (virtualizeDatabase) {
       // Make non-live TODO needed? Could make big queries for counts/sums if mutated

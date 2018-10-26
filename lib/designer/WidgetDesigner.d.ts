@@ -5,10 +5,12 @@ import "./WidgetDesigner.css";
 import { Schema, DataSource } from "mwater-expressions";
 import { WidgetLibrary } from "./widgetLibrary";
 import { ActionLibrary } from "../widgets/ActionLibrary";
+import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 interface WidgetDesignerProps {
     widgetDef: WidgetDef;
     createBlock: CreateBlock;
+    database: Database;
     schema: Schema;
     dataSource: DataSource;
     actionLibrary: ActionLibrary;

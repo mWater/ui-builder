@@ -4,6 +4,7 @@ import { Schema, DataSource } from "mwater-expressions";
 import BlockFactory from "../widgets/BlockFactory";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
+import { Database } from "../database/Database";
 export interface WidgetLibrary {
     widgets: {
         [id: string]: WidgetDef;
@@ -11,6 +12,7 @@ export interface WidgetLibrary {
 }
 interface Props {
     blockFactory: BlockFactory;
+    database: Database;
     schema: Schema;
     dataSource: DataSource;
     actionLibrary: ActionLibrary;

@@ -13,6 +13,8 @@ import { defaultBlockPaletteEntries } from './designer/blockPaletteEntries';
 
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
+import { Database } from './database/Database';
+import { DataSourceDatabase } from './database/DataSourceDatabase';
 
 const basicBlockFactory = new BlockFactory()
 
@@ -27,7 +29,7 @@ const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { loc
 const actionLibrary = new ActionLibrary()
 
 @DragDropContext(HTML5Backend)
-class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[] }> {
+class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[], database?: Database }> {
   constructor(props: object) {
     super(props)
 
@@ -39,7 +41,9 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
 
   componentDidMount() {
     fetch("https://api.mwater.co/v3/schema").then(req => req.json()).then(json => {
-      this.setState({ schema: new Schema(json) })
+      const schema = new Schema(json)
+      const database = new DataSourceDatabase(schema, dataSource)
+      this.setState({ schema, database })
     })
   }
 
@@ -55,7 +59,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
   }
   
   render() {
-    if (!this.state.schema) {
+    if (!this.state.schema || !this.state.database) {
       return <div>Loading...</div>
     }
 
@@ -67,6 +71,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
           widgetLibrary={this.state.widgetLibrary} 
           blockFactory={basicBlockFactory} 
           actionLibrary={actionLibrary}
+          database={this.state.database}
           schema={this.state.schema}
           dataSource={dataSource}
           onWidgetLibraryChange={this.handleWidgetLibraryChange} 
