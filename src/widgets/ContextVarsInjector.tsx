@@ -50,6 +50,6 @@ export default class ContextVarsInjector extends React.Component<Props> {
       )
     }
 
-    return elem(this.props.renderInstanceProps, false, false)
+    return elem({ ...this.props.renderInstanceProps, database: this.props.database }, false, false)
   }
 }
