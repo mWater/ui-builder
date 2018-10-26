@@ -8,6 +8,8 @@ export interface DropdownBlockDef extends ControlBlockDef {
     placeholder: LocalizedString | null;
     /** Text expression to display for entries of type id */
     idLabelExpr?: Expr;
+    /** Filter expression for entries of type id */
+    idFilterExpr?: Expr;
 }
 export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     validate(options: ValidateBlockOptions): string | null;

@@ -1,3 +1,15 @@
+declare module 'react-library/lib/AutoSizeComponent' {
+  class AutoSizeComponent extends React.Component<{
+    /** True to inject width */
+    injectWidth?: boolean
+    /** True to inject height */
+    injectHeight?: boolean
+    children: (size: { width?: number, height?: number }) => React.ReactElement<any>
+  }> {}
+
+  export default AutoSizeComponent
+}
+
 declare module 'react-library/lib/FillDownwardComponent' {
   class FillDownwardComponent extends React.Component<{}> {}
 
@@ -33,7 +45,7 @@ declare module 'react-library/lib/ActionCancelModalComponent' {
 }
 
 declare module 'react-library/lib/bootstrap' {
-  import { ReactNode } from "react";
+  import { ReactNode, Children } from "react";
 
   class TextInput extends React.Component<{
     value: string | null

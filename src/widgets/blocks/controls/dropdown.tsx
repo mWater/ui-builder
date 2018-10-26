@@ -5,7 +5,7 @@ import { Column, EnumValue, Expr, ExprValidator, ExprCompiler } from 'mwater-exp
 import { LocalizedString, localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import ReactSelect from "react-select"
-import { IdLiteralComponent, ExprComponent } from 'mwater-expressions-ui';
+import { IdLiteralComponent, ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -14,6 +14,9 @@ export interface DropdownBlockDef extends ControlBlockDef {
 
   /** Text expression to display for entries of type id */
   idLabelExpr?: Expr
+
+  /** Filter expression for entries of type id */
+  idFilterExpr?: Expr
 }
 
 export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
@@ -117,6 +120,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   renderId(props: RenderControlProps, column: Column) {
     const exprCompiler = new ExprCompiler(props.schema)
     const labelExpr = exprCompiler.compileExpr({ expr: this.blockDef.idLabelExpr || null, tableAlias: "main" })
+    const filterExpr = exprCompiler.compileExpr({ expr: this.blockDef.idFilterExpr || null, tableAlias: "main" })
     
     // TODO Should use a local implementation that uses database, not dataSource for data. This one will not 
     // pick up any changes in a virtual database
@@ -126,7 +130,8 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       idTable={column.join!.toTable}
       value={props.value}
       onChange={props.onChange}
-      labelExpr={labelExpr} />
+      labelExpr={labelExpr} 
+      filter={filterExpr} />
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
@@ -154,6 +159,20 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
                 schema={props.schema}
                 dataSource={props.dataSource}
                 types={["text"]}
+                table={column!.join!.toTable}
+                />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { column && column.type === "join" ?
+          <LabeledProperty label="Filter Expression">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="idFilterExpr">
+              {(value, onChange) => <FilterExprComponent 
+                value={value} 
+                onChange={onChange} 
+                schema={props.schema}
+                dataSource={props.dataSource}
                 table={column!.join!.toTable}
                 />
               }
