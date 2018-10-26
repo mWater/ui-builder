@@ -15,7 +15,7 @@ export declare class DataSourceDatabase implements Database {
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;
-    /** Force change event to fire */
+    /** Force change event to fire after clearing cache */
     triggerChange(): void;
     transaction(): Transaction;
 }
