@@ -150,7 +150,18 @@ interface Props {
   renderInstanceProps: RenderInstanceProps
 }
 
-class ControlInstance extends React.Component<Props> implements ValidatableInstance {
+interface State {
+  updating: boolean
+}
+
+class ControlInstance extends React.Component<Props, State> implements ValidatableInstance {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      updating: false
+    }
+  }
+
   getValue() {
     const renderInstanceProps = this.props.renderInstanceProps
     const blockDef = this.props.block.blockDef
@@ -176,9 +187,15 @@ class ControlInstance extends React.Component<Props> implements ValidatableInsta
     const id = renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Update database
-    const txn = this.props.renderInstanceProps.database.transaction()
-    await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
-    await txn.commit()
+    this.setState({ updating: true })
+    try {
+      const txn = this.props.renderInstanceProps.database.transaction()
+      await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
+      await txn.commit()
+      // TODO error handling
+    } finally {
+      this.setState({ updating: false })
+    }
   }
 
   renderRequired() {
@@ -202,7 +219,7 @@ class ControlInstance extends React.Component<Props> implements ValidatableInsta
     }
 
     return (
-      <div>
+      <div style={{ opacity: this.state.updating ? 0.6 : undefined }}>
         { this.renderRequired() }
         { this.props.block.renderControl(renderControlProps) }
       </div>
