@@ -45,8 +45,10 @@ export class DataSourceDatabase implements Database {
     this.changeListeners = _.difference(this.changeListeners, [changeListener])
   }
 
-  /** Force change event to fire */
+  /** Force change event to fire after clearing cache */
   triggerChange() {
+    this.dataSource.clearCache()
+    
     for (const changeListener of this.changeListeners) {
       changeListener()
     }
