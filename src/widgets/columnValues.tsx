@@ -89,6 +89,7 @@ export class ColumnValuesEditor extends React.Component<{
             enumValues={column.enumValues}
             table={contextVar ? contextVar.table! : null}
             value={contextVarExpr.expr}
+            types={[columnType]}
             onChange={this.handleExprChange.bind(null, columnId)}
           />
         </LabeledProperty>
