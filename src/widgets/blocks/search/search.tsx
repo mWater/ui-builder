@@ -3,7 +3,7 @@ import LeafBlock from '../../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import SearchBlockInstance from './SearchBlockInstance';
+import SearchBlockInstance, { SearchControl } from './SearchBlockInstance';
 import ListEditor from '../../ListEditor';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { LocalizedString, localize } from '../../localization';
@@ -53,17 +53,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
   }
   
   renderDesign(props: RenderDesignProps) {
-    return (
-      <div className="input-group" style={{ padding: 5 }}>
-        <span className="input-group-addon"><i className="fa fa-search"/></span>
-        <input 
-          type="text" 
-          className="form-control" 
-          style={{maxWidth: "20em"}} 
-          placeholder={localize(this.blockDef.placeholder, props.locale)} 
-        />
-      </div>
-    )
+    return <SearchControl value="" placeholder={localize(this.blockDef.placeholder, props.locale)} />
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {

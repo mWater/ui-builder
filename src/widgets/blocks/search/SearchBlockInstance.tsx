@@ -14,6 +14,7 @@ interface State {
   searchText: string
 }
 
+/** Search block that filters the rowset */
 export default class SearchBlockInstance extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -101,28 +102,42 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     throw new Error("Unsupported search type " + exprType) 
   }
 
-  handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange = (value: string) => {
     const blockDef = this.props.blockDef
-    const searchText = ev.target.value
-    this.setState({ searchText: searchText })
+    this.setState({ searchText: value })
 
     // Set filter 
-    this.props.renderInstanceProps.setFilter(blockDef.rowsetContextVarId!, this.createFilter(searchText))
+    this.props.renderInstanceProps.setFilter(blockDef.rowsetContextVarId!, this.createFilter(value))
+  }
+
+  render() {
+    return <SearchControl 
+      value={this.state.searchText} 
+      onChange={this.handleChange}
+      placeholder={localize(this.props.blockDef.placeholder, this.props.renderInstanceProps.locale)} />
+  }
+}
+
+/** Simple input box with magnifying glass */
+export class SearchControl extends React.Component<{ value: string, onChange?: (value: string) => void, placeholder?: string }> {
+  handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    if (this.props.onChange) {
+      this.props.onChange(ev.target.value)
+    }
   }
 
   render() {
     return (
       <div className="input-group" style={{ padding: 5 }}>
-        <span className="input-group-addon"><i className="fa fa-search"/></span>
-        <input 
-          type="text" 
-          className="form-control" 
-          style={{maxWidth: "20em"}} 
-          value={this.state.searchText} 
-          onChange={this.handleChange}
-          placeholder={localize(this.props.blockDef.placeholder, this.props.renderInstanceProps.locale)} 
-          />
-      </div>
-    )
+      <span className="input-group-addon"><i className="fa fa-search"/></span>
+      <input 
+        type="text" 
+        className="form-control" 
+        style={{maxWidth: "20em"}} 
+        value={this.props.value} 
+        onChange={this.handleChange}
+        placeholder={this.props.placeholder} />
+    </div>
+    )  
   }
 }
