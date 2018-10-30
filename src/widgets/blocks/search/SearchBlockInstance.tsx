@@ -128,15 +128,15 @@ export class SearchControl extends React.Component<{ value: string, onChange?: (
 
   render() {
     return (
-      <div className="input-group" style={{ padding: 5 }}>
-      <span className="input-group-addon"><i className="fa fa-search"/></span>
-      <input 
-        type="text" 
-        className="form-control" 
-        style={{maxWidth: "20em"}} 
-        value={this.props.value} 
-        onChange={this.handleChange}
-        placeholder={this.props.placeholder} />
+      <div style={{ position: "relative", display: "inline-block", pointerEvents: "none" }}>
+        <i className="fa fa-search" style={{ position: "absolute", right: 8, top: 10, color: "#AAA" }} />
+        <input 
+          type="text" 
+          className="form-control" 
+          style={{maxWidth: "20em"}} 
+          value={this.props.value} 
+          onChange={this.handleChange}
+          placeholder={this.props.placeholder} />
     </div>
     )  
   }
