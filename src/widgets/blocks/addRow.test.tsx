@@ -77,7 +77,5 @@ test("save writes to database", async () => {
   // Expect added row
   expect(database.mutations[0].type).toBe("add")
 
-  console.log(inst.debug())
-
   expect(inst.find("input").prop("value")).toBe("abc")
 })

@@ -1,4 +1,4 @@
-import SearchBlockInstance from "./SearchBlockInstance";
+import SearchBlockInstance, { SearchControl } from "./SearchBlockInstance";
 import { SearchBlockDef } from "./search";
 import { Filter, RenderInstanceProps } from "../../blocks";
 import { shallow } from "enzyme";
@@ -18,7 +18,7 @@ const getFilter = (blockDef: SearchBlockDef, searchText: string) => {
     }
 
     const sbi = shallow(<SearchBlockInstance blockDef={blockDef} renderInstanceProps={renderInstanceProps as RenderInstanceProps}/>)
-    sbi.find("input").simulate("change", { target: { value: searchText }})
+    sbi.prop("onChange")(searchText)
   })
 } 
 
