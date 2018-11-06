@@ -15,8 +15,6 @@ export interface RenderActionEditorProps {
     contextVars: ContextVar[];
     /** locale of the editor (e.g. "en") */
     locale: string;
-    /** Action being edited */
-    actionDef: ActionDef;
     /** Widget library that lists all available widgets */
     widgetLibrary: WidgetLibrary;
     onChange(actionDef: ActionDef): void;

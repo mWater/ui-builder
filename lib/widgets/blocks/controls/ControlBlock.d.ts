@@ -32,6 +32,8 @@ export declare abstract class ControlBlock<T extends ControlBlockDef> extends Le
     abstract filterColumn(column: Column): boolean;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
+    /** Allow subclasses to clear/update other fields on the column changing */
+    processColumnChanged(blockDef: T): T;
     renderEditor(props: RenderEditorProps): JSX.Element;
     getContextVarExprs(contextVar: ContextVar): Expr[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */
