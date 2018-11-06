@@ -187,7 +187,6 @@ export class ActionDefEditor extends React.Component<{
         { action 
           ? action.renderEditor({ 
               widgetLibrary: this.props.widgetLibrary,
-              actionDef: this.props.value!, 
               locale: this.props.locale, 
               contextVars: this.props.contextVars, 
               onChange: this.props.onChange,

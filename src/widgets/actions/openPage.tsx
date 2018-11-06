@@ -80,7 +80,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     // Create widget options 
     const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "name")
 
-    const actionDef = props.actionDef as OpenPageActionDef
+    const actionDef = this.actionDef as OpenPageActionDef
 
     const handleWidgetIdChange = (widgetId: string | null) => {
       props.onChange({ ...actionDef, widgetId: widgetId, contextVarValues: {} })
@@ -127,7 +127,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     return (
       <div>
         <LabeledProperty label="Page Type">
-          <PropertyEditor obj={props.actionDef} onChange={props.onChange} property="pageType">
+          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="pageType">
             {(value, onChange) => <Select value={value} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "modal", label: "Modal" }]} />}
           </PropertyEditor>
         </LabeledProperty>

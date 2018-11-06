@@ -34,6 +34,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "dropdown", rowContextVarId: null, column: null },
   },
   {
+    title: "Date/Datetime Control",
+    blockDef: { id: "", type: "datefield", rowContextVarId: null, column: null },
+  },
+  {
     title: "Expression",
     blockDef: { id: "", type: "expression", expr: null },
   },

@@ -68,8 +68,18 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     return <ControlInstance renderInstanceProps={props} block={this}/>      
   }
 
+  /** Allow subclasses to clear/update other fields on the column changing */
+  processColumnChanged(blockDef: T): T {
+    // Default does nothing
+    return blockDef
+  }
+
   renderEditor(props: RenderEditorProps) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
+
+    const handleColumnChanged = (blockDef: T) => {
+      props.onChange(this.processColumnChanged(blockDef))
+    }
 
     return (
       <div>
@@ -81,7 +91,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
 
         { contextVar ?
           <LabeledProperty label="Column">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="column">
+            <PropertyEditor obj={this.blockDef} onChange={handleColumnChanged} property="column">
               {(value, onChange) => {
                 const columnOptions = props.schema.getColumns(contextVar.table!)
                   .filter(c => this.filterColumn(c))

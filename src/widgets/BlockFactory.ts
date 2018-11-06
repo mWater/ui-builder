@@ -18,6 +18,7 @@ import { RowsetBlock, RowsetBlockDef } from './blocks/rowset';
 import { TabbedBlock, TabbedBlockDef } from './blocks/tabbed/tabbed';
 import { ImageBlock, ImageBlockDef } from './blocks/image';
 import { AddRowBlock, AddRowBlockDef } from './blocks/addRow';
+import { DatefieldBlock, DatefieldBlockDef } from './blocks/controls/datefield';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -68,6 +69,8 @@ export default class BlockFactory {
         return new TabbedBlock(blockDef as TabbedBlockDef, this.createBlock)
       case "image":
         return new ImageBlock(blockDef as ImageBlockDef)
+      case "datefield":
+        return new DatefieldBlock(blockDef as DatefieldBlockDef)
     }
 
     // Use custom blocks

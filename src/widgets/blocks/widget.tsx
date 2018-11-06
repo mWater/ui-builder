@@ -6,6 +6,9 @@ import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
+import { LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
+import { Select } from 'react-library/lib/bootstrap';
+import produce from 'immer';
 
 // Block which contains a widget
 export interface WidgetBlockDef extends BlockDef {
@@ -26,6 +29,12 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       return "Widget required"
     }
 
+    // Ensure that widget exists 
+    const widget = options.widgetLibrary.widgets[this.blockDef.widgetId]
+    if (!widget) {
+      return "Invalid widget"
+    }
+
     // Ensure that all context variables exist
     for (const internalContextVarId of Object.keys(this.blockDef.contextVarMap)) {
       if (!options.contextVars.find(cv => cv.id === this.blockDef.contextVarMap[internalContextVarId])) {
@@ -36,23 +45,22 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     return null 
   }
 
-  // TODO get initial filters, mapped
-  // async getInitialFilters(contextVarId: string): Promise<Filter[]> { 
-  //   const widgetDef = this.lookupWidget(this.blockDef.widgetId)
-  //   if (widgetDef && widgetDef.blockDef) {
-  //     const innerBlock = this.createBlock(widgetDef.blockDef)
+  getInitialFilters(contextVarId: string, widgetLibrary: WidgetLibrary): Filter[] { 
+    const widgetDef = widgetLibrary.widgets[this.blockDef.widgetId!]
+    if (widgetDef && widgetDef.blockDef) {
+      const innerBlock = this.createBlock(widgetDef.blockDef)
 
-  //     // Map contextVarId to internal id
-  //     for (const key of Object.keys(this.blockDef.contextVarMap)) {
-  //       const value = this.blockDef.contextVarMap[key]
-  //       if (value === contextVarId) {
-  //         return innerBlock.getInitialFilters(key)
-  //       }
-  //     }
-  //   }
+      // Map contextVarId to internal id
+      for (const key of Object.keys(this.blockDef.contextVarMap)) {
+        const value = this.blockDef.contextVarMap[key]
+        if (value === contextVarId) {
+          return innerBlock.getInitialFilters(key, widgetLibrary)
+        }
+      }
+    }
 
-  //   return []
-  // }
+    return []
+  }
 
   getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary) {
     if (!this.blockDef.widgetId) {
@@ -73,14 +81,32 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
 
     // Get complete context variables exprs of inner widget blocks
-    const contextVarExprs = _.flatten(getBlockTree(widgetDef.blockDef, this.createBlock, widgetDef.contextVars).map(cb => {
+    let contextVarExprs = _.flatten(getBlockTree(widgetDef.blockDef, this.createBlock, widgetDef.contextVars).map(cb => {
       const block = this.createBlock(cb.blockDef)
       return block.getContextVarExprs(innerContextVar, widgetLibrary, actionLibrary)
     }))
 
     // Map any variables of expressions that cross widget boundary
-    
+    contextVarExprs = contextVarExprs.map((cve) => this.mapInnerToOuterVariables(cve))
     return contextVarExprs
+  }
+
+  /** Maps variables in an expression from inner variable names to outer ones */
+  mapInnerToOuterVariables(expr: Expr): Expr {
+    return mapObjectTree(expr, (e: any) => {
+      if (e.type === "variable") {
+        // Change inner id to outer id
+        if (this.blockDef.contextVarMap[e.variableId]) {
+          return { ...e, variableId: this.blockDef.contextVarMap[e.variableId] }
+        }
+        else {
+          return e
+        }
+      }
+      else {
+        return e
+      }
+    })    
   }
 
   renderDesign(props: RenderDesignProps) {
@@ -152,7 +178,8 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
-            return props.getContextVarExprValue(outerContextVarId, expr)
+            // Map variable from inner to outer
+            return props.getContextVarExprValue(outerContextVarId, this.mapInnerToOuterVariables(expr))
           }
           else {
             return
@@ -190,6 +217,76 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   }
 
   renderEditor(props: RenderEditorProps) {
-    return <div>TODO</div>
+    // Create widget options 
+    const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "name")
+
+    const handleWidgetIdChange = (widgetId: string | null) => {
+      props.onChange({ ...this.blockDef, widgetId: widgetId, contextVarValues: {} })
+    }
+
+    const renderContextVarValues = () => {
+      if (!this.blockDef.widgetId) {
+        return null
+      }
+
+      // Find the widget
+      const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId]
+      if (!widgetDef) {
+        return null
+      }
+
+      return (
+        <table className="table table-bordered table-condensed">
+          <tbody>
+            { widgetDef.contextVars.map(contextVar => {
+              const cvr = this.blockDef.contextVarValues[contextVar.id]
+              const handleCVChange = (contextVarId: string) => {
+                props.onChange(produce(this.blockDef, (draft) => {
+                  draft.contextVarValues[contextVar.id] = contextVarId
+                }))
+              }
+
+              return (
+                <tr key={contextVar.id}>
+                  <td>{contextVar.name}</td>
+                  <td>
+                    <ContextVarPropertyEditor 
+                      contextVars={props.contextVars}  
+                      types={[contextVar.type]}
+                      table={contextVar.table}
+                      value={ cvr ? cvr.contextVarId : null }
+                      onChange={ handleCVChange }
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )
+    }
+
+    return <div>
+      <LabeledProperty label="Widget">
+        <Select value={this.blockDef.widgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
+      </LabeledProperty>
+      { renderContextVarValues() }
+    </div>
   }
+}
+
+// Run a possibly deep object through a mapping function. Automatically maps all values of objects and arrays recursively
+export const mapObjectTree = (obj: any, mapping: (input: any) => any): any => {
+  // If array, map items
+  if (_.isArray(obj)) {
+    return obj.map((elem) => mapObjectTree(elem, mapping))
+  }
+  if (_.isObject(obj)) {
+    // First map object itself
+    const res = mapping(obj)
+
+    // Then map values
+    return _.mapValues(res, (value) => mapObjectTree(value, mapping))
+  }
+  return obj
 }
