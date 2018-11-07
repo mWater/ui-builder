@@ -11,7 +11,6 @@ export declare class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
     validate(): null;
     processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
     canonicalize(): BlockDef | null;
-    renderChildDesign(props: RenderDesignProps, childBlockDef: BlockDef): JSX.Element;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
 }
