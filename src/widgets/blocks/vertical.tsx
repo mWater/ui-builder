@@ -47,18 +47,11 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
     })
   }
 
-  renderChildDesign(props: RenderDesignProps, childBlockDef: BlockDef) {
-    return (
-      <div key={childBlockDef.id}>
-        { props.renderChildBlock(props, childBlockDef) }
-      </div>
-    )
-  }
-
   renderDesign(props: RenderDesignProps) {
+    // Add keys
     return (
       <div style={{ paddingLeft: 5, paddingRight: 5 }}>
-        { this.blockDef.items.map(childBlock => this.renderChildDesign(props, childBlock)) }
+        { this.blockDef.items.map((childBlockDef, index) => React.cloneElement(props.renderChildBlock(props, childBlockDef), { key: index })) }
       </div>
     )      
   }
@@ -66,7 +59,10 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
   renderInstance(props: RenderInstanceProps) {
     return (
       <div style={{ paddingLeft: 5, paddingRight: 5 }}>
-        { this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef)) }
+        { this.blockDef.items.map((childBlockDef, index) => {
+          const childElem = props.renderChildBlock(props, childBlockDef)
+          return childElem ? React.cloneElement(childElem, { key: index }) : null
+        })}
       </div>
     )      
   }

@@ -42,6 +42,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "expression", expr: null },
   },
   {
+    title: "Embed Widget",
+    blockDef: { id: "", type: "widget", widgetId: null, contextVarMap: {} },
+  },
+  {
     title: "Query Table",
     blockDef: { 
       id: "", 

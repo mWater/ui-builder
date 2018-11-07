@@ -111,7 +111,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
   renderDesign(props: RenderDesignProps) {
     if (!this.blockDef.widgetId) {
-      return <div/>
+      return <div style={{ fontStyle: "italic" }}>Select widget...</div>
     }
 
     // Find the widget
@@ -221,7 +221,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "name")
 
     const handleWidgetIdChange = (widgetId: string | null) => {
-      props.onChange({ ...this.blockDef, widgetId: widgetId, contextVarValues: {} })
+      props.onChange({ ...this.blockDef, widgetId: widgetId, contextVarMap: {} })
     }
 
     const renderContextVarValues = () => {
@@ -239,10 +239,10 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         <table className="table table-bordered table-condensed">
           <tbody>
             { widgetDef.contextVars.map(contextVar => {
-              const cvr = this.blockDef.contextVarValues[contextVar.id]
+              const cv = this.blockDef.contextVarMap[contextVar.id]
               const handleCVChange = (contextVarId: string) => {
                 props.onChange(produce(this.blockDef, (draft) => {
-                  draft.contextVarValues[contextVar.id] = contextVarId
+                  draft.contextVarMap[contextVar.id] = contextVarId
                 }))
               }
 
@@ -254,7 +254,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
                       contextVars={props.contextVars}  
                       types={[contextVar.type]}
                       table={contextVar.table}
-                      value={ cvr ? cvr.contextVarId : null }
+                      value={cv}
                       onChange={ handleCVChange }
                     />
                   </td>
