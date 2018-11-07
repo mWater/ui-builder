@@ -128,8 +128,8 @@ export class SearchControl extends React.Component<{ value: string, onChange?: (
 
   render() {
     return (
-      <div style={{ position: "relative", display: "inline-block", pointerEvents: "none" }}>
-        <i className="fa fa-search" style={{ position: "absolute", right: 8, top: 10, color: "#AAA" }} />
+      <div style={{ position: "relative", display: "inline-block" }}>
+        <i className="fa fa-search" style={{ position: "absolute", right: 8, top: 10, color: "#AAA", pointerEvents: "none" }} />
         <input 
           type="text" 
           className="form-control" 
