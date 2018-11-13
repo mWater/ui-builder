@@ -131,7 +131,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         renderChildBlock: (childProps, childBlockDef) => { 
           if (childBlockDef) {
             const childBlock = this.createBlock(childBlockDef)
-            return childBlock.renderDesign(props)
+            return childBlock.renderDesign(childProps)
           }
           else {
             return <BlockPlaceholder/>
