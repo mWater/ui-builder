@@ -189,10 +189,20 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   render() {
     const riProps = this.props.renderInstanceProps
 
-    // TODO fade when refreshing
+    // Fade if refreshing
+    const style: React.CSSProperties = {}
+    if (this.state.refreshing) {
+      style.opacity = 0.6
+    }
+
+    // Put hover if an action connecte
+    let className = "table table-bordered"
+    if (this.props.block.blockDef.rowClickAction) {
+      className += " table-hover"
+    }
 
     return (
-      <table className="table table-bordered">
+      <table className={className} style={style}>
         <thead>
           <tr>
             { this.props.block.blockDef.headers.map((b, index) => {
