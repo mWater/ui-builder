@@ -66,7 +66,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     }
 
     return (
-      <button type="button" className={className} onClick={onClick}>
+      <button type="button" className={className} onClick={onClick} style={{ margin: 5 }}>
         { label }
       </button>
     )

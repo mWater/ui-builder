@@ -58,7 +58,7 @@ export default class TextInstance extends React.Component<{
 
     const noOptionsMessage = () => "Type to search"
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 })
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 })
     }
 
     // TODO key: JSON.stringify(@props.filters)  # Include to force a change when filters change
