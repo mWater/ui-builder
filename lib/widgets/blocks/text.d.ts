@@ -17,13 +17,21 @@ export interface TextBlockDef extends BlockDef {
     /** Text content */
     text: LocalizedString | null;
     style: "p" | "div" | "h1" | "h2" | "h3" | "h4";
+    bold?: boolean;
+    italic?: boolean;
+    underline?: boolean;
     /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
     embeddedExprs?: EmbeddedExpr[];
 }
 export declare class TextBlock extends LeafBlock<TextBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
     validate(options: ValidateBlockOptions): string | null;
-    renderDesign(props: RenderDesignProps): React.DetailedReactHTMLElement<{}, HTMLElement>;
+    renderText(content: React.ReactNode): React.DetailedReactHTMLElement<{
+        style: React.CSSProperties;
+    }, HTMLElement>;
+    renderDesign(props: RenderDesignProps): React.DetailedReactHTMLElement<{
+        style: React.CSSProperties;
+    }, HTMLElement>;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
     renderEditor(props: RenderEditorProps): JSX.Element;
 }

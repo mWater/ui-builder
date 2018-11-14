@@ -3,7 +3,7 @@ import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar, createExprVariables } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, NumberFormatEditor, ContextVarPropertyEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors'
 import { LocalizedString, localize } from '../localization'
-import { Select } from 'react-library/lib/bootstrap';
+import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { Expr, ExprValidator, ExprUtils, Schema, DataSource } from 'mwater-expressions';
 import * as _ from 'lodash';
 import { format as d3Format } from 'd3-format';
@@ -30,6 +30,10 @@ export interface TextBlockDef extends BlockDef {
   text: LocalizedString | null
 
   style: "p" | "div" | "h1" | "h2" | "h3" | "h4"
+
+  bold?: boolean
+  italic?: boolean
+  underline?: boolean
 
   /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
   embeddedExprs?: EmbeddedExpr[] 
@@ -66,10 +70,25 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
 
     return null 
   }
+
+  renderText(content: React.ReactNode) {
+    const style: React.CSSProperties = {}
+    if (this.blockDef.bold) {
+      style.fontWeight = "bold"
+    }
+    if (this.blockDef.italic) {
+      style.fontStyle = "italic"
+    }
+    if (this.blockDef.underline) {
+      style.textDecoration = "underline"
+    }
+
+    return React.createElement(this.blockDef.style, { style: style }, content)
+  }
   
   renderDesign(props: RenderDesignProps) {
     const text = localize(this.blockDef.text, props.locale)
-    return React.createElement(this.blockDef.style, {}, text ? text : <span className="text-muted">Text</span>)
+    return this.renderText(text ? text : <span className="text-muted">Text</span>)
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
@@ -103,7 +122,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
       text = text.replace(`{${i}}`, str)
     }
 
-    return React.createElement(this.blockDef.style, {}, text)
+    return this.renderText(text)
   }
 
   renderEditor(props: RenderEditorProps) {
@@ -132,6 +151,18 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
             ]} /> }
           </PropertyEditor>
         </LabeledProperty>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="bold">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Bold</Checkbox>}
+        </PropertyEditor>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="italic">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Italic</Checkbox>}
+        </PropertyEditor>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="underline">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
+        </PropertyEditor>
 
         <LabeledProperty label="Embedded expressions" help="Reference in text as {0}, {1}, etc.">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="embeddedExprs">
