@@ -1,6 +1,7 @@
 import { ActionDef, Action } from "./actions";
 import { OpenPageAction, OpenPageActionDef } from "./actions/openPage";
 import { AddRowAction, AddRowActionDef } from "./actions/addRow";
+import { GotoUrlAction, GotoUrlActionDef } from "./actions/gotoUrl";
 
 /** Library of actions */
 export class ActionLibrary {
@@ -11,6 +12,8 @@ export class ActionLibrary {
         return new OpenPageAction(actionDef as OpenPageActionDef)
       case "addRow":
         return new AddRowAction(actionDef as AddRowActionDef)
+      case "gotoUrl":
+        return new GotoUrlAction(actionDef as GotoUrlActionDef)
     }
     throw new Error("Unknown action type")
   }
@@ -31,6 +34,10 @@ export class ActionLibrary {
           table: null,
           columnValues: {}
         }
+      case "gotoUrl": 
+        return {
+          type: "gotoUrl"
+        }
     }
     throw new Error("Unknown action type")
   }
@@ -39,7 +46,8 @@ export class ActionLibrary {
   getActionTypes(): Array<{ type: string, name: string }> {
     return [
       { type: "openPage", name: "Open Page" },
-      { type: "addRow", name: "Add Row" }
+      { type: "addRow", name: "Add Row" },
+      { type: "gotoUrl", name: "Goto URL" }
     ]
   }
 }
