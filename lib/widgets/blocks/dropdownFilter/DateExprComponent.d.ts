@@ -22,6 +22,7 @@ interface Preset {
     id: string;
     name: string;
 }
+/** Convert a filter value to an expression */
 export declare const toExpr: (table: string, expr: Expr, datetime: boolean, value: DateValue) => Expr;
 /** Allows selection of a date expressions for quickfilters */
 export default class DateExprComponent extends React.Component<Props, State> {
