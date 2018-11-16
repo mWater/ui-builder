@@ -362,7 +362,7 @@ export class TableSelect extends React.Component<{
     const tables = _.sortBy(this.props.schema.getTables(), (table) => localize(table.name, this.props.locale))
 
     return <ReactSelect 
-      value={tables.find(t => t.id === this.props.value)} 
+      value={tables.find(t => t.id === this.props.value) || null} 
       options={tables}
       onChange={this.handleTableChange} 
       getOptionLabel={this.getOptionLabel}

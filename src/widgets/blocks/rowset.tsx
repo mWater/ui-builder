@@ -5,8 +5,6 @@ import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInst
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
-import ReactSelect from "react-select"
-import { localize } from '../localization';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';

@@ -116,16 +116,7 @@ function getDropSide(monitor: DropTargetMonitor, component: any) {
 }
 
 /** Wraps a block in a draggable control with an x to remove */
-@DragSource("block", blockSourceSpec, (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging()
-}))
-@DropTarget("block", blockTargetSpec, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop()
-}))
-export default class BlockWrapper extends React.Component<Props, State> {
+class BlockWrapper extends React.Component<Props, State> {
   constructor(props:Props) {
     super(props)
     this.state = { hoverSide: null }
@@ -199,3 +190,14 @@ export default class BlockWrapper extends React.Component<Props, State> {
     )
   }
 }
+
+const dropTarget = DropTarget("block", blockTargetSpec, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop()
+}))(BlockWrapper)
+
+export default DragSource("block", blockSourceSpec, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))(dropTarget)

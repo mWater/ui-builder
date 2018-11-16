@@ -1,6 +1,6 @@
 import * as React from "react";
 import { BlockDef, CreateBlock, DropSide } from "../widgets/blocks"
-import { ConnectDragSource, DragSource } from "react-dnd"
+import { ConnectDragSource, DragSource, DragSourceConnector } from "react-dnd"
 import { Schema, DataSource } from "mwater-expressions"
 import {v4 as uuid} from 'uuid'
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
@@ -24,10 +24,7 @@ const blockSourceSpec = {
   }
 }
 
-@DragSource("block", blockSourceSpec, (connect, monitor) => ({
-  connectDragSource: connect.dragSource()
-}))
-export default class BlockPaletteItem extends React.Component<Props> {
+class BlockPaletteItem extends React.Component<Props> {
   renderContents() {
     if (this.props.entry.elem) {
       return this.props.entry.elem
@@ -67,3 +64,9 @@ export default class BlockPaletteItem extends React.Component<Props> {
     )
   }
 }
+
+const collect = (connect: DragSourceConnector) => {
+  return { connectDragSource: connect.dragSource() }
+}
+
+export default DragSource("block", blockSourceSpec, collect)(BlockPaletteItem)

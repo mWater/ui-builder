@@ -29,15 +29,16 @@ const blockTargetSpec = {
   }
 }
 
-@DropTarget("block", blockTargetSpec, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop()
-}))
-export default class BlockPlaceholder extends React.Component<Props> {
+class BlockPlaceholder extends React.Component<Props> {
   render() {
     return this.props.connectDropTarget!(
       <div className={this.props.isOver ? "block-placeholder hover" : "block-placeholder"}/>
     )
   }
 }
+
+export default DropTarget("block", blockTargetSpec, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop()
+}))(BlockPlaceholder)

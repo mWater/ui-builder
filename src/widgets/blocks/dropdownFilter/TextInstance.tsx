@@ -3,7 +3,6 @@ import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, EnumValue } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
-import ReactSelect from "react-select"
 import Async from 'react-select/lib/Async'
 import { QueryOptions, Database } from "../../../database/Database";
 

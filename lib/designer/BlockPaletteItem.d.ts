@@ -1,4 +1,3 @@
-import * as React from "react";
 import { CreateBlock } from "../widgets/blocks";
 import { ConnectDragSource } from "react-dnd";
 import { Schema, DataSource } from "mwater-expressions";
@@ -10,8 +9,5 @@ interface Props {
     dataSource: DataSource;
     connectDragSource?: ConnectDragSource;
 }
-export default class BlockPaletteItem extends React.Component<Props> {
-    renderContents(): React.ReactElement<any>;
-    render(): JSX.Element;
-}
-export {};
+declare const _default: import("react-dnd/lib/interfaces").DndComponentClass<Props>;
+export default _default;

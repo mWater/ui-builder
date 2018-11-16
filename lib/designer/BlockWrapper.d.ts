@@ -1,5 +1,4 @@
-import * as React from "react";
-import { BlockDef, DropSide, BlockStore } from "../widgets/blocks";
+import { BlockDef, BlockStore } from "../widgets/blocks";
 import { ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd';
 import "./BlockWrapper.css";
 interface Props {
@@ -18,14 +17,5 @@ interface Props {
     onSelect(): void;
     onRemove(): void;
 }
-interface State {
-    hoverSide: DropSide | null;
-}
-/** Wraps a block in a draggable control with an x to remove */
-export default class BlockWrapper extends React.Component<Props, State> {
-    constructor(props: Props);
-    handleClick: (ev: React.MouseEvent<Element>) => void;
-    renderHover(): JSX.Element | null;
-    render(): React.ReactElement<any>;
-}
-export {};
+declare const _default: import("react-dnd/lib/interfaces").DndComponentClass<Props>;
+export default _default;
