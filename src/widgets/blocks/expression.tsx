@@ -91,8 +91,15 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
     const handleExprChange = (expr: Expr) => {
-      // Clear format
-      props.onChange({ ...this.blockDef, expr: expr, format: null })
+      // Clear format if type different
+      const newExprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(expr)
+      
+      if (newExprType !== exprType) {
+        props.onChange({ ...this.blockDef, expr: expr, format: null })
+      }
+      else {
+        props.onChange({ ...this.blockDef, expr: expr })
+      }
     }
   
     // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)

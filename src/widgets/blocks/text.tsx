@@ -201,8 +201,15 @@ class EmbeddedExprEditor extends React.Component<{
 }> {
 
   handleExprChange = (expr: Expr) => {
-    // Clear format
-    this.props.onChange({ ...this.props.value, expr: expr, format: null })
+    const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
+    const newExprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(expr)
+    
+    if (newExprType !== exprType) {
+      this.props.onChange({ ...this.props.value, expr: expr, format: null })
+    }
+    else {
+      this.props.onChange({ ...this.props.value, expr: expr })
+    }
   }
 
   render() {

@@ -4,6 +4,7 @@ import { RenderInstanceProps, ContextVar } from "../../blocks";
 import { Row, Expr } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
+import { localize } from "../../localization";
 
 interface Props {
   block: QueryTableBlock
@@ -177,10 +178,20 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     if (!this.state.rows) {
       return (
         <tr>
-          <th colSpan={this.props.block.blockDef.contents.length}>
+          <td colSpan={this.props.block.blockDef.contents.length}>
             <i className="fa fa-spinner fa-spin"/>
-          </th>
+          </td>
         </tr>)
+    }
+
+    if (this.state.rows.length === 0 && this.props.block.blockDef.noRowsMessage) {
+      return (
+        <tr>
+          <td colSpan={this.props.block.blockDef.contents.length} style={{ fontStyle: "italic" }}>
+            {localize(this.props.block.blockDef.noRowsMessage, this.props.renderInstanceProps.locale)}
+          </td>
+        </tr>
+      )
     }
 
     return this.state.rows.map((row, rowIndex) => this.renderRow(row, rowIndex))

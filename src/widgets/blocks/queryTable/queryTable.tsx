@@ -6,12 +6,13 @@ import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, Co
 import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { Row, OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor } from '../../propertyEditors';
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';
+import { LocalizedString } from '../../localization';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -30,6 +31,9 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Action to be executed when row is clicked */
   rowClickAction: ActionDef | null
+
+  /** Message to display when there are no rows */
+  noRowsMessage?: LocalizedString | null
 }
 
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
@@ -311,6 +315,12 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         : null } 
+
+        <LabeledProperty label="Message to display when no rows">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="noRowsMessage">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
 
         <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
           <i className="fa fa-plus"/> Add Column
