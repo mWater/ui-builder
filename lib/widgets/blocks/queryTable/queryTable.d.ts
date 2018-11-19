@@ -6,6 +6,7 @@ import { Row, OrderBy } from '../../../database/Database';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';
+import { LocalizedString } from '../../localization';
 export interface QueryTableBlockDef extends BlockDef {
     type: "queryTable";
     /** Determines if one table row contains one or multiple database table rows */
@@ -19,6 +20,8 @@ export interface QueryTableBlockDef extends BlockDef {
     orderBy: OrderBy[] | null;
     /** Action to be executed when row is clicked */
     rowClickAction: ActionDef | null;
+    /** Message to display when there are no rows */
+    noRowsMessage?: LocalizedString | null;
 }
 export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];

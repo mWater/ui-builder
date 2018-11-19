@@ -19,6 +19,7 @@ import { TabbedBlock, TabbedBlockDef } from './blocks/tabbed/tabbed';
 import { ImageBlock, ImageBlockDef } from './blocks/image';
 import { AddRowBlock, AddRowBlockDef } from './blocks/addRow';
 import { DatefieldBlock, DatefieldBlockDef } from './blocks/controls/datefield';
+import { ConditionalBlock, ConditionalBlockDef } from './blocks/conditional';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -51,6 +52,8 @@ export default class BlockFactory {
         return new CollapsibleBlock(blockDef as CollapsibleBlockDef, this.createBlock)
       case "expression":
         return new ExpressionBlock(blockDef as ExpressionBlockDef)
+      case "conditional":
+        return new ConditionalBlock(blockDef as ConditionalBlockDef, this.createBlock)
       case "queryTable":
         return new QueryTableBlock(blockDef as QueryTableBlockDef, this.createBlock)
       case "search":
