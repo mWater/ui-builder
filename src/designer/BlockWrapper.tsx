@@ -36,7 +36,7 @@ const blockSourceSpec = {
   },
 
   isDragging(props: Props, monitor: DragDropMonitor) {
-    return props.blockDef.id === monitor.getItem().blockDef.id
+    return monitor.getItem().blockDef && (props.blockDef.id === monitor.getItem().blockDef.id)
   }
 }
 
@@ -58,6 +58,10 @@ const blockTargetSpec = {
     component.setState({ hoverSide: side })
   },
   canDrop(props: Props, monitor: DropTargetMonitor) {
+    if (!monitor.getItem().blockDef) {
+      return false
+    }
+    
     const hoveringId = monitor.getItem().blockDef.id
     const myId = props.blockDef.id
     return (hoveringId !== myId)
