@@ -13,6 +13,8 @@ export interface ButtonBlockDef extends BlockDef {
     actionDef: ActionDef | null;
     style: "default" | "primary" | "link";
     size: "normal" | "small" | "large";
+    /** If present, message to display when confirming action */
+    confirmMessage?: LocalizedString | null;
 }
 export declare class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
