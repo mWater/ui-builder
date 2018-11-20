@@ -153,6 +153,12 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
             )}
           </PropertyEditor>
         </LabeledProperty>
+
+        <LabeledProperty label="Confirm message">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="confirmMessage">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }
