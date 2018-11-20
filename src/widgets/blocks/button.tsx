@@ -85,6 +85,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
         action.performAction({
           contextVars: props.contextVars,
           database: props.database,
+          schema: props.schema,
           locale: props.locale,
           contextVarValues: props.contextVarValues,
           pageStack: props.pageStack, 

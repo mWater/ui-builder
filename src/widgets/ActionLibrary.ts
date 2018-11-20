@@ -2,6 +2,7 @@ import { ActionDef, Action } from "./actions";
 import { OpenPageAction, OpenPageActionDef } from "./actions/openPage";
 import { AddRowAction, AddRowActionDef } from "./actions/addRow";
 import { GotoUrlAction, GotoUrlActionDef } from "./actions/gotoUrl";
+import { RemoveRowAction, RemoveRowActionDef } from "./actions/removeRow";
 
 /** Library of actions */
 export class ActionLibrary {
@@ -12,6 +13,8 @@ export class ActionLibrary {
         return new OpenPageAction(actionDef as OpenPageActionDef)
       case "addRow":
         return new AddRowAction(actionDef as AddRowActionDef)
+      case "removeRow":
+        return new RemoveRowAction(actionDef as RemoveRowActionDef)
       case "gotoUrl":
         return new GotoUrlAction(actionDef as GotoUrlActionDef)
     }
@@ -34,6 +37,12 @@ export class ActionLibrary {
           table: null,
           columnValues: {}
         }
+      case "removeRow": 
+        return {
+          type: "removeRow",
+          contextVarId: null,
+          idExpr: null
+        }
       case "gotoUrl": 
         return {
           type: "gotoUrl"
@@ -47,6 +56,7 @@ export class ActionLibrary {
     return [
       { type: "openPage", name: "Open Page" },
       { type: "addRow", name: "Add Row" },
+      { type: "removeRow", name: "Remove Row" },
       { type: "gotoUrl", name: "Goto URL" }
     ]
   }

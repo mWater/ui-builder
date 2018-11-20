@@ -5,7 +5,7 @@ import VirtualDatabase, { UpdateMutation, AddMutation } from "../../database/Vir
 import { NullDatabase } from "../../database/Database";
 import simpleSchema from "../../__fixtures__/schema";
 import { PageStack } from "../../PageStack";
-import { Expr } from "mwater-expressions";
+import { Expr, Schema } from "mwater-expressions";
 
 
 test("gets context var exprs", () => {
@@ -48,6 +48,7 @@ test("performs non-literal action", async () => {
   await action.performAction({
     locale: "en",
     database: database,
+    schema: {} as Schema,
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },
@@ -79,6 +80,7 @@ test("performs literal action", async () => {
   await action.performAction({
     locale: "en",
     database: database,
+    schema: {} as Schema,
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },

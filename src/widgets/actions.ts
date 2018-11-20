@@ -33,6 +33,7 @@ export interface PerformActionOptions {
   locale: string
   database: Database
   pageStack: PageStack
+  schema: Schema
 
   /** Context variables for the action */
   contextVars: ContextVar[]

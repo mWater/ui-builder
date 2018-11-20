@@ -154,6 +154,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
           contextVars: rowRIProps.contextVars,
           database: rowRIProps.database,
           locale: rowRIProps.locale,
+          schema: this.props.renderInstanceProps.schema,
           contextVarValues: rowRIProps.contextVarValues,
           pageStack: rowRIProps.pageStack, 
           getContextVarExprValue: rowRIProps.getContextVarExprValue
