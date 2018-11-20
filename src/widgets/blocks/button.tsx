@@ -18,6 +18,9 @@ export interface ButtonBlockDef extends BlockDef {
 
   style: "default" | "primary" | "link"
   size: "normal" | "small" | "large"
+
+  /** If present, message to display when confirming action */
+  confirmMessage?: LocalizedString | null
 }
 
 export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
@@ -78,6 +81,13 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     const handleClick = () => {
+      // Confirm if confirm message
+      if (this.blockDef.confirmMessage) {
+        if (!confirm(localize(this.blockDef.confirmMessage, props.locale))) {
+          return
+        }
+      }
+
       // Run action
       if (this.blockDef.actionDef) {
         const action = props.actionLibrary.createAction(this.blockDef.actionDef)
