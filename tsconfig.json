@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "outDir": "lib",
-    "module": "esnext",
-    "target": "es2017",
+    "module": "commonjs",
+    "target": "es5",
     "lib": ["es2017", "dom"],
     "sourceMap": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "src",
+    "baseUrl": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -16,7 +16,7 @@
     "suppressImplicitAnyIndexErrors": true,
     // "noUnusedLocals": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true
+    "esModuleInterop": true
   },
   "include": [
     "src"
