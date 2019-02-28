@@ -3,10 +3,9 @@ import { ContextVar } from './blocks';
 import { Database } from '../database/Database';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { PageStack } from '../PageStack';
-import { ActionLibrary } from './ActionLibrary';
 import { Schema, Expr, DataSource } from 'mwater-expressions';
 
-// Action definition
+/** Action definition. Something that can be performed */
 export interface ActionDef {
   type: string,  // Type of the action
   [index: string]: any  // Other props

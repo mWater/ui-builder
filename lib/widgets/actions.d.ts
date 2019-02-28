@@ -4,6 +4,7 @@ import { Database } from '../database/Database';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { PageStack } from '../PageStack';
 import { Schema, Expr, DataSource } from 'mwater-expressions';
+/** Action definition. Something that can be performed */
 export interface ActionDef {
     type: string;
     [index: string]: any;

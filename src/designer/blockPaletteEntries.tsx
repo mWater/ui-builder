@@ -100,7 +100,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "tabbed", tabs: [{ id: uuid(), label: { _base: "en", en: "Tab1" }, content: null }]}
   },
   {
-    title: "Image",
+    title: "Static Image",
     blockDef: { id: "", type: "image" }
   },
 ]
