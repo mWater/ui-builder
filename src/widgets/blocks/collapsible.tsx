@@ -4,11 +4,15 @@ import CompoundBlock from '../CompoundBlock';
 import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import BlockPlaceholder from '../BlockPlaceholder';
 import * as _ from 'lodash';
+import { PropertyEditor } from '../propertyEditors';
+import { Checkbox } from 'react-library/lib/bootstrap';
 
 export interface CollapsibleBlockDef extends BlockDef {
   type: "collapsible"
   label: BlockDef | null
   content: BlockDef | null
+  /** True if collapsible section is initially collapsed */
+  initialCollapsed?: boolean
 }
 
 export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
@@ -66,9 +70,19 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <Collapsible label={labelNode}>
+        <Collapsible label={labelNode} initialCollapsed={this.blockDef.initialCollapsed}>
           {contentNode}
         </Collapsible>
+      </div>
+    )
+  }
+
+  renderEditor(props: RenderEditorProps) {
+    return (
+      <div>
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="initialCollapsed">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Initially Collapsed</Checkbox>}
+        </PropertyEditor>
       </div>
     )
   }
@@ -77,6 +91,7 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
 interface Props {
   label: React.ReactNode
   forceOpen?: boolean
+  initialCollapsed?: boolean
 }
 
 class Collapsible extends React.Component<Props, { collapsed: boolean }> {
@@ -84,7 +99,8 @@ class Collapsible extends React.Component<Props, { collapsed: boolean }> {
     super(props)
 
     this.state = {
-      collapsed: false
+      // Collapse if not forced open and initialCollapsed
+      collapsed: !(this.props.forceOpen || false) && (this.props.initialCollapsed || false)
     }
   }
 
