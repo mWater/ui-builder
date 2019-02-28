@@ -84,7 +84,9 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
   renderDesign(props: RenderDesignProps) {
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 })
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 }),
+      // Keep menu above other controls
+      menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
     const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)

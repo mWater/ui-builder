@@ -23,7 +23,9 @@ export default class EnumInstance extends React.Component<{
     const getOptionValue = (ev: EnumValue) => ev.id
     const handleChange = (ev: EnumValue | null) => this.props.onChange(ev ? ev.id : null)
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 })
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 }),
+      // Keep menu above other controls
+      menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
     return <ReactSelect
