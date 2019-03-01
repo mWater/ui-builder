@@ -3,7 +3,7 @@ import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables, CreateBlock } from '../blocks'
 import * as _ from 'lodash';
-import { ExprValidator, Schema, LiteralExpr } from 'mwater-expressions';
+import { ExprValidator, Schema, LiteralExpr, Expr } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
@@ -114,7 +114,7 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
   }
 
   /** Get context variable expressions needed to add */
-  getContextVarExprs(contextVar: ContextVar) {
+  getContextVarExprs(contextVar: ContextVar): Expr[] {
     // Get ones for the specified context var
     return Object.values(this.blockDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
   }

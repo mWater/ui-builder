@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash'
 import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
-import { ExprValidator, LiteralExpr } from 'mwater-expressions';
+import { ExprValidator, LiteralExpr, Expr } from 'mwater-expressions';
 import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
 import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
@@ -92,7 +92,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
   }
 
   /** Get any context variables expressions that this action needs */
-  getContextVarExprs(contextVar: ContextVar) {
+  getContextVarExprs(contextVar: ContextVar): Expr[] {
     // Get ones for the specified context var
     return Object.values(this.actionDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
   }

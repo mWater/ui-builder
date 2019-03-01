@@ -9,5 +9,5 @@ interface Props {
     dataSource: DataSource;
     connectDragSource?: ConnectDragSource;
 }
-declare const _default: import("react-dnd/lib/interfaces").DndComponentClass<Props>;
+declare const _default: import("react-dnd").DndComponentClass<Props>;
 export default _default;

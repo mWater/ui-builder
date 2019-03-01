@@ -64,6 +64,21 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     }
   },
   {
+    title: "Fixed Table",
+    blockDef: { 
+      id: "", 
+      type: "fixedTable",
+      numRows: 2,
+      numColumns: 2,
+      cellBorders: "default",
+      cellPadding: "default",
+      rows: [
+        { cells: [{ content: null }, { content: null }]},
+        { cells: [{ content: null }, { content: null }]}
+      ] 
+    }
+  },
+  {
     title: "Search Box",
     blockDef: { id: "", type: "search", searchExprs: [], placeholder: null },
   },

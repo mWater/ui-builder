@@ -1,6 +1,6 @@
 import * as React from "react";
 import { SearchBlockDef, SearchBlock } from "./search";
-import { RenderInstanceProps, ContextVar, createExprVariables } from "../../blocks";
+import { RenderInstanceProps, ContextVar, createExprVariables, Filter } from "../../blocks";
 import { Row, Expr, ExprUtils } from "mwater-expressions";
 import * as _ from "lodash";
 import { localize } from "../../localization";
@@ -22,7 +22,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     this.state = { searchText: "" }
   }
 
-  createFilter(searchText: string) {
+  createFilter(searchText: string): Filter {
     const blockDef = this.props.blockDef
 
     // Get table

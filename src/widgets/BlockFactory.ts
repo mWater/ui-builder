@@ -20,6 +20,7 @@ import { ImageBlock, ImageBlockDef } from './blocks/image';
 import { AddRowBlock, AddRowBlockDef } from './blocks/addRow';
 import { DatefieldBlock, DatefieldBlockDef } from './blocks/controls/datefield';
 import { ConditionalBlock, ConditionalBlockDef } from './blocks/conditional';
+import { FixedTableBlock, FixedTableBlockDef } from './blocks/fixedTable';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -56,6 +57,8 @@ export default class BlockFactory {
         return new ConditionalBlock(blockDef as ConditionalBlockDef, this.createBlock)
       case "queryTable":
         return new QueryTableBlock(blockDef as QueryTableBlockDef, this.createBlock)
+      case "fixedTable":
+        return new FixedTableBlock(blockDef as FixedTableBlockDef, this.createBlock)
       case "search":
         return new SearchBlock(blockDef as SearchBlockDef)
       case "dropdownFilter":

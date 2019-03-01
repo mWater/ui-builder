@@ -1,6 +1,7 @@
 /// <reference types="react" />
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
+import { Expr } from 'mwater-expressions';
 import { ContextVarExpr } from '../columnValues';
 /** Block which creates a new row and adds it as a context variable to its content */
 export interface AddRowBlockDef extends BlockDef {
@@ -23,7 +24,7 @@ export declare class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     validateColumnValue(options: ValidateBlockOptions, columnId: string): string | null;
     processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
-    getContextVarExprs(contextVar: ContextVar): import("mwater-expressions").Expr[];
+    getContextVarExprs(contextVar: ContextVar): Expr[];
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;

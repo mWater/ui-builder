@@ -1,6 +1,6 @@
 import * as React from "react";
 import { SearchBlockDef } from "./search";
-import { RenderInstanceProps } from "../../blocks";
+import { RenderInstanceProps, Filter } from "../../blocks";
 import { Expr } from "mwater-expressions";
 interface Props {
     blockDef: SearchBlockDef;
@@ -12,13 +12,7 @@ interface State {
 /** Search block that filters the rowset */
 export default class SearchBlockInstance extends React.Component<Props, State> {
     constructor(props: Props);
-    createFilter(searchText: string): {
-        id: string;
-        expr: import("mwater-expressions").OpExpr;
-    } | {
-        id: string;
-        expr: null;
-    };
+    createFilter(searchText: string): Filter;
     createExprFilter(expr: Expr, searchText: string, table: string): Expr;
     handleChange: (value: string) => void;
     render(): JSX.Element;

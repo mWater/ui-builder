@@ -40,7 +40,7 @@ it itself.
 
 ### Widgets
 
-A widget contains a single block and has a human readable name. It also defines 0 or more contacts variables that will be passed to the block.
+A widget contains a single block and has a human readable name. It also defines 0 or more contexts variables that will be passed to the block.
 
 The purpose of the UI Builder is primarily to create widgets which represent pages of the website or that represents smaller pieces that can be reused.
 
@@ -51,8 +51,8 @@ Collection of widgets. Usually an app will have a single widget Library that is 
 ## How to add a new block type
 
 - Create block def and block in the blocks folder
-- Add to BlockFactory
-- Add to palette
+- Add to BlockFactory in `widgets/BlockFactory.ts`
+- Add to palette in `designer/blockPaletteEntries.tsx`
 
 ## Actions
 
@@ -63,4 +63,3 @@ Actions are things that buttons, etc perform.
 - deleteRow (table, row id)
 - gotoUrl (url, exprs)
 - close (closes current view)
-
