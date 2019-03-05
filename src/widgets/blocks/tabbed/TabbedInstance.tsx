@@ -41,7 +41,7 @@ export default class TabbedInstance extends React.Component<Props, State> {
     const content = this.props.renderInstanceProps.renderChildBlock(this.props.renderInstanceProps, tab.content)
 
     return (
-      <div key={index} style={{ display: (this.state.activeIndex === index) ? "block" : "none" }}>
+      <div key={index} style={{ visibility: (this.state.activeIndex === index) ? "visible" : "hidden" }}>
         {content}
       </div>
     )  
