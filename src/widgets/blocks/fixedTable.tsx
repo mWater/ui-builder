@@ -114,7 +114,7 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Number of Columns">
-          <NumberInput value={this.blockDef.numRows} onChange={handleNumColumnsChange} decimal={false}/>
+          <NumberInput value={this.blockDef.numColumns} onChange={handleNumColumnsChange} decimal={false}/>
         </LabeledProperty>
 
         <LabeledProperty label="Cell Padding">
