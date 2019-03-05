@@ -1,7 +1,8 @@
-import React from "react";
-import { TabbedBlockDef, TabbedBlockTab } from "./tabbed";
-import { RenderInstanceProps, BlockDef } from "../../blocks";
-import { localize } from "../../localization";
+import React from "react"
+import * as _ from 'lodash'
+import { TabbedBlockDef, TabbedBlockTab } from "./tabbed"
+import { RenderInstanceProps, BlockDef } from "../../blocks"
+import { localize } from "../../localization"
 
 interface Props {
   tabbedBlockDef: TabbedBlockDef
@@ -9,7 +10,13 @@ interface Props {
 }
 
 interface State {
+  /** Index of currently active tab */
   activeIndex: number
+
+  /** List of indexes of open tabs. This is to *not* render tabs that have not been opened, as maps in particular
+   * don't handle rendering when invisible.
+   */
+  openTabIndexes: number[]
 }
 
 export default class TabbedInstance extends React.Component<Props, State> {
@@ -17,12 +24,16 @@ export default class TabbedInstance extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      activeIndex: 0
+      activeIndex: 0,
+      openTabIndexes: [0]
     }
   }
 
   handleSelectTab = (index: number) => {
-    this.setState({ activeIndex: index })
+    this.setState({ 
+      activeIndex: index,
+      openTabIndexes: _.union(this.state.openTabIndexes, [index])
+    })
   }
 
   renderTab(tab: TabbedBlockTab, index: number) {
@@ -38,10 +49,15 @@ export default class TabbedInstance extends React.Component<Props, State> {
   }
 
   renderTabContent(tab: TabbedBlockTab, index: number) {
+    // If not opened, do not render
+    if (!this.state.openTabIndexes.includes(index)) {
+      return null
+    }
+    
     const content = this.props.renderInstanceProps.renderChildBlock(this.props.renderInstanceProps, tab.content)
 
     return (
-      <div key={index} style={{ visibility: (this.state.activeIndex === index) ? "visible" : "hidden" }}>
+      <div key={index} style={{ display: (this.state.activeIndex === index) ? "block" : "none" }}>
         {content}
       </div>
     )  
