@@ -6,6 +6,7 @@ import { Expr, Column, Schema, DataSource } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize, LocalizedString } from "../../localization";
 
+/** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
   /** Row context variable id */
   rowContextVarId: string | null
@@ -35,6 +36,7 @@ export interface RenderControlProps {
   onChange: (value: any) => void
 }
 
+/** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
 
   abstract renderControl(props: RenderControlProps): React.ReactElement<any>

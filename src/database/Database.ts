@@ -8,6 +8,7 @@ export interface OrderBy {
   dir: OrderByDir
 }
 
+/** Specification for a query that is made to a database */
 export interface QueryOptions {
   select: { [alias: string]: Expr },
   distinct?: boolean,
@@ -23,6 +24,10 @@ export interface Row {
 
 export type DatabaseChangeListener = () => void
 
+/** An abstraction of a database which allows querying using expressions. May be the live
+ * database or a virtual database which is applying local changes that have not been submitted
+ * to the server (see VirtualDatabase)
+ */
 export interface Database {
   query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]>;
   
@@ -33,6 +38,7 @@ export interface Database {
   transaction(): Transaction
 }
 
+/** Transaction of actions to apply to the database */
 export interface Transaction {
   /** Adds a row, returning the primary key as a promise */
   addRow(table: string, values: { [column: string]: any }): Promise<any>;
@@ -44,6 +50,7 @@ export interface Transaction {
   commit(): Promise<any>;
 }
 
+/** Database which performs no actions and always returns blank query results */
 export class NullDatabase implements Database {
   async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) { return [] }
   
@@ -54,6 +61,7 @@ export class NullDatabase implements Database {
   transaction() { return new NullTransaction() }
 }
 
+/** Transaction which performs no actions */
 class NullTransaction implements Transaction {
   /** Adds a row, returning the primary key as a promise */
   async addRow(table: string, values: { [column: string]: any }) { return null }

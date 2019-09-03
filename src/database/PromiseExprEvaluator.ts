@@ -19,6 +19,7 @@ export interface PromiseExprEvaluatorContext {
   rows?: PromiseExprEvaluatorRow[]
 }
 
+/** Expression evaluator that is promise-based */
 export class PromiseExprEvaluator {
   private exprEvaluator: ExprEvaluator
 
