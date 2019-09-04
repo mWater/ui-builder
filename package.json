@@ -23,7 +23,7 @@
     "react-dom": "^16.9.0",
     "react-library": "github:mWater/react-library",
     "react-onclickout": "^2.0.8",
-    "react-scripts-ts": "^3.1.0",
+    "react-scripts-ts": "^2.17.0",
     "react-select": "github:mWater/react-select#fix_2682_built",
     "src": "^1.1.2",
     "uuid": "^3.3.3"
