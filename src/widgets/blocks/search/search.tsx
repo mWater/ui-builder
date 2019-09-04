@@ -1,12 +1,12 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, createExprVariables } from '../../blocks'
-import { Expr, ExprValidator } from 'mwater-expressions';
+import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import SearchBlockInstance, { SearchControl } from './SearchBlockInstance';
 import ListEditor from '../../ListEditor';
 import { ExprComponent } from 'mwater-expressions-ui';
-import { LocalizedString, localize } from '../../localization';
+import { localize } from '../../localization';
 
 export interface SearchBlockDef extends BlockDef {
   type: "search"

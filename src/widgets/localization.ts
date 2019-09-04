@@ -1,9 +1,4 @@
-
-
-export interface LocalizedString {
-  _base: string,
-  [language: string]: string  // Localizations
-}
+import { LocalizedString } from "mwater-expressions";
 
 export function localize(str: LocalizedString | null, locale?: string): string {
   if (!str) {

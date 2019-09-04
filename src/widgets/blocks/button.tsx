@@ -2,12 +2,12 @@ import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
-import { localize, LocalizedString } from '../localization';
+import { localize } from '../localization';
 import { ActionDef } from '../actions';
 import { Select } from 'react-library/lib/bootstrap';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
-import { Expr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 
 export interface ButtonBlockDef extends BlockDef {
   type: "button"

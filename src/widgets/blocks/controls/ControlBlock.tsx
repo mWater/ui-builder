@@ -2,9 +2,9 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, Va
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
-import { Expr, Column, Schema, DataSource } from "mwater-expressions";
+import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
-import { localize, LocalizedString } from "../../localization";
+import { localize } from "../../localization";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {

@@ -2,9 +2,9 @@ import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar, createExprVariables } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, NumberFormatEditor, ContextVarPropertyEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors'
-import { LocalizedString, localize } from '../localization'
+import { localize } from '../localization'
 import { Select, Checkbox } from 'react-library/lib/bootstrap';
-import { Expr, ExprValidator, ExprUtils, Schema, DataSource } from 'mwater-expressions';
+import { Expr, ExprValidator, ExprUtils, Schema, DataSource, LocalizedString } from 'mwater-expressions';
 import * as _ from 'lodash';
 import { format as d3Format } from 'd3-format';
 import { ExprComponent } from 'mwater-expressions-ui';

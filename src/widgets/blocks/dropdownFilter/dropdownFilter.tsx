@@ -1,10 +1,10 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, Filter, ContextVar, createExprVariables } from '../../blocks'
-import { Expr, ExprValidator, Schema, ExprUtils } from 'mwater-expressions';
+import { Expr, ExprValidator, Schema, ExprUtils, LocalizedString } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { ExprComponent } from 'mwater-expressions-ui';
-import { LocalizedString, localize } from '../../localization';
+import { localize } from '../../localization';
 import ReactSelect from "react-select"
 import EnumInstance from './EnumInstance';
 import TextInstance from './TextInstance';

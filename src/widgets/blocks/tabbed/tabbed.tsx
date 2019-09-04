@@ -2,12 +2,13 @@ import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../../blocks'
-import { LocalizedString, localize } from '../../localization';
+import { localize } from '../../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../../propertyEditors';
 import TabbedDesigner from './TabbedDesigner';
 import ListEditor from '../../ListEditor';
 import uuid from 'uuid/v4';
 import TabbedInstance from './TabbedInstance';
+import { LocalizedString } from 'mwater-expressions';
 
 export interface TabbedBlockTab {
   /** Unique id for tab */

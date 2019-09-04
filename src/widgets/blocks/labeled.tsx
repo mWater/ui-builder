@@ -2,8 +2,9 @@ import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
-import { LocalizedString, localize } from '../localization';
+import { localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
+import { LocalizedString } from 'mwater-expressions';
 
 export interface LabeledBlockDef extends BlockDef {
   type: "labeled"

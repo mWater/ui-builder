@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
-import { Expr, Schema, ExprUtils, ExprValidator } from 'mwater-expressions';
+import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { Row, OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
@@ -12,7 +12,6 @@ import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';
-import { LocalizedString } from '../../localization';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"

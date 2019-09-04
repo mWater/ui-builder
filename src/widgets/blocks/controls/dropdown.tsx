@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { BlockDef, RenderEditorProps, ValidateBlockOptions, createExprVariables } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, EnumValue, Expr, ExprValidator, ExprCompiler } from 'mwater-expressions';
-import { LocalizedString, localize } from '../../localization';
+import { Column, EnumValue, Expr, ExprValidator, ExprCompiler, LocalizedString } from 'mwater-expressions';
+import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import ReactSelect from "react-select"
 import { IdLiteralComponent, ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';

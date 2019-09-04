@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column } from 'mwater-expressions';
-import { LocalizedString, localize } from '../../localization';
+import { Column, LocalizedString } from 'mwater-expressions';
+import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 
 export interface TextboxBlockDef extends ControlBlockDef {

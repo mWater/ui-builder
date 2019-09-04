@@ -2,11 +2,12 @@ import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock, ValidatableInstance } from '../blocks'
-import { LocalizedString, localize } from '../localization';
+import { localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
 import ContextVarsInjector from '../ContextVarsInjector';
 import * as _ from 'lodash'
+import { LocalizedString } from 'mwater-expressions';
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
