@@ -10,4 +10,4 @@ export { default as LeafBlock } from './widgets/LeafBlock';
 export * from './widgets/propertyEditors';
 export * from './PageStack';
 export * from './database/Database';
-export { ControlBlock, ControlBlockDef } from './widgets/blocks/controls/ControlBlock';
+export { ControlBlock, ControlBlockDef, RenderControlProps } from './widgets/blocks/controls/ControlBlock';
