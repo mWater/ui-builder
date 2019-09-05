@@ -69,7 +69,7 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
       <table className={ this.blockDef.cellPadding === "condensed" ? "table table-bordered table-condensed" : "table table-bordered" }>
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
-            <tr>
+            <tr key={rowIndex}>
               { row.cells.map((cell, columnIndex) => <td key={columnIndex}>{props.renderChildBlock(props, cell.content, handleSet.bind(null, rowIndex, columnIndex))}</td>) } 
             </tr>
           ))}

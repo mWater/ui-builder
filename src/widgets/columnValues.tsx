@@ -69,7 +69,7 @@ export class ColumnValuesEditor extends React.Component<{
     // Get type of column
     const columnType = (column.type === "join") ? "id" : column.type
 
-    return <tr>
+    return <tr key={columnId}>
       <td>{localize(column.name, this.props.locale)}</td>
       <td>
         <LabeledProperty label="Variable">
