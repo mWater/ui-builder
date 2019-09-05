@@ -13,7 +13,14 @@ import uuid = require('uuid')
 export interface TOCBlockDef extends BlockDef {
   type: "toc"
 
+  /** Nestable items in the table of contents */
   items: TOCItem[]
+
+  /** Optional header */
+  header: BlockDef | null
+
+  /** Optional footer */
+  footer: BlockDef | null
 }
 
 /** An item within the table of contents */
@@ -51,13 +58,23 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
   /** Get child blocks */
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Iterate all 
-    return _.compact(iterateItems(this.blockDef.items).map(item => item.content)).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+    return _.compact([this.blockDef.header, this.blockDef.footer].concat(
+      iterateItems(this.blockDef.items).map(item => item.content))
+      .map(bd => ({ blockDef: bd!, contextVars: contextVars })))
   }
 
   validate() { return null }
 
   processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
     return produce(this.blockDef, (draft: TOCBlockDef) => {
+      // For header and footer
+      if (draft.header) {
+        draft.header = action(draft.header)
+      }
+      if (draft.footer) {
+        draft.footer = action(draft.footer)
+      }
+
       // For each item (in flattened list)
       for (const item of iterateItems(draft.items)) {
         if (item.content) {
@@ -93,6 +110,29 @@ const TOCDesignComp = (props: {
   const alterBlockItems = (action: (draft: TOCItem) => TOCItem | TOCItem[] | undefined | null) => {
     renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
       bd.items = alterItems(bd.items, action)
+    }))
+  }
+
+  const handleAddItem = () => {
+    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
+      bd.items.push({
+        id: uuid(), 
+        label: { _base: renderProps.locale, [renderProps.locale]: "New Item" }, 
+        children: [], 
+        content: null
+      })
+    }))
+  }
+
+  const handleHeaderSet = (header: BlockDef | null) => {
+    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
+      bd.header = header
+    }))
+  }
+
+  const handleFooterSet = (footer: BlockDef | null) => {
+    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
+      bd.footer = footer
     }))
   }
 
@@ -151,6 +191,17 @@ const TOCDesignComp = (props: {
     }/>
   }
 
+  const renderLeft = () => {
+    return <div>
+      { renderProps.renderChildBlock(renderProps, blockDef.header, handleHeaderSet) }
+      { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
+      <button type="button" className="btn btn-link btn-xs" onClick={handleAddItem}>
+        <i className="fa fa-plus"/> Add Item
+      </button>
+      { renderProps.renderChildBlock(renderProps, blockDef.footer, handleFooterSet) }
+    </div>
+  }
+
   /** Render an item at a specified depth which starts at 0 */
   const renderItem = (items: TOCItem[], index: number, depth: number) => {
     const item = items[index]
@@ -186,7 +237,7 @@ const TOCDesignComp = (props: {
 
   // Render overall structure
   return <SplitPane
-    left={blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0))}
+    left={renderLeft()}
     right={renderProps.renderChildBlock(renderProps, selectedContent, handleSetContent)}
   />
 }
@@ -237,6 +288,14 @@ const TOCInstanceComp = (props: {
       : null}
     </div>
   }
+
+  const renderLeft = () => {
+    return <div>
+      <div key="header">{ renderProps.renderChildBlock(renderProps, blockDef.header) }</div>
+      { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
+      <div key="footer">{ renderProps.renderChildBlock(renderProps, blockDef.footer) }</div>
+    </div>
+  }
   
   // Get selected item
   const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
@@ -244,7 +303,7 @@ const TOCInstanceComp = (props: {
 
   // Render overall structure
   return <SplitPane
-    left={blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0))}
+    left={renderLeft()}
     right={renderProps.renderChildBlock(renderProps, selectedContent)}
   />
 }

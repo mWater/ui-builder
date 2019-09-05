@@ -70,7 +70,7 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr>
-              { row.cells.map((cell, columnIndex) => <td key="index">{props.renderChildBlock(props, cell.content, handleSet.bind(null, rowIndex, columnIndex))}</td>) } 
+              { row.cells.map((cell, columnIndex) => <td key={columnIndex}>{props.renderChildBlock(props, cell.content, handleSet.bind(null, rowIndex, columnIndex))}</td>) } 
             </tr>
           ))}
         </tbody>
@@ -84,7 +84,7 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr>
-              { row.cells.map((cell, columnIndex) => <td key="index">{props.renderChildBlock(props, cell.content)}</td>) } 
+              { row.cells.map((cell, columnIndex) => <td key={columnIndex}>{props.renderChildBlock(props, cell.content)}</td>) } 
             </tr>
           ))}
         </tbody>

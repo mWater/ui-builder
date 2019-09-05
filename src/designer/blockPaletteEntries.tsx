@@ -1,5 +1,6 @@
 import { BlockDef } from "../widgets/blocks";
 import uuid from "uuid/v4"
+import React from "react";
 
 export interface BlockPaletteEntry {
   title: string
@@ -51,22 +52,22 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Query Table",
-    blockDef: { 
-      id: "", 
+    blockDef: {
+      id: "",
       mode: "singleRow",
-      type: "queryTable", 
+      type: "queryTable",
       headers: [
         { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },
         { id: "h2", type: "text", text: { _base: "en", en: "Header 2" }, style: "div" }
-      ], 
+      ],
       contents: [null, null],
       limit: 100
     }
   },
   {
     title: "Fixed Table",
-    blockDef: { 
-      id: "", 
+    blockDef: {
+      id: "",
       type: "fixedTable",
       numRows: 2,
       numColumns: 2,
@@ -75,7 +76,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       rows: [
         { cells: [{ content: null }, { content: null }]},
         { cells: [{ content: null }, { content: null }]}
-      ] 
+      ]
     }
   },
   {
@@ -92,9 +93,9 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Save/Cancel",
-    blockDef: { 
-      id: "", 
-      type: "saveCancel", 
+    blockDef: {
+      id: "",
+      type: "saveCancel",
       saveLabel: { _base: "en", en: "Save" },
       cancelLabel: { _base: "en", en: "Cancel" },
       confirmDiscardMessage: { _base: "en", en: "Discard changes?" },
@@ -103,9 +104,9 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Add Row",
-    blockDef: { 
-      id: "", 
-      type: "addRow", 
+    blockDef: {
+      id: "",
+      type: "addRow",
       columnValues: {},
       content: null
     }
@@ -120,8 +121,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Table of Contents",
-    blockDef: { id: "", type: "toc", items: [
-      { id: "abc", label: { _base: "en", en: "Item!" }, children: [], content: null}
-    ] }
-  },
+    blockDef: { id: "", type: "toc", items: [] },
+    elem: <div>Table of Contents</div>
+  }
 ]
