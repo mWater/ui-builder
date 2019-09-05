@@ -17,6 +17,7 @@
     "jsx-boolean-value": false,
     "no-debugger": false,
     "no-var-requires": false,
-    "radix": false
+    "radix": false,
+    "jsx-no-lambda": false
   }
 }

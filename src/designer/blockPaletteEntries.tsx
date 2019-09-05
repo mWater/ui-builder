@@ -118,4 +118,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     title: "Static Image",
     blockDef: { id: "", type: "image" }
   },
+  {
+    title: "Table of Contents",
+    blockDef: { id: "", type: "toc", items: [
+      { id: "abc", label: { _base: "en", en: "Item!" }, children: [], content: null}
+    ] }
+  },
 ]

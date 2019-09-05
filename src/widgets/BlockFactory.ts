@@ -21,6 +21,7 @@ import { AddRowBlock, AddRowBlockDef } from './blocks/addRow';
 import { DatefieldBlock, DatefieldBlockDef } from './blocks/controls/datefield';
 import { ConditionalBlock, ConditionalBlockDef } from './blocks/conditional';
 import { FixedTableBlock, FixedTableBlockDef } from './blocks/fixedTable';
+import { TOCBlock, TOCBlockDef } from './blocks/toc';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -77,6 +78,8 @@ export default class BlockFactory {
         return new ImageBlock(blockDef as ImageBlockDef)
       case "datefield":
         return new DatefieldBlock(blockDef as DatefieldBlockDef)
+      case "toc":
+        return new TOCBlock(blockDef as TOCBlockDef, this.createBlock)
     }
 
     // Use custom blocks
