@@ -50,7 +50,11 @@ export class QueryCompiler {
       // Handle special case of geometry, converting to GeoJSON
       if (exprType === "geometry") {
         // Convert to 4326 (lat/long). Force ::geometry for null
-        compiledExpr = { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
+        compiledExpr = {
+          type: "op", op: "::json", exprs: [
+            { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
+          ]
+        }
       }
 
       query.selects.push({
