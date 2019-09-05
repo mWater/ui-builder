@@ -72,21 +72,11 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
-    return <h1>XUZZU</h1>
-    // return (
-    //   <table className={ this.blockDef.cellPadding === "condensed" ? "table table-bordered table-condensed" : "table table-bordered" }>
-    //     <tbody>
-    //       { this.blockDef.rows.map((row, rowIndex) => (
-    //         <tr>
-    //           { row.cells.map((cell, columnIndex) => <td key="index">{props.renderChildBlock(props, cell.content)}</td>) } 
-    //         </tr>
-    //       ))}
-    //     </tbody>
-    //   </table>
-    // )
+    return <TOCInstanceComp renderProps={props} blockDef={this.blockDef} />
   }
 }
 
+/** Designer component for TOC */
 const TOCDesignComp = (props: { 
   blockDef: TOCBlockDef
   renderProps: RenderDesignProps 
@@ -95,9 +85,6 @@ const TOCDesignComp = (props: {
 
   // Select first item by default
   const [selectedId, setSelectedId] = useState(blockDef.items[0] ? blockDef.items[0].id : null)
-
-  // // Edit mode off by default
-  // const [editMode] = useState(true)
 
   // Select item
   const handleItemClick = (item: TOCItem) => { setSelectedId(item.id) }
@@ -170,7 +157,8 @@ const TOCDesignComp = (props: {
 
     // Determine style of item label
     const itemLabelStyle: React.CSSProperties = {
-      padding: 5
+      padding: 5,
+      cursor: "pointer"
     }
     if (depth === 0) {
       itemLabelStyle.fontWeight = "bold"
@@ -200,6 +188,64 @@ const TOCDesignComp = (props: {
   return <SplitPane
     left={blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0))}
     right={renderProps.renderChildBlock(renderProps, selectedContent, handleSetContent)}
+  />
+}
+
+/** Instance component for TOC */
+const TOCInstanceComp = (props: { 
+  blockDef: TOCBlockDef
+  renderProps: RenderInstanceProps 
+}) => {
+  const { blockDef, renderProps } = props
+
+  // Select first item with content by default
+  const firstItem = blockDef.items.find(item => item.content)
+  const [selectedId, setSelectedId] = useState(firstItem ? firstItem.id : null)
+
+  // Select item
+  const handleItemClick = (item: TOCItem) => { 
+    // Only allow selecting with content
+    if (item.content) {
+      setSelectedId(item.id) 
+    }
+  }
+
+  /** Render an item at a specified depth which starts at 0 */
+  const renderItem = (items: TOCItem[], index: number, depth: number) => {
+    const item = items[index]
+
+    // Determine style of item label
+    const itemLabelStyle: React.CSSProperties = {
+      padding: 5,
+      cursor: item.content ? "pointer" : "default"
+    }
+    if (depth === 0) {
+      itemLabelStyle.fontWeight = "bold"
+    }
+    if (item.id === selectedId) {
+      itemLabelStyle.backgroundColor = "#DDD"
+    }
+
+    return <div>
+      <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
+        {localize(item.label, renderProps.locale)}
+      </div>
+      { item.children.length > 0 ? 
+        <div style={{ marginLeft: 10 }}>
+          { item.children.map((child, index) => renderItem(item.children, index, depth + 1)) }
+        </div>
+      : null}
+    </div>
+  }
+  
+  // Get selected item
+  const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
+  const selectedContent = selectedItem ? selectedItem.content : null
+
+  // Render overall structure
+  return <SplitPane
+    left={blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0))}
+    right={renderProps.renderChildBlock(renderProps, selectedContent)}
   />
 }
 
