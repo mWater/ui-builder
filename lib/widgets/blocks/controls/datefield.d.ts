@@ -1,8 +1,7 @@
 /// <reference types="react" />
 import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column } from 'mwater-expressions';
-import { LocalizedString } from '../../localization';
+import { Column, LocalizedString } from 'mwater-expressions';
 export interface DatefieldBlockDef extends ControlBlockDef {
     type: "datefield";
     placeholder: LocalizedString | null;

@@ -1,8 +1,7 @@
 /// <reference types="react" />
 import { RenderEditorProps, ValidateBlockOptions } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, Expr } from 'mwater-expressions';
-import { LocalizedString } from '../../localization';
+import { Column, Expr, LocalizedString } from 'mwater-expressions';
 export interface DropdownBlockDef extends ControlBlockDef {
     type: "dropdown";
     placeholder: LocalizedString | null;

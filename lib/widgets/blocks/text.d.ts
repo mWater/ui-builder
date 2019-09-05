@@ -1,8 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks';
-import { LocalizedString } from '../localization';
-import { Expr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 /** Expression which is embedded in the text string */
 interface EmbeddedExpr {
     /** Context variable (row or rowset) to use for expression */

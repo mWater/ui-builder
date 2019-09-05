@@ -1,12 +1,11 @@
 /// <reference types="react" />
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
-import { Expr, Schema } from 'mwater-expressions';
+import { Expr, Schema, LocalizedString } from 'mwater-expressions';
 import { Row, OrderBy } from '../../../database/Database';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';
-import { LocalizedString } from '../../localization';
 export interface QueryTableBlockDef extends BlockDef {
     type: "queryTable";
     /** Determines if one table row contains one or multiple database table rows */

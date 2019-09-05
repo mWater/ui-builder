@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import CompoundBlock from '../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks';
-import { LocalizedString } from '../localization';
+import { LocalizedString } from 'mwater-expressions';
 export interface SaveCancelBlockDef extends BlockDef {
     type: "saveCancel";
     saveLabel: LocalizedString | null;

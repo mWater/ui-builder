@@ -1,8 +1,7 @@
 /// <reference types="react" />
 import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column } from 'mwater-expressions';
-import { LocalizedString } from '../../localization';
+import { Column, LocalizedString } from 'mwater-expressions';
 export interface TextboxBlockDef extends ControlBlockDef {
     type: "textbox";
     placeholder: LocalizedString | null;

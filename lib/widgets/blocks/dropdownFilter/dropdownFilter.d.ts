@@ -1,8 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock';
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, Filter, ContextVar } from '../../blocks';
-import { Expr, Schema } from 'mwater-expressions';
-import { LocalizedString } from '../../localization';
+import { Expr, Schema, LocalizedString } from 'mwater-expressions';
 export interface DropdownFilterBlockDef extends BlockDef {
     type: "dropdownFilter";
     /** Placeholder in box */

@@ -14,6 +14,7 @@ export interface PromiseExprEvaluatorContext {
     /** array of rows (for aggregate expressions) */
     rows?: PromiseExprEvaluatorRow[];
 }
+/** Expression evaluator that is promise-based */
 export declare class PromiseExprEvaluator {
     private exprEvaluator;
     constructor(exprEvaluator: ExprEvaluator);

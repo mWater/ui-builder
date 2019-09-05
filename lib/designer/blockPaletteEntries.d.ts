@@ -1,5 +1,5 @@
-/// <reference types="react" />
 import { BlockDef } from "../widgets/blocks";
+import React from "react";
 export interface BlockPaletteEntry {
     title: string;
     blockDef: BlockDef;

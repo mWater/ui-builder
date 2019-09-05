@@ -1,8 +1,8 @@
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
-import { Expr, Column, Schema, DataSource } from "mwater-expressions";
-import { LocalizedString } from "../../localization";
+import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
+/** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
     /** Row context variable id */
     rowContextVarId: string | null;
@@ -24,6 +24,7 @@ export interface RenderControlProps {
     disabled: boolean;
     onChange: (value: any) => void;
 }
+/** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
     abstract renderControl(props: RenderControlProps): React.ReactElement<any>;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */

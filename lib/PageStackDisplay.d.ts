@@ -27,7 +27,7 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     openPage(page: Page): void;
     closePage(): void;
     refHandler: (key: string, component: React.Component<any, {}, any> | null) => void;
-    renderChildBlock: (page: Page, pageIndex: number, props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string | undefined) => React.ReactElement<any> | null;
+    renderChildBlock: (page: Page, pageIndex: number, props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string | undefined) => React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
     handleClose: () => void;
     renderPageContents(page: Page, pageIndex: number): JSX.Element | null;
     renderPage(page: Page, index: number): JSX.Element;

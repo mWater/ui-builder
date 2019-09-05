@@ -42,6 +42,6 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     performQueries(): Promise<void>;
     /** Create props needed by inner component */
     createInnerProps(): RenderInstanceProps;
-    render(): React.ReactElement<any>;
+    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
 }
 export {};

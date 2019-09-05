@@ -1,8 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock';
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps } from '../../blocks';
-import { Expr } from 'mwater-expressions';
-import { LocalizedString } from '../../localization';
+import { Expr, LocalizedString } from 'mwater-expressions';
 export interface SearchBlockDef extends BlockDef {
     type: "search";
     /** Placeholder in box */
