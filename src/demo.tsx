@@ -7,7 +7,6 @@ import { ActionLibrary } from './widgets/ActionLibrary';
 import * as _ from 'lodash';
 
 import './Demo.css'
-import 'font-awesome/css/font-awesome.css'
 import * as ReactDOM from 'react-dom';
 import { defaultBlockPaletteEntries } from './designer/blockPaletteEntries';
 
@@ -84,5 +83,5 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
 
 ReactDOM.render(
   <Demo />,
-  document.getElementById('root') as HTMLElement
+  document.getElementById('main') as HTMLElement
 );
