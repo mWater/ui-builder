@@ -26,6 +26,7 @@ export default class VirtualDatabase implements Database {
   /** True when database is destroyed by commit or rollback */
   destroyed: boolean
 
+  /** Cache of query results to increase performance. Cached by canonical json key based on query options */
   cache: Cache<string, Row[]>
 
   constructor(database: Database, schema: Schema, locale: string) {
@@ -252,8 +253,11 @@ export default class VirtualDatabase implements Database {
       }
     }
 
-    // Replace any temporary primary keys with null to avoid text/integer conflicts in queries
-    queryOptions = this.replaceTempPrimaryKeys(queryOptions, () => null)
+    // TODO this ended up creating a "= null" condition which, when compiled, matched all rows
+    // As for a long-term solution, it should probably search for any expression of "something = <temp primary key>" and replace
+    // them with false.
+    // // Replace any temporary primary keys with null to avoid text/integer conflicts in queries
+    // queryOptions = this.replaceTempPrimaryKeys(queryOptions, () => null)
 
     // Perform query
     let rows: Row[] | undefined

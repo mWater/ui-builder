@@ -18,6 +18,7 @@ export default class VirtualDatabase implements Database {
     tempPrimaryKeys: string[];
     /** True when database is destroyed by commit or rollback */
     destroyed: boolean;
+    /** Cache of query results to increase performance. Cached by canonical json key based on query options */
     cache: Cache<string, Row[]>;
     constructor(database: Database, schema: Schema, locale: string);
     query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: {
