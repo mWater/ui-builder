@@ -213,6 +213,7 @@ export default class VirtualDatabase implements Database {
       }
     }
     await txn.commit()
+    this.mutations = []
     this.destroyed = true
     this.database.removeChangeListener(this.handleChange)
   }
