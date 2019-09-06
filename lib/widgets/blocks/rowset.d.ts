@@ -18,7 +18,7 @@ export declare class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     createContextVar(): ContextVar | null;
     validate(options: ValidateBlockOptions): string | null;
-    processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
+    processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;

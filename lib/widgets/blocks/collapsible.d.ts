@@ -11,7 +11,7 @@ export interface CollapsibleBlockDef extends BlockDef {
 export declare class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
-    processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
+    processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;

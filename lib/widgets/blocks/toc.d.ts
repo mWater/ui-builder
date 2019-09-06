@@ -27,7 +27,7 @@ export declare class TOCBlock extends CompoundBlock<TOCBlockDef> {
     /** Get child blocks */
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
-    processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
+    processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
 }

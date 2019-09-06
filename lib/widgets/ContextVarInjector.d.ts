@@ -16,6 +16,7 @@ interface State {
     filters: Filter[];
     loading: boolean;
     refreshing: boolean;
+    error?: Error;
     /** Value of expressions. Index by canonicalized JSON */
     exprValues: {
         [exprJson: string]: any;
@@ -42,6 +43,6 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     performQueries(): Promise<void>;
     /** Create props needed by inner component */
     createInnerProps(): RenderInstanceProps;
-    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    render(): JSX.Element;
 }
 export {};

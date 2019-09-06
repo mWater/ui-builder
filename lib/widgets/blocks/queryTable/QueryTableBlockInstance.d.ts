@@ -10,6 +10,7 @@ interface Props {
 interface State {
     rows?: Row[];
     refreshing: boolean;
+    error?: Error;
 }
 /** Instance of a query table */
 export default class QueryTableBlockInstance extends React.Component<Props, State> {

@@ -22,7 +22,7 @@ export declare class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     createContextVar(): ContextVar | null;
     validate(options: ValidateBlockOptions): string | null;
     validateColumnValue(options: ValidateBlockOptions, columnId: string): string | null;
-    processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
+    processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
     getContextVarExprs(contextVar: ContextVar): Expr[];
     renderDesign(props: RenderDesignProps): JSX.Element;

@@ -14,6 +14,7 @@ interface Props {
 interface State {
   rows?: Row[]
   refreshing: boolean
+  error?: Error
 }
 
 /** Instance of a query table */
@@ -107,7 +108,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         this.setState({ rows, refreshing: false })
       }
     }).catch(error => {
-      // TODO handle errors
+      this.setState({ error: error })
     })
   }
 
@@ -176,6 +177,16 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   renderRows() {
+    if (!this.state.error) {
+      // TODO localize
+      return (
+        <tr>
+          <td colSpan={this.props.block.blockDef.contents.length}>
+            <div className="alert alert-danger">Error loading data</div>
+          </td>
+        </tr>)
+    }
+
     if (!this.state.rows) {
       return (
         <tr>

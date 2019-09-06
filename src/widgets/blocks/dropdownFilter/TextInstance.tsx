@@ -40,11 +40,17 @@ export default class TextInstance extends React.Component<{
       limit: 250
     }
 
-    const rows = await this.props.database.query(queryOptions, this.props.contextVars, {})
-    
-    // Filter null and blank
-    const values = rows.map(r => r.value).filter(v => v)
-    return values.map(v => ({ value: v, label: v}))
+    try {
+      const rows = await this.props.database.query(queryOptions, this.props.contextVars, {})
+      
+      // Filter null and blank
+      const values = rows.map(r => r.value).filter(v => v)
+      return values.map(v => ({ value: v, label: v}))
+    } catch (err) {
+      // TODO localize
+      alert("Unable to load options")
+      return []
+    }
   }
 
   handleChange = (option: any) => {

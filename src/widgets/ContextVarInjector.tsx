@@ -20,6 +20,8 @@ interface State {
   filters: Filter[]
   loading: boolean
   refreshing: boolean
+  error?: Error
+
   /** Value of expressions. Index by canonicalized JSON */
   exprValues: { [exprJson: string]: any }
 
@@ -151,32 +153,38 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
       // Perform query
       const queryOptions = this.createRowQueryOptions(table)
-      const rows = await this.props.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
-      // Ignore if query options out of date
-      if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
-        return
-      }
+      try {
+        const rows = await this.props.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
-      // Ignore if variable values out of date
-      if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
-        return
-      }
-
-      // Ignore if unmounted
-      if (this.unmounted) {
-        return
-      }
-
-      if (rows.length === 0) {
-        this.setState({ exprValues: {} })
-      }
-      else {
-        const exprValues = {}
-        for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
-          exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
+        // Ignore if query options out of date
+        if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
+          return
         }
-        this.setState({ exprValues })
+
+        // Ignore if variable values out of date
+        if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
+          return
+        }
+
+        // Ignore if unmounted
+        if (this.unmounted) {
+          return
+        }
+
+        if (rows.length === 0) {
+          this.setState({ exprValues: {} })
+        }
+        else {
+          const exprValues = {}
+          for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
+            exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
+          }
+          this.setState({ exprValues })
+        }
+      } catch (error) {
+        this.setState({ error })
+        return
       }
     }
 
@@ -187,35 +195,40 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       
       // Perform query
       const queryOptions = this.createRowsetQueryOptions(table, variables)
-      const rows = await this.props.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
+      try {
+        const rows = await this.props.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
-      // Ignore if query options out of date
-      if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
-        return
-      }
-
-      // Ignore if variable values out of date
-      if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
-        return
-      }
-
-      // Ignore if unmounted
-      if (this.unmounted) {
-        return
-      }
-      
-      const exprUtils = new ExprUtils(this.props.schema, variables)
-      const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
-
-      if (rows.length === 0) {
-        this.setState({ exprValues: {} })
-      }
-      else {
-        const exprValues = {}
-        for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
-          exprValues[canonical(nonAggrExpressions[i])] = rows[0]["e" + i]
+        // Ignore if query options out of date
+        if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
+          return
         }
-        this.setState({ exprValues })
+
+        // Ignore if variable values out of date
+        if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
+          return
+        }
+
+        // Ignore if unmounted
+        if (this.unmounted) {
+          return
+        }
+        
+        const exprUtils = new ExprUtils(this.props.schema, variables)
+        const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
+
+        if (rows.length === 0) {
+          this.setState({ exprValues: {} })
+        }
+        else {
+          const exprValues = {}
+          for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
+            exprValues[canonical(nonAggrExpressions[i])] = rows[0]["e" + i]
+          }
+          this.setState({ exprValues })
+        }
+      } catch (error) {
+        this.setState({ error })
+        return
       }
     }
     this.setState({ refreshing: false, loading: false })
@@ -270,6 +283,10 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
   
   render() {
+    if (this.state.error) {
+      // TODO localize
+      return <div className="alert alert-danger">Error loading data</div>
+    }
     return this.props.children(this.createInnerProps(), this.state.loading, this.state.refreshing)
   }
 }

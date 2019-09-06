@@ -12,7 +12,7 @@ export declare class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     canonicalize(): BlockDef | null;
-    processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
+    processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderBlock(children: React.ReactNode[]): JSX.Element;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;

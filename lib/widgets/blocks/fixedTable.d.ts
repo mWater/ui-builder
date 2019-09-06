@@ -26,7 +26,7 @@ interface FixedTableCellDef {
 export declare class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
-    processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef;
+    processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
     renderEditor(props: RenderEditorProps): JSX.Element;

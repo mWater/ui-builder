@@ -204,7 +204,9 @@ class ControlInstance extends React.Component<Props, State> implements Validatab
       const txn = this.props.renderInstanceProps.database.transaction()
       await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
       await txn.commit()
-      // TODO error handling
+    } catch (err) {
+      // TODO localize
+      alert("Unable to save changes")
     } finally {
       this.setState({ updating: false })
     }
