@@ -167,7 +167,15 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     }
 
     this.setState({ saving: true })
-    await this.state.virtualDatabase.commit()
+    try {
+      await this.state.virtualDatabase.commit()
+    }
+    catch (err) {
+      // TODO localize
+      alert("Unable to save changes")
+      this.setState({ saving: false })
+      return
+    }
     this.setState({ saving: false, destroyed: true })
     this.props.renderInstanceProps.pageStack.closePage()
   }

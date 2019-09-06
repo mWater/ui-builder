@@ -65,15 +65,11 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
 
   validate() { return null }
 
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, (draft: TOCBlockDef) => {
       // For header and footer
-      if (draft.header) {
-        draft.header = action(draft.header)
-      }
-      if (draft.footer) {
-        draft.footer = action(draft.footer)
-      }
+      draft.header = action(draft.header)
+      draft.footer = action(draft.footer)
 
       // For each item (in flattened list)
       for (const item of iterateItems(draft.items)) {
