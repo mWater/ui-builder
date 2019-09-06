@@ -44,14 +44,12 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
 
   validate() { return null }
 
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, (draft: FixedTableBlockDef) => {
       // For each row
       for (const row of draft.rows) {
         for (const cell of row.cells) {
-          if (cell.content) {
-            cell.content = action(cell.content)
-          }
+          cell.content = action(cell.content)
         }
       }
     })

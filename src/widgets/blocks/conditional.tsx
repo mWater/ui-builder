@@ -53,11 +53,9 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
     return null
   }
 
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {
-      if (draft.content) {
-        draft.content = action(draft.content)
-      }
+      draft.content = action(draft.content)
     })
   }
 

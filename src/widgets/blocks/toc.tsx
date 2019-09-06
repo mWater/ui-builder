@@ -73,9 +73,7 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
 
       // For each item (in flattened list)
       for (const item of iterateItems(draft.items)) {
-        if (item.content) {
-          item.content = action(item.content)
-        }
+        item.content = action(item.content)
       }
     })
   }

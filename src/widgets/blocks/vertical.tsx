@@ -17,7 +17,7 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
 
   validate() { return null }
  
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     // Apply action to all children, discarding null ones
     return produce(this.blockDef, draft => {
       const newItems: BlockDef[] = []

@@ -4,5 +4,5 @@ import { DropSide, dropBlock, Filter, Block, BlockDef, RenderEditorProps, Contex
 export default abstract class LeafBlock<T extends BlockDef> extends Block<T> {
   getChildren() { return [] }
 
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef { return this.blockDef }
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef { return this.blockDef }
 }

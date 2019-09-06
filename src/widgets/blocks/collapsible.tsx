@@ -22,14 +22,10 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
 
   validate() { return null }
  
-  processChildren(action: (self: BlockDef) => BlockDef | null): BlockDef {
+  processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, draft => {
-      if (draft.label) {
-        draft.label = action(draft.label)
-      }
-      if (draft.content) {
-        draft.content = action(draft.content)
-      }
+      draft.label = action(draft.label)
+      draft.content = action(draft.content)
     })
   }
 
