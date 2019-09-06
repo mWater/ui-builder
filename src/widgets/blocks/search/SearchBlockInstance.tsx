@@ -118,11 +118,25 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
   }
 }
 
+interface SearchControlProps {
+  value: string
+  onChange?: (value: string) => void
+  placeholder?: string
+}
+
 /** Simple input box with magnifying glass */
-export class SearchControl extends React.Component<{ value: string, onChange?: (value: string) => void, placeholder?: string }> {
+export class SearchControl extends React.Component<SearchControlProps> {
+  private inputRef = React.createRef<HTMLInputElement>()
+
   handleChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
     if (this.props.onChange) {
       this.props.onChange(ev.target.value)
+    }
+  }
+
+  focus() {
+    if (this.inputRef.current) {
+      this.inputRef.current.focus()
     }
   }
 
@@ -132,6 +146,7 @@ export class SearchControl extends React.Component<{ value: string, onChange?: (
         <i className="fa fa-search" style={{ position: "absolute", right: 8, top: 10, color: "#AAA", pointerEvents: "none" }} />
         <input 
           type="text" 
+          ref={this.inputRef}
           className="form-control" 
           style={{maxWidth: "20em"}} 
           value={this.props.value} 

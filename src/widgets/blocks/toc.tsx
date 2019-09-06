@@ -232,7 +232,7 @@ const TOCDesignComp = (props: {
   // Render overall structure
   return <SplitPane
     left={renderLeft()}
-    right={renderProps.renderChildBlock(renderProps, selectedContent, handleSetContent)}
+    right={selectedItem ? renderProps.renderChildBlock(renderProps, selectedContent, handleSetContent) : null }
   />
 }
 

@@ -17,13 +17,16 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     handleChange: (value: string) => void;
     render(): JSX.Element;
 }
-/** Simple input box with magnifying glass */
-export declare class SearchControl extends React.Component<{
+interface SearchControlProps {
     value: string;
     onChange?: (value: string) => void;
     placeholder?: string;
-}> {
+}
+/** Simple input box with magnifying glass */
+export declare class SearchControl extends React.Component<SearchControlProps> {
+    private inputRef;
     handleChange: (ev: React.ChangeEvent<HTMLInputElement>) => void;
+    focus(): void;
     render(): JSX.Element;
 }
 export {};

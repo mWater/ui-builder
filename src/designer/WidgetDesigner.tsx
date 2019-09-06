@@ -5,7 +5,6 @@ import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, RenderDesi
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
 import { Schema, DataSource } from "mwater-expressions";
-import BlockPalette from "./BlockPalette";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
 import { PageStackDisplay } from "../PageStackDisplay";
@@ -17,6 +16,7 @@ import { BlockPaletteEntry } from "./blockPaletteEntries";
 import ErrorBoundary from "./ErrorBoundary";
 import FillDownwardComponent from "react-library/lib/FillDownwardComponent";
 import VirtualDatabase from "../database/VirtualDatabase";
+import AddWizardPalette from "./AddWizardPalette"
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
@@ -131,16 +131,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     }
   }
 
-  renderPalette() {
-    return <BlockPalette 
-      key="palette" 
-      createBlock={this.props.createBlock} 
-      schema={this.props.schema} 
-      dataSource={this.props.dataSource} 
-      entries={this.props.blockPaletteEntries}
-      />
-  }
-
   renderDesignBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
@@ -186,6 +176,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         locale: "en",
         contextVars: this.props.widgetDef.contextVars,
         store,
+        blockPaletteEntries: this.props.blockPaletteEntries,
         renderChildBlock: renderChildBlock
       }
     
@@ -276,7 +267,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
   renderDesign() {
     return [
-      this.renderPalette(),
       (
         <div key="designer" className="widget-designer-block" onClick={this.handleUnselect}>
           {this.renderDesignBlock()}
@@ -319,7 +309,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       />
 
     return [
-      (<div key="palette" className="widget-designer-palette"/>),
       (<div key="preview" className="widget-designer-preview">
         <ErrorBoundary>
           {pageElem}
@@ -335,6 +324,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         <div style={{position: "relative", height: "100%"}}>
           <div className="widget-designer-header">
             <div style={{float: "right"}}>
+              <AddWizardPalette onSelect={this.handleSelect}/>
               <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
                 <i className="fa fa-undo"/> Undo              
               </button>

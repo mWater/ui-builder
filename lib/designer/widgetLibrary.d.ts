@@ -5,6 +5,7 @@ import BlockFactory from "../widgets/BlockFactory";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import { Database } from "../database/Database";
+/** All widgets in current project */
 export interface WidgetLibrary {
     widgets: {
         [id: string]: WidgetDef;

@@ -12,3 +12,33 @@
   padding: 10px;
   border-top: solid 1px #DDD;
 }
+
+.add-wizard-palette-item {
+  position: relative;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  width: 400px;
+  display: inline-block;
+  vertical-align: top
+}
+
+.add-wizard-palette-item-title {
+  text-align: center;
+  font-size: 13px;
+  background-color: #EEE;
+}
+
+.add-wizard-palette-item-cover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  cursor: pointer;
+}
+
+.add-wizard-palette-item-cover:hover {
+  background-color: #AAA;
+  opacity: 0.3;
+}

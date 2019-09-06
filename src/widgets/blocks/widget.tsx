@@ -128,6 +128,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         contextVars: widgetDef.contextVars,
         widgetLibrary: props.widgetLibrary,
         store: new NullBlockStore(),
+        blockPaletteEntries: [],
         renderChildBlock: (childProps, childBlockDef) => { 
           if (childBlockDef) {
             const childBlock = this.createBlock(childBlockDef)

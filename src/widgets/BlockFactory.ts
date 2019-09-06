@@ -22,6 +22,7 @@ import { DatefieldBlock, DatefieldBlockDef } from './blocks/controls/datefield';
 import { ConditionalBlock, ConditionalBlockDef } from './blocks/conditional';
 import { FixedTableBlock, FixedTableBlockDef } from './blocks/fixedTable';
 import { TOCBlock, TOCBlockDef } from './blocks/toc';
+import { AddWizardBlockDef, AddWizardBlock } from './blocks/addWizard';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -36,6 +37,8 @@ export default class BlockFactory {
 
   createBlock = (blockDef: BlockDef): Block<BlockDef> => {
     switch (blockDef.type) {
+      case "addWizard":
+        return new AddWizardBlock(blockDef as AddWizardBlockDef, this.createBlock)
       case "horizontal":
         return new HorizontalBlock(blockDef as HorizontalBlockDef, this.createBlock)
       case "vertical":

@@ -152,7 +152,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       const component = this.instanceRefs[key]
       if (component.validate) {
         const msg = component.validate()
-        if (msg !== null) {
+        if (msg != null) {
           validationMessages.push(msg)
         }
       }

@@ -5,6 +5,7 @@ import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
 import "./blocks.css";
+import { BlockPaletteEntry } from 'src/designer/blockPaletteEntries';
 /** Side on which another block is dropped on a block */
 export declare enum DropSide {
     top = "Top",
@@ -14,6 +15,8 @@ export declare enum DropSide {
 }
 /** Store which permits modification of the block tree */
 export interface BlockStore {
+    /** Replace block with specified id with either another block or nothing.
+     * Optionally removes another id first (for dragging where block should disappear and re-appear somewhere else) */
     alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string): void;
 }
 /** Store which throws on any operation */
@@ -74,6 +77,7 @@ export interface RenderDesignProps {
     schema: Schema;
     dataSource: DataSource;
     widgetLibrary: WidgetLibrary;
+    blockPaletteEntries: BlockPaletteEntry[];
     /** Selected block id as some blocks may display differently when selected */
     selectedId: string | null;
     /** All sub-block elements must rendered using this function. onSet will be called only when transitioning from null to a value */

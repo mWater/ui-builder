@@ -7,6 +7,7 @@ import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
 import "./blocks.css"
 import { LookupWidget } from './widgets';
+import { BlockPaletteEntry } from 'src/designer/blockPaletteEntries';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -18,6 +19,8 @@ export enum DropSide {
 
 /** Store which permits modification of the block tree */
 export interface BlockStore {
+  /** Replace block with specified id with either another block or nothing. 
+   * Optionally removes another id first (for dragging where block should disappear and re-appear somewhere else) */
   alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string): void
 }
 
@@ -92,6 +95,7 @@ export interface RenderDesignProps {
   schema: Schema,
   dataSource: DataSource
   widgetLibrary: WidgetLibrary
+  blockPaletteEntries: BlockPaletteEntry[]
 
   /** Selected block id as some blocks may display differently when selected */
   selectedId: string | null,
@@ -168,7 +172,7 @@ export abstract class Block<T extends BlockDef> {
   process(createBlock: CreateBlock, action: (self: BlockDef | null) => BlockDef | null): BlockDef | null {
     const blockDef = this.processChildren((childBlockDef) => {
       // Recursively process, starting at bottom
-      if (childBlockDef !== null) {
+      if (childBlockDef != null) {
         return createBlock(childBlockDef).process(createBlock, action)
       }
       else {

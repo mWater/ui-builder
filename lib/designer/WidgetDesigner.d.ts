@@ -43,7 +43,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     createBlockStore(): {
         alterBlock: (blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string | undefined) => void;
     };
-    renderPalette(): JSX.Element;
     renderDesignBlock(): JSX.Element;
     renderEditor(): JSX.Element;
     handleSetMode: (mode: Mode) => void;

@@ -1,15 +1,7 @@
-.widget-designer-palette {
-  height: 100%;
-  width: 20%;
-  background-color: #DDD;
-  display: inline-block;
-  overflow-y: auto;
-}
-
 .widget-designer-block {
   height: 100%;
-  left: 20%;
-  width: 60%;
+  left: 0%;
+  width: 80%;
   display: inline-block;
   vertical-align: top;
   padding: 5px;
@@ -39,8 +31,8 @@
 
 .widget-designer-preview {
   height: 100%;
-  left: 20%;
-  width: 60%;
+  left: 0%;
+  width: 80%;
   display: inline-block;
   vertical-align: top;
   border-left: solid 1px #AAA;

@@ -29,6 +29,7 @@ const blockTargetSpec = {
   }
 }
 
+/** Empty space with a dashed border that blocks can be dragged into */
 class BlockPlaceholder extends React.Component<Props> {
   render() {
     return this.props.connectDropTarget!(
