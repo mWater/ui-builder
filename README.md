@@ -34,7 +34,7 @@ Contacts variables are variable values that are passed down through the tree of 
 row of a table. `rowset` is a Boolean expression determining which rows of a table are included in a set of rows. They can also be `text`,
 `number`, etc and other literals.
 
-A block may use one or more contacts variables. Furthermore, for row and rowset variables, the block may request the value of one or more
+A block may use one or more context variables. Furthermore, for row and rowset variables, the block may request the value of one or more
 expressions based on the variable. For example, a text box may request the value of a text column of a row so that it doesn't have to query
 it itself.
 
@@ -63,3 +63,5 @@ Actions are things that buttons, etc perform.
 - deleteRow (table, row id)
 - gotoUrl (url, exprs)
 - close (closes current view)
+
+## Selectio

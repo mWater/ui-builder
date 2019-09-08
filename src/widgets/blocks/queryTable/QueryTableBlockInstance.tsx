@@ -177,7 +177,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   renderRows() {
-    if (!this.state.error) {
+    if (this.state.error) {
       // TODO localize
       return (
         <tr>
