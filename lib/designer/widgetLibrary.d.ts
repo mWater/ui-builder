@@ -33,6 +33,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     handleTabChange: (widgetId: string, widgetDef: WidgetDef) => void;
     handleSelectTab: (index: number) => void;
     handleAddWidget: (widgetDef: WidgetDef) => void;
+    handleDuplicateWidget: (widgetDef: WidgetDef) => void;
     handleCloseTab: (index: number) => void;
     handleOpenWidget: (widgetId: string) => void;
     handleRemoveWidget: (widgetId: string) => void;

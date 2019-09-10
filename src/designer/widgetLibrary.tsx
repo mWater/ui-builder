@@ -61,6 +61,18 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
     this.props.onOpenTabsChange(this.props.openTabs.concat(widgetDef.id))
   }
 
+  handleDuplicateWidget = (widgetDef: WidgetDef) => {
+    const newId = uuid()
+    const widgetLibrary = produce(this.props.widgetLibrary, (draft) => {
+      const newDef = _.cloneDeep(widgetDef)
+      newDef.id = newId
+      newDef.name = newDef.name + " (duplicate)"
+      draft.widgets[newId] = newDef
+    })
+    this.props.onWidgetLibraryChange(widgetLibrary)
+  }
+
+
   handleCloseTab = (index: number) => {
     const openTabs = this.props.openTabs.slice()
     openTabs.splice(index, 1)
@@ -131,6 +143,7 @@ export default class WidgetLibraryDesigner extends React.Component<Props, State>
         onAddWidget={this.handleAddWidget} 
         onOpenWidget={this.handleOpenWidget} 
         onRemoveWidget={this.handleRemoveWidget}
+        onDuplicateWidget={this.handleDuplicateWidget}
         />
     }
   }
@@ -188,6 +201,7 @@ class NewTab extends React.Component<{
   onAddWidget: (widgetDef: WidgetDef) => void,
   onOpenWidget: (widgetId: string) => void, 
   onRemoveWidget: (widgetId: string) => void, 
+  onDuplicateWidget: (widgetDef: WidgetDef) => void, 
 }> {
 
   /** Add a new blank widget */
@@ -202,6 +216,11 @@ class NewTab extends React.Component<{
     })
   }
 
+  handleDuplicateWidget = (widgetDef: WidgetDef, ev: React.MouseEvent) => {
+    ev.stopPropagation()
+    this.props.onDuplicateWidget(widgetDef)
+  }
+
   renderExistingWidgets() {
     const widgets: WidgetDef[] = _.sortBy(Object.values(this.props.widgetLibrary.widgets), "name")
 
@@ -209,8 +228,11 @@ class NewTab extends React.Component<{
       <ul className="list-group">
         { widgets.map(widget => (
           <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={this.props.onOpenWidget.bind(null, widget.id)}>
-            <span style={{ float: "right"}} onClick={this.props.onRemoveWidget.bind(null, widget.id)}>
-              <i className="fa fa-remove"/>
+            <span style={{ float: "right" }} onClick={this.props.onRemoveWidget.bind(null, widget.id)}>
+              <i className="fa fa-fw fa-remove"/>
+            </span>
+            <span style={{ float: "right" }} onClick={this.handleDuplicateWidget.bind(null, widget)}>
+              <i className="fa fa-fw fa-files-o"/>
             </span>
             {widget.name}
           </li>

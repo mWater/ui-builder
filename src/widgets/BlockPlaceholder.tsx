@@ -2,6 +2,7 @@ import * as React from "react";
 import { BlockDef } from "./blocks"
 import { DropTarget, DropTargetMonitor, ConnectDropTarget } from 'react-dnd'
 import "./BlockPlaceholder.css"
+import uuid = require("uuid");
 
 interface Props {
   isOver?: boolean;
@@ -31,9 +32,14 @@ const blockTargetSpec = {
 
 /** Empty space with a dashed border that blocks can be dragged into */
 class BlockPlaceholder extends React.Component<Props> {
+  handleNew = () => {
+    if (this.props.onSet) {
+      this.props.onSet({ id: uuid(), type: "addWizard" })
+    }
+  }
   render() {
     return this.props.connectDropTarget!(
-      <div className={this.props.isOver ? "block-placeholder hover" : "block-placeholder"}/>
+      <div className={this.props.isOver ? "block-placeholder drop" : "block-placeholder"} onClick={this.handleNew}/>
     )
   }
 }
