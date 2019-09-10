@@ -5,7 +5,7 @@ import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
 import "./blocks.css";
-import { BlockPaletteEntry } from 'src/designer/blockPaletteEntries';
+import { BlockPaletteEntry } from '../designer/blockPaletteEntries';
 /** Side on which another block is dropped on a block */
 export declare enum DropSide {
     top = "Top",

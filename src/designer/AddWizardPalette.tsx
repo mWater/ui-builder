@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ConnectDragSource, DragSource, DragSourceConnector, DragSourceSpec, DragSourceMonitor } from "react-dnd"
 import uuid from 'uuid'
-import { BlockDef } from "src/widgets/blocks";
+import { BlockDef } from "../widgets/blocks";
 
 interface Props {
   onSelect(blockId: string): void

@@ -6,8 +6,7 @@ import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
 import "./blocks.css"
-import { LookupWidget } from './widgets';
-import { BlockPaletteEntry } from 'src/designer/blockPaletteEntries';
+import { BlockPaletteEntry } from '../designer/blockPaletteEntries';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
