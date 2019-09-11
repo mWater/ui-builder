@@ -31,6 +31,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null },
   },
   {
+    title: "NumberBox Control",
+    blockDef: { id: "", type: "numberbox", rowContextVarId: null, decimal: true, column: null },
+  },
+  {
     title: "Dropdown Control",
     blockDef: { id: "", type: "dropdown", rowContextVarId: null, column: null },
   },

@@ -207,6 +207,7 @@ class ControlInstance extends React.Component<Props, State> implements Validatab
     } catch (err) {
       // TODO localize
       alert("Unable to save changes")
+      console.error(err.message)
     } finally {
       this.setState({ updating: false })
     }

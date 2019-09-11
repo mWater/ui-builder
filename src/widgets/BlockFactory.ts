@@ -23,6 +23,7 @@ import { ConditionalBlock, ConditionalBlockDef } from './blocks/conditional';
 import { FixedTableBlock, FixedTableBlockDef } from './blocks/fixedTable';
 import { TOCBlock, TOCBlockDef } from './blocks/toc';
 import { AddWizardBlockDef, AddWizardBlock } from './blocks/addWizard';
+import { NumberboxBlockDef, NumberboxBlock } from './blocks/controls/numberbox';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -51,6 +52,8 @@ export default class BlockFactory {
         return new LabeledBlock(blockDef as LabeledBlockDef, this.createBlock)
       case "textbox":
         return new TextboxBlock(blockDef as TextboxBlockDef)
+      case "numberbox":
+        return new NumberboxBlock(blockDef as NumberboxBlockDef)
       case "dropdown":
         return new DropdownBlock(blockDef as DropdownBlockDef)
       case "collapsible":

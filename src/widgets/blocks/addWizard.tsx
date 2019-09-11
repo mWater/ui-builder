@@ -114,6 +114,15 @@ const AddWizardPane = (props: {
         })
       }
 
+      if (column.type == "number") {
+        createLabeledBlock({
+          id: uuid(),
+          type: "numberbox",
+          rowContextVarId: contextVar.id,
+          column: column.id
+        })
+      }
+
       if (column.type == "date" || column.type == "datetime") {
         createLabeledBlock({
           id: uuid(),
