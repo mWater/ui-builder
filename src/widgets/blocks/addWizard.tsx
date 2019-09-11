@@ -1,12 +1,15 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, CreateBlock, NullBlockStore } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, CreateBlock, NullBlockStore, ContextVar } from '../blocks'
 import ModalWindowComponent from 'react-library/lib/ModalWindowComponent'
 import { BlockPaletteEntry } from '../../designer/blockPaletteEntries';
 import { Schema, DataSource } from 'mwater-expressions';
 import BlockPlaceholder from '../BlockPlaceholder';
 import { useState, useRef, useEffect } from 'react';
 import { SearchControl } from './search/SearchBlockInstance';
+import TabbedComponent from 'react-library/lib/TabbedComponent'
+import { localize } from '../localization';
+import uuid = require('uuid');
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -47,6 +50,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
             schema={props.schema}
             dataSource={props.dataSource}
             onSelect={handleSet}
+            contextVars={props.contextVars}
           />
         </ModalWindowComponent>
     )
@@ -64,6 +68,7 @@ const AddWizardPane = (props: {
   schema: Schema
   dataSource: DataSource
   onSelect: (blockDef: BlockDef) => void
+  contextVars: ContextVar[]
 }) => {
   const [search, setSearch] = useState("")
 
@@ -75,26 +80,120 @@ const AddWizardPane = (props: {
     }
   }, [])
 
-  // Compute visible entries
-  const visibleEntries = props.blockPaletteEntries.filter(entry => {
-    if (!search) {
-      return true
+  /** Get entries that are controls based off of columns of first row context variable */
+  const getControlEntries = () => {
+    // Find context var of type row
+    const contextVar = props.contextVars.find(cv => cv.type == "row")
+    if (!contextVar) {
+      return []
     }
-    return entry.title.toLowerCase().includes(search.toLowerCase())
-  })
+
+    // Get columns
+    const columns = props.schema.getColumns(contextVar.table!)
+    const allEntries: BlockPaletteEntry[] = []
+
+    for (const column of columns) {
+      const createLabeledBlock = (child: BlockDef) => {
+        allEntries.push({ 
+          title: localize(column.name), 
+          blockDef: { 
+            id: uuid(),
+            type: "labeled", 
+            label: column.name,
+            child: child
+          }
+        })
+      }
+  
+      if (column.type == "text") {
+        createLabeledBlock({
+          id: uuid(),
+          type: "textbox",
+          rowContextVarId: contextVar.id,
+          column: column.id
+        })
+      }
+
+      if (column.type == "date" || column.type == "datetime") {
+        createLabeledBlock({
+          id: uuid(),
+          type: "datefield",
+          rowContextVarId: contextVar.id,
+          column: column.id
+        })
+      }
+
+      if (column.type === "enum" || column.type === "enumset" || (column.type === "join" && column.join!.type === "n-1")) {
+        createLabeledBlock({
+          id: uuid(),
+          type: "dropdown",
+          rowContextVarId: contextVar.id,
+          column: column.id
+        })
+      }
+    }
+    return allEntries
+  }
+
+    /** Get entries that are expressions based off of columns of first row context variable */
+  const getExpressionEntries = () => {
+    // Find context var of type row
+    const contextVar = props.contextVars.find(cv => cv.type == "row")
+    if (!contextVar) {
+      return []
+    }
+
+    // Get columns
+    const columns = props.schema.getColumns(contextVar.table!)
+    const allEntries: BlockPaletteEntry[] = []
+
+    for (const column of columns) {
+      allEntries.push({ 
+        title: localize(column.name), 
+        blockDef: { 
+          id: uuid(),
+          type: "expression", 
+          contextVarId: contextVar.id,
+          expr: { type: "field", table: contextVar.table!, column: column.id }
+        }
+      })
+    }
+  
+    return allEntries
+  }
+  
+  const displayAndFilterEntries = (entries: BlockPaletteEntry[]) => {
+    // Compute visible entries
+    const visibleEntries = entries.filter(entry => {
+      return search ? entry.title.toLowerCase().includes(search.toLowerCase()) : true
+    })
+
+    return <div>
+      { visibleEntries.map(entry => {
+        return <PaletteItem 
+          entry={entry}
+          createBlock={props.createBlock}
+          schema={props.schema}
+          dataSource={props.dataSource}
+          onSelect={() => props.onSelect(entry.blockDef)} />
+      })}
+    </div>
+  }
 
   return <div>
     <div>
       <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
     </div>
-    { visibleEntries.map(entry => {
-      return <PaletteItem 
-        entry={entry}
-        createBlock={props.createBlock}
-        schema={props.schema}
-        dataSource={props.dataSource}
-        onSelect={() => props.onSelect(entry.blockDef)} />
-    })}
+    <TabbedComponent 
+      initialTabId="palette"
+      tabs={
+        [
+          { id: "palette", label: "Palette", elem: displayAndFilterEntries(props.blockPaletteEntries) },
+          { id: "controls", label: "Controls", elem: displayAndFilterEntries(getControlEntries()) },
+          { id: "expressions", label: "Expressions", elem: displayAndFilterEntries(getExpressionEntries()) }
+        ]
+      }    
+    />
   </div>
 }
 

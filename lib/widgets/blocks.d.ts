@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Database } from '../database/Database';
-import { Schema, Expr, DataSource, Variable } from 'mwater-expressions';
+import { Schema, Expr, DataSource, Variable, LiteralType } from 'mwater-expressions';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
 import { PageStack } from '../PageStack';
@@ -34,7 +34,7 @@ export declare type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>;
 export interface ContextVar {
     id: string;
     name: string;
-    type: string;
+    type: "row" | "rowset" | LiteralType;
     table?: string;
 }
 export interface RenderInstanceProps {

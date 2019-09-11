@@ -21,6 +21,7 @@ const blockSourceSpec: DragSourceSpec<Props, { blockDef: BlockDef }> = {
   }
 }
 
+/** Button that can be dragged into the designer to create an addWizard block */
 class AddWizardPalette extends React.Component<Props> {
   render() {
     return (

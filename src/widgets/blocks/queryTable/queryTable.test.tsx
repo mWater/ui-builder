@@ -7,7 +7,7 @@ import { WidgetLibrary } from "../../../designer/widgetLibrary";
 import { ActionLibrary } from "../../ActionLibrary";
 
 // Outer context vars
-const rowsetCV = { id: "cv1", type: "rowset", name: "", table: "t1" }
+const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
 const contextVars: ContextVar[] = [rowsetCV]
 
 const qtbdSingle: QueryTableBlockDef = {

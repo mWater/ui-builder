@@ -1,6 +1,6 @@
 import { TextBlockDef, TextBlock } from "./text";
 import { shallow } from "enzyme";
-import { RenderInstanceProps } from "../blocks";
+import { RenderInstanceProps, ContextVar } from "../blocks";
 import simpleSchema from "../../__fixtures__/schema";
 
 const tbd: TextBlockDef = {
@@ -15,7 +15,7 @@ const tbd: TextBlockDef = {
 
 const tb = new TextBlock(tbd)
 
-const cv1 = { id: "cv1", table: "t1", type: "row", name: "Cv1" }
+const cv1: ContextVar = { id: "cv1", table: "t1", type: "row", name: "Cv1" }
 
 test("gets expressions", () => {
   expect(tb.getContextVarExprs(cv1)).toEqual([

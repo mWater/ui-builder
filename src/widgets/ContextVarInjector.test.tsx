@@ -1,6 +1,6 @@
 import ContextVarInjector from "./ContextVarInjector";
 import { shallow, mount } from 'enzyme'
-import { RenderInstanceProps, Filter } from "./blocks";
+import { RenderInstanceProps, Filter, ContextVar } from "./blocks";
 import { Database, QueryOptions } from "../database/Database";
 import * as React from "react";
 import { Expr, Schema, DataSource } from "mwater-expressions";
@@ -38,7 +38,7 @@ beforeEach(() => {
 })
 
 test("inner contains extra context vars", () => {
-  const contextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
   const value = "1234"
   const contextVarExprs : Expr[] = [
     { type: "field", table: "t1", column: "c1" }
@@ -65,7 +65,7 @@ test("inner contains extra context vars", () => {
 })
 
 test("exprs are computed for row variables", (done) => {
-  const contextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
   const value = "1234"
   const contextVarExprs : Expr[] = [
     { type: "field", table: "t1", column: "c1" }
@@ -114,7 +114,7 @@ test("exprs are computed for row variables", (done) => {
 })
 
 test("exprs are null for null row variables", (done) => {
-  const contextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "row", table: "t1" }
   const value = null
   const contextVarExprs : Expr[] = [
     { type: "field", table: "t1", column: "c1" }
@@ -149,7 +149,7 @@ test("exprs are null for null row variables", (done) => {
 
 
 test("exprs are computed for rowset variables, excluding non-aggregates", (done) => {
-  const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs : Expr[] = [
     { type: "field", table: "t1", column: "text" },
@@ -195,7 +195,7 @@ test("exprs are computed for rowset variables, excluding non-aggregates", (done)
 })
 
 test("filters are applied for rowset variables", (done) => {
-  const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs : Expr[] = [
     { type: "op", table: "t1", op: "count", exprs: [] }
@@ -268,7 +268,7 @@ test("filters are applied for rowset variables", (done) => {
 })
 
 test("null filters are ignored for rowset variables", (done) => {
-  const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs : Expr[] = [
     { type: "op", table: "t1", op: "count", exprs: [] }
@@ -341,7 +341,7 @@ test("null filters are ignored for rowset variables", (done) => {
 })
 
 test("filters are applied for rowset variables to variable value", (done) => {
-  const contextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs : Expr[] = [
     { type: "op", table: "t1", op: "count", exprs: [] }

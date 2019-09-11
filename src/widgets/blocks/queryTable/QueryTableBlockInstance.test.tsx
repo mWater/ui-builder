@@ -13,7 +13,7 @@ import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';
 
 // Outer context vars
-const rowsetCV = { id: "cv1", type: "rowset", name: "", table: "t1" }
+const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
 const contextVars: ContextVar[] = [rowsetCV]
 
 const schema = simpleSchema()

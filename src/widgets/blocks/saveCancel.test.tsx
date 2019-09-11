@@ -11,7 +11,7 @@ import BlockFactory from "../BlockFactory";
 import { ActionLibrary } from "../ActionLibrary";
 
 // Outer context vars
-const rowCV = { id: "cv1", type: "row", name: "", table: "t1" }
+const rowCV: ContextVar = { id: "cv1", type: "row", name: "", table: "t1" }
 const contextVars: ContextVar[] = [rowCV]
 
 const schema = simpleSchema()
