@@ -205,10 +205,14 @@ export default class VirtualDatabase implements Database {
             throw new Error("Missing mapping for " + pk)
           })
 
-          await txn.updateRow(mutation.table, mutation.primaryKey, mutation.updates)
+          const updatePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
+
+          await txn.updateRow(mutation.table, updatePrimaryKey, mutation.updates)
           break
         case "remove":
-          await txn.removeRow(mutation.table, mutation.primaryKey)
+          const removePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
+
+          await txn.removeRow(mutation.table, removePrimaryKey)
           break
       }
     }

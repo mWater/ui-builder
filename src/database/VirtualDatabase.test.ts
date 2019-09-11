@@ -339,6 +339,7 @@ describe("select, order, limit", () => {
       // Create changes
       const txn = vdb.transaction()
       const pk = await txn.addRow("t1", { number: 1 })
+      await txn.updateRow("t1", pk, { number: 2 })
       const pk2 = await txn.addRow("t2", { "2-1": pk })
       await txn.commit()
 
@@ -359,6 +360,7 @@ describe("select, order, limit", () => {
       await vdb.commit()
 
       expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1 }])
+      expect(mockTransaction.updateRow.mock.calls[0]).toEqual(["t1", "PKA", { number: 2 }])
       expect(mockTransaction.addRow.mock.calls[1]).toEqual(["t2", { "2-1": "PKA" }])
     })
 
