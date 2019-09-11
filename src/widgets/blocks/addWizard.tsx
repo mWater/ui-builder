@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, CreateBlock, NullBlockStore, ContextVar } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
 import ModalWindowComponent from 'react-library/lib/ModalWindowComponent'
 import { BlockPaletteEntry } from '../../designer/blockPaletteEntries';
 import { Schema, DataSource } from 'mwater-expressions';
@@ -31,9 +31,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
   renderDesign(props: RenderDesignProps) {
     const handleSet = (newBlockDef: BlockDef | null) => {
       if (newBlockDef) {
-        props.store.alterBlock(this.blockDef.id, (bd) => {
-          return { ...newBlockDef, id: this.blockDef.id }
-        })
+        props.store.alterBlock(this.blockDef.id, (bd) => duplicateBlockDef(newBlockDef, this.createBlock))
       }
       else {
         props.store.alterBlock(this.blockDef.id, (bd) => null)
@@ -163,7 +161,7 @@ const AddWizardPane = (props: {
         })
       }
     }
-    
+
     return allEntries
   }
   

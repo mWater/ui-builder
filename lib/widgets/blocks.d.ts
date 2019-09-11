@@ -160,3 +160,5 @@ export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: C
 export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[];
 /** Create the variables as needed by mwater-expressions */
 export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
+/** Make a duplicate of a block */
+export declare function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef;

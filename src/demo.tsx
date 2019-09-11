@@ -1,7 +1,7 @@
 import * as React from 'react';
 import BlockFactory from './widgets/BlockFactory';
 import { Schema } from 'mwater-expressions';
-import WidgetLibraryDesigner, { WidgetLibrary } from './designer/widgetLibrary';
+import { WidgetLibraryDesigner, WidgetLibrary } from './designer/widgetLibrary';
 import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
 import { ActionLibrary } from './widgets/ActionLibrary';
 import * as _ from 'lodash';

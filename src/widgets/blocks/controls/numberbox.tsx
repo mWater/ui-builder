@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { BlockDef, RenderEditorProps, ValidateBlockOptions, createExprVariables } from '../../blocks';
+import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, EnumValue, Expr, ExprValidator, ExprCompiler, LocalizedString } from 'mwater-expressions';
+import { Column, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import ReactSelect from "react-select"
-import { IdLiteralComponent, ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
 import { NumberInput, Checkbox } from 'react-library/lib/bootstrap';
 
 export interface NumberboxBlockDef extends ControlBlockDef {
@@ -25,12 +23,12 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
     return <NumberInput
       value={props.value} 
       onChange={props.onChange}
+      style={{ width: "12em" }}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       decimal={this.blockDef.decimal}
       decimalPlaces={this.blockDef.decimalPlaces}
     />
   }
-
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   renderControlEditor(props: RenderEditorProps) {

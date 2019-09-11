@@ -28,7 +28,7 @@ interface State {
     activeTabIndex: number;
 }
 /** Design mode for a library of widgets */
-export default class WidgetLibraryDesigner extends React.Component<Props, State> {
+export declare class WidgetLibraryDesigner extends React.Component<Props, State> {
     constructor(props: Props);
     handleTabChange: (widgetId: string, widgetDef: WidgetDef) => void;
     handleSelectTab: (index: number) => void;

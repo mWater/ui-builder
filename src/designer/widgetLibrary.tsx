@@ -35,7 +35,7 @@ interface State {
 }
 
 /** Design mode for a library of widgets */
-export default class WidgetLibraryDesigner extends React.Component<Props, State> {
+export class WidgetLibraryDesigner extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {

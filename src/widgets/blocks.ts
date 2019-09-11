@@ -296,3 +296,7 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
   })
 }
 
+/** Make a duplicate of a block */
+export function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef {
+  return createBlock(blockDef).process(createBlock, (bd) => bd ? ({ ...bd, id: uuid() }) : null)!
+}

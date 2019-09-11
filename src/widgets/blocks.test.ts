@@ -1,6 +1,7 @@
 import * as blocks from './blocks'
 import BlockFactory from './BlockFactory';
 import { ContextVar } from './blocks';
+import { QueryTableBlockDef } from './blocks/queryTable/queryTable';
 
 test("drops left", () => {
   const source = { id: "a", type: "dummy" }
@@ -10,7 +11,6 @@ test("drops left", () => {
   expect(result.items[0]).toBe(source)
   expect(result.items[1]).toBe(target)
 })
-
 
 test("findBlockAncestry", () => {
   const createBlock = new BlockFactory().createBlock
@@ -95,4 +95,29 @@ test("createExprVariables", () => {
   expect(blocks.createExprVariables([{ id: "cv1", type: "rowset", name: "Cv1", table: "t1" }])).toEqual([
     { id: "cv1", type: "boolean", name: { _base: "en", en: "Cv1" }, table: "t1" }
   ])
+})
+
+test("duplicateBlockDef with queryTable", () => {
+  const createBlock = new BlockFactory().createBlock
+
+  // Root cv
+  const rootContextVars: ContextVar[] = [
+    { id: "cv1", type: "rowset", table: "t1", name: "CV1" }
+  ]
+
+  // Create simple tree
+  const blockDef = {
+    id: "qt1",
+    type: "queryTable",
+    rowsetContextVarId: "cv1",
+    mode: "singleRow",
+    headers: [],
+    contents: [
+      { id: "c1", type: "horizontal", items: [] }
+    ]
+  }
+  
+  const duplicate = blocks.duplicateBlockDef(blockDef, createBlock) as QueryTableBlockDef
+  expect(duplicate.id).not.toBe(blockDef.id)
+  expect(duplicate.contents[0]!.id).not.toBe(blockDef.contents[0]!.id)
 })
