@@ -323,8 +323,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       <FillDownwardComponent>
         <div style={{position: "relative", height: "100%"}}>
           <div className="widget-designer-header">
+            <AddWizardPalette onSelect={this.handleSelect}/>
             <div style={{float: "right"}}>
-              <AddWizardPalette onSelect={this.handleSelect}/>
               <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
                 <i className="fa fa-undo"/> Undo              
               </button>

@@ -82,92 +82,88 @@ const AddWizardPane = (props: {
 
   /** Get entries that are controls based off of columns of first row context variable */
   const getControlEntries = () => {
-    // Find context var of type row
-    const contextVar = props.contextVars.find(cv => cv.type == "row")
-    if (!contextVar) {
-      return []
-    }
-
-    // Get columns
-    const columns = props.schema.getColumns(contextVar.table!)
     const allEntries: BlockPaletteEntry[] = []
 
-    for (const column of columns) {
-      const createLabeledBlock = (child: BlockDef) => {
-        allEntries.push({ 
-          title: localize(column.name), 
-          blockDef: { 
+    // Find context var of type row
+    for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {
+      // Get columns
+      const columns = props.schema.getColumns(contextVar.table!)
+
+      for (const column of columns) {
+        const createLabeledBlock = (child: BlockDef) => {
+          allEntries.push({ 
+            title: localize(column.name), 
+            blockDef: { 
+              id: uuid(),
+              type: "labeled", 
+              label: column.name,
+              child: child
+            }
+          })
+        }
+    
+        if (column.type == "text") {
+          createLabeledBlock({
             id: uuid(),
-            type: "labeled", 
-            label: column.name,
-            child: child
-          }
-        })
-      }
-  
-      if (column.type == "text") {
-        createLabeledBlock({
-          id: uuid(),
-          type: "textbox",
-          rowContextVarId: contextVar.id,
-          column: column.id
-        })
-      }
+            type: "textbox",
+            rowContextVarId: contextVar.id,
+            column: column.id
+          })
+        }
 
-      if (column.type == "number") {
-        createLabeledBlock({
-          id: uuid(),
-          type: "numberbox",
-          rowContextVarId: contextVar.id,
-          column: column.id
-        })
-      }
+        if (column.type == "number") {
+          createLabeledBlock({
+            id: uuid(),
+            type: "numberbox",
+            rowContextVarId: contextVar.id,
+            column: column.id
+          })
+        }
 
-      if (column.type == "date" || column.type == "datetime") {
-        createLabeledBlock({
-          id: uuid(),
-          type: "datefield",
-          rowContextVarId: contextVar.id,
-          column: column.id
-        })
-      }
+        if (column.type == "date" || column.type == "datetime") {
+          createLabeledBlock({
+            id: uuid(),
+            type: "datefield",
+            rowContextVarId: contextVar.id,
+            column: column.id
+          })
+        }
 
-      if (column.type === "enum" || column.type === "enumset" || (column.type === "join" && column.join!.type === "n-1")) {
-        createLabeledBlock({
-          id: uuid(),
-          type: "dropdown",
-          rowContextVarId: contextVar.id,
-          column: column.id
-        })
+        if (column.type === "enum" || column.type === "enumset" || (column.type === "join" && column.join!.type === "n-1")) {
+          createLabeledBlock({
+            id: uuid(),
+            type: "dropdown",
+            rowContextVarId: contextVar.id,
+            column: column.id
+          })
+        }
       }
     }
     return allEntries
   }
 
-    /** Get entries that are expressions based off of columns of first row context variable */
+  /** Get entries that are expressions based off of columns of first row context variable */
   const getExpressionEntries = () => {
-    // Find context var of type row
-    const contextVar = props.contextVars.find(cv => cv.type == "row")
-    if (!contextVar) {
-      return []
-    }
-
-    // Get columns
-    const columns = props.schema.getColumns(contextVar.table!)
     const allEntries: BlockPaletteEntry[] = []
 
-    for (const column of columns) {
-      allEntries.push({ 
-        title: localize(column.name), 
-        blockDef: { 
-          id: uuid(),
-          type: "expression", 
-          contextVarId: contextVar.id,
-          expr: { type: "field", table: contextVar.table!, column: column.id }
-        }
-      })
+    // Find context var of type row
+    for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {  
+      // Get columns
+      const columns = props.schema.getColumns(contextVar.table!)
+
+      for (const column of columns) {
+        allEntries.push({ 
+          title: localize(column.name), 
+          blockDef: { 
+            id: uuid(),
+            type: "expression", 
+            contextVarId: contextVar.id,
+            expr: { type: "field", table: contextVar.table!, column: column.id }
+          }
+        })
+      }
     }
-  
+    
     return allEntries
   }
   
