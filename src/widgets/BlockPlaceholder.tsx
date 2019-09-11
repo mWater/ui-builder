@@ -39,7 +39,7 @@ class BlockPlaceholder extends React.Component<Props> {
   }
   render() {
     return this.props.connectDropTarget!(
-      <div className={this.props.isOver ? "block-placeholder drop" : "block-placeholder"} onClick={this.handleNew}/>
+      <div className={this.props.isOver ? "block-placeholder drop" : "block-placeholder"} onDoubleClick={this.handleNew}/>
     )
   }
 }
