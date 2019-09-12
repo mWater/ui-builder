@@ -237,7 +237,7 @@ const NewTab = (props: {
   }
 
   return (
-    <div>
+    <div style={{ padding: 10 }}>
       <div style={{ paddingBottom: 10 }}>
         <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
       </div>

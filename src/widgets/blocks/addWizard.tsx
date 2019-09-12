@@ -185,7 +185,8 @@ const AddWizardPane = (props: {
           createBlock={props.createBlock}
           schema={props.schema}
           dataSource={props.dataSource}
-          onSelect={() => props.onSelect(entry.blockDef)} />
+          contextVars={props.contextVars}
+          onSelect={() => props.onSelect(typeof entry.blockDef == "function" ? entry.blockDef(props.contextVars) : entry.blockDef)} />
       })}
     </div>
   }
@@ -217,6 +218,7 @@ class PaletteItem extends React.Component<{
   createBlock: CreateBlock
   schema: Schema
   dataSource: DataSource
+  contextVars: ContextVar[]
   onSelect: () => void
 }> {
   renderContents() {
@@ -224,7 +226,8 @@ class PaletteItem extends React.Component<{
       return this.props.entry.elem
     }
 
-    const block = this.props.createBlock(this.props.entry.blockDef)
+    const entry = this.props.entry
+    const block = this.props.createBlock(typeof entry.blockDef == "function" ? entry.blockDef(this.props.contextVars) : entry.blockDef)
 
     return block.renderDesign({
       selectedId: null,

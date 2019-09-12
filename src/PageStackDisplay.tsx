@@ -214,7 +214,7 @@ class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void
 class ModalPage extends React.Component<{ onClose: () => void }> {
   render() {
     return (
-      <ModalPopupComponent onClose={this.props.onClose}>
+      <ModalPopupComponent onClose={this.props.onClose} size="large">
         {this.props.children}
       </ModalPopupComponent>
     )

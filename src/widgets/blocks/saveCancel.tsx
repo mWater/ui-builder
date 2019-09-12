@@ -27,10 +27,6 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
   }
 
   validate() { 
-    if (!this.blockDef.child) {
-      return "Contents required"
-    }
-
     if (!this.blockDef.saveLabel) {
       return "Save label required"
     }
@@ -238,7 +234,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
           database={this.state.virtualDatabase}
           injectedContextVars={renderInstanceProps.contextVars}
           injectedContextVarValues={renderInstanceProps.contextVarValues}
-          innerBlock={this.props.blockDef.child!}
+          innerBlock={this.props.blockDef.child}
           renderInstanceProps={renderInstanceProps}
           schema={renderInstanceProps.schema}>
           { (innerRenderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {

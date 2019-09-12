@@ -115,6 +115,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
                       value={ cvr ? cvr.contextVarId : null }
                       onChange={ handleCVRChange }
                     />
+                    { !cvr ? <span className="text-warning">Value not set</span> : null}          
                   </td>
                 </tr>
               )

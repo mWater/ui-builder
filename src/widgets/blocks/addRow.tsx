@@ -46,10 +46,6 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
   validate(options: ValidateBlockOptions) { 
     let error: string | null
 
-    if (!this.blockDef.content) {
-      return "Content required"
-    }
-
     // Check that table is present
     if (!this.blockDef.table || !options.schema.getTable(this.blockDef.table)) {
       return "Table required"
@@ -257,7 +253,7 @@ class AddRowInstance extends React.Component<Props, State> {
       injectedContextVarValues={{ [this.props.contextVar.id]: this.state.addedRowId }}
       createBlock={this.props.createBlock}
       database={this.props.database}
-      innerBlock={this.props.blockDef.content!}
+      innerBlock={this.props.blockDef.content}
       renderInstanceProps={this.props.renderInstanceProps}
       schema={this.props.schema}>
         {(renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
@@ -266,7 +262,7 @@ class AddRowInstance extends React.Component<Props, State> {
           }
           return (
             <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { this.props.renderInstanceProps.renderChildBlock(renderInstanceProps, this.props.blockDef.content!) }
+              { this.props.renderInstanceProps.renderChildBlock(renderInstanceProps, this.props.blockDef.content) }
             </div>
           )
         }}

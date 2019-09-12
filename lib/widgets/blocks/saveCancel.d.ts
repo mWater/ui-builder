@@ -15,7 +15,7 @@ export interface SaveCancelBlockDef extends BlockDef {
  */
 export declare class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
-    validate(): "Contents required" | "Save label required" | "Cancel label required" | "Confirm discard message required" | null;
+    validate(): "Save label required" | "Cancel label required" | "Confirm discard message required" | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;

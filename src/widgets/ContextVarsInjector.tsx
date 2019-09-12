@@ -13,7 +13,7 @@ interface Props {
   database: Database
 
   /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
-  innerBlock: BlockDef
+  innerBlock: BlockDef | null
   createBlock: CreateBlock
   children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>
 }
@@ -31,10 +31,10 @@ export default class ContextVarsInjector extends React.Component<Props> {
 
     for (const contextVar of this.props.injectedContextVars) {
       // Get context var exprs
-      const contextVarExprs = _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, allContextVars).map(cb => {
+      const contextVarExprs = this.props.innerBlock ? _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, allContextVars).map(cb => {
         const block = this.props.createBlock(cb.blockDef)
         return block.getContextVarExprs(contextVar, this.props.renderInstanceProps.widgetLibrary, this.props.renderInstanceProps.actionLibrary)
-      }))
+      })) : []
 
       const currentElem = elem
       elem = (outerProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => (

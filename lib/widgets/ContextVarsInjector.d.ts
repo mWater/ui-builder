@@ -11,7 +11,7 @@ interface Props {
     schema: Schema;
     database: Database;
     /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
-    innerBlock: BlockDef;
+    innerBlock: BlockDef | null;
     createBlock: CreateBlock;
     children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>;
 }

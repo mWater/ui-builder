@@ -1,7 +1,7 @@
 .widget-designer-block {
   height: 100%;
   left: 0%;
-  width: 80%;
+  width: 70%;
   display: inline-block;
   vertical-align: top;
   padding: 5px;
@@ -10,8 +10,8 @@
 
 .widget-designer-editor {
   height: 100%;
-  left: 80%;
-  width: 20%;
+  left: 70%;
+  width: 30%;
   display: inline-block;
   vertical-align: top;
   padding: 5px;
@@ -32,7 +32,7 @@
 .widget-designer-preview {
   height: 100%;
   left: 0%;
-  width: 80%;
+  width: 70%;
   display: inline-block;
   vertical-align: top;
   border-left: solid 1px #AAA;
