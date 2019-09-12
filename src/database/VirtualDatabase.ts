@@ -451,7 +451,52 @@ class VirtualDatabaseTransaction implements Transaction {
 
   commit(): Promise<void> {
     // Clear mutations and transfer to main database
-    this.virtualDatabase.mutations = this.virtualDatabase.mutations.concat(this.mutations)
+    for (const mutation of this.mutations) {
+      if (mutation.type == "add") {
+        // Add mutations are always performed
+        this.virtualDatabase.mutations.push(mutation)
+      }
+      else if (mutation.type == "update") {
+        // Combine with add if present
+        const existingAdd = this.virtualDatabase.mutations.find(m => 
+          m.table == mutation.table 
+          && m.type == "add" 
+          && m.primaryKey == mutation.primaryKey) as AddMutation | undefined
+
+        if (existingAdd) {
+          existingAdd.values = { ...existingAdd.values, ...mutation.updates } 
+          continue
+        }
+
+        // Combine with update if present
+        const existingUpdate = this.virtualDatabase.mutations.find(m => 
+          m.table == mutation.table 
+          && m.type == "update" 
+          && m.primaryKey == mutation.primaryKey) as UpdateMutation | undefined
+
+        if (existingUpdate) {
+          existingUpdate.updates = { ...existingUpdate.updates, ...mutation.updates }
+          continue
+        }
+
+        this.virtualDatabase.mutations.push(mutation)
+      }
+      else if (mutation.type == "remove") {
+        // Remove add if present
+        // Combine with add if present
+        const existingAddIndex = this.virtualDatabase.mutations.findIndex(m => 
+          m.table == mutation.table 
+          && m.type == "add" 
+          && m.primaryKey == mutation.primaryKey)
+
+        if (existingAddIndex >= 0) {
+          this.virtualDatabase.mutations.splice(existingAddIndex, 1)
+          continue
+        }
+
+        this.virtualDatabase.mutations.push(mutation)
+      }
+    }
     this.mutations = []
 
     for (const changeListener of this.virtualDatabase.changeListeners) {

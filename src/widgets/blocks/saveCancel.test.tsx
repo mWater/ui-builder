@@ -120,7 +120,7 @@ test("save writes to database", async () => {
   
   expect(alertMessages.length).toBe(0)
 
-  expect(database.mutations[1].type).toBe("update")
+  expect(database.mutations[0].type).toBe("add")
   // expect(transaction.updateRow.mock.calls[0][2]).toEqual({ text: "def" })
 })
 

@@ -242,8 +242,8 @@ describe("select, order, limit", () => {
 
     test("insert relevant row", async () => {
       const txn = vdb.transaction()
-      txn.addRow("t1", { number: 6 })
-      txn.commit()
+      await txn.addRow("t1", { number: 6 })
+      await txn.commit()
   
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
       expect(rows).toEqual([
@@ -254,9 +254,9 @@ describe("select, order, limit", () => {
 
     test("insert irrelevant rows", async () => {
       const txn = vdb.transaction()
-      txn.addRow("t1", { number: 1 })
-      txn.addRow("t2", { number: 6 })
-      txn.commit()
+      await txn.addRow("t1", { number: 1 })
+      await txn.addRow("t2", { number: 6 })
+      await txn.commit()
   
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
       expect(rows).toEqual([
@@ -312,9 +312,9 @@ describe("select, order, limit", () => {
     test("commits changes", async () => {
       // Create changes
       const txn = vdb.transaction()
-      const pk = txn.addRow("t1", { number: 1 })
-      txn.removeRow("t1", 1)
-      txn.commit()
+      const pk = await txn.addRow("t1", { number: 1 })
+      await txn.removeRow("t1", 1)
+      await txn.commit()
 
       // Mock underlying transaction
       const mockTransaction = {
@@ -334,6 +334,44 @@ describe("select, order, limit", () => {
 
       expect(() => vdb.transaction()).toThrow()
     })
+
+    test("shortcuts updating inserted row", async () => {
+      const txn = vdb.transaction()
+      const pk = await txn.addRow("t1", { number: 1 })
+      await txn.updateRow("t1", pk, { number: 2 })
+      await txn.commit()
+
+      expect(vdb.mutations).toEqual([{
+        type: "add",
+        table: "t1",
+        primaryKey: pk,
+        values: { number: 2 }
+      }])
+    })
+
+    test("shortcuts updating row", async () => {
+      const txn = vdb.transaction()
+      await txn.updateRow("t1", 1, { number: 2 })
+      await txn.updateRow("t1", 1, { number: 3 })
+      await txn.commit()
+
+      expect(vdb.mutations).toEqual([{
+        type: "update",
+        table: "t1",
+        primaryKey: 1,
+        updates: { number: 3 }
+      }])
+    })
+
+    test("shortcuts removing inserted row", async () => {
+      const txn = vdb.transaction()
+      const pk = await txn.addRow("t1", { number: 1 })
+      await txn.removeRow("t1", pk)
+      await txn.commit()
+
+      expect(vdb.mutations).toEqual([])
+    })
+
 
     test("substitutes temporary primary keys", async () => {
       // Create changes
@@ -359,8 +397,7 @@ describe("select, order, limit", () => {
       // Commit to underlying database
       await vdb.commit()
 
-      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1 }])
-      expect(mockTransaction.updateRow.mock.calls[0]).toEqual(["t1", "PKA", { number: 2 }])
+      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 2 }])
       expect(mockTransaction.addRow.mock.calls[1]).toEqual(["t2", { "2-1": "PKA" }])
     })
 
