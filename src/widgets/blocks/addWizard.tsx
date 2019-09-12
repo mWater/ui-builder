@@ -33,7 +33,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
       if (newBlockDef) {
         // Duplicate but keep top level id so that selected
         const duplicatedBlockDef = duplicateBlockDef(newBlockDef, this.createBlock)
-        duplicatedBlockDef.id = newBlockDef.id
+        duplicatedBlockDef.id = this.blockDef.id
         props.store.alterBlock(this.blockDef.id, (bd) => duplicatedBlockDef)
       }
       else {
