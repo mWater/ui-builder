@@ -59,6 +59,9 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
   }
 }
 
+// Persist default tab
+var defaultCurrentTabId = "palette"
+
 /** Pane with search and allowing clicking on a widget to add */
 const AddWizardPane = (props: {
   blockPaletteEntries: BlockPaletteEntry[]
@@ -69,6 +72,7 @@ const AddWizardPane = (props: {
   contextVars: ContextVar[]
 }) => {
   const [search, setSearch] = useState("")
+  const [currentTabId, setCurrentTabId] = useState(defaultCurrentTabId)
 
   // Focus on load
   const searchControl = useRef<SearchControl>(null)
@@ -188,7 +192,11 @@ const AddWizardPane = (props: {
       <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
     </div>
     <TabbedComponent 
-      initialTabId="palette"
+      tabId={currentTabId}
+      onTabClick={tabId => { 
+        defaultCurrentTabId = tabId
+        setCurrentTabId(tabId) 
+      }}
       tabs={
         [
           { id: "palette", label: "Palette", elem: displayAndFilterEntries(props.blockPaletteEntries) },

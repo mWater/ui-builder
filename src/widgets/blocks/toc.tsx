@@ -40,8 +40,12 @@ interface TOCItem {
 
 /** Create a flat list of all items */
 const iterateItems = (items: TOCItem[]): TOCItem[] => {
-  const flatItems: TOCItem[] = _.flatten(items.map(item => iterateItems(item.children)))
-  return items.concat(flatItems)
+  var flatItems: TOCItem[] = []
+  for (const item of items) {
+    flatItems.push(item)
+    flatItems = flatItems.concat(iterateItems(item.children))
+  }
+  return flatItems
 }
 
 /** Alter each item, allowing item to be mutated, replaced (return item or array of items) or deleted (return null) */
