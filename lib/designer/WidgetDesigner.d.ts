@@ -9,6 +9,7 @@ import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 interface WidgetDesignerProps {
     widgetDef: WidgetDef;
+    onWidgetDefChange(widgetDef: WidgetDef): void;
     createBlock: CreateBlock;
     database: Database;
     schema: Schema;
@@ -17,7 +18,6 @@ interface WidgetDesignerProps {
     locale: string;
     widgetLibrary: WidgetLibrary;
     blockPaletteEntries: BlockPaletteEntry[];
-    onWidgetDefChange(widgetDef: WidgetDef): void;
 }
 declare enum Mode {
     Design = 0,

@@ -25,6 +25,7 @@ interface Props {
     onWidgetLibraryChange(widgetLibrary: WidgetLibrary): void;
 }
 interface State {
+    /** Index of active tab. Can be one past end for new tab */
     activeTabIndex: number;
 }
 /** Design mode for a library of widgets */
@@ -34,7 +35,7 @@ export declare class WidgetLibraryDesigner extends React.Component<Props, State>
     handleSelectTab: (index: number) => void;
     handleAddWidget: (widgetDef: WidgetDef) => void;
     handleDuplicateWidget: (widgetDef: WidgetDef) => void;
-    handleCloseTab: (index: number) => void;
+    handleCloseTab: (index: number, ev: React.MouseEvent<Element, MouseEvent>) => void;
     handleOpenWidget: (widgetId: string) => void;
     handleRemoveWidget: (widgetId: string) => void;
     renderTab(tab: string, index: number): JSX.Element | null;

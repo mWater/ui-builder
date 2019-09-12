@@ -244,7 +244,7 @@ const TOCInstanceComp = (props: {
   const { blockDef, renderProps } = props
 
   // Select first item with content by default
-  const firstItem = blockDef.items.find(item => item.content)
+  const firstItem = iterateItems(blockDef.items).find(item => item.content)
   const [selectedId, setSelectedId] = useState(firstItem ? firstItem.id : null)
 
   // Select item

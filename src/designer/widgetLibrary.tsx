@@ -5,11 +5,12 @@ import { Schema, DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
 import produce from "immer";
 import BlockFactory from "../widgets/BlockFactory";
-import { CreateBlock } from "../widgets/blocks";
 import * as _ from "lodash";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import { Database } from "../database/Database";
+import { useState, useRef, useEffect } from "react";
+import { SearchControl } from "../widgets/blocks/search/SearchBlockInstance";
 
 /** All widgets in current project */
 export interface WidgetLibrary {
@@ -31,7 +32,8 @@ interface Props {
 }
 
 interface State {
-  activeTabIndex: number     // Index of active tab. Can be one past end for new tab
+  /** Index of active tab. Can be one past end for new tab */
+  activeTabIndex: number     
 }
 
 /** Design mode for a library of widgets */
@@ -72,8 +74,9 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     this.props.onWidgetLibraryChange(widgetLibrary)
   }
 
+  handleCloseTab = (index: number, ev: React.MouseEvent) => {
+    ev.stopPropagation()
 
-  handleCloseTab = (index: number) => {
     const openTabs = this.props.openTabs.slice()
     openTabs.splice(index, 1)
     this.props.onOpenTabsChange(openTabs)
@@ -109,7 +112,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
         <a onClick={this.handleSelectTab.bind(null, index)}>
           {widgetDef.name}
           &nbsp;
-          { (index === this.state.activeTabIndex) ? <i onClick={this.handleCloseTab.bind(null, index)} className="fa fa-remove text-muted"/> : null }
+          <i onClick={this.handleCloseTab.bind(null, index)} className="fa fa-remove text-muted"/>
         </a>
       </li>
     )
@@ -124,7 +127,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
         return null
       }
 
-      return <WidgetTab
+      return <WidgetDesigner
         key={widgetDef.id}
         widgetDef={widgetDef}
         createBlock={this.props.blockFactory.createBlock}
@@ -135,6 +138,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
         widgetLibrary={this.props.widgetLibrary}
         blockPaletteEntries={this.props.blockPaletteEntries}
         onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
+        locale="en"
       />
     }
     else {
@@ -167,46 +171,28 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 }
 
-class WidgetTab extends React.Component<{
-    widgetDef: WidgetDef
-    createBlock: CreateBlock
-    database: Database
-    schema: Schema
-    dataSource: DataSource
-    actionLibrary: ActionLibrary
-    widgetLibrary: WidgetLibrary
-    blockPaletteEntries: BlockPaletteEntry[]
-    onWidgetDefChange(widgetDef: WidgetDef): void
-  }> {
-
-  render() {
-    return <WidgetDesigner 
-      widgetDef={this.props.widgetDef}
-      createBlock={this.props.createBlock}
-      schema={this.props.schema}
-      dataSource={this.props.dataSource}
-      database={this.props.database}
-      actionLibrary={this.props.actionLibrary}
-      widgetLibrary={this.props.widgetLibrary}
-      onWidgetDefChange={this.props.onWidgetDefChange}
-      blockPaletteEntries={this.props.blockPaletteEntries}
-      locale="en"
-    />
-  }
-}
-
 /** Tab which lists existing tabs and offers a button to create a new tab */
-class NewTab extends React.Component<{  
+const NewTab = (props: {  
   widgetLibrary: WidgetLibrary
   onAddWidget: (widgetDef: WidgetDef) => void,
   onOpenWidget: (widgetId: string) => void, 
   onRemoveWidget: (widgetId: string) => void, 
   onDuplicateWidget: (widgetDef: WidgetDef) => void, 
-}> {
+}) => {
+
+  const [search, setSearch] = useState("")
+
+  // Focus on load
+  const searchControl = useRef<SearchControl>(null)
+  useEffect(() => { 
+    if (searchControl.current) {
+      searchControl.current.focus()
+    }
+  }, [])
 
   /** Add a new blank widget */
-  handleAdd = () => {
-    this.props.onAddWidget({
+  const handleAdd = () => {
+    props.onAddWidget({
       id: uuid(),
       name: "Untitled",
       description: "",
@@ -216,22 +202,31 @@ class NewTab extends React.Component<{
     })
   }
 
-  handleDuplicateWidget = (widgetDef: WidgetDef, ev: React.MouseEvent) => {
+  const handleDuplicateWidget = (widgetDef: WidgetDef, ev: React.MouseEvent) => {
     ev.stopPropagation()
-    this.props.onDuplicateWidget(widgetDef)
+    props.onDuplicateWidget(widgetDef)
   }
 
-  renderExistingWidgets() {
-    const widgets: WidgetDef[] = _.sortBy(Object.values(this.props.widgetLibrary.widgets), "name")
+  const handleRemoveWidget = (widgetId: string, ev: React.MouseEvent) => {
+    ev.stopPropagation()
+    props.onRemoveWidget(widgetId)
+  }
+
+  const renderExistingWidgets = () => {
+    var widgets: WidgetDef[] = _.sortBy(Object.values(props.widgetLibrary.widgets), "name")
+
+    widgets = widgets.filter(widget => {
+      return search ? widget.name.toLowerCase().includes(search.toLowerCase()) : true
+    })
 
     return (
       <ul className="list-group">
         { widgets.map(widget => (
-          <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={this.props.onOpenWidget.bind(null, widget.id)}>
-            <span style={{ float: "right" }} onClick={this.props.onRemoveWidget.bind(null, widget.id)}>
+          <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={props.onOpenWidget.bind(null, widget.id)}>
+            <span style={{ float: "right" }} onClick={handleRemoveWidget.bind(null, widget.id)}>
               <i className="fa fa-fw fa-remove"/>
             </span>
-            <span style={{ float: "right" }} onClick={this.handleDuplicateWidget.bind(null, widget)}>
+            <span style={{ float: "right" }} onClick={handleDuplicateWidget.bind(null, widget)}>
               <i className="fa fa-fw fa-files-o"/>
             </span>
             {widget.name}
@@ -241,14 +236,15 @@ class NewTab extends React.Component<{
     )
   }
 
-  render() {
-    return (
-      <div>
-        {this.renderExistingWidgets()}
-        <button type="button" className="btn btn-primary" onClick={this.handleAdd}>
-          <i className="fa fa-plus"/> New Widget
-        </button>
+  return (
+    <div>
+      <div style={{ paddingBottom: 10 }}>
+        <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
       </div>
-    )
-  }
+      {renderExistingWidgets()}
+      <button type="button" className="btn btn-primary" onClick={handleAdd}>
+        <i className="fa fa-plus"/> New Widget
+      </button>
+    </div>
+  )
 }

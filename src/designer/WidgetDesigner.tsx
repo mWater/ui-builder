@@ -17,9 +17,11 @@ import ErrorBoundary from "./ErrorBoundary";
 import FillDownwardComponent from "react-library/lib/FillDownwardComponent";
 import VirtualDatabase from "../database/VirtualDatabase";
 import AddWizardPalette from "./AddWizardPalette"
+import ClipboardPalette from "./ClipboardPalette"
 
 interface WidgetDesignerProps {
   widgetDef: WidgetDef
+  onWidgetDefChange(widgetDef: WidgetDef): void
   createBlock: CreateBlock
   database: Database
   schema: Schema
@@ -28,7 +30,6 @@ interface WidgetDesignerProps {
   locale: string
   widgetLibrary: WidgetLibrary
   blockPaletteEntries: BlockPaletteEntry[]
-  onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
 enum Mode { Design, Preview }
@@ -325,6 +326,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
           <div className="widget-designer-header">
             <AddWizardPalette onSelect={this.handleSelect}/>
             <div style={{float: "right"}}>
+              <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.createBlock}/>
               <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
                 <i className="fa fa-undo"/> Undo              
               </button>
