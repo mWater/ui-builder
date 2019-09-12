@@ -1,5 +1,6 @@
-import { JsonQL, Schema, Row, Variable } from "mwater-expressions";
+import { Schema, Row, Variable } from "mwater-expressions";
 import { QueryOptions } from "./Database";
+import { JsonQL } from "jsonql";
 export declare class QueryCompiler {
     schema: Schema;
     variables: Variable[];

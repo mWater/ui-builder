@@ -31,7 +31,10 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
   renderDesign(props: RenderDesignProps) {
     const handleSet = (newBlockDef: BlockDef | null) => {
       if (newBlockDef) {
-        props.store.alterBlock(this.blockDef.id, (bd) => duplicateBlockDef(newBlockDef, this.createBlock))
+        // Duplicate but keep top level id so that selected
+        const duplicatedBlockDef = duplicateBlockDef(newBlockDef, this.createBlock)
+        duplicatedBlockDef.id = newBlockDef.id
+        props.store.alterBlock(this.blockDef.id, (bd) => duplicatedBlockDef)
       }
       else {
         props.store.alterBlock(this.blockDef.id, (bd) => null)
