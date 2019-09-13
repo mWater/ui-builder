@@ -200,7 +200,7 @@ class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void
       <div className="normal-page">
         <div key="header" className="normal-page-header">
           { !this.props.isFirst ?
-            <i className="fa fa-arrow-left" onClick={this.props.onClose} />
+            <i className="fa fa-chevron-left" onClick={this.props.onClose} />
           : null }
         </div>
         <div key="contents" className="normal-page-contents">

@@ -1,12 +1,21 @@
+.normal-page {
+  padding: 10px;
+  position: relative;
+}
+
 .normal-page-header {
-  /* height: 35px; */
-  /* border-bottom: solid 1px #CCC; */
-  padding: 3px;
-  font-size: 20px;
-  padding-left: 8px;
-  color: #337AB7;
+  position: absolute;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 17px;
+  left: -1px;
+  top: 8px;
+  color: #AAA;
+}
+
+.normal-page-header:hover {
+  color: #3378b7;
 }
 
 .normal-page-contents {
-  padding: 5px;
 }
