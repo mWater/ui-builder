@@ -212,8 +212,11 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   render() {
     const riProps = this.props.renderInstanceProps
 
+    const style: React.CSSProperties = {
+      marginTop: 5
+    }
+
     // Fade if refreshing
-    const style: React.CSSProperties = {}
     if (this.state.refreshing) {
       style.opacity = 0.6
     }
