@@ -47,11 +47,11 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, (draft: FixedTableBlockDef) => {
       // For each row
-      for (const row of draft.rows) {
-        for (const cell of row.cells) {
-          cell.content = action(cell.content)
-        }
-      }
+      this.blockDef.rows.forEach((row, rowIndex) => {
+        row.cells.forEach((cell, cellIndex) => {
+          draft.rows[rowIndex].cells[cellIndex].content = action(cell.content)
+        })
+      })
     })
   }
 

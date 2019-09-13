@@ -23,9 +23,11 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
   validate() { return null }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
+    const label = action(this.blockDef.label)
+    const content = action(this.blockDef.content)
     return produce(this.blockDef, draft => {
-      draft.label = action(draft.label)
-      draft.content = action(draft.content)
+      draft.label = label
+      draft.content = content
     })
   }
 

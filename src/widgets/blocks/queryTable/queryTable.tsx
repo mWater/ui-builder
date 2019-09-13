@@ -81,9 +81,12 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
+    const headers = this.blockDef.headers.map(b => action(b))
+    const contents = this.blockDef.contents.map(b => action(b))
+
     return produce(this.blockDef, draft => {
-      draft.headers = draft.headers.map(b => action(b))
-      draft.contents = draft.contents.map(b => action(b))
+      draft.headers = headers
+      draft.contents = contents
     })
   }
 

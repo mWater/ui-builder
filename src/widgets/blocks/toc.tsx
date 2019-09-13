@@ -70,15 +70,21 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
   validate() { return null }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
+    // Prevent recursive immer use
+
+    // For header and footer
+    const header = action(this.blockDef.header)
+    const footer = action(this.blockDef.footer)
+    const flatItemContents = iterateItems(this.blockDef.items).map(item => action(item.content))
+
     return produce(this.blockDef, (draft: TOCBlockDef) => {
-      // For header and footer
-      draft.header = action(draft.header)
-      draft.footer = action(draft.footer)
+      draft.header = header
+      draft.footer = footer
 
       // For each item (in flattened list)
-      for (const item of iterateItems(draft.items)) {
-        item.content = action(item.content)
-      }
+      iterateItems(draft.items).forEach((item, index) => {
+        item.content = flatItemContents[index]
+      })
     })
   }
 

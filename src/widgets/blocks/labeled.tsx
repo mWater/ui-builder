@@ -20,8 +20,9 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
   validate() { return null }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
+    const child = action(this.blockDef.child)
     return produce(this.blockDef, draft => {
-      draft.child = action(draft.child)
+      draft.child = child
     })
   }
 

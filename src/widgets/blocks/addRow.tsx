@@ -102,8 +102,9 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
+    const content = action(this.blockDef.content)
     return produce(this.blockDef, draft => {
-      draft.content = action(draft.content)
+      draft.content = content
     })
   }
 
