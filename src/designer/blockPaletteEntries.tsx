@@ -2,6 +2,7 @@ import { BlockDef, ContextVar } from "../widgets/blocks";
 import uuid from "uuid/v4"
 import React from "react";
 import { QueryTableBlockDef } from "src/widgets/blocks/queryTable/queryTable";
+import { TextBlockDef } from "src/widgets/blocks/text";
 
 export interface BlockPaletteEntry {
   title: string
@@ -14,6 +15,15 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Text",
     blockDef: { id: "", type: "text", text: { _base: "en", en: "" }, style: "div" },
+  },
+  {
+    title: "Header",
+    blockDef: { id: "", type: "header", child: {
+      type: "text",
+      id: "",
+      style: "h4",
+      text: { _base: "en", en: "Header"}
+    } as TextBlockDef},
   },
   {
     title: "Labeled Section",

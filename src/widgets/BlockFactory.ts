@@ -24,6 +24,7 @@ import { FixedTableBlock, FixedTableBlockDef } from './blocks/fixedTable';
 import { TOCBlock, TOCBlockDef } from './blocks/toc';
 import { AddWizardBlockDef, AddWizardBlock } from './blocks/addWizard';
 import { NumberboxBlockDef, NumberboxBlock } from './blocks/controls/numberbox';
+import { HeaderBlock, HeaderBlockDef } from './blocks/header';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -86,6 +87,8 @@ export default class BlockFactory {
         return new DatefieldBlock(blockDef as DatefieldBlockDef)
       case "toc":
         return new TOCBlock(blockDef as TOCBlockDef, this.createBlock)
+      case "header":
+        return new HeaderBlock(blockDef as HeaderBlockDef, this.createBlock)
     }
 
     // Use custom blocks
