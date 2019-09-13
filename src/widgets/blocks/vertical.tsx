@@ -58,7 +58,7 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
 
   renderInstance(props: RenderInstanceProps) {
     return (
-      <div style={{ paddingLeft: 5, paddingRight: 5 }}>
+      <div>
         { this.blockDef.items.map((childBlockDef, index) => {
           const childElem = props.renderChildBlock(props, childBlockDef)
           return childElem ? React.cloneElement(childElem, { key: index }) : null
