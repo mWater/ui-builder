@@ -31,9 +31,12 @@ export class TabbedBlock extends CompoundBlock<TabbedBlockDef> {
   validate() { return null }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
+    // Immer bug requires that producers not be nested
+    const tabContents = this.blockDef.tabs.map(t => action(t.content))
+
     return produce(this.blockDef, draft => {
-      for (const tab of draft.tabs) {
-        tab.content = action(tab.content)
+      for (var i = 0 ; i < tabContents.length ; i++ ) {
+        draft.tabs[i].content = tabContents[i]
       }
     })
   }
