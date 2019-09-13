@@ -1,6 +1,7 @@
 import { BlockDef, ContextVar } from "../widgets/blocks";
 import uuid from "uuid/v4"
 import React from "react";
+import { QueryTableBlockDef } from "src/widgets/blocks/queryTable/queryTable";
 
 export interface BlockPaletteEntry {
   title: string
@@ -56,16 +57,23 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Query Table",
-    blockDef: {
-      id: "",
-      mode: "singleRow",
-      type: "queryTable",
-      headers: [
-        { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },
-        { id: "h2", type: "text", text: { _base: "en", en: "Header 2" }, style: "div" }
-      ],
-      contents: [null, null],
-      limit: 100
+    blockDef: (contextVars: ContextVar[]) => {
+      const rowsetCV = contextVars.find(cv => cv.type == "rowset")
+      return {
+        id: "",
+        mode: "singleRow",
+        type: "queryTable",
+        headers: [
+          { id: "h1", type: "text", text: { _base: "en", en: "Header 1" }, style: "div" },
+          { id: "h2", type: "text", text: { _base: "en", en: "Header 2" }, style: "div" }
+        ],
+        contents: [null, null],
+        where: null,
+        rowClickAction: null,
+        orderBy: null,
+        rowsetContextVarId: rowsetCV ? rowsetCV.id : null,
+        limit: 100
+      } as QueryTableBlockDef
     }
   },
   {

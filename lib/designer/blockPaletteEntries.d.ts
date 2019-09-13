@@ -1,8 +1,8 @@
-import { BlockDef } from "../widgets/blocks";
+import { BlockDef, ContextVar } from "../widgets/blocks";
 import React from "react";
 export interface BlockPaletteEntry {
     title: string;
-    blockDef: BlockDef;
+    blockDef: BlockDef | ((contextVars: ContextVar[]) => BlockDef);
     /** Element to display instead of design view */
     elem?: React.ReactElement<any>;
 }

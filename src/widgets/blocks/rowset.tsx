@@ -8,6 +8,7 @@ import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
+import { localize } from '../localization';
 
 /** Block which creates a new rowset context variable */
 export interface RowsetBlockDef extends BlockDef {
@@ -48,10 +49,6 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
 
     if (!this.blockDef.table) {
       return "Missing table"
-    }
-
-    if (!this.blockDef.content) {
-      return "Content required"
     }
 
     // Validate where
@@ -113,7 +110,7 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
           }
           return (
             <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { props.renderChildBlock(renderInstanceProps, this.blockDef.content!) }
+              { props.renderChildBlock(renderInstanceProps, this.blockDef.content) }
             </div>
           )
         }}
@@ -121,15 +118,19 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
   }
 
   renderEditor(props: RenderEditorProps) {
+    const handleTableChange = (tableId: string) => {
+      const table = props.schema.getTable(tableId)!
+      props.onChange(produce(this.blockDef, (bd) => {
+        bd.table = tableId
+        bd.name = bd.name || ("List of " + localize(table.name))
+      }))
+    }
+
     return (
       <div>
         <h3>Rowset</h3>
         <LabeledProperty label="Table">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="table">
-            {(value, onChange) => 
-              <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange}/>
-            }
-          </PropertyEditor>
+          <TableSelect schema={props.schema} locale={props.locale} value={this.blockDef.table || null} onChange={handleTableChange}/>
         </LabeledProperty>
         <LabeledProperty label="Name">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="name">
