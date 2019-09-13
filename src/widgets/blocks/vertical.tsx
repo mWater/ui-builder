@@ -19,16 +19,15 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     // Apply action to all children, discarding null ones
-    return produce(this.blockDef, draft => {
-      const newItems: BlockDef[] = []
-      for (const item of draft.items) {
-        const newItem = action(item)
-        if (newItem) {
-          newItems.push(newItem)
-        }
+    const newItems: BlockDef[] = []
+    for (const item of this.blockDef.items) {
+      const newItem = action(item)
+      if (newItem) {
+        newItems.push(newItem)
       }
-      draft.items = newItems
-    })
+    }
+
+    return produce(this.blockDef, draft => { draft.items = newItems })
   }
 
   canonicalize(): BlockDef | null {
