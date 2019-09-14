@@ -10,7 +10,7 @@ import { LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
 import produce from 'immer';
 
-// Block which contains a widget
+/** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
   widgetId: string | null   // Id of the widget
   contextVarMap: { [internalContextVarId: string]: string }  // Maps each internal widgets' context variable id to an external one

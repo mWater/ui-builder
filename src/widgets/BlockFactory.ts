@@ -21,10 +21,10 @@ import { AddRowBlock, AddRowBlockDef } from './blocks/addRow';
 import { DatefieldBlock, DatefieldBlockDef } from './blocks/controls/datefield';
 import { ConditionalBlock, ConditionalBlockDef } from './blocks/conditional';
 import { FixedTableBlock, FixedTableBlockDef } from './blocks/fixedTable';
-import { TOCBlock, TOCBlockDef } from './blocks/toc';
 import { AddWizardBlockDef, AddWizardBlock } from './blocks/addWizard';
 import { NumberboxBlockDef, NumberboxBlock } from './blocks/controls/numberbox';
 import { HeaderBlock, HeaderBlockDef } from './blocks/header';
+import { TOCBlock, TOCBlockDef } from './blocks/toc/toc';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }

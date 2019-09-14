@@ -4,6 +4,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, Filter, 
 import { Expr } from 'mwater-expressions';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
+/** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
     widgetId: string | null;
     contextVarMap: {
