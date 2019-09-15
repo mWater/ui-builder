@@ -56,7 +56,7 @@ export default function TOCInstanceComp(props: {
   }
 
   const renderLeft = () => {
-    return <div>
+    return <div style={{ padding: 10 }}>
       <div key="header">{ renderProps.renderChildBlock(renderProps, blockDef.header) }</div>
       { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
       <div key="footer">{ renderProps.renderChildBlock(renderProps, blockDef.footer) }</div>
