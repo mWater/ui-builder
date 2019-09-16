@@ -133,7 +133,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     // Get action expressions too
     if (this.blockDef.rowClickAction) {
       const action = actionLibrary.createAction(this.blockDef.rowClickAction)
-      exprs = exprs.concat(action.getContextVarExprs(rowCV, widgetLibrary))
+      exprs = exprs.concat(action.getContextVarExprs(rowCV))
     }
     return exprs
   }
@@ -142,7 +142,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     // Include action expressions
     if (this.blockDef.rowClickAction) {
       const action = actionLibrary.createAction(this.blockDef.rowClickAction)
-      return action.getContextVarExprs(contextVar, widgetLibrary)
+      return action.getContextVarExprs(contextVar)
     }
 
     return [] 

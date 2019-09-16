@@ -56,5 +56,5 @@ export declare abstract class Action<T extends ActionDef> {
     /** Render an optional property editor for the action. This may use bootstrap */
     renderEditor(props: RenderActionEditorProps): React.ReactElement<any> | null;
     /** Get any context variables expressions that this action needs */
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary): Expr[];
+    getContextVarExprs(contextVar: ContextVar): Expr[];
 }

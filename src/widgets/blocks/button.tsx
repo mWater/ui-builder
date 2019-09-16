@@ -47,7 +47,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     // Include action expressions
     if (this.blockDef.actionDef) {
       const action = actionLibrary.createAction(this.blockDef.actionDef)
-      return action.getContextVarExprs(contextVar, widgetLibrary)
+      return action.getContextVarExprs(contextVar)
     }
 
     return [] 

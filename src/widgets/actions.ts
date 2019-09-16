@@ -74,5 +74,5 @@ export abstract class Action<T extends ActionDef> {
   renderEditor(props: RenderActionEditorProps): React.ReactElement<any> | null { return null }
 
   /** Get any context variables expressions that this action needs */
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary): Expr[] { return [] }
+  getContextVarExprs(contextVar: ContextVar): Expr[] { return [] }
 }
