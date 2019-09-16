@@ -21,6 +21,9 @@ export interface TOCItem {
     /** Widget to be displayed when the item is selected */
     widgetId?: string | null;
     /** Maps widgets' context variable ids to external ones */
+    contextVarMap?: {
+        [internalContextVarId: string]: string;
+    };
     /** Any children items */
     children: TOCItem[];
 }

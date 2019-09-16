@@ -33,7 +33,7 @@ export interface TOCItem {
   widgetId?: string | null
 
   /** Maps widgets' context variable ids to external ones */
-  // TODO contextVarMap?: { [internalContextVarId: string]: string }  
+  contextVarMap?: { [internalContextVarId: string]: string }
 
   /** Any children items */
   children: TOCItem[]

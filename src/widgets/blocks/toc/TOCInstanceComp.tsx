@@ -68,12 +68,25 @@ export default function TOCInstanceComp(props: {
   const selectedWidgetId = selectedItem ? selectedItem.widgetId : null
   
   const renderRight = () => {
-    if (!selectedId || !selectedWidgetId) {
+    if (!selectedId || !selectedWidgetId || !selectedItem) {
       return null
     }
 
+    // Map context var values
+    const mappedContextVarValues = {} as object
+
+    for (const innerContextVarId of Object.keys(selectedItem.contextVarMap || {})) {
+      const outerContextVarId = (selectedItem.contextVarMap || {})[innerContextVarId]
+      if (outerContextVarId) {
+        mappedContextVarValues[innerContextVarId] = renderProps.contextVarValues[outerContextVarId]
+      }
+      else {
+        mappedContextVarValues[innerContextVarId] = null
+      }
+    }
+
     const page: Page = {
-      contextVarValues: renderProps.contextVarValues,
+      contextVarValues: mappedContextVarValues,
       database: renderProps.database,
       type: "normal",
       widgetId: selectedWidgetId
@@ -98,4 +111,3 @@ export default function TOCInstanceComp(props: {
     right={renderRight()}
   />
 }
-

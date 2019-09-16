@@ -7,7 +7,7 @@ import produce from "immer"
 import uuid from "uuid"
 import { localize } from "../../localization"
 import SplitPane from "./SplitPane"
-import { LabeledProperty } from "../../propertyEditors"
+import { LabeledProperty, ContextVarPropertyEditor } from "../../propertyEditors"
 import { Select } from "react-library/lib/bootstrap"
 
 /** Designer component for TOC */
@@ -35,7 +35,8 @@ export default function TOCDesignComp(props: {
       bd.items.push({
         id: uuid(), 
         label: { _base: renderProps.locale, [renderProps.locale]: "New Item" }, 
-        children: []
+        children: [],
+        contextVarMap: {}
       })
     }))
   }
@@ -149,14 +150,68 @@ export default function TOCDesignComp(props: {
     })
   }
 
+  const handleContextVarMapChange = (contextVarMap: { [internalContextVarId: string]: string }) => {
+    alterBlockItems((draft: TOCItem) => {
+      if (draft.id === selectedItem!.id) {
+        draft.contextVarMap = contextVarMap
+      }
+      return draft
+    })
+  }
+
   const renderRight = () => {
     // Create widget options 
     const widgetOptions = _.sortBy(Object.values(props.renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
+
+    const renderContextVarValues = () => {
+      if (!selectedItem!.widgetId) {
+        return null
+      }
+
+      // Find the widget
+      const widgetDef = renderProps.widgetLibrary.widgets[selectedItem!.widgetId]
+      if (!widgetDef) {
+        return null
+      }
+
+      const contextVarMap = selectedItem!.contextVarMap || {}
+
+      return (
+        <table className="table table-bordered table-condensed">
+          <tbody>
+            { widgetDef.contextVars.map(contextVar => {
+              const cv = contextVarMap[contextVar.id]
+              const handleCVChange = (contextVarId: string) => {
+                handleContextVarMapChange({ ...selectedItem!.contextVarMap, [contextVar.id]: contextVarId })
+              }
+
+              return (
+                <tr key={contextVar.id}>
+                  <td>{contextVar.name}</td>
+                  <td>
+                    <ContextVarPropertyEditor 
+                      contextVars={renderProps.contextVars}  
+                      types={[contextVar.type]}
+                      table={contextVar.table}
+                      value={cv}
+                      onChange={handleCVChange}
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )
+    }
 
     return (
       <div style={{ padding: 10 }}>
         <LabeledProperty label="Widget">
           <Select value={selectedWidgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
+        </LabeledProperty>
+        <LabeledProperty label="Variable Mappings">
+          {renderContextVarValues()}
         </LabeledProperty>
       </div>
     )

@@ -120,6 +120,7 @@ const AddWizardPane = (props: {
           createLabeledBlock({
             id: uuid(),
             type: "numberbox",
+            decimal: true,
             rowContextVarId: contextVar.id,
             column: column.id
           })
