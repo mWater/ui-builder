@@ -16,6 +16,7 @@ export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     renderEnum(props: RenderControlProps, column: Column): JSX.Element;
     renderEnumset(props: RenderControlProps, column: Column): JSX.Element;
     renderId(props: RenderControlProps, column: Column): JSX.Element;
+    renderIds(props: RenderControlProps, column: Column): JSX.Element;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
     renderControlEditor(props: RenderEditorProps): JSX.Element;
     /** Filter the columns that this control is for. Can't be expression */

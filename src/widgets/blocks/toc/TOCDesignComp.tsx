@@ -151,7 +151,7 @@ export default function TOCDesignComp(props: {
 
   const renderRight = () => {
     // Create widget options 
-    const widgetOptions = _.sortBy(Object.values(props.renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "name")
+    const widgetOptions = _.sortBy(Object.values(props.renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
 
     return (
       <div style={{ padding: 10 }}>

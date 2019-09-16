@@ -63,6 +63,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     if (column.type === "enumset") {
       return this.renderEnumset(props, column)
     }
+    if (column.type === "id") {
+      return this.renderId(props, column)
+    }
+    if (column.type === "id[]") {
+      return this.renderIds(props, column)
+    }
     if (column.type === "join" && column.join!.type === "n-1") {
       return this.renderId(props, column)
     }
@@ -130,14 +136,34 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     const labelExpr = exprCompiler.compileExpr({ expr: this.blockDef.idLabelExpr || null, tableAlias: "main" })
     const filterExpr = exprCompiler.compileExpr({ expr: this.blockDef.idFilterExpr || null, tableAlias: "main" })
     
+    const idTable = column.join ? column.join.toTable : column.idTable
+
     // TODO Should use a local implementation that uses database, not dataSource for data. This one will not 
     // pick up any changes in a virtual database
     return <IdLiteralComponent
       schema={props.schema}
       dataSource={props.dataSource}
-      idTable={column.join!.toTable}
+      idTable={idTable!}
       value={props.value}
       onChange={props.onChange}
+      labelExpr={labelExpr} 
+      filter={filterExpr} />
+  }
+
+  renderIds(props: RenderControlProps, column: Column) {
+    const exprCompiler = new ExprCompiler(props.schema)
+    const labelExpr = exprCompiler.compileExpr({ expr: this.blockDef.idLabelExpr || null, tableAlias: "main" })
+    const filterExpr = exprCompiler.compileExpr({ expr: this.blockDef.idFilterExpr || null, tableAlias: "main" })
+    
+    // TODO Should use a local implementation that uses database, not dataSource for data. This one will not 
+    // pick up any changes in a virtual database
+    return <IdLiteralComponent
+      schema={props.schema}
+      dataSource={props.dataSource}
+      idTable={column.idTable!}
+      value={props.value}
+      onChange={props.onChange}
+      multi={true}
       labelExpr={labelExpr} 
       filter={filterExpr} />
   }
@@ -197,6 +223,10 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return false
     }
 
-    return column.type === "enum" || column.type === "enumset" || (column.type === "join" && column.join!.type === "n-1")
+    return column.type === "enum" 
+      || column.type === "enumset" 
+      || column.type === "id" 
+      || column.type === "id[]" 
+      || (column.type === "join" && column.join!.type === "n-1")
   }
 }
