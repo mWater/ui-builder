@@ -341,6 +341,9 @@ export default class VirtualDatabase implements Database {
 
   /** Apply all known mutations to a set of rows */
   private async mutateRows(rows: Row[], from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
+    const variables = createExprVariables(contextVars)
+    const variableValues = contextVarValues
+
     // Copy rows to be mutated safely
     rows = rows.slice()
 
@@ -377,7 +380,7 @@ export default class VirtualDatabase implements Database {
     if (where) {
       const filteredRows: Row[] = []
 
-      const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema))
+      const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
       for (const row of rows) {
         const evalRow = this.createEvalRow(row, from, contextVars, contextVarValues)
         if (await exprEval.evaluate(where, { row: evalRow })) {

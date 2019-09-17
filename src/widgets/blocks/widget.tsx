@@ -219,7 +219,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
   renderEditor(props: RenderEditorProps) {
     // Create widget options 
-    const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "name")
+    const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
 
     const handleWidgetIdChange = (widgetId: string | null) => {
       props.onChange({ ...this.blockDef, widgetId: widgetId, contextVarMap: {} })
