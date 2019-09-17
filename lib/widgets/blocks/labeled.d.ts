@@ -5,6 +5,8 @@ import { LocalizedString } from 'mwater-expressions';
 export interface LabeledBlockDef extends BlockDef {
     type: "labeled";
     label: LocalizedString | null;
+    /** Optional help text */
+    help?: LocalizedString | null;
     child: BlockDef | null;
 }
 export declare class LabeledBlock extends CompoundBlock<LabeledBlockDef> {

@@ -33,6 +33,11 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
         </PropertyEditor>
       </LabeledProperty>
+      <LabeledProperty label="Description">
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="description"> 
+          { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
+        </PropertyEditor>
+      </LabeledProperty>
       <LabeledProperty label="Variables">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
           { (value, onChange) => <ContextVarsEditor contextVars={value} onChange={onChange} schema={this.props.schema} /> }

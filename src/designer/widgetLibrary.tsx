@@ -230,6 +230,7 @@ const NewTab = (props: {
               <i className="fa fa-fw fa-files-o"/>
             </span>
             {widget.name}
+            { widget.description ? <span className="text-muted"> - {widget.description}</span> : null }
           </li>
         )) }
       </ul>

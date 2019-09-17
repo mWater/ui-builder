@@ -1,6 +1,6 @@
 import { LocalizedString } from "mwater-expressions";
 
-export function localize(str: LocalizedString | null, locale?: string): string {
+export function localize(str?: LocalizedString | null, locale?: string): string {
   if (!str) {
     return ""
   }
