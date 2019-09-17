@@ -18,11 +18,11 @@ export interface DropdownBlockDef extends ControlBlockDef {
   /** Filter expression for entries of type id */
   idFilterExpr?: Expr
 
-  /** Enum values to include (if present, only include them) */
-  includeEnumValues?: string[]
+  /** Values to include (if present, only include them) */
+  includeValues?: any[]
 
-  /** Enum values to exclude (if present, exclude them) */
-  excludeEnumValues?: string[]
+  /** Values to exclude (if present, exclude them) */
+  excludeValues?: any[]
 }
 
 export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
@@ -85,11 +85,11 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     var enumValues = column.enumValues!
 
     // Handle include/exclude
-    if (this.blockDef.includeEnumValues && this.blockDef.includeEnumValues.length > 0) {
-      enumValues = enumValues.filter(ev => this.blockDef.includeEnumValues!.includes(ev.id))
+    if (this.blockDef.includeValues && this.blockDef.includeValues.length > 0) {
+      enumValues = enumValues.filter(ev => this.blockDef.includeValues!.includes(ev.id))
     }
-    if (this.blockDef.excludeEnumValues && this.blockDef.excludeEnumValues.length > 0) {
-      enumValues = enumValues.filter(ev => !this.blockDef.excludeEnumValues!.includes(ev.id))
+    if (this.blockDef.excludeValues && this.blockDef.excludeValues.length > 0) {
+      enumValues = enumValues.filter(ev => !this.blockDef.excludeValues!.includes(ev.id))
     }
 
     // Lookup enumvalue
@@ -119,11 +119,11 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     var enumValues = column.enumValues!
 
     // Handle include/exclude
-    if (this.blockDef.includeEnumValues && this.blockDef.includeEnumValues.length > 0) {
-      enumValues = enumValues.filter(ev => this.blockDef.includeEnumValues!.includes(ev.id))
+    if (this.blockDef.includeValues && this.blockDef.includeValues.length > 0) {
+      enumValues = enumValues.filter(ev => this.blockDef.includeValues!.includes(ev.id))
     }
-    if (this.blockDef.excludeEnumValues && this.blockDef.excludeEnumValues.length > 0) {
-      enumValues = enumValues.filter(ev => !this.blockDef.excludeEnumValues!.includes(ev.id))
+    if (this.blockDef.excludeValues && this.blockDef.excludeValues.length > 0) {
+      enumValues = enumValues.filter(ev => !this.blockDef.excludeValues!.includes(ev.id))
     }
 
     // Map value to array
@@ -239,7 +239,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
           <LabeledProperty label="Include Values">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="includeEnumValues">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="includeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
                 onChange={onChange} 
@@ -251,7 +251,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
           <LabeledProperty label="Exclude Values">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="excludeEnumValues">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="excludeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
                 onChange={onChange} 

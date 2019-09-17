@@ -9,10 +9,10 @@ export interface DropdownBlockDef extends ControlBlockDef {
     idLabelExpr?: Expr;
     /** Filter expression for entries of type id */
     idFilterExpr?: Expr;
-    /** Enum values to include (if present, only include them) */
-    includeEnumValues?: string[];
-    /** Enum values to exclude (if present, exclude them) */
-    excludeEnumValues?: string[];
+    /** Values to include (if present, only include them) */
+    includeValues?: any[];
+    /** Values to exclude (if present, exclude them) */
+    excludeValues?: any[];
 }
 export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
