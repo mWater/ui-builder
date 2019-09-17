@@ -1,6 +1,6 @@
 import { TOCBlockDef, iterateItems, TOCItem } from "./toc"
 import { RenderInstanceProps, CreateBlock } from '../../blocks'
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { localize } from '../../localization'
 import SplitPane from "./SplitPane"
 import React from "react"
@@ -15,12 +15,32 @@ export default function TOCInstanceComp(props: {
 }) {
   const { blockDef, renderProps } = props
 
+  // Ref to page stack to ensure closed properly
+  const pageStackRef = useRef<PageStackDisplay>(null)
+
   // Select first item with widget by default
   const firstItem = iterateItems(blockDef.items).find(item => item.widgetId)
   const [selectedId, setSelectedId] = useState(firstItem ? firstItem.id : null)
 
   // Select item
   const handleItemClick = (item: TOCItem) => { 
+    // Do nothing if same id
+    if (item.id == selectedId) {
+      return
+    }
+
+    // Close all pages
+    if (pageStackRef.current) {
+      var pagesLeft
+      do {
+        pagesLeft = pageStackRef.current.closePage()
+        // Abort if can't close page
+        if (pagesLeft == null) {
+          return
+        }
+      } while (pagesLeft > 0)
+    }
+
     // Only allow selecting with content
     if (item.widgetId) {
       setSelectedId(item.id) 
@@ -102,6 +122,7 @@ export default function TOCInstanceComp(props: {
       locale={renderProps.locale}
       widgetLibrary={renderProps.widgetLibrary}
       initialPage={page}
+      ref={pageStackRef}
       />
   }
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Page, PageStack } from "./PageStack";
-import { CreateBlock, RenderInstanceProps, Filter, BlockDef, ValidatableInstance } from "./widgets/blocks";
+import { CreateBlock, RenderInstanceProps, Filter, BlockDef } from "./widgets/blocks";
 import { Schema, Expr, DataSource } from "mwater-expressions";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
@@ -8,6 +8,7 @@ import { ActionLibrary } from "./widgets/ActionLibrary";
 import { WidgetLibrary } from "./designer/widgetLibrary";
 
 import './PageStackDisplay.css'
+import uuid = require("uuid");
 
 interface Props {
   initialPage: Page
@@ -25,8 +26,10 @@ interface State {
 
 /** Maintains and displays the stack of pages, including modals.  */
 export class PageStackDisplay extends React.Component<Props, State> implements PageStack {
-  /** Keyed by <page index>:<block id>:<block instance> */
-  instanceRefs: { [key: string]: React.Component<any> & ValidatableInstance }
+  /** Stores validation registrations for all sub-components so that they can be validated
+   * before being saved. Contains pageIndex as well to allow validating a single page
+   */
+  validationRegistrations: { [key: string]: { pageIndex: number, validate: (() => string | null) } }
 
   constructor(props: Props) {
     super(props)
@@ -36,29 +39,31 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       pages: [props.initialPage]
     }
 
-    this.instanceRefs = {}
+    this.validationRegistrations = {}
   }
 
   openPage(page: Page): void {
     this.setState({ pages: this.state.pages.concat(page) })
   }
 
-  closePage(): void {
+  closePage(): number | null {
+    if (this.state.pages.length == 0) {
+      throw new Error("Zero pages in stack")
+    }
+
     // Validate all instances within page
     const pageIndex = this.state.pages.length - 1
     const validationMessages: string[] = []
 
-    for (const key of Object.keys(this.instanceRefs)) {
-      if (!key.startsWith(pageIndex + ":")) {
+    for (const key of Object.keys(this.validationRegistrations)) {
+      const value = this.validationRegistrations[key]!
+      if (value.pageIndex != pageIndex) {
         continue
       }
 
-      const component = this.instanceRefs[key]
-      if (component.validate) {
-        const msg = component.validate()
-        if (msg != null) {
-          validationMessages.push(msg)
-        }
+      const msg = value.validate()
+      if (msg != null) {
+        validationMessages.push(msg)
       }
     }
 
@@ -67,42 +72,35 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       if (_.compact(validationMessages).length > 0) {
         alert(_.compact(validationMessages).join("\n"))
       }
-      return
+      return null
     }
 
     const pages = this.state.pages.slice()
     pages.splice(pages.length - 1, 1)
     this.setState({ pages })
+    return pages.length
   }
 
-  refHandler = (key: string, component: React.Component<any> | null) => {
-    if (component) {
-      this.instanceRefs[key] = component
-    }
-    else {
-      delete this.instanceRefs[key]
-    }
-  }
-
-  renderChildBlock = (page: Page, pageIndex: number, props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string) => {
+  renderChildBlock = (props: RenderInstanceProps, childBlockDef: BlockDef | null) => {
     // Create block
     if (childBlockDef) {
       const block = this.props.createBlock(childBlockDef)
-
-      const elem = block.renderInstance(props)
-  
-      // Add ref to element
-      const key = instanceId ? pageIndex + ":" + childBlockDef.id + ":" + instanceId : pageIndex + ":" +childBlockDef.id
-      const refedElem = React.cloneElement(elem, { ...elem.props, ref: this.refHandler.bind(null, key) })
-      return refedElem
+      return block.renderInstance(props)
     }
-    else {
-      return null
-    }
+    return null
   }
 
   handleClose = () => {
     this.closePage()
+  }
+
+  /** Stores the registration for validation of a child block and returns an unregister function */
+  registerChildForValidation = (pageIndex: number, validate: () => string | null): (() => void) => {
+    const key = uuid()
+    this.validationRegistrations[key] = { pageIndex: pageIndex, validate: validate }
+    return () => {
+      delete this.validationRegistrations[key]
+    }
   }
 
   renderPageContents(page: Page, pageIndex: number) {
@@ -133,7 +131,8 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       onSelectContextVar: (contextVarId: string, primaryKey: any) => { throw new Error("Non-existant context variable") },
       setFilter: (contextVarId: string, filter: Filter) => { throw new Error("Non-existant context variable") },
       getFilters: (contextVarId: string) => { throw new Error("Non-existant context variable") },
-      renderChildBlock: this.renderChildBlock.bind(null, page, pageIndex)
+      renderChildBlock: this.renderChildBlock,
+      registerForValidation: this.registerChildForValidation.bind(null, pageIndex)
     }
 
     // Wrap in context var injector
@@ -151,7 +150,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
           }
           return (
             <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { this.renderChildBlock(page, pageIndex, innerRenderInstanceProps, widgetDef.blockDef) }
+              { this.renderChildBlock(innerRenderInstanceProps, widgetDef.blockDef) }
             </div>
           )
         }}

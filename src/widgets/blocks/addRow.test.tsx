@@ -42,7 +42,8 @@ beforeEach(() => {
      }
      return <div/>
    },
-   widgetLibrary: { widgets: {} }
+   widgetLibrary: { widgets: {} },
+   registerForValidation: () => { return () => {} }
  }
 })
 

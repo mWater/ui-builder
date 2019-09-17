@@ -79,11 +79,13 @@ export interface RenderInstanceProps {
   /** Get any filters set on a rowset context variable  */
   getFilters(contextVarId: string): Filter[]
 
-  /** All sub-block elements must rendered using this function. 
-   * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string 
-   * per instance 
+  /** All sub-block elements must rendered using this function. */
+  renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null): React.ReactElement<any> | null
+
+  /** Registers an instance for validation. Returns a function which must be called to unregister when the instance goes away.
+   * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show
    */
-  renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string): React.ReactElement<any> | null
+  registerForValidation(validate: () => string | null): (() => void)
 }
 
 export interface RenderDesignProps {
@@ -193,12 +195,6 @@ export abstract class Block<T extends BlockDef> {
   canonicalize(): BlockDef | null {
     return this.blockDef
   }
-}
-
-/** Implemented by rendered block instances that require validation */
-export interface ValidatableInstance {
-  /** Validate the instance. Returns null if correct, message if not. Empty message ("") blocks but does not show */
-  validate?(): string | null
 }
 
 // Handles logic of a simple dropping of a block on another

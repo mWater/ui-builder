@@ -34,6 +34,7 @@ beforeEach(() => {
     setFilter: jest.fn(),
     getFilters: jest.fn(),
     renderChildBlock: jest.fn(),
+    registerForValidation: () => () => {}
   }  
 })
 

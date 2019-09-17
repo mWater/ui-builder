@@ -21,5 +21,6 @@ export interface Page {
 export interface PageStack {
   openPage(page: Page): void
 
-  closePage(): void
+  /** Returns number of pages left in stack if succeeded or null if failed */
+  closePage(): number | null
 }

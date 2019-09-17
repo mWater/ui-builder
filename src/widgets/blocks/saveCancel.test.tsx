@@ -42,14 +42,15 @@ beforeEach(() => {
    onSelectContextVar: jest.fn(),
    schema: schema,
    dataSource: {} as DataSource,
-   renderChildBlock: (props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string) => {
+   renderChildBlock: (props: RenderInstanceProps, childBlockDef: BlockDef | null) => {
      if (childBlockDef) {
        const childBlock = createBlock(childBlockDef)
        return childBlock.renderInstance(props)
      }
      return <div/>
    },
-   widgetLibrary: { widgets: {} }
+   widgetLibrary: { widgets: {} },
+   registerForValidation: () => { return () => {} }
  }
 
  alertMessages = []

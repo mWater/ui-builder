@@ -131,7 +131,8 @@ describe("renderInstance", () => {
       onSelectContextVar: jest.fn(),
       setFilter: jest.fn(),
       getFilters: jest.fn(),
-      renderChildBlock: jest.fn()
+      renderChildBlock: jest.fn(),
+      registerForValidation: () => { return () => {} }      
     }
     widgetBlock.renderInstance(renderInstanceProps)
 

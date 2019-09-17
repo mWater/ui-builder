@@ -63,11 +63,12 @@ export interface RenderInstanceProps {
     setFilter(contextVarId: string, filter: Filter): void;
     /** Get any filters set on a rowset context variable  */
     getFilters(contextVarId: string): Filter[];
-    /** All sub-block elements must rendered using this function.
-     * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string
-     * per instance
+    /** All sub-block elements must rendered using this function. */
+    renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null): React.ReactElement<any> | null;
+    /** Registers an instance for validation. Returns a function which must be called to unregister when the instance goes away.
+     * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show
      */
-    renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string): React.ReactElement<any> | null;
+    registerForValidation(validate: () => string | null): (() => void);
 }
 export interface RenderDesignProps {
     /** locale to use (e.g. "en") */
@@ -140,11 +141,6 @@ export declare abstract class Block<T extends BlockDef> {
     getInitialFilters(contextVarId: string, widgetLibrary: WidgetLibrary): Filter[];
     /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children */
     canonicalize(): BlockDef | null;
-}
-/** Implemented by rendered block instances that require validation */
-export interface ValidatableInstance {
-    /** Validate the instance. Returns null if correct, message if not. Empty message ("") blocks but does not show */
-    validate?(): string | null;
 }
 export declare function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, dropSide: DropSide): BlockDef;
 /**

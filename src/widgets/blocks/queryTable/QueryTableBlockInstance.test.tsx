@@ -58,7 +58,8 @@ beforeEach(() => {
    schema: schema,
    dataSource: {} as DataSource,
    renderChildBlock: jest.fn(),
-   widgetLibrary: { widgets: {} }
+   widgetLibrary: { widgets: {} },
+   registerForValidation: () => () => {}
  }
 })
 

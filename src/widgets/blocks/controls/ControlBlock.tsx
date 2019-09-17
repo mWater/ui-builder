@@ -1,4 +1,4 @@
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar, ValidatableInstance } from "../../blocks";
+import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
@@ -166,12 +166,23 @@ interface State {
   updating: boolean
 }
 
-class ControlInstance extends React.Component<Props, State> implements ValidatableInstance {
+class ControlInstance extends React.Component<Props, State> {
+  /** Function to call to unregister validation */
+  unregisterValidation: () => void
+
   constructor(props: Props) {
     super(props)
     this.state = {
       updating: false
     }
+  }
+
+  componentDidMount() {
+    this.unregisterValidation = this.props.renderInstanceProps.registerForValidation(this.validate)
+  }
+
+  componentWillUnmount() {
+    this.unregisterValidation()
   }
 
   getValue() {

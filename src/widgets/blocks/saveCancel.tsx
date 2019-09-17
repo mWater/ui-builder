@@ -1,13 +1,14 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock, ValidatableInstance } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock } from '../blocks'
 import { localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
 import ContextVarsInjector from '../ContextVarsInjector';
 import * as _ from 'lodash'
 import { LocalizedString } from 'mwater-expressions';
+import uuid = require('uuid');
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -116,18 +117,33 @@ interface SaveCancelInstanceState {
 }
 
 /** Instance swaps out the database for a virtual database */
-class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCancelInstanceState> implements ValidatableInstance {
-  instanceRefs: { [key: string]: React.Component<any> & ValidatableInstance }
+class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCancelInstanceState> {
+  /** Stores validation registrations for all sub-components so that they can be validated
+   * before being saved. 
+   */
+  validationRegistrations: { [key: string]: (() => string | null) }
+
+  /** Function to call to unregister validation */
+  unregisterValidation: () => void
 
   constructor(props: SaveCancelInstanceProps) {
     super(props)
+
+    this.validationRegistrations = {}
+
     this.state = {
       virtualDatabase: new VirtualDatabase(props.renderInstanceProps.database, props.renderInstanceProps.schema, props.renderInstanceProps.locale), 
       destroyed: false,
       saving: false
     }
+  }
 
-    this.instanceRefs = {}
+  componentDidMount() {
+    this.unregisterValidation = this.props.renderInstanceProps.registerForValidation(this.validate)
+  }
+
+  componentWillUnmount() {
+    this.unregisterValidation()
   }
 
   validate = () => {
@@ -142,16 +158,13 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
   }
 
   handleSave = async () => {
-    // Validate all instances
+    // Validate all instances that have registered
     const validationMessages: string[] = []
 
-    for (const key of Object.keys(this.instanceRefs)) {
-      const component = this.instanceRefs[key]
-      if (component.validate) {
-        const msg = component.validate()
-        if (msg != null) {
-          validationMessages.push(msg)
-        }
+    for (const key of Object.keys(this.validationRegistrations)) {
+      const msg = this.validationRegistrations[key]()
+      if (msg != null) {
+        validationMessages.push(msg)
       }
     }
 
@@ -183,33 +196,12 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     this.props.renderInstanceProps.pageStack.closePage()
   }
 
-  refHandler = (key: string, component: React.Component<any> | null) => {
-    if (component) {
-      this.instanceRefs[key] = component
-    }
-    else {
-      delete this.instanceRefs[key]
-    }
-  }
-
-  /** All sub-block elements must rendered using this function. 
-   * @param instanceId if more than one child element with the same id will be rendered, instanceId must be a unique string 
-   * per instance 
-   */
-  renderChildBlock = (props: RenderInstanceProps, childBlockDef: BlockDef | null, instanceId?: string) => {
-    // Create block
-    if (childBlockDef) {
-      const block = this.props.createBlock(childBlockDef)
-
-      const elem = block.renderInstance(props)
-
-      // Add ref to element
-      const key = instanceId ? childBlockDef.id + ":" + instanceId : childBlockDef.id
-      const refedElem = React.cloneElement(elem, { ...elem.props, ref: this.refHandler.bind(null, key) })
-      return refedElem
-    }
-    else {
-      return null
+  /** Stores the registration for validation of a child block and returns an unregister function */
+  registerChildForValidation = (validate: () => string | null): (() => void) => {
+    const key = uuid()
+    this.validationRegistrations[key] = validate
+    return () => {
+      delete this.validationRegistrations[key]
     }
   }
 
@@ -222,8 +214,9 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     const cancelLabelText = localize(this.props.blockDef.cancelLabel, this.props.renderInstanceProps.locale)
 
     // Replace renderChildBlock with function that keeps all instances for validation
-    const renderInstanceProps = { ...this.props.renderInstanceProps, 
-      renderChildBlock: this.renderChildBlock
+    const renderInstanceProps = { 
+      ...this.props.renderInstanceProps, 
+      registerForValidation: this.registerChildForValidation 
     }
 
     // Inject new database and re-inject all context variables. This is needed to allow computed expressions
