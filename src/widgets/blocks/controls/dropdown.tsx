@@ -3,7 +3,7 @@ import { BlockDef, RenderEditorProps, ValidateBlockOptions, createExprVariables 
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, EnumValue, Expr, ExprValidator, ExprCompiler, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
+import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EnumArrayEditor } from '../../propertyEditors';
 import ReactSelect from "react-select"
 import { IdLiteralComponent, ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
 
@@ -17,6 +17,12 @@ export interface DropdownBlockDef extends ControlBlockDef {
 
   /** Filter expression for entries of type id */
   idFilterExpr?: Expr
+
+  /** Enum values to include (if present, only include them) */
+  includeEnumValues?: string[]
+
+  /** Enum values to exclude (if present, exclude them) */
+  excludeEnumValues?: string[]
 }
 
 export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
@@ -76,7 +82,17 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   }
 
   renderEnum(props: RenderControlProps, column: Column) {
-    const enumValues = column.enumValues!
+    var enumValues = column.enumValues!
+
+    // Handle include/exclude
+    if (this.blockDef.includeEnumValues && this.blockDef.includeEnumValues.length > 0) {
+      enumValues = enumValues.filter(ev => this.blockDef.includeEnumValues!.includes(ev.id))
+    }
+    if (this.blockDef.excludeEnumValues && this.blockDef.excludeEnumValues.length > 0) {
+      enumValues = enumValues.filter(ev => !this.blockDef.excludeEnumValues!.includes(ev.id))
+    }
+
+    // Lookup enumvalue
     const enumValue = enumValues.find(ev => ev.id === props.value) || null
 
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
@@ -86,7 +102,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     return <ReactSelect
       value={enumValue} 
       onChange={handleChange}
-      options={column.enumValues}
+      options={enumValues}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
@@ -100,7 +116,15 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   }
 
   renderEnumset(props: RenderControlProps, column: Column) {
-    const enumValues = column.enumValues!
+    var enumValues = column.enumValues!
+
+    // Handle include/exclude
+    if (this.blockDef.includeEnumValues && this.blockDef.includeEnumValues.length > 0) {
+      enumValues = enumValues.filter(ev => this.blockDef.includeEnumValues!.includes(ev.id))
+    }
+    if (this.blockDef.excludeEnumValues && this.blockDef.excludeEnumValues.length > 0) {
+      enumValues = enumValues.filter(ev => !this.blockDef.excludeEnumValues!.includes(ev.id))
+    }
 
     // Map value to array
     let value: EnumValue[] | null = null
@@ -117,7 +141,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     return <ReactSelect
       value={value} 
       onChange={handleChange}
-      options={column.enumValues}
+      options={enumValues}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
@@ -208,6 +232,30 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
                 schema={props.schema}
                 dataSource={props.dataSource}
                 table={column!.join!.toTable}
+                />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { column && (column.type === "enum" || column.type === "enumset") ?
+          <LabeledProperty label="Include Values">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="includeEnumValues">
+              {(value, onChange) => <EnumArrayEditor 
+                value={value} 
+                onChange={onChange} 
+                enumValues={column!.enumValues!}
+                />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { column && (column.type === "enum" || column.type === "enumset") ?
+          <LabeledProperty label="Exclude Values">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="excludeEnumValues">
+              {(value, onChange) => <EnumArrayEditor 
+                value={value} 
+                onChange={onChange} 
+                enumValues={column!.enumValues!}
                 />
               }
             </PropertyEditor>

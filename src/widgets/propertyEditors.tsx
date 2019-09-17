@@ -4,7 +4,7 @@ import { ContextVar, createExprVariables } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
-import { LocalizedString, Schema, DataSource, Expr, Table } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue } from "mwater-expressions";
 import { OrderBy, OrderByDir } from "../database/Database";
 import ListEditor from "./ListEditor";
 import { ExprComponent } from "mwater-expressions-ui";
@@ -369,4 +369,40 @@ export class TableSelect extends React.Component<{
       getOptionValue={this.getOptionValue}
     />
   }
+}
+
+/** Edits an array of enum values */
+export const EnumArrayEditor = (props: {
+  value?: string[]
+  onChange: (value: string[] | null) => void
+  enumValues: EnumValue[]
+  locale?: string
+  placeholder?: string
+}) => {
+  // Map value to array
+  let value: EnumValue[] | null = null
+  if (props.value) {
+    value = _.compact((props.value || []).map((v: any) => props.enumValues.find(ev => ev.id === v)!))
+  }
+
+  const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
+  const getOptionValue = (ev: EnumValue) => ev.id
+  const handleChange = (evs: EnumValue[] | null) => {
+    props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+  }
+
+  return <ReactSelect
+    value={value} 
+    onChange={handleChange}
+    options={props.enumValues}
+    placeholder={props.placeholder}
+    getOptionLabel={getOptionLabel}
+    getOptionValue={getOptionValue}
+    isClearable={true}
+    isMulti={true}
+    styles={{ 
+      // Keep menu above other controls
+      menu: (style) => ({ ...style, zIndex: 2000 })
+    }}
+    />
 }

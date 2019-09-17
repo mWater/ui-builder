@@ -3,7 +3,7 @@ import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
-import { LocalizedString, Schema, DataSource, Expr, Table } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
 import * as PropTypes from 'prop-types';
 export declare class LabeledProperty extends React.Component<{
@@ -142,4 +142,12 @@ export declare class TableSelect extends React.Component<{
     getOptionValue: (table: Table) => string;
     render(): JSX.Element;
 }
+/** Edits an array of enum values */
+export declare const EnumArrayEditor: (props: {
+    value?: string[] | undefined;
+    onChange: (value: string[] | null) => void;
+    enumValues: EnumValue[];
+    locale?: string | undefined;
+    placeholder?: string | undefined;
+}) => JSX.Element;
 export {};

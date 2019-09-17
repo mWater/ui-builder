@@ -87,7 +87,8 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 
   handleRemoveWidget = (widgetId: string) => {
-    if (!confirm("Permanently delete widget?")) {
+    const widget = this.props.widgetLibrary.widgets[widgetId]!
+    if (!confirm(`Permanently delete ${widget.name} widget?`)) {
       return
     }
 
