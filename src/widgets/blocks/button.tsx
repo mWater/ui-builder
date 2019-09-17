@@ -17,7 +17,8 @@ export interface ButtonBlockDef extends BlockDef {
   actionDef: ActionDef | null
 
   style: "default" | "primary" | "link"
-  size: "normal" | "small" | "large"
+  size: "normal" | "small" | "large" | "extrasmall"
+  icon?: "plus" | "times" | "pencil"
 
   /** If present, message to display when confirming action */
   confirmMessage?: LocalizedString | null
@@ -63,13 +64,20 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
       case "small":
         className += ` btn-sm`
         break
-      case "large":
+      case "extrasmall":
+        className += ` btn-xs`
+        break
+        case "large":
         className += ` btn-lg`
         break
     }
 
+    const icon = this.blockDef.icon ? <i className={`fa fa-${this.blockDef.icon}`}/> : null
+
     return (
       <button type="button" className={className} onClick={onClick} style={{ margin: 5 }}>
+        { icon }
+        { icon && label ? "\u00A0" : null }
         { label }
       </button>
     )
@@ -134,7 +142,20 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
               options={[
                 { value: "normal", label: "Default"},
                 { value: "small", label: "Small"},
+                { value: "extrasmall", label: "Extra-small"},
                 { value: "large", label: "Large"}
+            ]}/> }
+          </PropertyEditor>
+        </LabeledProperty>
+        <LabeledProperty label="Icon">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="icon">
+            {(value, onChange) => 
+            <Select value={value} onChange={onChange}
+              nullLabel="None"
+              options={[
+                { value: "plus", label: "Add"},
+                { value: "pencil", label: "Edit"},
+                { value: "times", label: "Remove"}
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>

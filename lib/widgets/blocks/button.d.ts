@@ -11,7 +11,8 @@ export interface ButtonBlockDef extends BlockDef {
     /** Action to perform when button is clicked */
     actionDef: ActionDef | null;
     style: "default" | "primary" | "link";
-    size: "normal" | "small" | "large";
+    size: "normal" | "small" | "large" | "extrasmall";
+    icon?: "plus" | "times" | "pencil";
     /** If present, message to display when confirming action */
     confirmMessage?: LocalizedString | null;
 }
