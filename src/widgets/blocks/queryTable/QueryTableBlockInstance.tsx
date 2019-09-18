@@ -83,6 +83,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     if (block.blockDef.orderBy) {
       queryOptions.orderBy = block.blockDef.orderBy
     }
+    else {
+      queryOptions.orderBy = []
+    }
+
+    // Stabilize sort order if in singleRow mode
+    if (block.blockDef.mode === "singleRow") {
+      queryOptions.orderBy.push({ expr: { type: "id", table: rowsetCV.table! }, dir: "asc" })
+    }
 
     // Add expressions
     if (block.blockDef.mode === "singleRow") {
@@ -163,8 +171,11 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       }
     }
 
+    // Use row id if possible, otherwise just the index
+    const rowKey = this.props.block.blockDef.mode == "singleRow" ? row.id : rowIndex
+
     return (
-      <tr key={rowIndex}>
+      <tr key={rowKey}>
         { this.props.block.blockDef.contents.map((b, colIndex) => {
           return (
             <td key={colIndex} onClick={handleRowClick}>

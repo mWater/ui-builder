@@ -18,7 +18,7 @@ interface Validation {
 }
 export declare class ValidationBlock extends LeafBlock<ValidationBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
-    /** Get context variable expressions needed to add */
+    /** Get context variable expressions needed */
     getContextVarExprs(contextVar: ContextVar): Expr[];
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;

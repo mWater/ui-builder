@@ -55,7 +55,7 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
     return null
   }
 
-  /** Get context variable expressions needed to add */
+  /** Get context variable expressions needed */
   getContextVarExprs(contextVar: ContextVar): Expr[] {
     return this.blockDef.validations.filter(v => v.contextVarId == contextVar.id).map(v => v.condition)
   }
@@ -180,7 +180,7 @@ const ValidationBlockInstance = (props: {
 
     const errors = getValidationErrors(props.blockDef, props.renderProps)
     if (errors.length > 0) {
-      return ""
+      return errors[0]
     }
     return null
   }
