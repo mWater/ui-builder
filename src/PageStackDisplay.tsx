@@ -46,7 +46,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     this.setState({ pages: this.state.pages.concat(page) })
   }
 
-  closePage(): number | null {
+  closePage(): boolean {
     if (this.state.pages.length == 0) {
       throw new Error("Zero pages in stack")
     }
@@ -72,13 +72,48 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       if (_.compact(validationMessages).length > 0) {
         alert(_.compact(validationMessages).join("\n"))
       }
-      return null
+      return false
     }
 
     const pages = this.state.pages.slice()
     pages.splice(pages.length - 1, 1)
     this.setState({ pages })
-    return pages.length
+    return true
+  }
+
+  closeAllPages(): boolean {
+    const pages = this.state.pages.slice()
+
+    while (pages.length > 0) {
+      // Validate all instances within page
+      const pageIndex = pages.length - 1
+      const validationMessages: string[] = []
+
+      for (const key of Object.keys(this.validationRegistrations)) {
+        const value = this.validationRegistrations[key]!
+        if (value.pageIndex != pageIndex) {
+          continue
+        }
+
+        const msg = value.validate()
+        if (msg != null) {
+          validationMessages.push(msg)
+        }
+      }
+
+      if (validationMessages.length > 0) {
+        // "" just blocks
+        if (_.compact(validationMessages).length > 0) {
+          alert(_.compact(validationMessages).join("\n"))
+        }
+        return false
+      }
+
+      pages.splice(pages.length - 1, 1)
+    }
+    
+    this.setState({ pages: [] })
+    return true
   }
 
   renderChildBlock = (props: RenderInstanceProps, childBlockDef: BlockDef | null) => {

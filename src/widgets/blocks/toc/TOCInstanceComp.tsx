@@ -31,14 +31,9 @@ export default function TOCInstanceComp(props: {
 
     // Close all pages
     if (pageStackRef.current) {
-      var pagesLeft
-      do {
-        pagesLeft = pageStackRef.current.closePage()
-        // Abort if can't close page
-        if (pagesLeft == null) {
-          return
-        }
-      } while (pagesLeft > 0)
+      if (!pageStackRef.current.closeAllPages()) {
+        return
+      }
     }
 
     // Only allow selecting with content

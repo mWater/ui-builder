@@ -21,6 +21,9 @@ export interface Page {
 export interface PageStack {
   openPage(page: Page): void
 
-  /** Returns number of pages left in stack if succeeded or null if failed */
-  closePage(): number | null
+  /** Close top page. true for success, false for failure */
+  closePage(): boolean
+
+  /** Closes all pages. true for success, false for failure */
+  closeAllPages(): boolean
 }
