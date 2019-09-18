@@ -145,5 +145,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     title: "Table of Contents",
     blockDef: { id: "", type: "toc", items: [] },
     elem: <div>Table of Contents</div>
+  },
+  {
+    title: "Validation",
+    blockDef: { id: "", type: "validation", validations: [] },
+    elem: <div className="alert alert-danger"><ul><li>Condition </li></ul></div>
   }
 ]
