@@ -1,14 +1,9 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables, CreateBlock } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
-import { ExprValidator, Schema, LiteralExpr, Expr, LocalizedString, DataSource } from 'mwater-expressions';
-import ContextVarsInjector from '../ContextVarsInjector';
-import { TextInput } from 'react-library/lib/bootstrap';
-import { PropertyEditor, LabeledProperty, TableSelect, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
-import { ColumnValuesEditor, ContextVarExpr } from '../columnValues';
-import { Database } from '../../database/Database';
+import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
+import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
 import { LeafBlock } from '../..';
 import ListEditor from '../ListEditor';
 import { ExprComponent } from 'mwater-expressions-ui';
