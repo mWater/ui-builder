@@ -76,20 +76,18 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       select: {},
       from: rowsetCV.table!,
       where: where.exprs.length > 0 ? where : null,
+      orderBy: [],
       limit: block.blockDef.limit
     }
     
     // Add order by
     if (block.blockDef.orderBy) {
-      queryOptions.orderBy = block.blockDef.orderBy
-    }
-    else {
-      queryOptions.orderBy = []
+      queryOptions.orderBy = queryOptions.orderBy!.concat(block.blockDef.orderBy)
     }
 
     // Stabilize sort order if in singleRow mode
     if (block.blockDef.mode === "singleRow") {
-      queryOptions.orderBy.push({ expr: { type: "id", table: rowsetCV.table! }, dir: "asc" })
+      queryOptions.orderBy!.push({ expr: { type: "id", table: rowsetCV.table! }, dir: "asc" })
     }
 
     // Add expressions
