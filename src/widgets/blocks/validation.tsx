@@ -133,6 +133,7 @@ const ValidationEditor = (props: {
                 schema={props.schema} 
                 dataSource={props.dataSource} 
                 types={["boolean"]}
+                aggrStatuses={["aggregate", "individual", "literal"]}
                 variables={createExprVariables(props.contextVars)}
                 table={contextVar.table!}/>
             }
