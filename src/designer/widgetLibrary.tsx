@@ -242,11 +242,11 @@ const NewTab = (props: {
     <div style={{ padding: 10 }}>
       <div style={{ paddingBottom: 10 }}>
         <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
+        <button type="button" className="btn btn-primary" onClick={handleAdd}>
+          <i className="fa fa-plus"/> New Widget
+        </button>
       </div>
       {renderExistingWidgets()}
-      <button type="button" className="btn btn-primary" onClick={handleAdd}>
-        <i className="fa fa-plus"/> New Widget
-      </button>
     </div>
   )
 }
