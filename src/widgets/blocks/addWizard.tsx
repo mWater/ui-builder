@@ -97,7 +97,7 @@ const AddWizardPane = (props: {
       for (const column of columns) {
         const createLabeledBlock = (child: BlockDef) => {
           allEntries.push({ 
-            title: localize(column.name), 
+            title: localize(column.name) || "", 
             blockDef: { 
               id: uuid(),
               type: "labeled", 
@@ -163,7 +163,7 @@ const AddWizardPane = (props: {
 
       for (const column of columns) {
         allEntries.push({ 
-          title: localize(column.name), 
+          title: localize(column.name) || "", 
           blockDef: { 
             id: uuid(),
             type: "expression", 
