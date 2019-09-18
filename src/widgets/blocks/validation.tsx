@@ -1,14 +1,13 @@
-import produce from 'immer'
-import * as React from 'react';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
-import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
-import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
-import { LeafBlock } from '../..';
-import ListEditor from '../ListEditor';
+import produce from 'immer'
 import { ExprComponent } from 'mwater-expressions-ui';
-import { useState, useEffect } from 'react';
+import { default as React, useState, useEffect } from 'react';
+import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
+import ListEditor from '../ListEditor';
 import { localize } from '../localization';
+import LeafBlock from '../LeafBlock';
 
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {

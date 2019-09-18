@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ValidateBlockOptions } from '../blocks';
 import { Expr, LocalizedString } from 'mwater-expressions';
-import { LeafBlock } from '../..';
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ValidateBlockOptions } from '../blocks';
+import LeafBlock from '../LeafBlock';
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {
     type: "validation";
