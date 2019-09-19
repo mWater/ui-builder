@@ -306,6 +306,11 @@ export default class VirtualDatabase implements Database {
 
         // For n-1 and 1-1 joins, create row
         if (column.join!.type === "n-1" || column.join!.type === "1-1") {
+          // Short-circuit if null/undefined
+          if (row["c_" + columnId] == null) {
+            return null
+          }
+
           const joinRows = await this.queryEvalRows(column.join!.toTable, {
             type: "op", op: "=", table: column.join!.toTable, exprs: [
               { type: "id", table: column.join!.toTable },
@@ -315,9 +320,14 @@ export default class VirtualDatabase implements Database {
         }
 
         // For non-inverse 1-n and n-n, create rows based on key
-        if (column.join!.type !== "1-n" || !column.join!.inverse) {
+        if (column.join!.type == "n-n" || !column.join!.inverse) {
+          // Short-circuit if null/undefined
+          if (row["c_" + columnId] == null || row["c_" + columnId].length == 0) {
+            return []
+          }
+
           const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: column.join!.toTable, exprs: [
+            type: "op", op: "= any", table: column.join!.toTable, exprs: [
               { type: "id", table: column.join!.toTable },
               { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
           ]}, contextVars, contextVarValues)

@@ -81,6 +81,7 @@ test("creates query", () => {
       table: "t1",
       exprs: [{ type: "field", table: "t1", column: "boolean" }],
     },
+    orderBy: [{ expr: { type: "id", table: "t1" }, dir: "asc" }],
     limit: 10
   })
 })
@@ -116,7 +117,8 @@ test("adds filters, orderBy and where", () => {
       ]
     },
     orderBy: [
-      { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
+      { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" },
+      { expr: { type: "id", table: "t1" }, dir: "asc" }
     ],
     limit: 10
   })
