@@ -7,6 +7,7 @@ import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import { format } from 'd3-format'
 import moment from 'moment'
+import { Toggle } from 'react-library/lib/bootstrap';
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
@@ -19,6 +20,9 @@ export interface ExpressionBlockDef extends BlockDef {
 
   /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
   format: string | null
+
+  /** How to align text. Default is left */
+  align?: "left" | "center" | "right" | "justify"
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
@@ -49,7 +53,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
 
     return (
-      <div>
+      <div style={{ textAlign: this.blockDef.align }}>
         <span className="text-muted">&lt;</span>
         {summary}
         <span className="text-muted">&gt;</span>
@@ -67,21 +71,26 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
     let str
-    if (exprType === "number" && value != null) {
-      str = format(this.blockDef.format || "")(value)
-    }
-    else if (exprType === "date" && value != null) {
-      str = moment(value, moment.ISO_8601).format(this.blockDef.format || "ll")
-    }
-    else if (exprType === "datetime" && value != null) {
-      str = moment(value, moment.ISO_8601).format(this.blockDef.format || "lll")
+    if (value == null) {
+      str = ""
     }
     else {
-      str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
+      if (exprType === "number") {
+        str = format(this.blockDef.format || "")(value)
+      }
+      else if (exprType === "date" && value != null) {
+        str = moment(value, moment.ISO_8601).format(this.blockDef.format || "ll")
+      }
+      else if (exprType === "datetime" && value != null) {
+        str = moment(value, moment.ISO_8601).format(this.blockDef.format || "lll")
+      }
+      else {
+        str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
+      }
     }
-
+    
     return (
-      <div>{str}</div>
+      <div style={{ textAlign: this.blockDef.align }}>{str}</div>
     )     
   }
 
@@ -164,6 +173,21 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           </LabeledProperty>
           : null
         }
+        <LabeledProperty label="Alignment">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
+            {(value, onChange) => 
+              <Toggle 
+                value={value || "left"} 
+                onChange={onChange} 
+                options={[
+                  { value: "left", label: <i className="fa fa-align-left"/> },
+                  { value: "center", label: <i className="fa fa-align-center"/> },
+                  { value: "right", label: <i className="fa fa-align-right"/> },
+                  { value: "justify", label: <i className="fa fa-align-justify"/> }
+                ]} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
 
       </div>
     )

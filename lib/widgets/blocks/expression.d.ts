@@ -10,6 +10,8 @@ export interface ExpressionBlockDef extends BlockDef {
     expr: Expr;
     /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
     format: string | null;
+    /** How to align text. Default is left */
+    align?: "left" | "center" | "right" | "justify";
 }
 export declare class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];

@@ -21,6 +21,8 @@ export interface TextBlockDef extends BlockDef {
     underline?: boolean;
     /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
     embeddedExprs?: EmbeddedExpr[];
+    /** How to align text. Default is left */
+    align?: "left" | "center" | "right" | "justify";
 }
 export declare class TextBlock extends LeafBlock<TextBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];

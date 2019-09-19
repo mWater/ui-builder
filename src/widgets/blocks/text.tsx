@@ -3,7 +3,7 @@ import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar, createExprVariables } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, NumberFormatEditor, ContextVarPropertyEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors'
 import { localize } from '../localization'
-import { Select, Checkbox } from 'react-library/lib/bootstrap';
+import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { Expr, ExprValidator, ExprUtils, Schema, DataSource, LocalizedString } from 'mwater-expressions';
 import * as _ from 'lodash';
 import { format as d3Format } from 'd3-format';
@@ -37,6 +37,9 @@ export interface TextBlockDef extends BlockDef {
 
   /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
   embeddedExprs?: EmbeddedExpr[] 
+
+  /** How to align text. Default is left */
+  align?: "left" | "center" | "right" | "justify"
 }
 
 export class TextBlock extends LeafBlock<TextBlockDef> {
@@ -82,6 +85,9 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     if (this.blockDef.underline) {
       style.textDecoration = "underline"
     }
+    if (this.blockDef.align) {
+      style.textAlign = this.blockDef.align
+    }
 
     return React.createElement(this.blockDef.style, { style: style }, content)
   }
@@ -106,19 +112,24 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
       const format = this.blockDef.embeddedExprs![i].format
       const value = exprValues[i]
 
-      if (exprType === "number" && value != null) {
-        str = d3Format(format || "")(value)
-      }
-      else if (exprType === "date" && value != null) {
-        str = moment(value, moment.ISO_8601).format(format || "ll")
-      }
-      else if (exprType === "datetime" && value != null) {
-        str = moment(value, moment.ISO_8601).format(format || "lll")
+      if (value == null) {
+        str = ""
       }
       else {
-        str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(expr, value, props.locale)
+        if (exprType === "number" && value != null) {
+          str = d3Format(format || "")(value)
+        }
+        else if (exprType === "date" && value != null) {
+          str = moment(value, moment.ISO_8601).format(format || "ll")
+        }
+        else if (exprType === "datetime" && value != null) {
+          str = moment(value, moment.ISO_8601).format(format || "lll")
+        }
+        else {
+          str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(expr, value, props.locale)
+        }
       }
-  
+      
       text = text.replace(`{${i}}`, str)
     }
 
@@ -163,6 +174,22 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
         <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="underline">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
         </PropertyEditor>
+
+        <LabeledProperty label="Alignment">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
+            {(value, onChange) => 
+              <Toggle 
+                value={value || "left"} 
+                onChange={onChange} 
+                options={[
+                  { value: "left", label: <i className="fa fa-align-left"/> },
+                  { value: "center", label: <i className="fa fa-align-center"/> },
+                  { value: "right", label: <i className="fa fa-align-right"/> },
+                  { value: "justify", label: <i className="fa fa-align-justify"/> }
+                ]} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
 
         <LabeledProperty label="Embedded expressions" help="Reference in text as {0}, {1}, etc.">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="embeddedExprs">
