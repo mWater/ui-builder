@@ -62,6 +62,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "conditional", expr: null },
   },
   {
+    title: "Float",
+    blockDef: { id: "", type: "float", direction: "right", verticalAlign: "top", mainContent: null, floatContent: null },
+  },
+  {
     title: "Embed Widget",
     blockDef: { id: "", type: "widget", widgetId: null, contextVarMap: {} },
   },

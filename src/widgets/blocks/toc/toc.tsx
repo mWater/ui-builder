@@ -6,6 +6,7 @@ import produce from 'immer'
 import { LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
+import './toc.css'
 
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {

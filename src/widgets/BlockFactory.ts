@@ -26,6 +26,7 @@ import { NumberboxBlockDef, NumberboxBlock } from './blocks/controls/numberbox';
 import { HeaderBlock, HeaderBlockDef } from './blocks/header';
 import { TOCBlock, TOCBlockDef } from './blocks/toc/toc';
 import { ValidationBlockDef, ValidationBlock } from './blocks/validation';
+import { FloatBlock, FloatBlockDef } from './blocks/float';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -92,7 +93,9 @@ export default class BlockFactory {
         return new HeaderBlock(blockDef as HeaderBlockDef, this.createBlock)
       case "validation":
         return new ValidationBlock(blockDef as ValidationBlockDef)
-      }
+      case "float":
+        return new FloatBlock(blockDef as FloatBlockDef, this.createBlock)
+    }
 
     // Use custom blocks
     if (this.customBlocks[blockDef.type]) {

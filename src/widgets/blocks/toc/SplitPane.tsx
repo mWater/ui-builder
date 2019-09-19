@@ -4,11 +4,11 @@ import FillDownwardComponent from "react-library/lib/FillDownwardComponent"
 /** Pane that is split left right */
 const SplitPane = ({ left, right }: { left: ReactNode, right : ReactNode }) => {
   return <FillDownwardComponent>
-    <div style={{ height: "100%", position: "relative" }}>
-      <div style={{ height: "100%", width: "25%", float: "left" }}>
+    <div className="toc-split">
+      <div className="toc-split-left">
         {left}
       </div>
-      <div style={{ height: "100%", width: "75%", float: "left", borderLeft: "solid 1px #DDD"  }}>
+      <div className="toc-split-right">
         {right}
       </div>
     </div>

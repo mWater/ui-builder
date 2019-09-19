@@ -2,6 +2,7 @@ import * as React from 'react';
 import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock } from '../../blocks';
 import CompoundBlock from '../../CompoundBlock';
 import { LocalizedString } from 'mwater-expressions';
+import './toc.css';
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
     type: "toc";

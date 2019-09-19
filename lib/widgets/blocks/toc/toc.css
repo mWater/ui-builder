@@ -1,0 +1,27 @@
+.toc-split { 
+  height: 100%;
+  position: relative
+}
+
+.toc-split-left { 
+  height: 100%;
+  width: 25%;
+  float: left;
+}
+
+.toc-split-right { 
+  height: 100%;
+  width: 75%;
+  float: left;
+  border-left: solid 1px #DDD;
+}
+
+@media (min-width: 1200px) {
+  .toc-split-left {
+    width: 17%;
+  }
+
+  .toc-split-right {
+    width: 83%;
+  }
+}
