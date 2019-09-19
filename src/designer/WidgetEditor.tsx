@@ -2,13 +2,12 @@ import * as React from "react";
 import {v4 as uuid} from 'uuid'
 import { LabeledProperty, PropertyEditor, TableSelect } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
-import { ContextVar, createExprVariables } from "../widgets/blocks";
+import { ContextVar } from "../widgets/blocks";
 import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
 import { produce } from "immer";
 import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import ListEditor from "../widgets/ListEditor";
-import ReactSelect from "react-select"
 import * as _ from "lodash";
 import { TextInput, Select } from "react-library/lib/bootstrap";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";

@@ -25,7 +25,8 @@ export default class EnumInstance extends React.Component<{
     const styles = {
       control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 }),
       // Keep menu above other controls
-      menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
+      menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 }),
+      menuPortal: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
     return <ReactSelect
@@ -37,6 +38,8 @@ export default class EnumInstance extends React.Component<{
       getOptionValue={getOptionValue}
       isClearable={true}
       styles={styles}
+      closeMenuOnScroll={true}
+      menuPortalTarget={document.body}
       />
   }
 }

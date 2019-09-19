@@ -108,9 +108,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       getOptionValue={getOptionValue}
       isDisabled={props.disabled}
       isClearable={true}
+      closeMenuOnScroll={true}
+      menuPortalTarget={document.body}
       styles={{ 
         // Keep menu above other controls
-        menu: (style) => ({ ...style, zIndex: 2000 })
+        menu: (style) => ({ ...style, zIndex: 2000 }),
+        menuPortal: (style) => ({ ...style, zIndex: 2000 })
       }}
       />
   }
@@ -148,9 +151,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       isDisabled={props.disabled}
       isClearable={true}
       isMulti={true}
+      closeMenuOnScroll={true}
+      menuPortalTarget={document.body}
       styles={{ 
         // Keep menu above other controls
-        menu: (style) => ({ ...style, zIndex: 2000 })
+        menu: (style) => ({ ...style, zIndex: 2000 }),
+        menuPortal: (style) => ({ ...style, zIndex: 2000 })
       }}
       />
   }
