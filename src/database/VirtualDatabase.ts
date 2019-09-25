@@ -1,6 +1,5 @@
-import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
-import { Schema, Column, ExprEvaluator, ExprUtils, Expr } from "mwater-expressions";
-import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
+import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction, performEvalQuery } from "./Database";
+import { Schema, Column, ExprEvaluator, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions";
 import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
 import LRU, { Cache } from 'lru-cache'
@@ -43,115 +42,18 @@ export default class VirtualDatabase implements Database {
     database.addChangeListener(this.handleChange)
   }
 
-  async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
+  async query(query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
     const variables = createExprVariables(contextVars)
     const variableValues = contextVarValues
    
     const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
     const exprUtils = new ExprUtils(this.schema, variables)
 
-    // Create rows to evaluate
-    const evalRows = (await this.queryEvalRows(options.from, options.where || null, contextVars, contextVarValues))
+    // Create rows to evaluate (just use where clause to filter)
+    const evalRows = (await this.queryEvalRows(query.from, query.where || null, contextVars, contextVarValues))
 
-    // Create temporary rows to manipulate
-    let tempRows: any[] = evalRows.map(r => ({ row: r }))
-
-    // Get list of selects in { id, expr, isAggr } format
-    const selects = Object.keys(options.select).map(id => ({
-      id: id,
-      expr: options.select[id],
-      isAggr: exprUtils.getExprAggrStatus(options.select[id]) === "aggregate"
-    }))
-
-    // Get list of orderBys in { expr, isAggr } format
-    const orderBys = (options.orderBy || []).map(orderBy => ({
-      expr: orderBy.expr,
-      isAggr: exprUtils.getExprAggrStatus(orderBy.expr) === "aggregate"
-    }))
-
-    // Evaluate all non-aggr selects and non-aggr orderbys
-    for (const tempRow of tempRows) {
-      for (let i = 0 ; i < selects.length ; i++) {
-        if (!selects[i].isAggr) {
-          tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: tempRow.row })
-        }
-      }
-
-      for (let i = 0 ; i < orderBys.length ; i++) {
-        if (!orderBys[i].isAggr) {
-          tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: tempRow.row })
-        }
-      }
-    }
-
-    // If any aggregate expressions, perform transform to aggregate
-    if (selects.find(s => s.isAggr) || orderBys.find(o => o.isAggr)) {
-      // Group by all non-aggregate selects and non-aggregate order bys
-      const groups = _.groupBy(tempRows, tempRow => {
-        // Concat stringified version of all non-aggr values
-        let key = ""
-        for (let i = 0 ; i < selects.length ; i++) {
-          if (!selects[i].isAggr) {
-            key += ":" + tempRow["s" + i]
-          }
-        }
-
-        for (let i = 0 ; i < orderBys.length ; i++) {
-          if (!orderBys[i].isAggr) {
-            key += ":" + tempRow["o" + i]
-          }
-        }
-        return key
-      })
-
-      // Evaluate each group, adding aggregate expressions to first item of each group
-      for (const group of Object.values(groups)) {
-        const tempRow = group[0]
-
-        // Evaluate all aggr selects and aggr orderbys
-        for (let i = 0 ; i < selects.length ; i++) {
-          if (selects[i].isAggr) {
-            tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
-          }
-        }
-
-        for (let i = 0 ; i < orderBys.length ; i++) {
-          if (orderBys[i].isAggr) {
-            tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
-          }
-        }
-      }
-
-      // Flatten groups into single rows each
-      tempRows = _.map(Object.values(groups), (group) => group[0])
-    }
-
-    // Order by
-    if (options.orderBy && options.orderBy.length > 0) {
-      tempRows = _.sortByOrder(tempRows, 
-        options.orderBy.map((orderBy, i) => (tempRow: any) => tempRow["o" + i]),
-        options.orderBy.map(orderBy => orderBy.dir))
-    }
-
-    // Limit
-    if (options.limit) {
-      tempRows = _.take(tempRows, options.limit)
-    }
-
-    // Create selects
-    const projectedRows = []
-    for (const tempRow of tempRows) {
-      const projectedRow = {}
-
-      // Project each one
-      for (let i = 0 ; i < selects.length ; i++) {
-        projectedRow[selects[i].id] = tempRow["s" + i]
-      }
-
-      projectedRows.push(projectedRow)
-    }
-
-    return projectedRows
+    // Perform actual query
+    return performEvalQuery({ evalRows, exprUtils, exprEval, query: query })
   }
   
   /** Adds a listener which is called with each change to the database */

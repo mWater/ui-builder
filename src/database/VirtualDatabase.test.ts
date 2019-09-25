@@ -1,10 +1,9 @@
 import VirtualDatabase from "./VirtualDatabase";
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
-import { OrderByDir, QueryOptions, Transaction } from "./Database";
-import { Expr, ExprEvaluator } from "mwater-expressions";
+import { QueryOptions } from "./Database";
+import { Expr, ExprEvaluator, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions";
 import * as _ from "lodash";
-import { PromiseExprEvaluator, PromiseExprEvaluatorRow } from "./PromiseExprEvaluator";
 
 const schema = simpleSchema()
 let db: any
@@ -329,7 +328,7 @@ describe("select, order, limit", () => {
       // Commit to underlying database
       await vdb.commit()
 
-      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1}])
+      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1 }])
       expect(mockTransaction.removeRow.mock.calls[0]).toEqual(["t1", 1])
 
       expect(() => vdb.transaction()).toThrow()
