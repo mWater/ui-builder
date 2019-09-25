@@ -46,12 +46,16 @@ export default class VirtualDatabase implements Database {
   async query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
     const variables = createExprVariables(contextVars)
     const variableValues = contextVarValues
+   
+    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
+    const exprUtils = new ExprUtils(this.schema, variables)
 
     // Create rows to evaluate
-    let evalRows: any[] = (await this.queryEvalRows(options.from, options.where || null, contextVars, contextVarValues)).map(r => ({ row: r }))
+    const evalRows = (await this.queryEvalRows(options.from, options.where || null, contextVars, contextVarValues))
 
-    const exprUtils = new ExprUtils(this.schema, variables)
-    
+    // Create temporary rows to manipulate
+    let tempRows: any[] = evalRows.map(r => ({ row: r }))
+
     // Get list of selects in { id, expr, isAggr } format
     const selects = Object.keys(options.select).map(id => ({
       id: id,
@@ -65,19 +69,17 @@ export default class VirtualDatabase implements Database {
       isAggr: exprUtils.getExprAggrStatus(orderBy.expr) === "aggregate"
     }))
 
-    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
-    
     // Evaluate all non-aggr selects and non-aggr orderbys
-    for (const evalRow of evalRows) {
+    for (const tempRow of tempRows) {
       for (let i = 0 ; i < selects.length ; i++) {
         if (!selects[i].isAggr) {
-          evalRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: evalRow.row })
+          tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: tempRow.row })
         }
       }
 
       for (let i = 0 ; i < orderBys.length ; i++) {
         if (!orderBys[i].isAggr) {
-          evalRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: evalRow.row })
+          tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: tempRow.row })
         }
       }
     }
@@ -85,18 +87,18 @@ export default class VirtualDatabase implements Database {
     // If any aggregate expressions, perform transform to aggregate
     if (selects.find(s => s.isAggr) || orderBys.find(o => o.isAggr)) {
       // Group by all non-aggregate selects and non-aggregate order bys
-      const groups = _.groupBy(evalRows, evalRow => {
+      const groups = _.groupBy(tempRows, tempRow => {
         // Concat stringified version of all non-aggr values
         let key = ""
         for (let i = 0 ; i < selects.length ; i++) {
           if (!selects[i].isAggr) {
-            key += ":" + evalRow["s" + i]
+            key += ":" + tempRow["s" + i]
           }
         }
 
         for (let i = 0 ; i < orderBys.length ; i++) {
           if (!orderBys[i].isAggr) {
-            key += ":" + evalRow["o" + i]
+            key += ":" + tempRow["o" + i]
           }
         }
         return key
@@ -104,46 +106,46 @@ export default class VirtualDatabase implements Database {
 
       // Evaluate each group, adding aggregate expressions to first item of each group
       for (const group of Object.values(groups)) {
-        const evalRow = group[0]
+        const tempRow = group[0]
 
         // Evaluate all aggr selects and aggr orderbys
         for (let i = 0 ; i < selects.length ; i++) {
           if (selects[i].isAggr) {
-            evalRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: evalRow.row, rows: group.map(r => r.row) })
+            tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
           }
         }
 
         for (let i = 0 ; i < orderBys.length ; i++) {
           if (orderBys[i].isAggr) {
-            evalRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: evalRow.row, rows: group.map(r => r.row) })
+            tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
           }
         }
       }
 
       // Flatten groups into single rows each
-      evalRows = _.map(Object.values(groups), (group) => group[0])
+      tempRows = _.map(Object.values(groups), (group) => group[0])
     }
 
     // Order by
     if (options.orderBy && options.orderBy.length > 0) {
-      evalRows = _.sortByOrder(evalRows, 
-        options.orderBy.map((orderBy, i) => (evalRow: any) => evalRow["o" + i]),
+      tempRows = _.sortByOrder(tempRows, 
+        options.orderBy.map((orderBy, i) => (tempRow: any) => tempRow["o" + i]),
         options.orderBy.map(orderBy => orderBy.dir))
     }
 
     // Limit
     if (options.limit) {
-      evalRows = _.take(evalRows, options.limit)
+      tempRows = _.take(tempRows, options.limit)
     }
 
     // Create selects
     const projectedRows = []
-    for (const evalRow of evalRows) {
+    for (const tempRow of tempRows) {
       const projectedRow = {}
 
       // Project each one
       for (let i = 0 ; i < selects.length ; i++) {
-        projectedRow[selects[i].id] = evalRow["s" + i]
+        projectedRow[selects[i].id] = tempRow["s" + i]
       }
 
       projectedRows.push(projectedRow)
@@ -231,9 +233,13 @@ export default class VirtualDatabase implements Database {
 
   /** Determine if a column should be included in the underlying query */
   shouldIncludeColumn(column: Column): boolean {
+    // Normal columns that don't have an expression should be included
     if (column.type !== "join" && !column.expr) {
       return true
     }
+    // n-1 joins should be included to get pk of joined row
+    // 1-n joins that don't have an inverse column need to be included as otherwise
+    // can't figure out which rows are at other end of the join
     if (column.type === "join" && (!column.join!.inverse || column.join!.type !== "1-n")) {
       return true
     }
