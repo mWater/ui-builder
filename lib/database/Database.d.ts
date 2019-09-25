@@ -1,5 +1,7 @@
-import { Expr } from 'mwater-expressions';
+import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator } from 'mwater-expressions';
 import { ContextVar } from '../widgets/blocks';
+import { Row, QueryOptions } from "./Database";
+import { ExprUtils } from "mwater-expressions";
 export declare type OrderByDir = "asc" | "desc";
 export interface OrderBy {
     expr: Expr;
@@ -67,4 +69,13 @@ declare class NullTransaction implements Transaction {
     removeRow(table: string, primaryKey: any): Promise<void>;
     commit(): Promise<void>;
 }
+/** Evaluates a database query given a set of rows of the type that are needed by the ExprEvaluator.
+ * Useful for performing a query on a non-SQL database, e.g. in memory or MongoDb, etc.
+ */
+export declare function performEvalQuery(options: {
+    evalRows: PromiseExprEvaluatorRow[];
+    query: QueryOptions;
+    exprEval: PromiseExprEvaluator;
+    exprUtils: ExprUtils;
+}): Promise<Row[]>;
 export {};

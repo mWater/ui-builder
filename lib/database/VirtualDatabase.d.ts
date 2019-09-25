@@ -21,7 +21,7 @@ export default class VirtualDatabase implements Database {
     /** Cache of query results to increase performance. Cached by canonical json key based on query options */
     cache: Cache<string, Row[]>;
     constructor(database: Database, schema: Schema, locale: string);
-    query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: {
+    query(query: QueryOptions, contextVars: ContextVar[], contextVarValues: {
         [contextVarId: string]: any;
     }): Promise<Row[]>;
     /** Adds a listener which is called with each change to the database */
