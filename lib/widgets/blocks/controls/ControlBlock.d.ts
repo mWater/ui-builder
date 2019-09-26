@@ -2,6 +2,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, Va
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
+import { Database } from "../../../database/Database";
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
     /** Row context variable id */
@@ -16,10 +17,15 @@ export interface ControlBlockDef extends BlockDef {
 export interface RenderControlProps {
     value: any;
     locale: string;
+    database: Database;
     schema: Schema;
-    dataSource: DataSource;
+    dataSource?: DataSource;
     /** Context variable. Can be undefined in design mode */
     rowContextVar?: ContextVar;
+    contextVars: ContextVar[];
+    contextVarValues: {
+        [contextVarId: string]: any;
+    };
     /** True if control should be disabled */
     disabled: boolean;
     onChange: (value: any) => void;

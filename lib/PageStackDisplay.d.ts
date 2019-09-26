@@ -10,7 +10,7 @@ interface Props {
     createBlock: CreateBlock;
     locale: string;
     schema: Schema;
-    dataSource: DataSource;
+    dataSource?: DataSource;
     actionLibrary: ActionLibrary;
     widgetLibrary: WidgetLibrary;
 }

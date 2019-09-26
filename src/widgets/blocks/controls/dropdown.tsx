@@ -5,7 +5,8 @@ import { Column, EnumValue, Expr, ExprValidator, ExprCompiler, LocalizedString }
 import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EnumArrayEditor } from '../../propertyEditors';
 import ReactSelect from "react-select"
-import { IdLiteralComponent, ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
+import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
+import { IdDropdownComponent } from './IdDropdownComponent';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -162,40 +163,31 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   }
 
   renderId(props: RenderControlProps, column: Column) {
-    const exprCompiler = new ExprCompiler(props.schema)
-    const labelExpr = exprCompiler.compileExpr({ expr: this.blockDef.idLabelExpr || null, tableAlias: "main" })
-    const filterExpr = exprCompiler.compileExpr({ expr: this.blockDef.idFilterExpr || null, tableAlias: "main" })
-    
     const idTable = column.join ? column.join.toTable : column.idTable
 
-    // TODO Should use a local implementation that uses database, not dataSource for data. This one will not 
-    // pick up any changes in a virtual database
-    return <IdLiteralComponent
-      schema={props.schema}
-      dataSource={props.dataSource}
-      idTable={idTable!}
+    return <IdDropdownComponent
+      database={props.database}
+      table={idTable!}
       value={props.value}
       onChange={props.onChange}
-      labelExpr={labelExpr} 
-      filter={filterExpr} />
+      multi={false}
+      labelExpr={this.blockDef.idLabelExpr || null} 
+      filterExpr={this.blockDef.idFilterExpr || null}
+      contextVars={props.contextVars}
+      contextVarValues={props.contextVarValues} />
   }
 
   renderIds(props: RenderControlProps, column: Column) {
-    const exprCompiler = new ExprCompiler(props.schema)
-    const labelExpr = exprCompiler.compileExpr({ expr: this.blockDef.idLabelExpr || null, tableAlias: "main" })
-    const filterExpr = exprCompiler.compileExpr({ expr: this.blockDef.idFilterExpr || null, tableAlias: "main" })
-    
-    // TODO Should use a local implementation that uses database, not dataSource for data. This one will not 
-    // pick up any changes in a virtual database
-    return <IdLiteralComponent
-      schema={props.schema}
-      dataSource={props.dataSource}
-      idTable={column.idTable!}
+    return <IdDropdownComponent
+      database={props.database}
+      table={column.idTable!}
       value={props.value}
       onChange={props.onChange}
       multi={true}
-      labelExpr={labelExpr} 
-      filter={filterExpr} />
+      labelExpr={this.blockDef.idLabelExpr || null} 
+      filterExpr={this.blockDef.idFilterExpr || null}
+      contextVars={props.contextVars}
+      contextVarValues={props.contextVarValues} />
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
@@ -284,3 +276,5 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       || (column.type === "join" && column.join!.type === "n-1")
   }
 }
+
+

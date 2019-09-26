@@ -54,7 +54,8 @@ export interface RenderInstanceProps {
   locale: string,
   database: Database,
   schema: Schema,
-  dataSource: DataSource
+  /** Data source might not be available in instance rendering as it supports full SQL queries */
+  dataSource?: DataSource
   contextVars: ContextVar[]
   actionLibrary: ActionLibrary
   widgetLibrary: WidgetLibrary

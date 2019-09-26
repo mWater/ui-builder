@@ -1,5 +1,5 @@
 import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
-import { Schema, Column, Row } from "mwater-expressions";
+import { Schema, Column, ExprUtils, Row } from "mwater-expressions";
 import { Cache } from 'lru-cache';
 import { ContextVar } from "../widgets/blocks";
 /**
@@ -24,6 +24,11 @@ export default class VirtualDatabase implements Database {
     query(query: QueryOptions, contextVars: ContextVar[], contextVarValues: {
         [contextVarId: string]: any;
     }): Promise<Row[]>;
+    /** Determine if query should be simply sent to the underlying database.
+     * Do if no mutations to any tables referenced *and* it is not a simple id = query which
+     * is best to cache.
+     */
+    shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils): boolean;
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;

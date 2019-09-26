@@ -5,6 +5,8 @@ import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTex
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
+import { Database } from "../../../database/Database";
+import { DataSourceDatabase } from "../../../database/DataSourceDatabase";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -24,11 +26,15 @@ export interface ControlBlockDef extends BlockDef {
 export interface RenderControlProps {
   value: any
   locale: string
+  database: Database
   schema: Schema
-  dataSource: DataSource
+  dataSource?: DataSource
 
   /** Context variable. Can be undefined in design mode */
   rowContextVar?: ContextVar
+
+  contextVars: ContextVar[]
+  contextVarValues: { [contextVarId: string]: any }
 
   /** True if control should be disabled */
   disabled: boolean
@@ -53,9 +59,12 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
       onChange: () => { return }, 
       locale: props.locale,
+      database: new DataSourceDatabase(props.schema, props.dataSource),
       schema: props.schema,
       dataSource: props.dataSource,
-      disabled: false
+      disabled: false,
+      contextVars: props.contextVars,
+      contextVarValues: {}
     }
     
     return (
@@ -239,9 +248,12 @@ class ControlInstance extends React.Component<Props, State> {
       onChange: this.handleChange,
       schema: this.props.renderInstanceProps.schema,
       dataSource: this.props.renderInstanceProps.dataSource,
+      database: this.props.renderInstanceProps.database,
       locale: this.props.renderInstanceProps.locale,
       rowContextVar: contextVar,
-      disabled: id == null
+      disabled: id == null,
+      contextVars: this.props.renderInstanceProps.contextVars,
+      contextVarValues: this.props.renderInstanceProps.contextVarValues
     }
 
     return (

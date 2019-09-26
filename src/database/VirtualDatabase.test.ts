@@ -24,6 +24,14 @@ beforeEach(() => {
   vdb = new VirtualDatabase(db, schema, "en")
 })
 
+/** Simulates a change to the virtual database to prevent passthrough */
+const preventPassthrough = () => {
+  const tx = vdb.transaction()
+  tx.removeRow("t1", "NONSUCH")
+  tx.removeRow("t2", "NONSUCH")
+  tx.commit()
+}
+
 test("shouldIncludeColumn includes regular columns and joins without inverse", () => {
   expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" }})).toBe(true)
   expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" }, expr: { type: "literal", valueType: "text", value: "xyz"}})).toBe(false)
@@ -43,6 +51,7 @@ test("trigger change if underlying database changed", () => {
 
 test("queries with where clause and included columns", async () => {
   (db.query as jest.Mock).mockResolvedValue([])
+  preventPassthrough()    // Test how queries are transformed by preventing passthrough
 
   await vdb.query({
     select: {
@@ -102,6 +111,8 @@ describe("select, order, limit", () => {
   }
 
   test("simple query", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { x: { type: "field", table: "t1", column: "text" }},
       from: "t1"
@@ -114,6 +125,8 @@ describe("select, order, limit", () => {
   })
 
   test("aggr count expr", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { 
         x: { type: "field", table: "t1", column: "text" },
@@ -135,6 +148,8 @@ describe("select, order, limit", () => {
   })
 
   test("orderby query with limit", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { x: { type: "field", table: "t1", column: "text" }},
       from: "t1",
@@ -154,6 +169,8 @@ describe("select, order, limit", () => {
   })
 
   test("n-1 join", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { x: { type: "field", table: "t2", column: "2-1" }},
       from: "t2"
@@ -171,6 +188,8 @@ describe("select, order, limit", () => {
   })
 
   test("n-1 scalar", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { x: { type: "scalar", joins: ["2-1"], table: "t2", expr: { type: "field", table: "t1", column: "text" } } },
       from: "t2"
@@ -187,6 +206,8 @@ describe("select, order, limit", () => {
   })
 
   test("1-n scalar", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { x: { type: "scalar", joins: ["1-2"], table: "t1", expr: {
         type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t2", column: "number" }] } } },
@@ -208,6 +229,8 @@ describe("select, order, limit", () => {
   })
 
   test("caches backend queries", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
     const qopts: QueryOptions = {
       select: { x: { type: "field", table: "t1", column: "text" }},
       from: "t1"
@@ -249,6 +272,8 @@ describe("select, order, limit", () => {
     }
 
     test("waits until transaction committed", async () => {
+      preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
       vdb.transaction().addRow("t1", { number: 6 })
   
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)

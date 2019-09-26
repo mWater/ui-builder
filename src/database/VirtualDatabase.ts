@@ -46,14 +46,50 @@ export default class VirtualDatabase implements Database {
     const variables = createExprVariables(contextVars)
     const variableValues = contextVarValues
    
-    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
     const exprUtils = new ExprUtils(this.schema, variables)
+    
+    // Pass through if no changes and not id query
+    if (this.shouldPassthrough(query, exprUtils)) {
+      return this.database.query(query, contextVars, contextVarValues)
+    }
+    
+    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
 
     // Create rows to evaluate (just use where clause to filter)
     const evalRows = (await this.queryEvalRows(query.from, query.where || null, contextVars, contextVarValues))
 
     // Perform actual query
     return performEvalQuery({ evalRows, exprUtils, exprEval, query: query })
+  }
+
+  /** Determine if query should be simply sent to the underlying database. 
+   * Do if no mutations to any tables referenced *and* it is not a simple id = query which 
+   * is best to cache.
+   */
+  shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils) {
+    // Determine which tables are referenced
+    let tablesReferenced = [query.from]
+    for (const expr of Object.values(query.select)) {
+      tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(expr).map(f => f.table))
+    } 
+    tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(query.where || null).map(f => f.table))
+    for (const orderBy of query.orderBy || []) {
+      tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(orderBy.expr).map(f => f.table))
+    }
+    tablesReferenced = _.uniq(tablesReferenced)
+
+    const mutatedTables = _.uniq(this.mutations.map(m => m.table))
+
+    // Can't passthrough if depends on mutated table
+    if (_.intersection(tablesReferenced, mutatedTables).length > 0) {
+      return false
+    }
+
+    // Passthrough if not a simple id query, so that caching still happens
+    if (getWherePrimaryKey(query.where)) {
+      return false
+    }
+    return true
   }
   
   /** Adds a listener which is called with each change to the database */
@@ -181,7 +217,7 @@ export default class VirtualDatabase implements Database {
         this.cache.set(queryCacheKey, rows)
       }
     }
-    
+
     // Apply mutations
     rows = await this.mutateRows(rows, from, where, contextVars, contextVarValues)
 
