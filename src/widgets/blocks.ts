@@ -160,6 +160,25 @@ export abstract class Block<T extends BlockDef> {
   /** Get any context variables expressions that this block needs (not including child blocks) */
   getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { return [] }
 
+  /** Get any context variables expressions that this block needs *including* child blocks. Can be overridden */
+  getSubtreeContextVarExprs(options: {
+    contextVar: ContextVar,
+    widgetLibrary: WidgetLibrary, 
+    actionLibrary: ActionLibrary, 
+    /** All context variables */
+    contextVars: ContextVar[], 
+    createBlock: CreateBlock }): Expr[] { 
+    // Get own exprs
+    let ownExprs = this.getContextVarExprs(options.contextVar, options.widgetLibrary, options.actionLibrary)
+
+    // Append child ones
+    for (const childBlock of this.getChildren(options.contextVars)) {
+      const block = options.createBlock(childBlock.blockDef)
+      ownExprs = ownExprs.concat(block.getSubtreeContextVarExprs(options))
+    }
+    return ownExprs
+  }
+
   /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
   abstract getChildren(contextVars: ContextVar[]): ChildBlock[]
 

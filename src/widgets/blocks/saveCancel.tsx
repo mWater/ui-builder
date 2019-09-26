@@ -7,8 +7,10 @@ import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '..
 import VirtualDatabase from '../../database/VirtualDatabase';
 import ContextVarsInjector from '../ContextVarsInjector';
 import * as _ from 'lodash'
-import { LocalizedString } from 'mwater-expressions';
+import { LocalizedString, Expr } from 'mwater-expressions';
 import uuid = require('uuid');
+import { WidgetLibrary } from '../../designer/widgetLibrary';
+import { ActionLibrary } from '../ActionLibrary';
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -71,6 +73,17 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
         </div>
       </div>
     )
+  }
+
+  /** Special case as the inner block will have a virtual database and its own expression evaluator */
+  getSubtreeContextVarExprs(options: {
+    contextVar: ContextVar,
+    widgetLibrary: WidgetLibrary, 
+    actionLibrary: ActionLibrary, 
+    /** All context variables */
+    contextVars: ContextVar[], 
+    createBlock: CreateBlock }): Expr[] {
+    return []
   }
 
   renderInstance(props: RenderInstanceProps) {

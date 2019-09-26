@@ -1,6 +1,6 @@
-import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator } from 'mwater-expressions';
+import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator, Row } from 'mwater-expressions';
 import { ContextVar } from '../widgets/blocks';
-import { Row, QueryOptions } from "./Database";
+import { QueryOptions } from "./Database";
 import { ExprUtils } from "mwater-expressions";
 export declare type OrderByDir = "asc" | "desc";
 export interface OrderBy {
@@ -17,9 +17,6 @@ export interface QueryOptions {
     where?: Expr;
     orderBy?: OrderBy[];
     limit?: number | null;
-}
-export interface Row {
-    [alias: string]: any;
 }
 export declare type DatabaseChangeListener = () => void;
 /** An abstraction of a database which allows querying using expressions. May be the live

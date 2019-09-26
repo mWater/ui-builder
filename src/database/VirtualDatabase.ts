@@ -1,5 +1,5 @@
-import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction, performEvalQuery } from "./Database";
-import { Schema, Column, ExprEvaluator, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions";
+import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery } from "./Database";
+import { Schema, Column, ExprEvaluator, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
 import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
 import LRU, { Cache } from 'lru-cache'

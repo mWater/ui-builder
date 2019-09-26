@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar, ValidateBlockOptions, getBlockTree } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks'
 import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
@@ -81,10 +81,13 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
 
     // Get complete context variables exprs of inner widget blocks
-    let contextVarExprs = _.flatten(getBlockTree(widgetDef.blockDef, this.createBlock, widgetDef.contextVars).map(cb => {
-      const block = this.createBlock(cb.blockDef)
-      return block.getContextVarExprs(innerContextVar, widgetLibrary, actionLibrary)
-    }))
+    let contextVarExprs = this.createBlock(widgetDef.blockDef).getSubtreeContextVarExprs({
+      actionLibrary: actionLibrary,
+      widgetLibrary: widgetLibrary,
+      contextVars: widgetDef.contextVars,
+      contextVar: innerContextVar,
+      createBlock: this.createBlock
+    })
 
     // Map any variables of expressions that cross widget boundary
     contextVarExprs = contextVarExprs.map((cve) => this.mapInnerToOuterVariables(cve))

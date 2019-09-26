@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import CompoundBlock from '../../CompoundBlock';
 import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
-import { Expr, Schema, LocalizedString } from 'mwater-expressions';
-import { Row, OrderBy } from '../../../database/Database';
+import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
+import { OrderBy } from '../../../database/Database';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';

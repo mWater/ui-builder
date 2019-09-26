@@ -1,5 +1,5 @@
-import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
-import { DataSource, Schema } from "mwater-expressions";
+import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
+import { DataSource, Schema, Row } from "mwater-expressions";
 import { ContextVar } from "../widgets/blocks";
 declare type TransactionHandler = () => Transaction;
 /** Database which is driven from a data source. Changes must be handled externally and updates triggered manually */

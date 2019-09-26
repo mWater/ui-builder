@@ -2,9 +2,9 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, getBlockTree, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
-import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString } from 'mwater-expressions';
-import { Row, OrderBy } from '../../../database/Database';
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
+import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
+import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
@@ -121,12 +121,16 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     
     const rowCV = this.createRowContextVar(rowsetCV)
 
+    // Get expressions for all content blocks
     for (const contentBlockDef of this.blockDef.contents) {
-      // Get block tree, compiling expressions for each one
       if (contentBlockDef) {
-        for (const descChildBlock of getBlockTree(contentBlockDef, this.createBlock, contextVars)) {
-          exprs = exprs.concat(this.createBlock(descChildBlock.blockDef).getContextVarExprs(rowCV, widgetLibrary, actionLibrary))
-        }
+        exprs = exprs.concat(this.createBlock(contentBlockDef).getSubtreeContextVarExprs({
+          actionLibrary: actionLibrary,
+          widgetLibrary: widgetLibrary,
+          contextVars: contextVars.concat([rowCV]),
+          contextVar: rowCV,
+          createBlock: this.createBlock 
+        }))
       }
     }
 

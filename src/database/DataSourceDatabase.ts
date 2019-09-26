@@ -1,5 +1,5 @@
-import { Database, QueryOptions, Row, DatabaseChangeListener, Transaction } from "./Database";
-import { DataSource, Schema } from "mwater-expressions";
+import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
+import { DataSource, Schema, Row } from "mwater-expressions";
 import { QueryCompiler } from "./QueryCompiler";
 import { createExprVariables, ContextVar } from "../widgets/blocks";
 

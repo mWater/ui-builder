@@ -124,6 +124,15 @@ export declare abstract class Block<T extends BlockDef> {
     renderEditor(props: RenderEditorProps): React.ReactElement<any> | null;
     /** Get any context variables expressions that this block needs (not including child blocks) */
     getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    /** Get any context variables expressions that this block needs *including* child blocks. Can be overridden */
+    getSubtreeContextVarExprs(options: {
+        contextVar: ContextVar;
+        widgetLibrary: WidgetLibrary;
+        actionLibrary: ActionLibrary;
+        /** All context variables */
+        contextVars: ContextVar[];
+        createBlock: CreateBlock;
+    }): Expr[];
     /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
     abstract getChildren(contextVars: ContextVar[]): ChildBlock[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */

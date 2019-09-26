@@ -1,7 +1,6 @@
 import { AddRowAction, AddRowActionDef } from "./addRow";
-import { Action } from "../actions";
 import { ContextVar } from "../blocks";
-import VirtualDatabase, { UpdateMutation, AddMutation } from "../../database/VirtualDatabase";
+import VirtualDatabase, { AddMutation } from "../../database/VirtualDatabase";
 import { NullDatabase } from "../../database/Database";
 import simpleSchema from "../../__fixtures__/schema";
 import { PageStack } from "../../PageStack";
@@ -52,7 +51,7 @@ test("performs non-literal action", async () => {
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: (cvid: string, expr: Expr) => 123
+    getContextVarExprValue: () => 123
   })
 
   expect(database.mutations.length).toBe(1)
@@ -84,7 +83,7 @@ test("performs literal action", async () => {
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: (cvid: string, expr: Expr) => { throw new Error("Not used") }
+    getContextVarExprValue: () => { throw new Error("Not used") }
   })
 
   expect(database.mutations.length).toBe(1)

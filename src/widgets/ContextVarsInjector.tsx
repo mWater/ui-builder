@@ -1,4 +1,4 @@
-import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter, getBlockTree } from "./blocks";
+import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock } from "./blocks";
 import * as React from "react";
 import ContextVarInjector from './ContextVarInjector'
 import * as _ from "lodash";
@@ -31,10 +31,13 @@ export default class ContextVarsInjector extends React.Component<Props> {
 
     for (const contextVar of this.props.injectedContextVars) {
       // Get context var exprs
-      const contextVarExprs = this.props.innerBlock ? _.flatten(getBlockTree(this.props.innerBlock, this.props.createBlock, allContextVars).map(cb => {
-        const block = this.props.createBlock(cb.blockDef)
-        return block.getContextVarExprs(contextVar, this.props.renderInstanceProps.widgetLibrary, this.props.renderInstanceProps.actionLibrary)
-      })) : []
+      const contextVarExprs = this.props.innerBlock ? this.props.createBlock(this.props.innerBlock).getSubtreeContextVarExprs({
+        actionLibrary: this.props.renderInstanceProps.actionLibrary,
+        widgetLibrary: this.props.renderInstanceProps.widgetLibrary,
+        contextVars: allContextVars,
+        contextVar: contextVar,
+        createBlock: this.props.createBlock
+      }) : []
 
       const currentElem = elem
       elem = (outerProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => (
