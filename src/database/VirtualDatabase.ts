@@ -1,4 +1,4 @@
-import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery } from "./Database";
+import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery, getWherePrimaryKey } from "./Database";
 import { Schema, Column, ExprEvaluator, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
 import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
@@ -166,22 +166,22 @@ export default class VirtualDatabase implements Database {
       }
     }
 
-    // TODO this ended up creating a "= null" condition which, when compiled, matched all rows
-    // As for a long-term solution, it should probably search for any expression of "something = <temp primary key>" and replace
-    // them with false.
-    // // Replace any temporary primary keys with null to avoid text/integer conflicts in queries
-    // queryOptions = this.replaceTempPrimaryKeys(queryOptions, () => null)
-
     // Perform query
     let rows: Row[] | undefined
-    
-    const queryCacheKey = canonical({ queryOptions: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
-    rows = this.cache.get(queryCacheKey)
-    if (!rows) {
-      rows = await this.database.query(queryOptions, contextVars, contextVarValues)
-      this.cache.set(queryCacheKey, rows)
-    }
 
+    // Skip if us just a query on a temporary row, which will not match anything
+    if (this.tempPrimaryKeys.includes(getWherePrimaryKey(where))) {
+      rows = []
+    }
+    else {
+      const queryCacheKey = canonical({ queryOptions: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
+      rows = this.cache.get(queryCacheKey)
+      if (!rows) {
+        rows = await this.database.query(queryOptions, contextVars, contextVarValues)
+        this.cache.set(queryCacheKey, rows)
+      }
+    }
+    
     // Apply mutations
     rows = await this.mutateRows(rows, from, where, contextVars, contextVarValues)
 

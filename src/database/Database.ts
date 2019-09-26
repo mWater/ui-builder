@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator, Row } from 'mwater-expressions'
+import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator, Row, LiteralExpr } from 'mwater-expressions'
 import { ContextVar } from '../widgets/blocks';
 import { QueryOptions } from "./Database"
 import { ExprUtils } from "mwater-expressions"
@@ -190,4 +190,23 @@ export async function performEvalQuery(options: {
   }
 
   return projectedRows
+}
+
+/** Determine if a where clause expression filters by primary key, and if so, return the key */
+export function getWherePrimaryKey(where: Expr): any {
+  if (!where) {
+    return null
+  }
+
+  // Only match if is a single expression that uses =
+  if (where.type == "op" && where.op == "=" && where.exprs[0]!.type == "id" && where.exprs[1]!.type == "literal") {
+    return (where.exprs[1] as LiteralExpr).value
+  }
+
+  // And expressions that are collapsible are ok
+  if (where.type == "op" && where.op == "and" && where.exprs.length == 1) {
+    return getWherePrimaryKey(where.exprs[0])
+  }
+
+  return null
 }

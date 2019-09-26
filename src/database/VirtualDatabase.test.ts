@@ -218,6 +218,24 @@ describe("select, order, limit", () => {
     await performQuery(null, qopts)
   })
 
+  test("does not query rows that are not yet added", async () => {
+    const tx = vdb.transaction()
+    const pk = await tx.addRow("t1", {})
+    await tx.commit()
+
+    const qopts: QueryOptions = {
+      select: { x: { type: "field", table: "t1", column: "text" }},
+      from: "t1",
+      where: { type: "op", table: "t1", op: "=", exprs: [
+        { type: "id", table: "t1" }, 
+        { type: "literal", valueType: "id", value: pk }
+      ]}
+    }
+
+    // Should not crash as doesn't pass along
+    await performQuery(null, qopts)
+  })
+
   describe("transactions", () => {
     const numberField: Expr = { type: "field", table: "t1", column: "number" }
     const qopts: QueryOptions = {
