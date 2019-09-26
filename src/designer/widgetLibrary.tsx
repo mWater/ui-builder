@@ -11,6 +11,8 @@ import { BlockPaletteEntry } from "./blockPaletteEntries";
 import { Database } from "../database/Database";
 import { useState, useRef, useEffect } from "react";
 import { SearchControl } from "../widgets/blocks/search/SearchBlockInstance";
+import { NewTab } from "./NewTab";
+import { getBlockTree } from "../widgets/blocks";
 
 /** All widgets in current project */
 export interface WidgetLibrary {
@@ -99,6 +101,30 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     this.props.onWidgetLibraryChange(widgetLibrary)
   }
 
+  /** Validate a single widget */
+  validateWidget = (widgetDef: WidgetDef): string | null => {
+    if (!widgetDef.blockDef) {
+      return null
+    }
+
+    for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.blockFactory.createBlock, widgetDef.contextVars)) {
+      const block = this.props.blockFactory.createBlock(childBlock.blockDef)
+      
+      const error = block.validate({ 
+        schema: this.props.schema, 
+        actionLibrary: this.props.actionLibrary, 
+        widgetLibrary: this.props.widgetLibrary,
+        contextVars: childBlock.contextVars
+       })
+       
+       if (error) {
+         return error
+       }
+    }
+
+    return null
+  }
+
   renderTab(tab: string, index: number) {
     const activeTabId = this.props.openTabs[index]
     const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
@@ -149,6 +175,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
         onOpenWidget={this.handleOpenWidget} 
         onRemoveWidget={this.handleRemoveWidget}
         onDuplicateWidget={this.handleDuplicateWidget}
+        validateWidget={this.validateWidget}
         />
     }
   }
@@ -172,81 +199,3 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 }
 
-/** Tab which lists existing tabs and offers a button to create a new tab */
-const NewTab = (props: {  
-  widgetLibrary: WidgetLibrary
-  onAddWidget: (widgetDef: WidgetDef) => void,
-  onOpenWidget: (widgetId: string) => void, 
-  onRemoveWidget: (widgetId: string) => void, 
-  onDuplicateWidget: (widgetDef: WidgetDef) => void, 
-}) => {
-
-  const [search, setSearch] = useState("")
-
-  // Focus on load
-  const searchControl = useRef<SearchControl>(null)
-  useEffect(() => { 
-    if (searchControl.current) {
-      searchControl.current.focus()
-    }
-  }, [])
-
-  /** Add a new blank widget */
-  const handleAdd = () => {
-    props.onAddWidget({
-      id: uuid(),
-      name: "Untitled",
-      description: "",
-      blockDef: null,
-      contextVars: [],
-      contextVarPreviewValues: {}
-    })
-  }
-
-  const handleDuplicateWidget = (widgetDef: WidgetDef, ev: React.MouseEvent) => {
-    ev.stopPropagation()
-    props.onDuplicateWidget(widgetDef)
-  }
-
-  const handleRemoveWidget = (widgetId: string, ev: React.MouseEvent) => {
-    ev.stopPropagation()
-    props.onRemoveWidget(widgetId)
-  }
-
-  const renderExistingWidgets = () => {
-    var widgets: WidgetDef[] = _.sortBy(Object.values(props.widgetLibrary.widgets), "name")
-
-    widgets = widgets.filter(widget => {
-      return search ? widget.name.toLowerCase().includes(search.toLowerCase()) : true
-    })
-
-    return (
-      <ul className="list-group">
-        { widgets.map(widget => (
-          <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={props.onOpenWidget.bind(null, widget.id)}>
-            <span style={{ float: "right" }} onClick={handleRemoveWidget.bind(null, widget.id)}>
-              <i className="fa fa-fw fa-remove"/>
-            </span>
-            <span style={{ float: "right" }} onClick={handleDuplicateWidget.bind(null, widget)}>
-              <i className="fa fa-fw fa-files-o"/>
-            </span>
-            {widget.name}
-            { widget.description ? <span className="text-muted"> - {widget.description}</span> : null }
-          </li>
-        )) }
-      </ul>
-    )
-  }
-
-  return (
-    <div style={{ padding: 10 }}>
-      <div style={{ paddingBottom: 10 }}>
-        <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
-        <button type="button" className="btn btn-primary" onClick={handleAdd}>
-          <i className="fa fa-plus"/> New Widget
-        </button>
-      </div>
-      {renderExistingWidgets()}
-    </div>
-  )
-}

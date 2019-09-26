@@ -76,5 +76,5 @@ export declare function performEvalQuery(options: {
     exprUtils: ExprUtils;
 }): Promise<Row[]>;
 /** Determine if a where clause expression filters by primary key, and if so, return the key */
-export declare function getWherePrimaryKey(where: Expr): any;
+export declare function getWherePrimaryKey(where?: Expr): any;
 export {};

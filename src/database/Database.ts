@@ -193,7 +193,7 @@ export async function performEvalQuery(options: {
 }
 
 /** Determine if a where clause expression filters by primary key, and if so, return the key */
-export function getWherePrimaryKey(where: Expr): any {
+export function getWherePrimaryKey(where?: Expr): any {
   if (!where) {
     return null
   }

@@ -38,6 +38,8 @@ export declare class WidgetLibraryDesigner extends React.Component<Props, State>
     handleCloseTab: (index: number, ev: React.MouseEvent<Element, MouseEvent>) => void;
     handleOpenWidget: (widgetId: string) => void;
     handleRemoveWidget: (widgetId: string) => void;
+    /** Validate a single widget */
+    validateWidget: (widgetDef: WidgetDef) => string | null;
     renderTab(tab: string, index: number): JSX.Element | null;
     renderActiveTabContents(): JSX.Element | null;
     render(): JSX.Element;
