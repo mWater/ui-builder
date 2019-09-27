@@ -86,12 +86,11 @@ export async function performEvalQuery(options: {
   // Create temporary rows to manipulate
   let tempRows: any[] = evalRows.map(r => ({ row: r }))
 
-  // Filter by where clause
+  // Filter by where clause (in parallel)
   if (query.where) {
-    for (const tempRow of tempRows) {
-      tempRow["where"] = await exprEval.evaluate(query.where, { row: tempRow.row })
-    }
-    tempRows = tempRows.filter(row => row["where"] == true)
+    const wherePromises = tempRows.map(tempRow => exprEval.evaluate(query.where!, { row: tempRow.row }))
+    const whereValues = await Promise.all<boolean>(wherePromises)
+    tempRows = tempRows.filter((row, index) => whereValues[index] == true)
   }
 
   // Get list of selects in { id, expr, isAggr } format
@@ -111,13 +110,28 @@ export async function performEvalQuery(options: {
   for (const tempRow of tempRows) {
     for (let i = 0 ; i < selects.length ; i++) {
       if (!selects[i].isAggr) {
-        tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: tempRow.row })
+        tempRow["s" + i] = exprEval.evaluate(selects[i].expr, { row: tempRow.row })
       }
     }
 
     for (let i = 0 ; i < orderBys.length ; i++) {
       if (!orderBys[i].isAggr) {
-        tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: tempRow.row })
+        tempRow["o" + i] = exprEval.evaluate(orderBys[i].expr, { row: tempRow.row })
+      }
+    }
+  }
+
+  // Evaluate promises
+  for (const tempRow of tempRows) {
+    for (let i = 0 ; i < selects.length ; i++) {
+      if (!selects[i].isAggr) {
+        tempRow["s" + i] = await tempRow["s" + i]
+      }
+    }
+
+    for (let i = 0 ; i < orderBys.length ; i++) {
+      if (!orderBys[i].isAggr) {
+        tempRow["o" + i] = await tempRow["o" + i]
       }
     }
   }
@@ -149,13 +163,31 @@ export async function performEvalQuery(options: {
       // Evaluate all aggr selects and aggr orderbys
       for (let i = 0 ; i < selects.length ; i++) {
         if (selects[i].isAggr) {
-          tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
+          tempRow["s" + i] = exprEval.evaluate(selects[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
         }
       }
 
       for (let i = 0 ; i < orderBys.length ; i++) {
         if (orderBys[i].isAggr) {
-          tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
+          tempRow["o" + i] = exprEval.evaluate(orderBys[i].expr, { row: tempRow.row, rows: group.map(r => r.row) })
+        }
+      }
+    }
+
+    // Evaluate promises
+    for (const group of Object.values(groups)) {
+      const tempRow = group[0]
+
+      // Evaluate all aggr selects and aggr orderbys
+      for (let i = 0 ; i < selects.length ; i++) {
+        if (selects[i].isAggr) {
+          tempRow["s" + i] = await tempRow["s" + i]
+        }
+      }
+
+      for (let i = 0 ; i < orderBys.length ; i++) {
+        if (orderBys[i].isAggr) {
+          tempRow["o" + i] = await tempRow["o" + i]
         }
       }
     }
@@ -209,4 +241,20 @@ export function getWherePrimaryKey(where?: Expr): any {
   }
 
   return null
+}
+
+/** Determine if a query is aggregate (either select or order clauses) */
+export function isQueryAggregate(query: QueryOptions, exprUtils: ExprUtils) {
+  for (const select of Object.values(query.select)) {
+    if (exprUtils.getExprAggrStatus(select) === "aggregate"){
+      return true
+    }
+  }
+
+  for (const orderBy of query.orderBy || []) {
+    if (exprUtils.getExprAggrStatus(orderBy.expr) === "aggregate"){
+      return true
+    }
+  }
+  return false
 }
