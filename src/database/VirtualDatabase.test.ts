@@ -168,6 +168,59 @@ describe("select, order, limit", () => {
     ])
   })
 
+  test("orderby query with capitalization", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
+    const qopts: QueryOptions = {
+      select: { x: { type: "id", table: "t1" }},
+      from: "t1",
+      orderBy: [
+        { expr: { type: "field", table: "t1", column: "text" }, dir: "asc" },
+        { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
+      ],
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: 1, text: "a", number: 1 },
+      { id: 2, text: "a", number: 2 },
+      { id: 3, text: "b", number: 3 },
+      { id: 4, text: "A", number: 4 }
+    ] }, qopts)
+
+    expect(rows).toEqual([
+      { x: 2 },
+      { x: 1 },
+      { x: 4 },
+      { x: 3 }
+    ])
+  })
+
+  test("orderby query with numbers", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
+    const qopts: QueryOptions = {
+      select: { x: { type: "id", table: "t1" }},
+      from: "t1",
+      orderBy: [
+        { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
+      ],
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: 1, number: 1 },
+      { id: 2, number: 2 },
+      { id: 3, number: 3 },
+      { id: 4, number: 11 }
+    ] }, qopts)
+
+    expect(rows).toEqual([
+      { x: 4 },
+      { x: 3 },
+      { x: 2 },
+      { x: 1 }
+    ])
+  })
+
   test("n-1 join", async () => {
     preventPassthrough()    // Test how queries are transformed by preventing passthrough
 

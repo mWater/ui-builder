@@ -79,4 +79,6 @@ export declare function performEvalQuery(options: {
 export declare function getWherePrimaryKey(where?: Expr): any;
 /** Determine if a query is aggregate (either select or order clauses) */
 export declare function isQueryAggregate(query: QueryOptions, exprUtils: ExprUtils): boolean;
+/** Stable sort on field */
+export declare function stableSort<T>(items: T[], iteratee: (item: T) => any, direction: "asc" | "desc"): T[];
 export {};

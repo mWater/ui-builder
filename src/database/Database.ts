@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator, Row, LiteralExpr } from 'mwater-expressions'
 import { ContextVar } from '../widgets/blocks';
 import { QueryOptions } from "./Database"
+import stable from 'stable'
 import { ExprUtils } from "mwater-expressions"
 
 export type OrderByDir = "asc" | "desc"
@@ -198,9 +199,10 @@ export async function performEvalQuery(options: {
 
   // Order by
   if (query.orderBy && query.orderBy.length > 0) {
-    tempRows = _.sortByOrder(tempRows, 
-      query.orderBy.map((orderBy, i) => (tempRow: any) => tempRow["o" + i]),
-      query.orderBy.map(orderBy => orderBy.dir))
+    // Sort by orders in reverse to prioritize first
+    for (let i = query.orderBy.length - 1 ; i >= 0 ; i--) {
+      tempRows = stableSort(tempRows, (tempRow: any) => tempRow["o" + i], query.orderBy[i].dir)
+    }
   }
 
   // Limit
@@ -257,4 +259,17 @@ export function isQueryAggregate(query: QueryOptions, exprUtils: ExprUtils) {
     }
   }
   return false
+}
+
+/** Stable sort on field */
+export function stableSort<T>(items: T[], iteratee: (item: T) => any, direction: "asc" | "desc") {
+  return stable(items, (a, b) => direction == "asc" ? normalCompare(iteratee(a), iteratee(b)) : normalCompare(iteratee(b), iteratee(a)))
+}
+  
+/** Compare two values in normal sense of the word (numbers as numbers, strings as strings with locale) */
+function normalCompare(a: any, b: any): number {
+  if (typeof a == "number" && typeof b == "number") {
+    return a > b ? 1 : (a < b ? -1 : 0)
+  }
+  return String(a).localeCompare(b)
 }
