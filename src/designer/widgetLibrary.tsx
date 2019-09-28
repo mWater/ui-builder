@@ -9,8 +9,6 @@ import * as _ from "lodash";
 import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import { Database } from "../database/Database";
-import { useState, useRef, useEffect } from "react";
-import { SearchControl } from "../widgets/blocks/search/SearchBlockInstance";
 import { NewTab } from "./NewTab";
 import { getBlockTree } from "../widgets/blocks";
 
@@ -125,7 +123,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     return null
   }
 
-  renderTab(tab: string, index: number) {
+  renderTab(index: number) {
     const activeTabId = this.props.openTabs[index]
     const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
 
@@ -182,9 +180,9 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
 
   render() {
     return (
-      <div style={{ height: "100%" }}>
+      <div style={{ height: "100%", display: "grid", gridTemplateRows: "auto 1fr" }}>
         <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
-          {this.props.openTabs.map((tab, index) => this.renderTab(tab, index))}
+          {this.props.openTabs.map((tab, index) => this.renderTab(index))}
           <li 
             className={(this.state.activeTabIndex >= this.props.openTabs.length) ? "active" : ""}
             key="new">
