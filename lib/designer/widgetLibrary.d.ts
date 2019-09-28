@@ -40,7 +40,7 @@ export declare class WidgetLibraryDesigner extends React.Component<Props, State>
     handleRemoveWidget: (widgetId: string) => void;
     /** Validate a single widget */
     validateWidget: (widgetDef: WidgetDef) => string | null;
-    renderTab(tab: string, index: number): JSX.Element | null;
+    renderTab(index: number): JSX.Element | null;
     renderActiveTabContents(): JSX.Element | null;
     render(): JSX.Element;
 }

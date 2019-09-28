@@ -63,7 +63,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
     }
 
     return (
-      <div style={{ padding: 5, height: "100%" }}>
+      <div style={{ padding: 5, height: "100vh" }}>
         <WidgetLibraryDesigner
           openTabs={this.state.openTabs}
           onOpenTabsChange={this.handleOpenTabsChange}
