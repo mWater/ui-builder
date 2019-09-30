@@ -238,6 +238,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     return (
       <table className={className} style={style}>
+        { !this.props.block.blockDef.hideHeaders ? 
         <thead>
           <tr>
             { this.props.block.blockDef.headers.map((b, index) => {
@@ -245,6 +246,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
             })}
           </tr>
         </thead>
+        : null }
         <tbody>
           {this.renderRows()}
         </tbody>

@@ -21,6 +21,8 @@ export interface QueryTableBlockDef extends BlockDef {
     rowClickAction: ActionDef | null;
     /** Message to display when there are no rows */
     noRowsMessage?: LocalizedString | null;
+    /** True to hide headers */
+    hideHeaders?: boolean;
 }
 export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];

@@ -7,7 +7,7 @@ import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row } from 'mw
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import { NumberInput, Select } from 'react-library/lib/bootstrap';
+import { NumberInput, Select, Checkbox } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
@@ -33,6 +33,9 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Message to display when there are no rows */
   noRowsMessage?: LocalizedString | null
+
+  /** True to hide headers */
+  hideHeaders?: boolean
 }
 
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
@@ -207,6 +210,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
     return (
       <table className="table table-bordered">
+        { !this.blockDef.hideHeaders ? 
         <thead>
           <tr>
             { this.blockDef.headers.map((b, index) => {
@@ -214,6 +218,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
             })}
           </tr>
         </thead>
+        : null }
         <tbody>
           <tr>
             { this.blockDef.contents.map((b, index) => {
@@ -327,6 +332,10 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="hideHeaders">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Hide Headers</Checkbox>}
+        </PropertyEditor>
 
         <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
           <i className="fa fa-plus"/> Add Column
