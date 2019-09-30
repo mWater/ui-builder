@@ -238,11 +238,8 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   createInnerProps(): RenderInstanceProps {
     const outer = this.props.renderInstanceProps
 
-    // Get injected context variable value (rowset is special case that incorporates filters)
+    // Get injected context variable value
     let value = this.props.value
-    if (this.props.injectedContextVar.type === "rowset" && this.state.filters.length > 0) {
-      value = { type: "op", op: "and", table: this.props.injectedContextVar.table!, exprs: _.compact([value].concat(this.state.filters.map(f => f.expr))) }
-    }
 
     // Create inner props
     const innerProps: RenderInstanceProps = {

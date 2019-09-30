@@ -341,7 +341,7 @@ test("null filters are ignored for rowset variables", (done) => {
   })
 })
 
-test("filters are applied for rowset variables to variable value", (done) => {
+test("filters are not applied for rowset variables to variable value", (done) => {
   const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs : Expr[] = [
@@ -372,10 +372,7 @@ test("filters are applied for rowset variables to variable value", (done) => {
     </ContextVarInjector>))
 
   setImmediate(() => {
-    expect(innerRenderProps.contextVarValues.cv1).toEqual({
-      type: "op", op: "and", table: "t1", exprs: [
-        value, initialFilters[0].expr
-      ]})
+    expect(innerRenderProps.contextVarValues.cv1).toEqual(value)
     done()
   })
   

@@ -48,7 +48,7 @@ export interface RenderInstanceProps {
     actionLibrary: ActionLibrary;
     widgetLibrary: WidgetLibrary;
     pageStack: PageStack;
-    /** Values of context variables */
+    /** Values of context variables. Note: filters are not incorporated automatically into rowset values! */
     contextVarValues: {
         [contextVarId: string]: any;
     };
