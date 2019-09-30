@@ -89,7 +89,7 @@ export async function performEvalQuery(options: {
 
   // Filter by where clause (in parallel)
   if (query.where) {
-    const wherePromises = tempRows.map(tempRow => exprEval.evaluate(query.where!, { row: tempRow.row }))
+    const wherePromises = tempRows.map(tempRow => exprEval.evaluate(query.where!, { row: tempRow.row, rows: tempRows.map(tr => tr.row) }))
     const whereValues = await Promise.all<boolean>(wherePromises)
     tempRows = tempRows.filter((row, index) => whereValues[index] == true)
   }
@@ -111,13 +111,13 @@ export async function performEvalQuery(options: {
   for (const tempRow of tempRows) {
     for (let i = 0 ; i < selects.length ; i++) {
       if (!selects[i].isAggr) {
-        tempRow["s" + i] = exprEval.evaluate(selects[i].expr, { row: tempRow.row })
+        tempRow["s" + i] = exprEval.evaluate(selects[i].expr, { row: tempRow.row, rows: tempRows.map(tr => tr.row) })
       }
     }
 
     for (let i = 0 ; i < orderBys.length ; i++) {
       if (!orderBys[i].isAggr) {
-        tempRow["o" + i] = exprEval.evaluate(orderBys[i].expr, { row: tempRow.row })
+        tempRow["o" + i] = exprEval.evaluate(orderBys[i].expr, { row: tempRow.row, rows: tempRows.map(tr => tr.row) })
       }
     }
   }
