@@ -2,12 +2,12 @@ import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
 import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors';
-import { Expr, ExprUtils, Schema, ExprValidator } from 'mwater-expressions';
+import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import { format } from 'd3-format'
 import moment from 'moment'
-import { Toggle } from 'react-library/lib/bootstrap';
+import { Toggle, Checkbox } from 'react-library/lib/bootstrap';
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
@@ -20,6 +20,10 @@ export interface ExpressionBlockDef extends BlockDef {
 
   /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
   format: string | null
+
+  bold?: boolean
+  italic?: boolean
+  underline?: boolean
 
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
@@ -51,14 +55,32 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
   renderDesign(props: RenderDesignProps) {
     const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
+    const style = this.getStyle()
 
     return (
-      <div style={{ textAlign: this.blockDef.align }}>
+      <div style={style}>
         <span className="text-muted">&lt;</span>
         {summary}
         <span className="text-muted">&gt;</span>
       </div>
     )     
+  }
+
+  getStyle() {
+    const style: React.CSSProperties = {}
+    if (this.blockDef.bold) {
+      style.fontWeight = "bold"
+    }
+    if (this.blockDef.italic) {
+      style.fontStyle = "italic"
+    }
+    if (this.blockDef.underline) {
+      style.textDecoration = "underline"
+    }
+    if (this.blockDef.align) {
+      style.textAlign = this.blockDef.align
+    }
+    return style
   }
 
 
@@ -69,6 +91,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
     const value = props.getContextVarExprValue(this.blockDef.contextVarId, this.blockDef.expr)
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
+    const style = this.getStyle()
 
     let str
     if (value == null) {
@@ -90,7 +113,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     }
     
     return (
-      <div style={{ textAlign: this.blockDef.align }}>{str}</div>
+      <div style={style}>{str}</div>
     )     
   }
 
@@ -173,6 +196,19 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           </LabeledProperty>
           : null
         }
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="bold">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Bold</Checkbox>}
+        </PropertyEditor>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="italic">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Italic</Checkbox>}
+        </PropertyEditor>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="underline">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
+        </PropertyEditor>
+
         <LabeledProperty label="Alignment">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
             {(value, onChange) => 
