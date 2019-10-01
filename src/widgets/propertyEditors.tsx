@@ -4,13 +4,14 @@ import { ContextVar, createExprVariables } from "./blocks";
 import { ActionDef } from "./actions";
 import { WidgetLibrary } from "../designer/widgetLibrary";
 import { ActionLibrary } from "./ActionLibrary";
-import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, ExprUtils } from "mwater-expressions";
 import { OrderBy, OrderByDir } from "../database/Database";
 import ListEditor from "./ListEditor";
 import { ExprComponent } from "mwater-expressions-ui";
 import * as PropTypes from 'prop-types'
 import ReactSelect from "react-select"
 import { localize } from "./localization";
+import { EmbeddedExpr } from "../embeddedExprs";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -406,3 +407,125 @@ export const EnumArrayEditor = (props: {
     }}
     />
 }
+
+/** Edits embedded expressions */
+export const EmbeddedExprsEditor = (props: { 
+  value: EmbeddedExpr[] | null
+  onChange: (value: EmbeddedExpr[]) => void
+  schema: Schema
+  dataSource: DataSource
+  contextVars: ContextVar[]
+}) => {
+  const { value, onChange, schema, dataSource, contextVars } = props
+
+  const handleAddEmbeddedExpr = () => {
+    onChange((value || []).concat([{ contextVarId: null, expr: null, format: null }]))
+  }
+
+  return (
+    <div>
+      <ListEditor items={value || []} onItemsChange={onChange}>
+        {(item, onItemChange) => 
+          <EmbeddedExprEditor value={item} onChange={onItemChange} schema={schema} dataSource={dataSource} contextVars={contextVars} />
+        }
+      </ListEditor>
+      <button type="button" className="btn btn-link btn-sm" onClick={handleAddEmbeddedExpr}>
+        + Add Embedded Expression
+      </button>
+    </div>
+  )
+}
+
+/** Allows editing of an embedded expression */
+export class EmbeddedExprEditor extends React.Component<{
+  value: EmbeddedExpr
+  onChange: (embeddedExpr: EmbeddedExpr) => void
+  contextVars: ContextVar[]
+  schema: Schema
+  dataSource: DataSource
+}> {
+
+  handleExprChange = (expr: Expr) => {
+    const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
+    const newExprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(expr)
+    
+    if (newExprType !== exprType) {
+      this.props.onChange({ ...this.props.value, expr: expr, format: null })
+    }
+    else {
+      this.props.onChange({ ...this.props.value, expr: expr })
+    }
+  }
+
+  render() {
+    // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
+
+    const contextVar = this.props.contextVars.find(cv => cv.id === this.props.value.contextVarId)
+    const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
+
+    return (
+      <div>
+        <LabeledProperty label="Row/Rowset Variable">
+          <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="contextVarId">
+            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={this.props.contextVars} types={["row", "rowset"]} />}
+          </PropertyEditor>
+        </LabeledProperty>
+    
+        { contextVar && contextVar.table 
+          ?
+          <LabeledProperty label="Expression">
+            <ExprComponent 
+              value={this.props.value.expr} 
+              onChange={this.handleExprChange} 
+              schema={this.props.schema} 
+              dataSource={this.props.dataSource} 
+              aggrStatuses={["individual", "aggregate", "literal"]}
+              variables={createExprVariables(this.props.contextVars)}
+              table={contextVar.table!}/>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "number" ?
+          <LabeledProperty label="Number Format">
+            <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="format">
+              {(value: string, onChange) => (
+                <NumberFormatEditor
+                  value={value} 
+                  onChange={onChange} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "date" ?
+          <LabeledProperty label="Date Format">
+            <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="format">
+              {(value: string, onChange) => (
+                <DateFormatEditor
+                  value={value} 
+                  onChange={onChange} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "datetime" ?
+          <LabeledProperty label="Date/time Format">
+            <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="format">
+              {(value: string, onChange) => (
+                <DatetimeFormatEditor
+                  value={value} 
+                  onChange={onChange} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+      </div>
+    )
+  }
+}
+

@@ -1,4 +1,3 @@
-import { WidgetDef } from "./widgets/widgets";
 import { Database } from "./database/Database";
 
 export interface Page {

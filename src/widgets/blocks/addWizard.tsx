@@ -10,6 +10,7 @@ import { SearchControl } from './search/SearchBlockInstance';
 import TabbedComponent from 'react-library/lib/TabbedComponent'
 import { localize } from '../localization';
 import uuid = require('uuid');
+import { ExpressionBlock, ExpressionBlockDef } from './expression';
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -168,8 +169,9 @@ const AddWizardPane = (props: {
             id: uuid(),
             type: "expression", 
             contextVarId: contextVar.id,
-            expr: { type: "field", table: contextVar.table!, column: column.id }
-          }
+            expr: { type: "field", table: contextVar.table!, column: column.id },
+            format: column.type == "number" ? "," : null
+          } as ExpressionBlockDef
         })
       }
     }

@@ -2,15 +2,7 @@ import * as React from 'react';
 import LeafBlock from '../LeafBlock';
 import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks';
 import { Expr, LocalizedString } from 'mwater-expressions';
-/** Expression which is embedded in the text string */
-interface EmbeddedExpr {
-    /** Context variable (row or rowset) to use for expression */
-    contextVarId: string | null;
-    /** Expression to be displayed */
-    expr: Expr;
-    /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
-    format: string | null;
-}
+import { EmbeddedExpr } from '../../embeddedExprs';
 export interface TextBlockDef extends BlockDef {
     type: "text";
     /** Text content */
@@ -36,4 +28,3 @@ export declare class TextBlock extends LeafBlock<TextBlockDef> {
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
     renderEditor(props: RenderEditorProps): JSX.Element;
 }
-export {};

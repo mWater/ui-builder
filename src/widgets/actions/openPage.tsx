@@ -1,10 +1,14 @@
 import * as _ from 'lodash'
 import * as React from 'react';
 import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
+import { LocalizedString, Expr } from 'mwater-expressions';
+import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
+import { ContextVar } from '../blocks';
+import { localize } from '../localization';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -19,6 +23,12 @@ export interface OpenPageActionDef extends ActionDef {
   type: "openPage"
 
   pageType: "normal" | "modal"
+
+  /** Title of page to open */
+  title?: LocalizedString | null
+
+  /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
+  titleEmbeddedExprs?: EmbeddedExpr[] 
 
   /** id of the widget that will be displayed in the page */
   widgetId: string | null
@@ -42,9 +52,9 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     // Ensure that all context variables are correctly mapped
     for (const widgetCV of widget.contextVars) {
-      // Allow unmapped variables
+      // Don't allow unmapped variables
       if (!this.actionDef.contextVarValues[widgetCV.id]) {
-        continue
+        return "Missing variable mapping"
       }
 
       // Ensure that mapping is to available context var
@@ -54,7 +64,24 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       }
     }
 
+    // Validate expressions
+    const err = validateEmbeddedExprs({
+      embeddedExprs: this.actionDef.titleEmbeddedExprs || [],
+      schema: options.schema,
+      contextVars: options.contextVars})
+    if (err) {
+      return err
+    }
+
     return null
+  }
+
+  /** Get any context variables expressions that this action needs */
+  getContextVarExprs(contextVar: ContextVar): Expr[] {
+    if (this.actionDef.titleEmbeddedExprs) {
+      return _.compact(_.map(this.actionDef.titleEmbeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null))
+    }
+    return []
   }
 
   performAction(options: PerformActionOptions): Promise<void> {
@@ -65,11 +92,30 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       contextVarValues[cvid] = options.contextVarValues[this.actionDef.contextVarValues[cvid].contextVarId]
     }
 
+    // Get title
+    let title = localize(this.actionDef.title, options.locale)
+
+    if (title) {
+      // Get any embedded expression values
+      const exprValues = _.map(this.actionDef.titleEmbeddedExprs || [], ee => options.getContextVarExprValue(ee.contextVarId!, ee.expr))
+
+      // Format and replace
+      title = formatEmbeddedExprString({
+        text: title, 
+        embeddedExprs: this.actionDef.titleEmbeddedExprs || [],
+        exprValues: exprValues,
+        schema: options.schema,
+        contextVars: options.contextVars,
+        locale: options.locale
+      })
+    }
+
     options.pageStack.openPage({
       type: this.actionDef.pageType,
       database: options.database,
       widgetId: this.actionDef.widgetId!,
-      contextVarValues: contextVarValues
+      contextVarValues: contextVarValues,
+      title: title
     })
 
     return Promise.resolve()
@@ -139,6 +185,27 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
         <LabeledProperty label="Variables">
           {renderContextVarValues()}
+        </LabeledProperty>
+
+        <LabeledProperty label="Page Title">
+          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="title">
+            {(value, onChange) => 
+              <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Page Title embedded expressions" help="Reference in text as {0}, {1}, etc.">
+          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="titleEmbeddedExprs">
+            {(value: EmbeddedExpr[] | null, onChange) => (
+              <EmbeddedExprsEditor 
+                value={value} 
+                onChange={onChange} 
+                schema={props.schema} 
+                dataSource={props.dataSource}
+                contextVars={props.contextVars} />
+            )}
+          </PropertyEditor>
         </LabeledProperty>
       </div>
     )

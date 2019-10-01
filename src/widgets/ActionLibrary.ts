@@ -27,10 +27,10 @@ export class ActionLibrary {
       case "openPage":
         return {
           type: "openPage",
-          pageType: "normal",
+          pageType: "modal",
           widgetId: null,
           contextVarValues: {}
-        }
+        } as OpenPageActionDef
       case "addRow": 
         return {
           type: "addRow",

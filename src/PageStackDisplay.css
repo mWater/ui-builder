@@ -4,18 +4,20 @@
 }
 
 .normal-page-header {
-  position: absolute;
-  cursor: pointer;
-  padding: 5px;
-  font-size: 17px;
-  left: 1px;
-  top: 13px;
+  padding: 5px 5px 15px 0px;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 15px;
+}
+
+.normal-page-header-back {
+  padding-right: 10px;
   color: #AAA;
+  cursor: pointer;
+}
+.normal-page-header-back:hover {
+  color: #38d;
 }
 
-.normal-page-header:hover {
-  color: #3378b7;
+.normal-page-header h4 {
+  margin: 0;
 }
-
-/* .normal-page-contents {
-} */

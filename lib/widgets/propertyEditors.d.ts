@@ -6,6 +6,7 @@ import { ActionLibrary } from "./ActionLibrary";
 import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
 import * as PropTypes from 'prop-types';
+import { EmbeddedExpr } from "../embeddedExprs";
 export declare class LabeledProperty extends React.Component<{
     label: string;
     help?: string;
@@ -150,4 +151,23 @@ export declare const EnumArrayEditor: (props: {
     locale?: string | undefined;
     placeholder?: string | undefined;
 }) => JSX.Element;
+/** Edits embedded expressions */
+export declare const EmbeddedExprsEditor: (props: {
+    value: EmbeddedExpr[] | null;
+    onChange: (value: EmbeddedExpr[]) => void;
+    schema: Schema;
+    dataSource: DataSource;
+    contextVars: ContextVar[];
+}) => JSX.Element;
+/** Allows editing of an embedded expression */
+export declare class EmbeddedExprEditor extends React.Component<{
+    value: EmbeddedExpr;
+    onChange: (embeddedExpr: EmbeddedExpr) => void;
+    contextVars: ContextVar[];
+    schema: Schema;
+    dataSource: DataSource;
+}> {
+    handleExprChange: (expr: Expr) => void;
+    render(): JSX.Element;
+}
 export {};

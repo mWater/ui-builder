@@ -207,7 +207,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       case "normal":
         return (
           <div style={{ display: invisible ? "none" : "block" }} key={index}>
-            <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index}>
+            <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index} title={page.title}>
               {contents}
             </NormalPage>
           </div>
@@ -215,7 +215,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       case "modal":
         return (
           <div style={{ display: invisible ? "none" : "block" }} key={index}>
-            <ModalPage onClose={this.handleClose} key={index}>
+            <ModalPage onClose={this.handleClose} key={index} title={page.title}>
               {contents}
             </ModalPage>
           </div>
@@ -228,15 +228,24 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 }
 
-class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void }> {
+class NormalPage extends React.Component<{ 
+  isFirst: boolean
+  onClose: () => void
+  title?: string 
+}> {
   render() {
     return (
       <div className="normal-page">
-        <div key="header" className="normal-page-header">
-          { !this.props.isFirst ?
-            <i className="fa fa-chevron-left" onClick={this.props.onClose} />
-          : null }
-        </div>
+        { !this.props.isFirst || this.props.title ?
+          <div className="normal-page-header" key="header">
+            <h4>
+              { !this.props.isFirst ?
+                <i className="normal-page-header-back fa fa-arrow-left fa-fw" onClick={this.props.onClose} />
+              : null }
+              { this.props.title }
+            </h4>
+          </div>
+        : null}
         <div key="contents" className="normal-page-contents">
           {this.props.children}
         </div>
@@ -245,10 +254,10 @@ class NormalPage extends React.Component<{ isFirst: boolean, onClose: () => void
   }
 }
 
-class ModalPage extends React.Component<{ onClose: () => void }> {
+class ModalPage extends React.Component<{ title?: string, onClose: () => void }> {
   render() {
     return (
-      <ModalPopupComponent onClose={this.props.onClose} size="large">
+      <ModalPopupComponent onClose={this.props.onClose} size="large" header={this.props.title}>
         {this.props.children}
       </ModalPopupComponent>
     )
