@@ -1,11 +1,10 @@
 .normal-page {
-  padding: 15px 20px 15px 20px;
   position: relative;
 }
 
 .normal-page-header {
-  padding: 5px 5px 15px 0px;
-  border-bottom: 1px solid #e5e5e5;
+  padding: 15px 5px 15px 10px;
+  border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
 }
 
@@ -20,4 +19,8 @@
 
 .normal-page-header h4 {
   margin: 0;
+}
+
+.normal-page-contents {
+  padding: 15px 20px 15px 20px;
 }
