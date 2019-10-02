@@ -8,12 +8,16 @@ import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
 import { Expr } from 'mwater-expressions';
 import { localize } from '../localization';
+import produce from 'immer';
 
 export interface ImageBlockDef extends BlockDef {
   type: "image"
 
   /** URL of image */
   url?: string
+
+  /** Localized version of the urls that override above for images that vary with locale */
+  localizedUrls?: { [locale: string]: string }
 
   /** Action to perform when image is clicked */
   clickActionDef: ActionDef | null
@@ -61,9 +65,17 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     return [] 
   }
    
-  renderImage(handleClick?: () => void) {
+  renderImage(locale: string, handleClick?: () => void) {
     if (!this.blockDef.url) {
       return <i className="fa fa-picture-o"/>
+    }
+
+    var url
+    if (this.blockDef.localizedUrls && this.blockDef.localizedUrls[locale]) {
+      url = this.blockDef.localizedUrls[locale]
+    }
+    else {
+      url = this.blockDef.url
     }
     
     const divStyle: React.CSSProperties = {}
@@ -83,13 +95,13 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
 
     return (
       <div onClick={handleClick} style={divStyle}>
-        <img src={this.blockDef.url} style={imageStyle}/>
+        <img src={url} style={imageStyle}/>
       </div>
     )
   }
 
   renderDesign(props: RenderDesignProps) {
-    return this.renderImage()
+    return this.renderImage(props.locale)
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
@@ -117,10 +129,26 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
       }
     }
 
-    return this.renderImage(handleClick)
+    return this.renderImage(props.locale, handleClick)
   }
 
   renderEditor(props: RenderEditorProps) {
+    const locales = [
+      "en",
+      "fr",
+      "es",
+      "pt",
+      "sw",
+      "tet",
+      "id",
+      "ht",
+      "my",
+      "km",
+      "bn",
+      "am"
+    ]
+    const localizedUrls = this.blockDef.localizedUrls || {}
+
     return (
       <div>
         <LabeledProperty label="URL">
@@ -156,6 +184,26 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
             )}
           </PropertyEditor>
         </LabeledProperty>
+
+        <LabeledProperty label="Locale-specific URL overrides">
+        { locales.map(locale => {
+          const onChange = (url: string | null) => {
+            props.onChange(produce(this.blockDef, bd => {
+              if (url) {
+                bd.localizedUrls = bd.localizedUrls || {}
+                bd.localizedUrls[locale] = url
+              }
+              else {
+                bd.localizedUrls = bd.localizedUrls || {}
+                delete bd.localizedUrls[locale]
+              }
+            }))
+          }
+          return <LabeledProperty label={locale}>
+            <TextInput value={localizedUrls[locale]} onChange={onChange} emptyNull />
+          </LabeledProperty>
+        })}
+      </LabeledProperty>
 
     </div>
     )

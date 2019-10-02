@@ -9,6 +9,10 @@ export interface ImageBlockDef extends BlockDef {
     type: "image";
     /** URL of image */
     url?: string;
+    /** Localized version of the urls that override above for images that vary with locale */
+    localizedUrls?: {
+        [locale: string]: string;
+    };
     /** Action to perform when image is clicked */
     clickActionDef: ActionDef | null;
     /** Size mode:
@@ -22,7 +26,7 @@ export interface ImageBlockDef extends BlockDef {
 export declare class ImageBlock extends LeafBlock<ImageBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
     getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
-    renderImage(handleClick?: () => void): JSX.Element;
+    renderImage(locale: string, handleClick?: () => void): JSX.Element;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
     renderEditor(props: RenderEditorProps): JSX.Element;
