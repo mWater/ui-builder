@@ -14,7 +14,6 @@ import { ActionLibrary } from "../widgets/ActionLibrary";
 import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import ErrorBoundary from "./ErrorBoundary";
-import FillDownwardComponent from "react-library/lib/FillDownwardComponent";
 import VirtualDatabase from "../database/VirtualDatabase";
 import AddWizardPalette from "./AddWizardPalette"
 import ClipboardPalette from "./ClipboardPalette"
