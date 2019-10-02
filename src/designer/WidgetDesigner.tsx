@@ -310,7 +310,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       />
 
     return [
-      (<div key="preview" className="widget-designer-preview">
+      (<div key="preview" className="widget-designer-block">
         <ErrorBoundary>
           {pageElem}
         </ErrorBoundary>
@@ -321,7 +321,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
   render() {
     return (
-      <div style={{position: "relative", height: "100%"}}>
+      <div className="widget-designer">
         <div className="widget-designer-header">
           <AddWizardPalette onSelect={this.handleSelect}/>
           <div style={{float: "right"}}>
@@ -342,9 +342,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
               />
           </div>
         </div>
-        <div style={{ height: "100%", paddingTop: 44 }}>
-          { this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview() }
-        </div>
+        { this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview() }
       </div>
     )
   }
