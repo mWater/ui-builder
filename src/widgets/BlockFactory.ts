@@ -27,6 +27,7 @@ import { HeaderBlock, HeaderBlockDef } from './blocks/header';
 import { TOCBlock, TOCBlockDef } from './blocks/toc/toc';
 import { ValidationBlockDef, ValidationBlock } from './blocks/validation';
 import { FloatBlock, FloatBlockDef } from './blocks/float';
+import { SpacerBlock, SpacerBlockDef } from './blocks/spacer';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -95,7 +96,9 @@ export default class BlockFactory {
         return new ValidationBlock(blockDef as ValidationBlockDef)
       case "float":
         return new FloatBlock(blockDef as FloatBlockDef, this.createBlock)
-    }
+      case "spacer":
+        return new SpacerBlock(blockDef as SpacerBlockDef)
+      }
 
     // Use custom blocks
     if (this.customBlocks[blockDef.type]) {
