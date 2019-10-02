@@ -1,10 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash'
 import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
-import { ExprValidator, LiteralExpr } from 'mwater-expressions';
-import { ContextVar, createExprVariables } from '../blocks';
-import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
-import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
+import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { TextInput, Checkbox } from 'react-library/lib/bootstrap';
 
 export interface GotoUrlActionDef extends ActionDef {
