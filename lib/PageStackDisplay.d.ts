@@ -30,7 +30,11 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     };
     constructor(props: Props);
     openPage(page: Page): void;
-    closePage(): boolean;
+    /** Close top page. Returns whether successful and pages still open */
+    closePage(): {
+        success: boolean;
+        pageCount: number;
+    };
     closeAllPages(): boolean;
     renderChildBlock: (props: RenderInstanceProps, childBlockDef: BlockDef | null) => React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
     handleClose: () => void;

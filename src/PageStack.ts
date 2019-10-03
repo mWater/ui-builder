@@ -20,8 +20,8 @@ export interface Page {
 export interface PageStack {
   openPage(page: Page): void
 
-  /** Close top page. true for success, false for failure */
-  closePage(): boolean
+  /** Close top page. Returns whether successful and pages still open */
+  closePage(): { success: boolean, pageCount: number }
 
   /** Closes all pages. true for success, false for failure */
   closeAllPages(): boolean

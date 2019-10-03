@@ -46,7 +46,8 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     this.setState({ pages: this.state.pages.concat(page) })
   }
 
-  closePage(): boolean {
+  /** Close top page. Returns whether successful and pages still open */
+  closePage(): { success: boolean, pageCount: number } {
     if (this.state.pages.length == 0) {
       throw new Error("Zero pages in stack")
     }
@@ -72,13 +73,13 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       if (_.compact(validationMessages).length > 0) {
         alert(_.compact(validationMessages).join("\n"))
       }
-      return false
+      return { success: false, pageCount: this.state.pages.length }
     }
 
     const pages = this.state.pages.slice()
     pages.splice(pages.length - 1, 1)
     this.setState({ pages })
-    return true
+    return { success: true, pageCount: pages.length }
   }
 
   closeAllPages(): boolean {
