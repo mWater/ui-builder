@@ -13,6 +13,8 @@ export interface ButtonBlockDef extends BlockDef {
     style: "default" | "primary" | "link";
     size: "normal" | "small" | "large" | "extrasmall";
     icon?: "plus" | "times" | "pencil";
+    /** True to make block-style button */
+    block?: boolean;
     /** If present, message to display when confirming action */
     confirmMessage?: LocalizedString | null;
 }

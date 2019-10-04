@@ -4,7 +4,7 @@ import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, Va
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { ActionDef } from '../actions';
-import { Select } from 'react-library/lib/bootstrap';
+import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
 import { Expr, LocalizedString } from 'mwater-expressions';
@@ -19,6 +19,9 @@ export interface ButtonBlockDef extends BlockDef {
   style: "default" | "primary" | "link"
   size: "normal" | "small" | "large" | "extrasmall"
   icon?: "plus" | "times" | "pencil"
+
+  /** True to make block-style button */
+  block?: boolean
 
   /** If present, message to display when confirming action */
   confirmMessage?: LocalizedString | null
@@ -70,6 +73,10 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
         case "large":
         className += ` btn-lg`
         break
+    }
+
+    if (this.blockDef.block) {
+      className += " btn-block"
     }
 
     const icon = this.blockDef.icon ? <i className={`fa fa-${this.blockDef.icon}`}/> : null
@@ -159,6 +166,9 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="block">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Block-style</Checkbox>}
+        </PropertyEditor>
         <LabeledProperty label="When button clicked">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="actionDef">
             {(value, onChange) => (
