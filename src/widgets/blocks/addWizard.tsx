@@ -186,9 +186,10 @@ const AddWizardPane = (props: {
     })
 
     return <div>
-      { visibleEntries.map(entry => {
+      { visibleEntries.map((entry, index) => {
         return <PaletteItem 
           entry={entry}
+          key={index}
           createBlock={props.createBlock}
           schema={props.schema}
           dataSource={props.dataSource}
