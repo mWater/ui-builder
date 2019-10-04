@@ -80,9 +80,13 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     }
 
     const icon = this.blockDef.icon ? <i className={`fa fa-${this.blockDef.icon}`}/> : null
+    const style: React.CSSProperties = {}
+    if (!this.blockDef.block) {
+      style.margin = 5
+    }
 
     return (
-      <button type="button" className={className} onClick={onClick} style={{ margin: 5 }}>
+      <button type="button" className={className} onClick={onClick} style={style}>
         { icon }
         { icon && label ? "\u00A0" : null }
         { label }
