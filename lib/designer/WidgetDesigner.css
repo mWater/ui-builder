@@ -15,7 +15,6 @@
 
 .widget-designer-editor {
   grid-area: editor;
-  height: 100%;
   vertical-align: top;
   padding: 5px;
   border-left: solid 1px #AAA;
