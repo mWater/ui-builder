@@ -40,7 +40,6 @@ export class RemoveRowAction extends Action<RemoveRowActionDef> {
   }
 
   renderEditor(props: RenderActionEditorProps) {
- 
     return (
       <div>
         <LabeledProperty label="Row Variable to delete">
