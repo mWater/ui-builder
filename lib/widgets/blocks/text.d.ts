@@ -7,7 +7,7 @@ export interface TextBlockDef extends BlockDef {
     type: "text";
     /** Text content */
     text: LocalizedString | null;
-    style: "p" | "div" | "h1" | "h2" | "h3" | "h4";
+    style: "p" | "div" | "h1" | "h2" | "h3" | "h4" | "h5";
     bold?: boolean;
     italic?: boolean;
     underline?: boolean;

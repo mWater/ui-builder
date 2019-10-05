@@ -14,7 +14,7 @@ export interface TextBlockDef extends BlockDef {
   /** Text content */
   text: LocalizedString | null
 
-  style: "p" | "div" | "h1" | "h2" | "h3" | "h4"
+  style: "p" | "div" | "h1" | "h2" | "h3" | "h4" | "h5"
 
   bold?: boolean
   italic?: boolean
@@ -107,7 +107,8 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
                   { value: "h1", label: "Heading 1"},
                   { value: "h2", label: "Heading 2"},
                   { value: "h3", label: "Heading 3"},
-                  { value: "h4", label: "Heading 4"}
+                  { value: "h4", label: "Heading 4"},
+                  { value: "h5", label: "Heading 5"}
             ]} /> }
           </PropertyEditor>
         </LabeledProperty>
