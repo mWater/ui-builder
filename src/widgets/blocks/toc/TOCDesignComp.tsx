@@ -160,6 +160,10 @@ export default function TOCDesignComp(props: {
   }
 
   const renderRight = () => {
+    if (!selectedItem) {
+      return null
+    }
+    
     // Create widget options 
     const widgetOptions = _.sortBy(Object.values(props.renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
 
