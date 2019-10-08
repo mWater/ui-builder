@@ -132,7 +132,7 @@ const ValidationEditor = (props: {
       </LabeledProperty>
 
       { contextVar && contextVar.table ?
-        <LabeledProperty label="Condition that must be true">
+        <LabeledProperty label="Condition that must be not be false">
           <PropertyEditor obj={props.validation} onChange={props.onValidationsChange} property="condition">
             { (value, onChange) => 
               <ExprComponent 
@@ -167,7 +167,7 @@ const getValidationErrors = (blockDef: ValidationBlockDef,  renderProps: RenderI
   for (const validation of blockDef.validations) {
     // Get value of condition
     const value = renderProps.getContextVarExprValue(validation.contextVarId!, validation.condition)
-    if (value !== true) {
+    if (value === false) {
       errors.push(localize(validation.message, renderProps.locale))
     }
   }
