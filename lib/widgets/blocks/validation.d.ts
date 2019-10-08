@@ -5,7 +5,10 @@ import LeafBlock from '../LeafBlock';
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {
     type: "validation";
+    /** Validations to apply */
     validations: Validation[];
+    /** True if validates immediately rather than waiting for validation on save */
+    immediate?: boolean;
 }
 /** Single validation to test */
 interface Validation {

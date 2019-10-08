@@ -8,12 +8,17 @@ import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTex
 import ListEditor from '../ListEditor';
 import { localize } from '../localization';
 import LeafBlock from '../LeafBlock';
+import { Checkbox } from 'react-library/lib/bootstrap';
 
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {
   type: "validation"
 
+  /** Validations to apply */
   validations: Validation[]
+
+  /** True if validates immediately rather than waiting for validation on save */
+  immediate?: boolean
 }
 
 /** Single validation to test */
@@ -99,6 +104,9 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
             <i className="fa fa-plus"/> Add Validation
           </button>
         </LabeledProperty>
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="immediate">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Validate Immediately</Checkbox>}
+        </PropertyEditor>
       </div>
     )
   }
@@ -172,7 +180,7 @@ const ValidationBlockInstance = (props: {
   renderProps: RenderInstanceProps
 }) => {
   // True if validating
-  const [validating, setValidating] = useState(false)
+  const [validating, setValidating] = useState(props.blockDef.immediate || false)
 
   const validate = () => {
     // Now validating
