@@ -230,7 +230,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       style.opacity = 0.6
     }
 
-    // Put hover if an action connecte
+    // Put hover if an action connected
     let className = "table table-bordered"
     if (this.props.block.blockDef.rowClickAction) {
       className += " table-hover"

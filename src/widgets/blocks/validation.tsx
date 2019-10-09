@@ -210,6 +210,6 @@ const ValidationBlockInstance = (props: {
   }
 
   return <div className="alert alert-danger">
-    { errors.map(e => <div><i className="fa fa-exclamation-triangle"/> {e}</div>) }
+    { errors.map((e, index) => <div key={index}><i className="fa fa-exclamation-triangle"/> {e}</div>) }
   </div>
 }

@@ -1,9 +1,9 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock } from '../blocks'
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock, ValidateBlockOptions } from '../blocks'
 import { localize } from '../localization';
-import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty } from '../propertyEditors';
+import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
 import ContextVarsInjector from '../ContextVarsInjector';
 import * as _ from 'lodash'
@@ -17,19 +17,29 @@ export interface SaveCancelBlockDef extends BlockDef {
   saveLabel: LocalizedString | null
   cancelLabel: LocalizedString | null
   child: BlockDef | null
+
   /** Message to confirm discarding changes */
   confirmDiscardMessage: LocalizedString | null
+
+  /** Context variable containing row to delete to enable a Delete button */
+  deleteContextVarId?: string | null
+
+  /** Label of delete button if present */
+  deleteLabel?: LocalizedString | null
+
+  /** Optional confirmation message for delete */
+  confirmDeleteMessage?: LocalizedString | null
 }
 
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
- * When either is clicked, the page is closed.
+ * When either is clicked, the page is closed. Has optional delete button too.
  */
 export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }
 
-  validate() { 
+  validate(options: ValidateBlockOptions) { 
     if (!this.blockDef.saveLabel) {
       return "Save label required"
     }
@@ -40,6 +50,19 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
 
     if (!this.blockDef.confirmDiscardMessage) {
       return "Confirm discard message required"
+    }
+
+    if (this.blockDef.deleteContextVarId) {
+      if (!this.blockDef.deleteLabel) {
+        return "Delete label required"
+      }
+      const deleteCV = options.contextVars.find(cv => cv.id == this.blockDef.deleteContextVarId)
+      if (!deleteCV) {
+        return "Delete context variable not found"
+      }
+      if (deleteCV.type !== "row") {
+        return "Delete context variable wrong type"
+      }
     }
 
     return null 
@@ -62,11 +85,15 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
 
     const saveLabelText = localize(this.blockDef.saveLabel, props.locale)
     const cancelLabelText = localize(this.blockDef.cancelLabel, props.locale)
+    const deleteLabelText = localize(this.blockDef.deleteLabel, props.locale)
 
     return (
       <div>
         { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
         <div className="save-cancel-footer">
+          { this.blockDef.deleteContextVarId ?
+            <button type="button" className="btn btn-danger" style={{float: "left"}}>{deleteLabelText}</button>
+          : null}
           <button type="button" className="btn btn-primary">{saveLabelText}</button>
           &nbsp;
           <button type="button" className="btn btn-default">{cancelLabelText}</button>
@@ -108,7 +135,26 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
-      </div>
+        <LabeledProperty label="Optional Delete Target">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="deleteContextVarId">
+            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row"]} />}
+          </PropertyEditor>
+        </LabeledProperty>
+        { this.blockDef.deleteContextVarId ?
+          <LabeledProperty label="Delete Label">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="deleteLabel">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { this.blockDef.deleteContextVarId ?
+          <LabeledProperty label="Optional Confirm Delete Message">
+            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="confirmDeleteMessage">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        </div>
     )
   }
 }
@@ -209,6 +255,37 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     this.props.renderInstanceProps.pageStack.closePage()
   }
 
+  handleDelete = async () => {
+    // Confirm deletion
+    if (this.props.blockDef.confirmDeleteMessage && !confirm(localize(this.props.blockDef.confirmDeleteMessage, this.props.renderInstanceProps.locale))) {
+      return     
+    }
+    // Do actual deletion
+    const db = this.props.renderInstanceProps.database
+    const deleteCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id == this.props.blockDef.deleteContextVarId)
+    if (!deleteCV) {
+      throw new Error("Missing delete CV")
+    }
+    const rowId = this.props.renderInstanceProps.contextVarValues[deleteCV.id]
+    if (!rowId) {
+      throw new Error("Missing delete row id")
+    }
+
+    try {
+      const tx = db.transaction()
+      await tx.removeRow(deleteCV.table!, rowId)
+      await tx.commit()
+    } catch (err) {
+      // TODO localize
+      alert("Unable to delete row")
+      return
+    }
+
+    this.state.virtualDatabase.rollback()
+    this.setState({ destroyed: true })
+    this.props.renderInstanceProps.pageStack.closePage()
+  }
+
   /** Stores the registration for validation of a child block and returns an unregister function */
   registerChildForValidation = (validate: () => string | null): (() => void) => {
     const key = uuid()
@@ -225,6 +302,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
 
     const saveLabelText = localize(this.props.blockDef.saveLabel, this.props.renderInstanceProps.locale)
     const cancelLabelText = localize(this.props.blockDef.cancelLabel, this.props.renderInstanceProps.locale)
+    const deleteLabelText = localize(this.props.blockDef.deleteLabel, this.props.renderInstanceProps.locale)
 
     // Replace renderChildBlock with function that keeps all instances for validation
     const renderInstanceProps = { 
@@ -257,6 +335,9 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
           </ContextVarsInjector>
 
         <div className="save-cancel-footer">
+          { this.props.blockDef.deleteContextVarId && this.props.renderInstanceProps.contextVarValues[this.props.blockDef.deleteContextVarId] ?
+            <button type="button" className="btn btn-danger" onClick={this.handleDelete} style={{float: "left"}}>{deleteLabelText}</button>
+          : null}
           <button type="button" className="btn btn-primary" onClick={this.handleSave} disabled={this.state.saving}>{saveLabelText}</button>
           &nbsp;
           <button type="button" className="btn btn-default" onClick={this.handleCancel} disabled={this.state.saving}>{cancelLabelText}</button>
