@@ -149,6 +149,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
             actionLibrary: this.props.actionLibrary,
             widgetLibrary: this.props.widgetLibrary
           })
+
+          // Gets the label of the block which is displayed on hover
+          const label = childBlock.getLabel()
       
           return (
             <BlockWrapper 
@@ -158,6 +161,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
               onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)} 
               store={store}
               validationError={validationError}
+              label={label}
             >
               {childBlock.renderDesign(props)}
             </BlockWrapper>

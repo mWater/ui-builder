@@ -17,4 +17,5 @@ export declare class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
     renderEditor(props: RenderEditorProps): JSX.Element;
+    getLabel(): string;
 }

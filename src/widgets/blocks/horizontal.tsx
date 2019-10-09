@@ -141,4 +141,6 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
       </div>
     )
   }
+
+  getLabel() { return "" } 
 }

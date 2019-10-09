@@ -20,6 +20,9 @@ interface Props {
   /** Injected by react-dnd */
   connectDragPreview?: ConnectDragPreview;
 
+  /** Wrapper label */
+  label?: string
+
   onSelect(): void;
   onRemove(): void;
 }
@@ -185,6 +188,7 @@ class BlockWrapper extends React.Component<Props, State> {
       this.props.connectDragSource!(
         this.props.connectDropTarget!(
           <div onClick={this.handleClick} className={className}>
+            { this.props.label ? <div className="block-wrapper-label">{this.props.label}</div> : null }
             {selected ? <span className="delete-block" onClick={this.props.onRemove}><i className="fa fa-remove"/></span> : null}
             {this.renderHover()}
             {this.props.children}

@@ -14,6 +14,8 @@ interface Props {
     connectDropTarget?: ConnectDropTarget;
     /** Injected by react-dnd */
     connectDragPreview?: ConnectDragPreview;
+    /** Wrapper label */
+    label?: string;
     onSelect(): void;
     onRemove(): void;
 }

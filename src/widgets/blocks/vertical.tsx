@@ -65,4 +65,6 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
       </div>
     )      
   }
+
+  getLabel() { return "" } 
 }

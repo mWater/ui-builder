@@ -151,6 +151,8 @@ export declare abstract class Block<T extends BlockDef> {
     getInitialFilters(contextVarId: string, widgetLibrary: WidgetLibrary): Filter[];
     /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children */
     canonicalize(): BlockDef | null;
+    /** Get label to display in designer */
+    getLabel(): string;
 }
 export declare function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, dropSide: DropSide): BlockDef;
 /**

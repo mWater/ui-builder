@@ -13,4 +13,5 @@ export declare class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
     canonicalize(): BlockDef | null;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): JSX.Element;
+    getLabel(): string;
 }

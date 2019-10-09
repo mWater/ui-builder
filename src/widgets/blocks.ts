@@ -215,6 +215,11 @@ export abstract class Block<T extends BlockDef> {
   canonicalize(): BlockDef | null {
     return this.blockDef
   }
+
+  /** Get label to display in designer */
+  getLabel(): string {
+    return this.blockDef.type
+  }
 }
 
 // Handles logic of a simple dropping of a block on another

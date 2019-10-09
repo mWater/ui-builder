@@ -1,6 +1,6 @@
 .block-wrapper {
   border: solid 1px transparent;
-  padding: 3px;
+  padding: 8px 3px 3px 3px;
   margin: 1px;
   position: relative;
 }
@@ -23,4 +23,24 @@
   top: -11px;
   right: -6px;
   cursor: pointer;
+}
+.block-wrapper .block-wrapper-label {
+  display: none;
+  position: absolute;
+  padding-left: 3px;
+  padding-right: 3px;
+  color: #AAA;
+  background-color: white;
+  font-size: 6pt;
+  top: -6px;
+  left: 6px;
+}
+
+.block-wrapper:hover .block-wrapper-label {
+  display: block;
+}
+
+.block-wrapper.selected > .block-wrapper-label {
+  display: block;
+  color: #38D;
 }
