@@ -149,7 +149,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
       case "none":
         return null
       case "page_break":
-        return <div className="page-break">&nbsp;</div>
+        return <div className="page-break"/>
       case "solid_line":
         return <hr/>
     }
