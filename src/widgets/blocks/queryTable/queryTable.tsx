@@ -64,6 +64,8 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       return error
     }
 
+    // TODO Validate order by
+
     // Validate action
     if (this.blockDef.rowClickAction) {
       const action = options.actionLibrary.createAction(this.blockDef.rowClickAction)

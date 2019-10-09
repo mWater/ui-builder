@@ -162,5 +162,9 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Print",
     blockDef: { id: "", type: "print", content: null }
+  },
+  {
+    title: "Repeating Block",
+    blockDef: { id: "", type: "queryRepeat", content: null, separator: "solid_line", limit: 100 }
   }
 ]

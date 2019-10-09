@@ -53,3 +53,17 @@
 .header-block h1, .header-block h2, .header-block h3, .header-block h4  {
   margin: 0;
 }
+
+@media screen {
+  .page-break {
+    border-bottom: dashed 1px #AAA;
+    padding-top: 10px;
+    margin-bottom: 20px;
+  }
+}
+
+@media print {
+  .page-break {
+    page-break-before: always;
+  }
+}

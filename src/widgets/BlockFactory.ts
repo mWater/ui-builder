@@ -29,6 +29,7 @@ import { ValidationBlockDef, ValidationBlock } from './blocks/validation';
 import { FloatBlock, FloatBlockDef } from './blocks/float';
 import { SpacerBlock, SpacerBlockDef } from './blocks/spacer';
 import { PrintBlock, PrintBlockDef } from './blocks/print';
+import { QueryRepeatBlock, QueryRepeatBlockDef } from './blocks/queryRepeat/queryRepeat';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -101,7 +102,9 @@ export default class BlockFactory {
         return new SpacerBlock(blockDef as SpacerBlockDef)
       case "print":
         return new PrintBlock(blockDef as PrintBlockDef, this.createBlock)
-      }
+      case "queryRepeat":
+        return new QueryRepeatBlock(blockDef as QueryRepeatBlockDef, this.createBlock)
+    }
 
     // Use custom blocks
     if (this.customBlocks[blockDef.type]) {
