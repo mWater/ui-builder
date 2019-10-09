@@ -158,5 +158,9 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     title: "Validation",
     blockDef: { id: "", type: "validation", validations: [] },
     elem: <div className="alert alert-danger"><div><i className="fa fa-exclamation-triangle"/> Validation</div></div>
+  },
+  {
+    title: "Print",
+    blockDef: { id: "", type: "print", content: null }
   }
 ]

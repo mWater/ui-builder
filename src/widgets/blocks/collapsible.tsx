@@ -1,8 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
-import BlockPlaceholder from '../BlockPlaceholder';
+import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
 import { PropertyEditor } from '../propertyEditors';
 import { Checkbox } from 'react-library/lib/bootstrap';
