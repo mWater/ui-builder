@@ -7,8 +7,6 @@ test("adds rows", () => {
     type: "fixedTable",
     numRows: 1,
     numColumns: 1,
-    cellBorders: "default",
-    cellPadding: "default",
     rows: [
       { cells: [{ content: { id: "b11", type: "none" }}]}
     ]
@@ -30,8 +28,6 @@ test("removes rows", () => {
     type: "fixedTable",
     numRows: 2,
     numColumns: 1,
-    cellBorders: "default",
-    cellPadding: "default",
     rows: [
       { cells: [{ content: { id: "b11", type: "none" }}]},
       { cells: [{ content: { id: "b21", type: "none" }}]}
@@ -53,8 +49,6 @@ test("adds columns", () => {
     type: "fixedTable",
     numRows: 1,
     numColumns: 1,
-    cellBorders: "default",
-    cellPadding: "default",
     rows: [
       { cells: [{ content: { id: "b11", type: "none" }}]}
     ]
@@ -75,8 +69,6 @@ test("removes columns", () => {
     type: "fixedTable",
     numRows: 1,
     numColumns: 2,
-    cellBorders: "default",
-    cellPadding: "default",
     rows: [
       { cells: [{ content: { id: "b11", type: "none" }}, { content: { id: "b12", type: "none" }}]}
     ]

@@ -36,6 +36,12 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** True to hide headers */
   hideHeaders?: boolean
+
+  /** Borders (default is "horizontal") */
+  borders?: "horizontal" | "all"
+
+  /** Table padding (default is "normal") */
+  padding?: "normal" | "compact"
 }
 
 export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
@@ -210,8 +216,21 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       contentProps = { ...contentProps, contextVars: props.contextVars.concat([this.createRowContextVar(rowsetCV)]) }
     }
 
+    let className = "table"
+    switch (this.blockDef.borders || "horizontal") {
+      case "all":
+        className += " table-bordered"
+        break
+    }
+
+    switch (this.blockDef.padding || "normal") {
+      case "compact":
+        className += " table-condensed"
+        break
+    }
+
     return (
-      <table className="table table-bordered">
+      <table className={className}>
         { !this.blockDef.hideHeaders ? 
         <thead>
           <tr>
@@ -338,6 +357,18 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
         <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="hideHeaders">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Hide Headers</Checkbox>}
         </PropertyEditor>
+
+        <LabeledProperty label="Borders">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="borders">
+            {(value, onChange) => <Select value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Padding">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="padding">
+            {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
+          </PropertyEditor>
+        </LabeledProperty>
 
         <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
           <i className="fa fa-plus"/> Add Column

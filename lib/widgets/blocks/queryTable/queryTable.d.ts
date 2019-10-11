@@ -23,6 +23,10 @@ export interface QueryTableBlockDef extends BlockDef {
     noRowsMessage?: LocalizedString | null;
     /** True to hide headers */
     hideHeaders?: boolean;
+    /** Borders (default is "horizontal") */
+    borders?: "horizontal" | "all";
+    /** Table padding (default is "normal") */
+    padding?: "normal" | "compact";
 }
 export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];

@@ -4,10 +4,10 @@ import CompoundBlock from '../CompoundBlock';
 /** Table with a fixed number of rows and columns */
 export interface FixedTableBlockDef extends BlockDef {
     type: "fixedTable";
-    /** Style of borders around the cells */
-    cellBorders: "default";
-    /** Padding of the cells */
-    cellPadding: "default" | "condensed";
+    /** Borders (default is "horizontal") */
+    borders?: "horizontal" | "all";
+    /** Table padding (default is "normal") */
+    padding?: "normal" | "compact";
     /** Number of rows in the table */
     numRows: number;
     /** Number of columns in the table */

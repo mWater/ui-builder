@@ -10,11 +10,11 @@ import produce from 'immer';
 export interface FixedTableBlockDef extends BlockDef {
   type: "fixedTable"
 
-  /** Style of borders around the cells */
-  cellBorders: "default"
+  /** Borders (default is "horizontal") */
+  borders?: "horizontal" | "all"
 
-  /** Padding of the cells */
-  cellPadding: "default" | "condensed"
+  /** Table padding (default is "normal") */
+  padding?: "normal" | "compact"
 
   /** Number of rows in the table */
   numRows: number
@@ -63,8 +63,21 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
       }), content.id)
     }
 
+    let className = "table"
+    switch (this.blockDef.borders || "horizontal") {
+      case "all":
+        className += " table-bordered"
+        break
+    }
+
+    switch (this.blockDef.padding || "normal") {
+      case "compact":
+        className += " table-condensed"
+        break
+    }
+
     return (
-      <table className={ this.blockDef.cellPadding === "condensed" ? "table table-bordered table-condensed" : "table table-bordered" }>
+      <table className={className}>
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
@@ -77,8 +90,21 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+    let className = "table"
+    switch (this.blockDef.borders || "horizontal") {
+      case "all":
+        className += " table-bordered"
+        break
+    }
+
+    switch (this.blockDef.padding || "normal") {
+      case "compact":
+        className += " table-condensed"
+        break
+    }
+
     return (
-      <table className={ this.blockDef.cellPadding === "condensed" ? "table table-bordered table-condensed" : "table table-bordered" }>
+      <table className={className}>
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr>
@@ -115,14 +141,15 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
           <NumberInput value={this.blockDef.numColumns} onChange={handleNumColumnsChange} decimal={false}/>
         </LabeledProperty>
 
-        <LabeledProperty label="Cell Padding">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="cellPadding">
-            {(value, onChange) => 
-              <Select value={value} onChange={onChange}
-                options={[
-                  { value: "default", label: "Normal"},
-                  { value: "condensed", label: "Condensed"},
-              ]}/> }
+        <LabeledProperty label="Borders">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="borders">
+            {(value, onChange) => <Select value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Padding">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="padding">
+            {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>
      </div>

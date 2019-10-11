@@ -220,6 +220,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
   render() {
     const riProps = this.props.renderInstanceProps
+    const blockDef = this.props.block.blockDef
 
     const style: React.CSSProperties = {
       marginTop: 5
@@ -230,18 +231,30 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       style.opacity = 0.6
     }
 
+    let className = "table"
+    switch (blockDef.borders || "horizontal") {
+      case "all":
+        className += " table-bordered"
+        break
+    }
+
+    switch (blockDef.padding || "normal") {
+      case "compact":
+        className += " table-condensed"
+        break
+    }
+
     // Put hover if an action connected
-    let className = "table table-bordered"
-    if (this.props.block.blockDef.rowClickAction) {
+    if (blockDef.rowClickAction) {
       className += " table-hover"
     }
 
     return (
       <table className={className} style={style}>
-        { !this.props.block.blockDef.hideHeaders ? 
+        { !blockDef.hideHeaders ? 
         <thead>
           <tr>
-            { this.props.block.blockDef.headers.map((b, index) => {
+            { blockDef.headers.map((b, index) => {
               return <th key={index}>{riProps.renderChildBlock(riProps, b)}</th>
             })}
           </tr>
