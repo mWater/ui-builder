@@ -30,6 +30,9 @@ export interface TOCItem {
   /** Localized label */
   label: LocalizedString
 
+  /** Localized title of page */
+  title?: LocalizedString | null
+
   /** Widget to be displayed when the item is selected */
   widgetId?: string | null
 

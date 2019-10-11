@@ -104,6 +104,7 @@ export default function TOCInstanceComp(props: {
       contextVarValues: mappedContextVarValues,
       database: renderProps.database,
       type: "normal",
+      title: selectedItem.title ? localize(selectedItem.title, renderProps.locale) : undefined,
       widgetId: selectedWidgetId
     }
 

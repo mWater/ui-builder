@@ -7,8 +7,9 @@ import produce from "immer"
 import uuid from "uuid"
 import { localize } from "../../localization"
 import SplitPane from "./SplitPane"
-import { LabeledProperty, ContextVarPropertyEditor } from "../../propertyEditors"
+import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors"
 import { Select } from "react-library/lib/bootstrap"
+import { LocalizedString } from "mwater-expressions"
 
 /** Designer component for TOC */
 export default function TOCDesignComp(props: { 
@@ -150,6 +151,15 @@ export default function TOCDesignComp(props: {
     })
   }
 
+  const handleTitleChange = (title: LocalizedString | null) => {
+    alterBlockItems((draft: TOCItem) => {
+      if (draft.id === selectedItem!.id) {
+        draft.title = title
+      }
+      return draft
+    })
+  }
+
   const handleContextVarMapChange = (contextVarMap: { [internalContextVarId: string]: string }) => {
     alterBlockItems((draft: TOCItem) => {
       if (draft.id === selectedItem!.id) {
@@ -213,6 +223,9 @@ export default function TOCDesignComp(props: {
       <div style={{ padding: 10 }}>
         <LabeledProperty label="Widget">
           <Select value={selectedWidgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
+        </LabeledProperty>
+        <LabeledProperty label="Page title (optional)">
+          <LocalizedTextPropertyEditor value={selectedItem.title || null} onChange={handleTitleChange} locale={props.renderProps.locale} />
         </LabeledProperty>
         <LabeledProperty label="Variable Mappings">
           {renderContextVarValues()}
