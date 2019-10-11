@@ -30,12 +30,22 @@ export default class ContextVarsInjector extends React.Component<Props> {
     const allContextVars = this.props.renderInstanceProps.contextVars.concat(this.props.injectedContextVars)
 
     for (const contextVar of this.props.injectedContextVars) {
+      const innerBlock = this.props.innerBlock ? this.props.createBlock(this.props.innerBlock) : null
+
       // Get context var exprs
-      const contextVarExprs = this.props.innerBlock ? this.props.createBlock(this.props.innerBlock).getSubtreeContextVarExprs({
+      const contextVarExprs = innerBlock ? innerBlock.getSubtreeContextVarExprs({
         actionLibrary: this.props.renderInstanceProps.actionLibrary,
         widgetLibrary: this.props.renderInstanceProps.widgetLibrary,
         contextVars: allContextVars,
         contextVar: contextVar,
+        createBlock: this.props.createBlock
+      }) : []
+
+      const initialFilters = innerBlock ? innerBlock.getSubtreeInitialFilters({
+        contextVarId: contextVar.id, 
+        widgetLibrary: this.props.renderInstanceProps.widgetLibrary,
+        schema: this.props.renderInstanceProps.schema, 
+        contextVars: allContextVars,
         createBlock: this.props.createBlock
       }) : []
 
@@ -47,6 +57,7 @@ export default class ContextVarsInjector extends React.Component<Props> {
             database={this.props.database}
             value={this.props.injectedContextVarValues[contextVar.id]} 
             renderInstanceProps={outerProps}
+            initialFilters={initialFilters}
             contextVarExprs={contextVarExprs}>
           {(renderProps, innerLoading, innerRefreshing) => currentElem(renderProps, innerLoading || loading, innerRefreshing || refreshing)}
         </ContextVarInjector>

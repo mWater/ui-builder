@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import './datepicker-tweaks.css'
 
 /** Either range or preset id or null */
-type DateValue = [string | null, string | null] | string | null
+export type DateValue = [string | null, string | null] | string | null
 
 interface Props {
   value: DateValue

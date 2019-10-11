@@ -8,7 +8,9 @@ import { localize } from '../../localization';
 import ReactSelect from "react-select"
 import EnumInstance from './EnumInstance';
 import TextInstance from './TextInstance';
-import DateExprComponent, { toExpr } from './DateExprComponent';
+import DateExprComponent, { toExpr, DateValue } from './DateExprComponent';
+import produce from 'immer';
+import { WidgetLibrary } from '../../../designer/widgetLibrary';
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -21,6 +23,9 @@ export interface DropdownFilterBlockDef extends BlockDef {
 
   /** Expression to filter on  */
   filterExpr: Expr
+
+  /** Default value of filter */
+  defaultValue?: any
 }
 
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
@@ -83,6 +88,8 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   }
 
   renderDesign(props: RenderDesignProps) {
+    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
+
     const styles = {
       control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34 }),
       // Keep menu above other controls
@@ -93,16 +100,36 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)
 
     if (valueType === "date" || valueType === "datetime") {
-      const doNothing = () => null
+      // Fake table
+      const table = contextVar ? contextVar.table || "" : ""
+      const handleSetDefault = (defaultValue: DateValue) => {
+        props.store.alterBlock(this.blockDef.id, (bd) => {
+          return { ...bd, defaultValue: defaultValue }
+        })
+      }
       const placeholder = localize(this.blockDef.placeholder, props.locale)
       return (
         <div style={{ padding: 5 }}>
-          <DateExprComponent table="" datetime={valueType === "datetime"} value={null} onChange={doNothing} placeholder={placeholder}/>
+          <DateExprComponent table={table} datetime={valueType === "datetime"} value={this.blockDef.defaultValue} onChange={handleSetDefault} placeholder={placeholder}/>
         </div>
       )
     }
 
     return <div style={{ padding: 5 }}><ReactSelect styles={styles}/></div>
+  }
+
+  getInitialFilters(options: { 
+    contextVarId: string, 
+    widgetLibrary: WidgetLibrary, 
+    schema: Schema, 
+    contextVars: ContextVar[]
+  }): Filter[] { 
+    if (options.contextVarId == this.blockDef.rowsetContextVarId) {
+      if (this.blockDef.defaultValue) {
+        return [this.createFilter(options.schema, options.contextVars, this.blockDef.defaultValue)]
+      }
+    }
+    return [] 
   }
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
@@ -158,6 +185,14 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     // Get rowset context variable
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
+    const handleExprChange = (expr: Expr) => {
+      props.onChange(produce(this.blockDef, (draft) => {
+        // Clear default value if expression changes
+        draft.filterExpr = expr
+        delete draft.defaultValue
+      }))
+    }
+
     return (
       <div>
         <LabeledProperty label="Rowset">
@@ -168,11 +203,13 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
         {rowsetCV ?
           <LabeledProperty label="Filter expression">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="filterExpr">
-              {(expr: Expr, onExprChange) => (
-                <ExprComponent value={expr} schema={props.schema} dataSource={props.dataSource} onChange={onExprChange} table={rowsetCV.table!} types={["enum", "text", "date", "datetime"]} />
-              )}
-            </PropertyEditor>
+            <ExprComponent 
+              value={this.blockDef.filterExpr} 
+              schema={props.schema} 
+              dataSource={props.dataSource} 
+              onChange={handleExprChange} 
+              table={rowsetCV.table!} 
+              types={["enum", "text", "date", "datetime"]} />
           </LabeledProperty>
         : null}
 

@@ -95,9 +95,9 @@ describe("getInitialFilters", () => {
     createBlock.mockReturnValueOnce(innerBlock)
     innerBlock.getInitialFilters.mockReturnValue([{ id: "f1", memo: "m", expr: {} as Expr }])
 
-    const filters = widgetBlock.getInitialFilters("a1", widgetLibrary)
+    const filters = widgetBlock.getInitialFilters({ contextVarId: "a1", widgetLibrary: widgetLibrary, schema: {} as Schema, contextVars: [] })
     expect(filters).toEqual([{ id: "f1", memo: "m", expr: {} as Expr }])
-    expect(innerBlock.getInitialFilters.mock.calls[0][0]).toBe("b1")
+    expect(innerBlock.getInitialFilters.mock.calls[0][0].contextVarId).toBe("b1")
   })
 })
 

@@ -4,7 +4,7 @@ import { Expr } from 'mwater-expressions';
 import "react-datepicker/dist/react-datepicker.css";
 import './datepicker-tweaks.css';
 /** Either range or preset id or null */
-declare type DateValue = [string | null, string | null] | string | null;
+export declare type DateValue = [string | null, string | null] | string | null;
 interface Props {
     value: DateValue;
     onChange: (value: DateValue) => void;

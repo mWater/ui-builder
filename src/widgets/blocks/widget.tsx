@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks'
-import { Expr } from 'mwater-expressions'
+import { Expr, Schema } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
@@ -45,16 +45,21 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     return null 
   }
 
-  getInitialFilters(contextVarId: string, widgetLibrary: WidgetLibrary): Filter[] { 
-    const widgetDef = widgetLibrary.widgets[this.blockDef.widgetId!]
+  getInitialFilters(options: {
+    contextVarId: string, 
+    widgetLibrary: WidgetLibrary, 
+    schema: Schema, 
+    contextVars: ContextVar[]
+  }): Filter[] { 
+    const widgetDef = options.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
       // Map contextVarId to internal id
       for (const key of Object.keys(this.blockDef.contextVarMap)) {
         const value = this.blockDef.contextVarMap[key]
-        if (value === contextVarId) {
-          return innerBlock.getInitialFilters(key, widgetLibrary)
+        if (value === options.contextVarId) {
+          return innerBlock.getInitialFilters({ ...options, contextVarId: key })
         }
       }
     }
