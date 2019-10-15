@@ -16,6 +16,10 @@
   border-left: solid 1px #DDD;
 }
 
+.normal-page-contents .toc-split {
+  margin: -15px -20px -15px -20px;
+}
+
 @media (min-width: 1200px) {
   .toc-split-left {
     width: 17%;

@@ -313,7 +313,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       />
 
     return [
-      (<div key="preview" className="widget-designer-block">
+      (<div key="preview" className="widget-preview-block">
         <ErrorBoundary>
           {pageElem}
         </ErrorBoundary>
