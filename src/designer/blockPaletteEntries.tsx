@@ -38,6 +38,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "rowset", content: null, filter: null },
   },
   {
+    title: "Row",
+    blockDef: { id: "", type: "row", content: null, filter: null },
+  },
+  {
     title: "TextBox Control",
     blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null },
   },

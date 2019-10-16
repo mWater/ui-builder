@@ -30,6 +30,7 @@ import { FloatBlock, FloatBlockDef } from './blocks/float';
 import { SpacerBlock, SpacerBlockDef } from './blocks/spacer';
 import { PrintBlock, PrintBlockDef } from './blocks/print';
 import { QueryRepeatBlock, QueryRepeatBlockDef } from './blocks/queryRepeat/queryRepeat';
+import { RowBlockDef, RowBlock } from './blocks/row';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -82,6 +83,8 @@ export default class BlockFactory {
         return new SaveCancelBlock(blockDef as SaveCancelBlockDef, this.createBlock)
       case "rowset":
         return new RowsetBlock(blockDef as RowsetBlockDef, this.createBlock)
+      case "row":
+        return new RowBlock(blockDef as RowBlockDef, this.createBlock)
       case "addRow":
         return new AddRowBlock(blockDef as AddRowBlockDef, this.createBlock)
       case "tabbed":
