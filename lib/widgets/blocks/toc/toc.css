@@ -14,6 +14,7 @@
   width: 75%;
   float: left;
   border-left: solid 1px #DDD;
+  overflow-y: auto;
 }
 
 .normal-page-contents .toc-split {

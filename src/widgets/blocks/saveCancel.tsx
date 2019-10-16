@@ -338,7 +338,10 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
           { this.props.blockDef.deleteContextVarId && this.props.renderInstanceProps.contextVarValues[this.props.blockDef.deleteContextVarId] ?
             <button type="button" className="btn btn-danger" onClick={this.handleDelete} style={{float: "left"}}>{deleteLabelText}</button>
           : null}
-          <button type="button" className="btn btn-primary" onClick={this.handleSave} disabled={this.state.saving}>{saveLabelText}</button>
+          <button type="button" className="btn btn-primary" onClick={this.handleSave} disabled={this.state.saving}>
+            { this.state.saving ? <i className="fa fa-fw fa-spinner fa-spin"/> : null }
+            {saveLabelText}
+          </button>
           &nbsp;
           <button type="button" className="btn btn-default" onClick={this.handleCancel} disabled={this.state.saving}>{cancelLabelText}</button>
         </div>
