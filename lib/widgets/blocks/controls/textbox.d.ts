@@ -5,6 +5,8 @@ import { Column, LocalizedString } from 'mwater-expressions';
 export interface TextboxBlockDef extends ControlBlockDef {
     type: "textbox";
     placeholder: LocalizedString | null;
+    /** Number of lines in the text box. Default is 1. */
+    numLines?: number;
 }
 /** Block that is a text input control linked to a specific field */
 export declare class TextboxBlock extends ControlBlock<TextboxBlockDef> {
