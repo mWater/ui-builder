@@ -120,8 +120,8 @@ class Collapsible extends React.Component<Props, { collapsed: boolean }> {
     }
 
     return (
-      <div onClick={this.handleToggle}>
-        <div>
+      <div>
+        <div onClick={this.handleToggle}>
           <div style={{float: "left", marginRight: 5, fontSize: 18, color: "#3bd" }}>
             <i className="fa fa-caret-down"/>
           </div>
