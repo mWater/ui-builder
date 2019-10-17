@@ -12,7 +12,7 @@ export interface ButtonBlockDef extends BlockDef {
     actionDef: ActionDef | null;
     style: "default" | "primary" | "link";
     size: "normal" | "small" | "large" | "extrasmall";
-    icon?: "plus" | "times" | "pencil";
+    icon?: "plus" | "times" | "pencil" | "print";
     /** True to make block-style button */
     block?: boolean;
     /** If present, message to display when confirming action */

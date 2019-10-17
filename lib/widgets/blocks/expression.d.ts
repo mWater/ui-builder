@@ -15,6 +15,8 @@ export interface ExpressionBlockDef extends BlockDef {
     underline?: boolean;
     /** How to align text. Default is left */
     align?: "left" | "center" | "right" | "justify";
+    /** True to make multiple lines break */
+    multiline?: boolean;
 }
 export declare class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];

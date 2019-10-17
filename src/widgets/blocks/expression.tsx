@@ -27,6 +27,9 @@ export interface ExpressionBlockDef extends BlockDef {
 
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
+
+  /** True to make multiple lines break */
+  multiline?: boolean
 }
 
 export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
@@ -79,6 +82,9 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     }
     if (this.blockDef.align) {
       style.textAlign = this.blockDef.align
+    }
+    if (this.blockDef.multiline) {
+      style.whiteSpace = "pre-line"
     }
     return style
   }
@@ -225,6 +231,9 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="multiline">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
+        </PropertyEditor>
       </div>
     )
   }
