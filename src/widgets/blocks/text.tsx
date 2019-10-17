@@ -25,6 +25,12 @@ export interface TextBlockDef extends BlockDef {
 
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
+
+  /** Color of text. Default is no coloring */
+  color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger" 
+
+  /** True to make multiple lines break */
+  multiline?: boolean
 }
 
 export class TextBlock extends LeafBlock<TextBlockDef> {
@@ -43,6 +49,13 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
       contextVars: options.contextVars})
   }
 
+  getClassName() {
+    if (this.blockDef.color) {
+      return "text-" + this.blockDef.color
+    }
+    return ""
+  }
+
   renderText(content: React.ReactNode) {
     const style: React.CSSProperties = {}
     if (this.blockDef.bold) {
@@ -57,8 +70,11 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     if (this.blockDef.align) {
       style.textAlign = this.blockDef.align
     }
+    if (this.blockDef.multiline) {
+      style.whiteSpace = "pre-line"
+    }
 
-    return React.createElement(this.blockDef.style, { style: style }, content)
+    return React.createElement(this.blockDef.style, { style: style, className: this.getClassName() }, content)
   }
   
   renderDesign(props: RenderDesignProps) {
@@ -91,7 +107,12 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
         <LabeledProperty label="Text">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="text">
             {(value, onChange) => 
-              <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+              <LocalizedTextPropertyEditor 
+                value={value} 
+                onChange={onChange} 
+                locale={props.locale} 
+                multiline={this.blockDef.multiline} 
+                allowCR={this.blockDef.multiline} />
             }
           </PropertyEditor>
         </LabeledProperty>
@@ -136,6 +157,29 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
                   { value: "center", label: <i className="fa fa-align-center"/> },
                   { value: "right", label: <i className="fa fa-align-right"/> },
                   { value: "justify", label: <i className="fa fa-align-justify"/> }
+                ]} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="multiline">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
+        </PropertyEditor>
+
+        <LabeledProperty label="Color">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="color">
+            {(value, onChange) => 
+              <Select 
+                value={value || null} 
+                onChange={onChange} 
+                options={[
+                  { value: null, label: "Default" },
+                  { value: "muted", label: "Muted" },
+                  { value: "primary", label: "Primary" },
+                  { value: "info", label: "Info" },
+                  { value: "success", label: "Success" },
+                  { value: "warning", label: "Warning" },
+                  { value: "danger", label: "Danger" }
                 ]} />
             }
           </PropertyEditor>

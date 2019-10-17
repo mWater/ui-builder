@@ -7,7 +7,7 @@ import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import { format } from 'd3-format'
 import moment from 'moment'
-import { Toggle, Checkbox } from 'react-library/lib/bootstrap';
+import { Toggle, Checkbox, Select } from 'react-library/lib/bootstrap';
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
@@ -24,6 +24,9 @@ export interface ExpressionBlockDef extends BlockDef {
   bold?: boolean
   italic?: boolean
   underline?: boolean
+
+  /** Color of text. Default is no coloring */
+  color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger" 
 
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
@@ -59,14 +62,22 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   renderDesign(props: RenderDesignProps) {
     const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
     const style = this.getStyle()
+    const className = this.getClassName()
 
     return (
       <div style={style}>
         <span className="text-muted">&lt;</span>
-        {summary}
+        <span className={this.getClassName()}>{summary}</span>
         <span className="text-muted">&gt;</span>
       </div>
     )     
+  }
+
+  getClassName() {
+    if (this.blockDef.color) {
+      return "text-" + this.blockDef.color
+    }
+    return ""
   }
 
   getStyle() {
@@ -119,7 +130,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     }
     
     return (
-      <div style={style}>{str}</div>
+      <div style={style} className={this.getClassName()}>{str}</div>
     )     
   }
 
@@ -215,6 +226,10 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
         </PropertyEditor>
 
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="multiline">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
+        </PropertyEditor>
+
         <LabeledProperty label="Alignment">
           <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
             {(value, onChange) => 
@@ -231,9 +246,24 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="multiline">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
-        </PropertyEditor>
+        <LabeledProperty label="Color">
+          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="color">
+            {(value, onChange) => 
+              <Select 
+                value={value || null} 
+                onChange={onChange} 
+                options={[
+                  { value: null, label: "Default" },
+                  { value: "muted", label: "Muted" },
+                  { value: "primary", label: "Primary" },
+                  { value: "info", label: "Info" },
+                  { value: "success", label: "Success" },
+                  { value: "warning", label: "Warning" },
+                  { value: "danger", label: "Danger" }
+                ]} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }

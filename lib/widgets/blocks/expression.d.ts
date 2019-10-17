@@ -13,6 +13,8 @@ export interface ExpressionBlockDef extends BlockDef {
     bold?: boolean;
     italic?: boolean;
     underline?: boolean;
+    /** Color of text. Default is no coloring */
+    color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger";
     /** How to align text. Default is left */
     align?: "left" | "center" | "right" | "justify";
     /** True to make multiple lines break */
@@ -22,6 +24,7 @@ export declare class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
     validate(options: ValidateBlockOptions): string | null;
     renderDesign(props: RenderDesignProps): JSX.Element;
+    getClassName(): string;
     getStyle(): React.CSSProperties;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
     renderEditor(props: RenderEditorProps): JSX.Element;
