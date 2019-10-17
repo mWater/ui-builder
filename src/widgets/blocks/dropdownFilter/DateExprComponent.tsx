@@ -243,7 +243,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
   renderSummary() {
     if (!this.props.value) {
-      return <span className="text-muted">{this.props.placeholder || "All"}</span>
+      return <span className="text-muted">{this.props.placeholder || ""}</span>
     }
 
     const preset = presets.find(p => p.id === this.props.value)
