@@ -145,7 +145,7 @@ export function IdDropdownComponent<T>(props: Props<T>) {
     }
   }, [props.onChange])
 
-  return <div style={{ width: "100%" }}>
+  return <div style={{ width: "100%", minWidth: 160 }}>
     <AsyncReactSelect
       value={currentValue}
       placeholder={props.placeholder}
