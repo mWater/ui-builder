@@ -1,12 +1,14 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock } from '../../blocks'
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock, RenderEditorProps } from '../../blocks'
 import CompoundBlock from '../../CompoundBlock'
 import produce from 'immer'
 import { LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
 import './toc.css'
+import { PropertyEditor } from '../../propertyEditors'
+import { Checkbox } from 'react-library/lib/bootstrap'
 
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
@@ -20,6 +22,9 @@ export interface TOCBlockDef extends BlockDef {
 
   /** Optional footer */
   footer: BlockDef | null
+
+  /** Remove padding (for top-level TOC that should fit page completely) */
+  removePadding?: boolean
 }
 
 /** An item within the table of contents */
@@ -87,6 +92,16 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
 
   renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
     return <TOCInstanceComp renderProps={props} blockDef={this.blockDef} createBlock={this.createBlock} />
+  }
+  
+  renderEditor(props: RenderEditorProps) {
+    return (
+      <div>
+        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="removePadding">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Remove Padding (for top-level TOCs)</Checkbox>}
+        </PropertyEditor>
+      </div>
+    )
   }
 }
 

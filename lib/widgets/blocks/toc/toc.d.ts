@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock } from '../../blocks';
+import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock, RenderEditorProps } from '../../blocks';
 import CompoundBlock from '../../CompoundBlock';
 import { LocalizedString } from 'mwater-expressions';
 import './toc.css';
@@ -12,6 +12,8 @@ export interface TOCBlockDef extends BlockDef {
     header: BlockDef | null;
     /** Optional footer */
     footer: BlockDef | null;
+    /** Remove padding (for top-level TOC that should fit page completely) */
+    removePadding?: boolean;
 }
 /** An item within the table of contents */
 export interface TOCItem {
@@ -41,4 +43,5 @@ export declare class TOCBlock extends CompoundBlock<TOCBlockDef> {
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: RenderDesignProps): JSX.Element;
     renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
+    renderEditor(props: RenderEditorProps): JSX.Element;
 }

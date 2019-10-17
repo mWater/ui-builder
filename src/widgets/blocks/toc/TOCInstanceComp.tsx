@@ -126,5 +126,6 @@ export default function TOCInstanceComp(props: {
   return <SplitPane
     left={renderLeft()}
     right={renderRight()}
+    removePadding={blockDef.removePadding || false}
   />
 }

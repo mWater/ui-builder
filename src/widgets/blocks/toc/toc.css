@@ -17,7 +17,7 @@
   overflow-y: auto;
 }
 
-.normal-page-contents .toc-split {
+.toc-split.remove-padding {
   margin: -15px -20px -15px -20px;
 }
 
