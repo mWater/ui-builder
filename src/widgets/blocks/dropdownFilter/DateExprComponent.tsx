@@ -275,7 +275,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
             return (
               <li key={preset.id}>
                 <a style={{ padding: 5 }} onClick={this.handlePreset.bind(null, preset)}>
-                  {preset.name}
+                  {localize(preset.name, this.props.locale)}
                 </a>
               </li>
             )
