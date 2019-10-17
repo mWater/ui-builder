@@ -2,9 +2,10 @@ import ClickOutHandler from 'react-onclickout'
 import DatePicker from 'react-datepicker'
 import moment from 'moment';
 import React from 'react';
-import { Expr, LiteralExpr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 import "react-datepicker/dist/react-datepicker.css" 
 import './datepicker-tweaks.css'
+import { localize } from '../../localization';
 
 /** Either range or preset id or null */
 export type DateValue = [string | null, string | null] | string | null
@@ -16,6 +17,7 @@ interface Props {
   datetime: boolean
   table: string
   placeholder?: string
+  locale: string
 }
 
 interface State {
@@ -26,20 +28,90 @@ interface State {
 
 interface Preset {
   id: string
-  name: string
+  name: LocalizedString
 }
 
 const presets: Preset[] = [
-  { id: "thisyear", name: "This Year" },
-  { id: "lastyear", name: "Last Year" },
-  { id: "thismonth", name: "This Month" },
-  { id: "lastmonth", name: "Last Month" },
-  { id: "today", name: "Today" },
-  { id: "yesterday", name: "Yesterday" },
-  { id: "last24hours", name: "In Last 24 Hours" },
-  { id: "last7days", name: "In Last 7 Days" },
-  { id: "last30days", name: "In Last 30 Days" },
-  { id: "last365days", name: "In Last 365 Days" }
+  { 
+    id: "thisyear", 
+    name: {
+      _base: "en",
+      en: "This Year",
+      es: "Este año"
+    }
+  },
+  { 
+    id: "lastyear", 
+    name: {
+      _base: "en",
+      en: "Last Year",
+      es: "El año pasado"
+    }
+  },
+  { 
+    id: "thismonth", 
+    name: {
+      _base: "en",
+      en: "This Month",
+      es: "Este mes"
+    }
+  },
+  { 
+    id: "lastmonth", 
+    name: {
+      _base: "en",
+      en: "Last Month",
+      es: "Último Mes"
+    }
+  },
+  { 
+    id: "today", 
+    name: {
+      _base: "en",
+      en: "Today",
+      es: "Hoy"
+    }
+  },
+  { 
+    id: "yesterday", 
+    name: {
+      _base: "en",
+      en: "Yesterday",
+      es: "Ayer"
+    }
+  },
+  { 
+    id: "last24hours", 
+    name: {
+      _base: "en",
+      en: "In Last 24 Hours",
+      es: "En las últimas 24 horas"
+    }
+  },
+  { 
+    id: "last7days", 
+    name: {
+      _base: "en",
+      en: "In Last 7 Days",
+      es: "En los últimos 7 días"
+    }
+  },
+  { 
+    id: "last30days", 
+    name: {
+      _base: "en",
+      en: "In Last 30 Days",
+      es: "En los últimos 30 días"
+    }
+  },
+  { 
+    id: "last365days", 
+    name: {
+      _base: "en",
+      en: "In Last 365 Days",
+      es: "En los últimos 365 días"
+    }
+   }
 ]
 
 const toLiteral = (datetime: boolean, value: string | null): Expr => {
@@ -176,7 +248,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
     const preset = presets.find(p => p.id === this.props.value)
     if (preset) {
-      return preset.name
+      return localize(preset.name, this.props.locale)
     }
 
     if (Array.isArray(this.props.value)) {
@@ -210,7 +282,11 @@ export default class DateExprComponent extends React.Component<Props, State> {
           })}
           <li>
             <a style={{ padding: 5 }} onClick={this.handleCustom}>
-              Custom Date Range...
+              {localize({ 
+                _base: "en", 
+                en: "Custom Date Range...",
+                es: "Rango de fechas personalizado...."
+              }, this.props.locale)}
             </a>
           </li>
         </ul>

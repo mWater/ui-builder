@@ -110,7 +110,13 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       const placeholder = localize(this.blockDef.placeholder, props.locale)
       return (
         <div style={{ padding: 5 }}>
-          <DateExprComponent table={table} datetime={valueType === "datetime"} value={this.blockDef.defaultValue} onChange={handleSetDefault} placeholder={placeholder}/>
+          <DateExprComponent 
+            table={table} 
+            datetime={valueType === "datetime"} 
+            value={this.blockDef.defaultValue} 
+            onChange={handleSetDefault} 
+            placeholder={placeholder}
+            locale={props.locale}/>
         </div>
       )
     }
@@ -169,10 +175,24 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           locale={props.locale} />
         break
       case "date":
-        elem = <DateExprComponent datetime={false} table={contextVar.table!} value={value} onChange={handleChange} placeholder={placeholder}/>
+        elem = <DateExprComponent 
+          datetime={false} 
+          table={contextVar.table!} 
+          value={value} 
+          onChange={handleChange} 
+          placeholder={placeholder}
+          locale={props.locale}
+         />
         break
       case "datetime":
-        elem = <DateExprComponent datetime={true} table={contextVar.table!} value={value} onChange={handleChange} placeholder={placeholder}/>
+        elem = <DateExprComponent 
+          datetime={true} 
+          table={contextVar.table!} 
+          value={value} 
+          onChange={handleChange} 
+          placeholder={placeholder}
+          locale={props.locale}
+        />
         break
       default:
         elem = <div/>

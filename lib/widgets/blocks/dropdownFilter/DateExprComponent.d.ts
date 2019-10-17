@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import { Expr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 import "react-datepicker/dist/react-datepicker.css";
 import './datepicker-tweaks.css';
 /** Either range or preset id or null */
@@ -12,6 +12,7 @@ interface Props {
     datetime: boolean;
     table: string;
     placeholder?: string;
+    locale: string;
 }
 interface State {
     dropdownOpen: boolean;
@@ -20,7 +21,7 @@ interface State {
 }
 interface Preset {
     id: string;
-    name: string;
+    name: LocalizedString;
 }
 /** Convert a filter value to an expression */
 export declare const toExpr: (table: string, expr: Expr, datetime: boolean, value: DateValue) => Expr;
