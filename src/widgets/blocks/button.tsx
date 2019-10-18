@@ -118,7 +118,8 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
           locale: props.locale,
           contextVarValues: props.contextVarValues,
           pageStack: props.pageStack, 
-          getContextVarExprValue: props.getContextVarExprValue
+          getContextVarExprValue: props.getContextVarExprValue,
+          getFilters: props.getFilters
         })
       }
     }

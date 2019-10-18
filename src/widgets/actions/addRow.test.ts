@@ -51,7 +51,8 @@ test("performs non-literal action", async () => {
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: () => 123
+    getContextVarExprValue: () => 123,
+    getFilters: () => []
   })
 
   expect(database.mutations.length).toBe(1)
@@ -83,7 +84,8 @@ test("performs literal action", async () => {
     pageStack: {} as PageStack,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: () => { throw new Error("Not used") }
+    getContextVarExprValue: () => { throw new Error("Not used") },
+    getFilters: () => []
   })
 
   expect(database.mutations.length).toBe(1)

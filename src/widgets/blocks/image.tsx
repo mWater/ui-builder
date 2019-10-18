@@ -124,7 +124,8 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
           locale: props.locale,
           contextVarValues: props.contextVarValues,
           pageStack: props.pageStack, 
-          getContextVarExprValue: props.getContextVarExprValue
+          getContextVarExprValue: props.getContextVarExprValue,
+          getFilters: props.getFilters
         })
       }
     }

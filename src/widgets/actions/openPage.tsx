@@ -87,9 +87,28 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
   performAction(options: PerformActionOptions): Promise<void> {
     const contextVarValues = {}
 
-    // Perform mappings TODO test
+    // Perform mappings 
     for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
-      contextVarValues[cvid] = options.contextVarValues[this.actionDef.contextVarValues[cvid].contextVarId]
+      // Look up outer context variable
+      const outerCV = options.contextVars.find(cv => cv.id == this.actionDef.contextVarValues[cvid].contextVarId)
+      if (!outerCV) {
+        throw new Error("Outer context variable not found")
+      }
+
+      // Get value 
+      let outerCVValue = options.contextVarValues[outerCV.id]
+
+      // Add filters if rowset
+      if (outerCV.type == "rowset") {
+        outerCVValue = {
+          type: "op",
+          op: "and",
+          table: outerCV.table!,
+          exprs: _.compact([outerCVValue].concat(_.map(options.getFilters(outerCV.id), f => f.expr)))
+        }
+      }
+
+      contextVarValues[cvid] = outerCVValue
     }
 
     // Get title

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ContextVar } from './blocks';
+import { ContextVar, Filter } from './blocks';
 import { Database } from '../database/Database';
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { PageStack } from '../PageStack';
@@ -32,6 +32,8 @@ export interface PerformActionOptions {
     contextVarValues: {
         [contextVarId: string]: any;
     };
+    /** Get any filters set on a rowset context variable  */
+    getFilters(contextVarId: string): Filter[];
     /**
      * Gets the value of an expression based off of a context variable
      * @param contextVarId id of context variable
