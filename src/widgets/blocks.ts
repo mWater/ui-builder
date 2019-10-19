@@ -1,8 +1,6 @@
 import * as React from 'react'
 import {v4 as uuid} from 'uuid'
-import { Schema, Expr, Variable, LiteralType } from 'mwater-expressions'
-import { WidgetLibrary } from '../designer/widgetLibrary';
-import { ActionLibrary } from './ActionLibrary';
+import { Expr, Variable, LiteralType } from 'mwater-expressions'
 import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css"
 
