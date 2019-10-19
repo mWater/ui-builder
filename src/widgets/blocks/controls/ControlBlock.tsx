@@ -1,4 +1,4 @@
-import { BlockDef, ValidateBlockOptions, ContextVar } from "../../blocks";
+import { BlockDef, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
@@ -144,7 +144,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   }
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-  validate(options: ValidateBlockOptions): string | null {
+  validate(options: DesignCtx): string | null {
     // Validate row
     const rowCV = options.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId && cv.type === "row")
     if (!rowCV) {

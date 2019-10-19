@@ -53,16 +53,6 @@ export interface ContextVar {
   // selectable?: boolean;  // true if row can be selected (when type = "rowset")
 }
 
-export interface ValidateBlockOptions {
-  schema: Schema
-  contextVars: ContextVar[]
-
-  actionLibrary: ActionLibrary
-
-  /** Widget library that lists all available widgets */
-  widgetLibrary: WidgetLibrary
-}
-
 /** A filter that applies to a particular rowset context variable */
 export interface Filter {
   id: string, // Unique id of the filter

@@ -2,15 +2,13 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
+import { BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryRepeatBlockInstance from './QueryRepeatBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { NumberInput, Checkbox, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
-import { WidgetLibrary } from '../../../designer/widgetLibrary';
-import { ActionLibrary } from '../../ActionLibrary';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 
 export interface QueryRepeatBlockDef extends BlockDef {
@@ -47,7 +45,7 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
     return []
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     // Validate rowset
     const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {

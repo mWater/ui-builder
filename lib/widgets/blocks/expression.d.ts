@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, ContextVar, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface ExpressionBlockDef extends BlockDef {
@@ -23,7 +23,7 @@ export interface ExpressionBlockDef extends BlockDef {
 }
 export declare class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     renderDesign(props: DesignCtx): JSX.Element;
     getClassName(): string;
     getStyle(): React.CSSProperties;

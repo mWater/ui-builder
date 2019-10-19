@@ -1,5 +1,4 @@
 /// <reference types="react" />
-import { ValidateBlockOptions } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx } from '../../../contexts';
@@ -16,7 +15,7 @@ export interface DropdownBlockDef extends ControlBlockDef {
     excludeValues?: any[];
 }
 export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     renderControl(props: RenderControlProps): JSX.Element;
     renderEnum(props: RenderControlProps, column: Column): JSX.Element;
     renderEnumset(props: RenderControlProps, column: Column): JSX.Element;

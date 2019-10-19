@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { ContextVarExpr } from '../columnValues';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -21,8 +21,8 @@ export interface AddRowBlockDef extends BlockDef {
 export declare class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     createContextVar(): ContextVar | null;
-    validate(options: ValidateBlockOptions): string | null;
-    validateColumnValue(options: ValidateBlockOptions, columnId: string): string | null;
+    validate(options: DesignCtx): string | null;
+    validateColumnValue(options: DesignCtx, columnId: string): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
     getContextVarExprs(contextVar: ContextVar): Expr[];

@@ -3,6 +3,8 @@ import { NullDatabase } from "../../database/Database";
 import simpleSchema from "../../__fixtures__/schema";
 import { PageStack, Page } from "../../PageStack";
 import { OpenPageActionDef, OpenPageAction } from "./openPage";
+import mockInstanceCtx from "../../__fixtures__/mockInstanceCtx";
+import { ContextVar, Filter } from "../blocks";
 
 
 test("performs action", async () => {
@@ -24,19 +26,20 @@ test("performs action", async () => {
     openPage: openPage as unknown
   } as PageStack
 
-  const action = new OpenPageAction(ad)
-  await action.performAction({
-    locale: "en",
+  const instanceCtx = { ...mockInstanceCtx(),
     database: database,
     schema: schema,
     pageStack: pageStack,
-    contextVars: [{ id: "outercv1", table: "t2", name: "Cv1", type: "rowset" }],
+    contextVars: [{ id: "outercv1", table: "t2", name: "Cv1", type: "rowset" } as ContextVar],
     contextVarValues: { outercv1: { type: "literal", valueType: "boolean", value: true }},
     getContextVarExprValue: () => null,
-    getFilters: (cvid) => {
-      return cvid == "outercv1" ? [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: false }}] : []
+    getFilters: (cvid: string) => {
+      return cvid == "outercv1" ? [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: false }} as Filter] : []
     }
-  })
+  }
+
+  const action = new OpenPageAction(ad)
+  await action.performAction(instanceCtx)
 
   const page = openPage.mock.calls[0][0] as Page
 

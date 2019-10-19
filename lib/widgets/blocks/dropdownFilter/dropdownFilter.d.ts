@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock';
-import { BlockDef, ValidateBlockOptions, Filter, ContextVar } from '../../blocks';
+import { BlockDef, Filter, ContextVar } from '../../blocks';
 import { Expr, Schema, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface DropdownFilterBlockDef extends BlockDef {
@@ -15,7 +15,7 @@ export interface DropdownFilterBlockDef extends BlockDef {
     defaultValue?: any;
 }
 export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     createFilter(schema: Schema, contextVars: ContextVar[], value: any): Filter;
     renderDesign(props: DesignCtx): JSX.Element;
     getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];

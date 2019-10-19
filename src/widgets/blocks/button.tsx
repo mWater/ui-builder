@@ -1,12 +1,10 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { ActionDef } from '../actions';
 import { Select, Checkbox } from 'react-library/lib/bootstrap';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -29,18 +27,14 @@ export interface ButtonBlockDef extends BlockDef {
 }
 
 export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
-  validate(options: ValidateBlockOptions) { 
+  validate(designCtx: DesignCtx) { 
     let error: string | null
 
     // Validate action
     if (this.blockDef.actionDef) {
-      const action = options.actionLibrary.createAction(this.blockDef.actionDef)
+      const action = designCtx.actionLibrary.createAction(this.blockDef.actionDef)
 
-      error = action.validate({
-        schema: options.schema,
-        contextVars: options.contextVars,
-        widgetLibrary: options.widgetLibrary
-      })
+      error = action.validate(designCtx)
       if (error) {
         return error
       }
@@ -99,33 +93,24 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     return this.renderButton(props.locale, (() => null))
   }
 
-  renderInstance(props: InstanceCtx): React.ReactElement<any> {
+  renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
     const handleClick = () => {
       // Confirm if confirm message
       if (this.blockDef.confirmMessage) {
-        if (!confirm(localize(this.blockDef.confirmMessage, props.locale))) {
+        if (!confirm(localize(this.blockDef.confirmMessage, instanceCtx.locale))) {
           return
         }
       }
 
       // Run action
       if (this.blockDef.actionDef) {
-        const action = props.actionLibrary.createAction(this.blockDef.actionDef)
+        const action = instanceCtx.actionLibrary.createAction(this.blockDef.actionDef)
 
-        action.performAction({
-          contextVars: props.contextVars,
-          database: props.database,
-          schema: props.schema,
-          locale: props.locale,
-          contextVarValues: props.contextVarValues,
-          pageStack: props.pageStack, 
-          getContextVarExprValue: props.getContextVarExprValue,
-          getFilters: props.getFilters
-        })
+        action.performAction(instanceCtx)
       }
     }
 
-    return this.renderButton(props.locale, handleClick)
+    return this.renderButton(instanceCtx.locale, handleClick)
   }
 
   renderEditor(props: DesignCtx) {
@@ -182,12 +167,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
               <ActionDefEditor 
                 value={value} 
                 onChange={onChange} 
-                locale={props.locale}
-                schema={props.schema}
-                dataSource={props.dataSource}
-                actionLibrary={props.actionLibrary} 
-                widgetLibrary={props.widgetLibrary}
-                contextVars={props.contextVars} />
+                designCtx={props} />
             )}
           </PropertyEditor>
         </LabeledProperty>

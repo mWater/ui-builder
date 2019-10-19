@@ -1,14 +1,13 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables, CreateBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock, createExprVariables, CreateBlock } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Schema, LiteralExpr, Expr } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 import { ColumnValuesEditor, ContextVarExpr } from '../columnValues';
-import { Database } from '../../database/Database';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block which creates a new row and adds it as a context variable to its content */
@@ -44,7 +43,7 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     return null
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     let error: string | null
 
     // Check that table is present
@@ -62,7 +61,7 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     return null
   }
 
-  validateColumnValue(options: ValidateBlockOptions, columnId: string): string | null {
+  validateColumnValue(options: DesignCtx, columnId: string): string | null {
     // Check that column exists
     const column = options.schema.getColumn(this.blockDef.table!, columnId)
     if (!column) {

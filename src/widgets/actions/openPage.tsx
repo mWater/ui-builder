@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import * as React from 'react';
-import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
+import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
@@ -9,6 +9,7 @@ import { LocalizedString, Expr } from 'mwater-expressions';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
 import { ContextVar } from '../blocks';
 import { localize } from '../localization';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -38,14 +39,14 @@ export interface OpenPageActionDef extends ActionDef {
 }
 
 export class OpenPageAction extends Action<OpenPageActionDef> {
-  validate(options: ValidateActionOptions) {
+  validate(designCtx: DesignCtx) {
     // Find widget
     if (!this.actionDef.widgetId) {
       return "Widget required"
     }
 
     // Ensure that widget exists 
-    const widget = options.widgetLibrary.widgets[this.actionDef.widgetId]
+    const widget = designCtx.widgetLibrary.widgets[this.actionDef.widgetId]
     if (!widget) {
       return "Invalid widget"
     }
@@ -58,7 +59,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       }
 
       // Ensure that mapping is to available context var
-      const srcCV = options.contextVars.find(cv => cv.id === this.actionDef.contextVarValues[widgetCV.id].contextVarId)
+      const srcCV = designCtx.contextVars.find(cv => cv.id === this.actionDef.contextVarValues[widgetCV.id].contextVarId)
       if (!srcCV || srcCV.table !== widgetCV.table || srcCV.type !== widgetCV.type) {
         return "Invalid context variable"
       }
@@ -67,8 +68,8 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     // Validate expressions
     const err = validateEmbeddedExprs({
       embeddedExprs: this.actionDef.titleEmbeddedExprs || [],
-      schema: options.schema,
-      contextVars: options.contextVars})
+      schema: designCtx.schema,
+      contextVars: designCtx.contextVars})
     if (err) {
       return err
     }
@@ -84,19 +85,19 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     return []
   }
 
-  performAction(options: PerformActionOptions): Promise<void> {
+  performAction(instanceCtx: InstanceCtx): Promise<void> {
     const contextVarValues = {}
 
     // Perform mappings 
     for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
       // Look up outer context variable
-      const outerCV = options.contextVars.find(cv => cv.id == this.actionDef.contextVarValues[cvid].contextVarId)
+      const outerCV = instanceCtx.contextVars.find(cv => cv.id == this.actionDef.contextVarValues[cvid].contextVarId)
       if (!outerCV) {
         throw new Error("Outer context variable not found")
       }
 
       // Get value 
-      let outerCVValue = options.contextVarValues[outerCV.id]
+      let outerCVValue = instanceCtx.contextVarValues[outerCV.id]
 
       // Add filters if rowset
       if (outerCV.type == "rowset") {
@@ -104,7 +105,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           type: "op",
           op: "and",
           table: outerCV.table!,
-          exprs: _.compact([outerCVValue].concat(_.map(options.getFilters(outerCV.id), f => f.expr)))
+          exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), f => f.expr)))
         }
       }
 
@@ -112,26 +113,26 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     }
 
     // Get title
-    let title = localize(this.actionDef.title, options.locale)
+    let title = localize(this.actionDef.title, instanceCtx.locale)
 
     if (title) {
       // Get any embedded expression values
-      const exprValues = _.map(this.actionDef.titleEmbeddedExprs || [], ee => options.getContextVarExprValue(ee.contextVarId!, ee.expr))
+      const exprValues = _.map(this.actionDef.titleEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
 
       // Format and replace
       title = formatEmbeddedExprString({
         text: title, 
         embeddedExprs: this.actionDef.titleEmbeddedExprs || [],
         exprValues: exprValues,
-        schema: options.schema,
-        contextVars: options.contextVars,
-        locale: options.locale
+        schema: instanceCtx.schema,
+        contextVars: instanceCtx.contextVars,
+        locale: instanceCtx.locale
       })
     }
 
-    options.pageStack.openPage({
+    instanceCtx.pageStack.openPage({
       type: this.actionDef.pageType,
-      database: options.database,
+      database: instanceCtx.database,
       widgetId: this.actionDef.widgetId!,
       contextVarValues: contextVarValues,
       title: title

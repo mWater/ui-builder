@@ -1,10 +1,11 @@
 import * as React from 'react';
 import * as _ from 'lodash'
-import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
+import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { ExprValidator, LiteralExpr, Expr } from 'mwater-expressions';
 import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
 import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
+import { InstanceCtx, DesignCtx } from '../../contexts';
 
 export interface AddRowActionDef extends ActionDef {
   type: "addRow"
@@ -15,7 +16,7 @@ export interface AddRowActionDef extends ActionDef {
 }
 
 export class AddRowAction extends Action<AddRowActionDef> {
-  async performAction(options: PerformActionOptions): Promise<void> {
+  async performAction(instanceCtx: InstanceCtx): Promise<void> {
     // Create row to insert
     const row = {}
 
@@ -23,27 +24,27 @@ export class AddRowAction extends Action<AddRowActionDef> {
       const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
 
       if (contextVarExpr.contextVarId != null) {
-        row[columnId] = options.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
+        row[columnId] = instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
       }
       else {
         row[columnId] = contextVarExpr.expr ? (contextVarExpr.expr as LiteralExpr).value : null
       }
     }
 
-    const txn = options.database.transaction()
+    const txn = instanceCtx.database.transaction()
     await txn.addRow(this.actionDef.table!, row)
     await txn.commit()
   }
 
-  validate(options: ValidateActionOptions) {
+  validate(designCtx: DesignCtx) {
     // Check that table is present
-    if (!this.actionDef.table || !options.schema.getTable(this.actionDef.table)) {
+    if (!this.actionDef.table || !designCtx.schema.getTable(this.actionDef.table)) {
       return "Table required"
     }
 
     // Check each column value
     for (const columnId of Object.keys(this.actionDef.columnValues)) {
-      const error = this.validateColumnValue(options, columnId)
+      const error = this.validateColumnValue(designCtx, columnId)
       if (error) {
         return error
       }
@@ -51,14 +52,14 @@ export class AddRowAction extends Action<AddRowActionDef> {
     return null
   }
 
-  validateColumnValue(options: ValidateActionOptions, columnId: string): string | null {
+  validateColumnValue(designCtx: DesignCtx, columnId: string): string | null {
     // Check that column exists
-    const column = options.schema.getColumn(this.actionDef.table!, columnId)
+    const column = designCtx.schema.getColumn(this.actionDef.table!, columnId)
     if (!column) {
       return "Column not found"
     }
 
-    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
+    const exprValidator = new ExprValidator(designCtx.schema, createExprVariables(designCtx.contextVars))
 
     // Get type of column
     const columnType = (column.type === "join") ? "id" : column.type
@@ -68,7 +69,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
     let contextVar: ContextVar | undefined
 
     if (contextVarExpr.contextVarId) {
-      contextVar = options.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
+      contextVar = designCtx.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
       if (!contextVar || !contextVar.table) {
         return "Context variable not found"
       }

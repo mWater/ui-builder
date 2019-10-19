@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks';
+import { BlockDef, ContextVar } from '../blocks';
 import { ActionDef } from '../actions';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -18,10 +18,10 @@ export interface ButtonBlockDef extends BlockDef {
     confirmMessage?: LocalizedString | null;
 }
 export declare class ButtonBlock extends LeafBlock<ButtonBlockDef> {
-    validate(options: ValidateBlockOptions): string | null;
+    validate(designCtx: DesignCtx): string | null;
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     renderButton(locale: string, onClick: () => void): JSX.Element;
     renderDesign(props: DesignCtx): JSX.Element;
-    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
 }

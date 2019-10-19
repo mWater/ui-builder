@@ -1,4 +1,4 @@
-import { BlockDef, ValidateBlockOptions, ContextVar } from "../../blocks";
+import { BlockDef, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
@@ -45,5 +45,5 @@ export declare abstract class ControlBlock<T extends ControlBlockDef> extends Le
     renderEditor(props: DesignCtx): JSX.Element;
     getContextVarExprs(contextVar: ContextVar): Expr[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
 }

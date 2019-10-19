@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock';
-import { BlockDef, ValidateBlockOptions } from '../../blocks';
+import { BlockDef } from '../../blocks';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface SearchBlockDef extends BlockDef {
@@ -13,7 +13,7 @@ export interface SearchBlockDef extends BlockDef {
     searchExprs: Expr[];
 }
 export declare class SearchBlock extends LeafBlock<SearchBlockDef> {
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(props: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;

@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, CreateBlock, ContextVar, ChildBlock, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
@@ -44,7 +44,7 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
     return null
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     let error: string | null
 

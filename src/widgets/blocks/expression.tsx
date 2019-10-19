@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, ContextVar, createExprVariables } from '../blocks'
 import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors';
 import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
@@ -41,7 +41,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     return (contextVar.id === this.blockDef.contextVarId && this.blockDef.expr) ? [this.blockDef.expr] : [] 
   }
 
-  validate(options: ValidateBlockOptions) {
+  validate(options: DesignCtx) {
     // Validate cv
     const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
     if (!contextVar) {

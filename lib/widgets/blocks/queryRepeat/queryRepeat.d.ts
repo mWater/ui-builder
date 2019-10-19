@@ -1,6 +1,6 @@
 import * as React from 'react';
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
+import { BlockDef, ContextVar, ChildBlock } from '../../blocks';
 import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
@@ -20,7 +20,7 @@ export interface QueryRepeatBlockDef extends BlockDef {
 }
 export declare class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Create the context variable used */
     createRowContextVar(rowsetCV: ContextVar): ContextVar;

@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
+import { BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
@@ -10,8 +10,6 @@ import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEdi
 import { NumberInput, Select, Checkbox } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
-import { WidgetLibrary } from '../../../designer/widgetLibrary';
-import { ActionLibrary } from '../../ActionLibrary';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 
 export interface QueryTableBlockDef extends BlockDef {
@@ -55,14 +53,14 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     return headerChildren.concat(contentChildren)
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(designCtx: DesignCtx) { 
     // Validate rowset
-    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
+    const rowsetCV = designCtx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {
       return "Rowset required"
     }
 
-    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
+    const exprValidator = new ExprValidator(designCtx.schema, createExprVariables(designCtx.contextVars))
     let error: string | null
     
     // Validate where
@@ -75,15 +73,11 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
     // Validate action
     if (this.blockDef.rowClickAction) {
-      const action = options.actionLibrary.createAction(this.blockDef.rowClickAction)
+      const action = designCtx.actionLibrary.createAction(this.blockDef.rowClickAction)
 
       // Create row context variable
       const rowCV = this.createRowContextVar(rowsetCV)
-      error = action.validate({
-        schema: options.schema,
-        contextVars: options.contextVars.concat(rowCV),
-        widgetLibrary: options.widgetLibrary
-      })
+      error = action.validate({ ...designCtx, contextVars: designCtx.contextVars.concat(rowCV) })
       if (error) {
         return error
       }
@@ -335,12 +329,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
                 <ActionDefEditor 
                   value={value} 
                   onChange={onChange} 
-                  locale={props.locale}
-                  schema={props.schema}
-                  dataSource={props.dataSource}
-                  actionLibrary={props.actionLibrary} 
-                  widgetLibrary={props.widgetLibrary}
-                  contextVars={props.contextVars.concat(rowCV)} />
+                  designCtx={{ ...props, contextVars: props.contextVars.concat(rowCV) }} />
               )}
             </PropertyEditor>
           </LabeledProperty>

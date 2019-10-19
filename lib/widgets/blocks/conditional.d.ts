@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Block which only displays content if an expression is true */
@@ -15,7 +15,7 @@ export interface ConditionalBlockDef extends BlockDef {
 }
 export declare class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
     getContextVarExprs(contextVar: ContextVar): Expr[];

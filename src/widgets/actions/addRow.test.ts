@@ -3,8 +3,7 @@ import { ContextVar } from "../blocks";
 import VirtualDatabase, { AddMutation } from "../../database/VirtualDatabase";
 import { NullDatabase } from "../../database/Database";
 import simpleSchema from "../../__fixtures__/schema";
-import { PageStack } from "../../PageStack";
-import { Expr, Schema } from "mwater-expressions";
+import mockInstanceCtx from "../../__fixtures__/mockInstanceCtx";
 
 
 test("gets context var exprs", () => {
@@ -44,16 +43,14 @@ test("performs non-literal action", async () => {
   const database = new VirtualDatabase(new NullDatabase(), schema, "en")
 
   const action = new AddRowAction(ad)
-  await action.performAction({
-    locale: "en",
+  const instanceCtx = { ...mockInstanceCtx(),
     database: database,
-    schema: {} as Schema,
-    pageStack: {} as PageStack,
-    contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
+    contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" } as ContextVar],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: () => 123,
-    getFilters: () => []
-  })
+    getContextVarExprValue: () => 123
+  }
+
+  await action.performAction(instanceCtx)
 
   expect(database.mutations.length).toBe(1)
   expect((database.mutations[0] as AddMutation).values).toEqual({
@@ -76,17 +73,16 @@ test("performs literal action", async () => {
   const schema = simpleSchema()
   const database = new VirtualDatabase(new NullDatabase(), schema, "en")
 
-  const action = new AddRowAction(ad)
-  await action.performAction({
-    locale: "en",
+  const instanceCtx = { ...mockInstanceCtx(),
     database: database,
-    schema: {} as Schema,
-    pageStack: {} as PageStack,
-    contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" }],
+    contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" } as ContextVar],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: () => { throw new Error("Not used") },
+    getContextVarExprValue: () => 123,
     getFilters: () => []
-  })
+  }
+
+  const action = new AddRowAction(ad)
+  await action.performAction(instanceCtx)
 
   expect(database.mutations.length).toBe(1)
   expect((database.mutations[0] as AddMutation).values).toEqual({

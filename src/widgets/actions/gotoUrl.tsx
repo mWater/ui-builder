@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash'
-import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
+import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { TextInput, Checkbox } from 'react-library/lib/bootstrap';
 
@@ -13,11 +13,11 @@ export interface GotoUrlActionDef extends ActionDef {
 }
 
 export class GotoUrlAction extends Action<GotoUrlActionDef> {
-  async performAction(options: PerformActionOptions): Promise<void> {
+  async performAction(): Promise<void> {
     window.open(this.actionDef.url, this.actionDef.newTab ? "_blank" : "_self")
   }
 
-  validate(options: ValidateActionOptions) {
+  validate() {
     // Check that url is present
     if (!this.actionDef.url) {
       return "URL required"

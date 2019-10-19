@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BlockDef, ValidateBlockOptions, createExprVariables } from '../../blocks';
+import { BlockDef, createExprVariables } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, EnumValue, Expr, ExprValidator, ExprCompiler, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
@@ -28,7 +28,7 @@ export interface DropdownBlockDef extends ControlBlockDef {
 }
 
 export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
-  validate(options: ValidateBlockOptions) {
+  validate(options: DesignCtx) {
     let error = super.validate(options)
 
     if (error) {

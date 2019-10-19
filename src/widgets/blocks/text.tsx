@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, EmbeddedExprsEditor } from '../propertyEditors'
 import { localize } from '../localization'
 import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
@@ -42,7 +42,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     return []
   }
 
-  validate(options: ValidateBlockOptions) {
+  validate(options: DesignCtx) {
     // Validate expressions
     return validateEmbeddedExprs({
       embeddedExprs: this.blockDef.embeddedExprs || [],

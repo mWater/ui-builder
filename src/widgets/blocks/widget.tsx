@@ -1,11 +1,9 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, CreateBlock, NullBlockStore, Filter, ContextVar, ValidateBlockOptions } from '../blocks'
+import { BlockDef, CreateBlock, NullBlockStore, Filter, ContextVar } from '../blocks'
 import { Expr, Schema } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
 import { LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
 import produce from 'immer';
@@ -25,7 +23,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     this.createBlock = createBlock
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     if (!this.blockDef.widgetId) {
       return "Widget required"
     }

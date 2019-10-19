@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { Expr, LocalizedString } from 'mwater-expressions';
-import { BlockDef, ContextVar, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar } from '../blocks';
 import LeafBlock from '../LeafBlock';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Block that appears when one or more validation conditions fail */
@@ -21,7 +21,7 @@ interface Validation {
     message: LocalizedString | null;
 }
 export declare class ValidationBlock extends LeafBlock<ValidationBlockDef> {
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     /** Get context variable expressions needed */
     getContextVarExprs(contextVar: ContextVar): Expr[];
     renderDesign(props: DesignCtx): JSX.Element;

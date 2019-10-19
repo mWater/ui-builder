@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { Schema, Expr, Variable, LiteralType } from 'mwater-expressions';
-import { WidgetLibrary } from '../designer/widgetLibrary';
-import { ActionLibrary } from './ActionLibrary';
+import { Expr, Variable, LiteralType } from 'mwater-expressions';
 import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css";
 /** Side on which another block is dropped on a block */
@@ -37,13 +35,6 @@ export interface ContextVar {
     name: string;
     type: "row" | "rowset" | LiteralType;
     table?: string;
-}
-export interface ValidateBlockOptions {
-    schema: Schema;
-    contextVars: ContextVar[];
-    actionLibrary: ActionLibrary;
-    /** Widget library that lists all available widgets */
-    widgetLibrary: WidgetLibrary;
 }
 /** A filter that applies to a particular rowset context variable */
 export interface Filter {

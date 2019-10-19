@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ValidateBlockOptions, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
+import { BlockDef, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
 import ModalWindowComponent from 'react-library/lib/ModalWindowComponent'
 import { BlockPaletteEntry } from '../../designer/blockPaletteEntries';
 import { Schema, DataSource } from 'mwater-expressions';
@@ -26,7 +26,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
     this.createBlock = createBlock;
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     return null 
   }
 

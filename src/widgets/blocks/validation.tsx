@@ -3,7 +3,7 @@ import produce from 'immer'
 import { ExprComponent } from 'mwater-expressions-ui';
 import { default as React, useState, useEffect } from 'react';
 import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
-import { BlockDef, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, ContextVar, createExprVariables } from '../blocks'
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
 import ListEditor from '../ListEditor';
 import { localize } from '../localization';
@@ -35,7 +35,7 @@ interface Validation {
 }
 
 export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     let error: string | null
 
     for (const validation of this.blockDef.validations) {

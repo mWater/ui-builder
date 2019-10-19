@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
-import { BlockDef, ValidateBlockOptions, Filter, ContextVar, createExprVariables } from '../../blocks'
+import { BlockDef, Filter, ContextVar, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator, Schema, ExprUtils, LocalizedString } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { ExprComponent } from 'mwater-expressions-ui';
@@ -30,7 +30,7 @@ export interface DropdownFilterBlockDef extends BlockDef {
 }
 
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
-  validate(options: ValidateBlockOptions) {
+  validate(options: DesignCtx) {
     // Validate rowset
     const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {

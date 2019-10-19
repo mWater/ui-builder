@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks';
+import { BlockDef, ContextVar } from '../blocks';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { EmbeddedExpr } from '../../embeddedExprs';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -23,7 +23,7 @@ export interface TextBlockDef extends BlockDef {
 }
 export declare class TextBlock extends LeafBlock<TextBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
-    validate(options: ValidateBlockOptions): string | null;
+    validate(options: DesignCtx): string | null;
     getClassName(): string;
     renderText(content: React.ReactNode): React.DetailedReactHTMLElement<{
         style: React.CSSProperties;

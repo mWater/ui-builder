@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, CreateBlock, ValidateBlockOptions } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock, CreateBlock } from '../blocks'
 import { localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
@@ -40,7 +40,7 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     if (!this.blockDef.saveLabel) {
       return "Save label required"
     }

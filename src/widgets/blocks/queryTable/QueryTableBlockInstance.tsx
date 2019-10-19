@@ -157,16 +157,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         const actionDef = this.props.block.blockDef.rowClickAction
         const action = this.props.instanceCtx.actionLibrary.createAction(actionDef)
 
-        action.performAction({
-          contextVars: rowRIProps.contextVars,
-          database: rowRIProps.database,
-          locale: rowRIProps.locale,
-          schema: this.props.instanceCtx.schema,
-          contextVarValues: rowRIProps.contextVarValues,
-          pageStack: rowRIProps.pageStack, 
-          getContextVarExprValue: rowRIProps.getContextVarExprValue,
-          getFilters: rowRIProps.getFilters
-        })
+        action.performAction({ ...rowRIProps })
       }
     }
 

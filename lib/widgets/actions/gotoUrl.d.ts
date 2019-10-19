@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { ActionDef, Action, PerformActionOptions, RenderActionEditorProps, ValidateActionOptions } from '../actions';
+import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 export interface GotoUrlActionDef extends ActionDef {
     type: "gotoUrl";
     url?: string;
@@ -7,7 +7,7 @@ export interface GotoUrlActionDef extends ActionDef {
     newTab?: boolean;
 }
 export declare class GotoUrlAction extends Action<GotoUrlActionDef> {
-    performAction(options: PerformActionOptions): Promise<void>;
-    validate(options: ValidateActionOptions): "URL required" | null;
+    performAction(): Promise<void>;
+    validate(): "URL required" | null;
     renderEditor(props: RenderActionEditorProps): JSX.Element;
 }

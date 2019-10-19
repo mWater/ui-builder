@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
-import { BlockDef, ValidateBlockOptions, createExprVariables } from '../../blocks'
+import { BlockDef, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import SearchBlockInstance, { SearchControl } from './SearchBlockInstance';
@@ -23,7 +23,7 @@ export interface SearchBlockDef extends BlockDef {
 }
 
 export class SearchBlock extends LeafBlock<SearchBlockDef> {
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     // Validate rowset
     const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {

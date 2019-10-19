@@ -2,16 +2,15 @@ import * as React from "react";
 import { Select } from "react-library/lib/bootstrap";
 import { ContextVar, createExprVariables } from "./blocks";
 import { ActionDef } from "./actions";
-import { WidgetLibrary } from "../designer/widgetLibrary";
-import { ActionLibrary } from "./ActionLibrary";
 import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, ExprUtils } from "mwater-expressions";
-import { OrderBy, OrderByDir } from "../database/Database";
+import { OrderBy } from "../database/Database";
 import ListEditor from "./ListEditor";
 import { ExprComponent } from "mwater-expressions-ui";
 import * as PropTypes from 'prop-types'
 import ReactSelect from "react-select"
 import { localize } from "./localization";
 import { EmbeddedExpr } from "../embeddedExprs";
+import { DesignCtx } from "../contexts";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -157,17 +156,12 @@ export class ContextVarPropertyEditor extends React.Component<{
 export class ActionDefEditor extends React.Component<{
   value: ActionDef | null
   onChange: (actionDef: ActionDef | null) => void
-  locale: string
-  contextVars: ContextVar[]
-  actionLibrary: ActionLibrary
-  widgetLibrary: WidgetLibrary
-  schema: Schema
-  dataSource: DataSource
+  designCtx: DesignCtx
 }> {
 
   handleChangeAction = (type: string | null) => {
     if (type) {
-      this.props.onChange(this.props.actionLibrary.createNewActionDef(type))
+      this.props.onChange(this.props.designCtx.actionLibrary.createNewActionDef(type))
     }
     else {
       this.props.onChange(null)
@@ -175,7 +169,7 @@ export class ActionDefEditor extends React.Component<{
   }
 
   render() {
-    const action = this.props.value ? this.props.actionLibrary.createAction(this.props.value) : null
+    const action = this.props.value ? this.props.designCtx.actionLibrary.createAction(this.props.value) : null
 
     return (
       <div>
@@ -183,17 +177,10 @@ export class ActionDefEditor extends React.Component<{
           nullLabel="No Action"
           onChange={this.handleChangeAction}
           value={this.props.value ? this.props.value.type : null}
-          options={this.props.actionLibrary.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
+          options={this.props.designCtx.actionLibrary.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
         />
         { action 
-          ? action.renderEditor({ 
-              widgetLibrary: this.props.widgetLibrary,
-              locale: this.props.locale, 
-              contextVars: this.props.contextVars, 
-              onChange: this.props.onChange,
-              schema: this.props.schema,
-              dataSource: this.props.dataSource
-            }) 
+          ? action.renderEditor({ ...this.props.designCtx, onChange: this.props.onChange })
           : null }
       </div>
     )

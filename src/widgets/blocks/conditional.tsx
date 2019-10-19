@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Expr } from 'mwater-expressions';
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
@@ -30,7 +30,7 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
     return []
   }
 
-  validate(options: ValidateBlockOptions) { 
+  validate(options: DesignCtx) { 
     let error: string | null
 
     if (!this.blockDef.content) {

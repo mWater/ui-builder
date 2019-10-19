@@ -1,11 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { TextInput, Select } from 'react-library/lib/bootstrap';
 import { ActionDef } from '../actions';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
 import { Expr } from 'mwater-expressions';
 import { localize } from '../localization';
 import produce from 'immer';
@@ -33,7 +31,7 @@ export interface ImageBlockDef extends BlockDef {
 
 /** Simple static image block */
 export class ImageBlock extends LeafBlock<ImageBlockDef> {
-  validate(options: ValidateBlockOptions) { 
+  validate(designCtx: DesignCtx) { 
     if (!this.blockDef.url) {
       return "URL required"
     }
@@ -42,13 +40,9 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
 
     // Validate action
     if (this.blockDef.clickActionDef) {
-      const action = options.actionLibrary.createAction(this.blockDef.clickActionDef)
+      const action = designCtx.actionLibrary.createAction(this.blockDef.clickActionDef)
 
-      error = action.validate({
-        schema: options.schema,
-        contextVars: options.contextVars,
-        widgetLibrary: options.widgetLibrary
-      })
+      error = action.validate(designCtx)
       if (error) {
         return error
       }
@@ -105,33 +99,24 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     return this.renderImage(props.locale)
   }
 
-  renderInstance(props: InstanceCtx): React.ReactElement<any> {
+  renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
     const handleClick = () => {
       // Confirm if confirm message
       if (this.blockDef.confirmMessage) {
-        if (!confirm(localize(this.blockDef.confirmMessage, props.locale))) {
+        if (!confirm(localize(this.blockDef.confirmMessage, instanceCtx.locale))) {
           return
         }
       }
 
       // Run action
       if (this.blockDef.clickActionDef) {
-        const action = props.actionLibrary.createAction(this.blockDef.clickActionDef)
+        const action = instanceCtx.actionLibrary.createAction(this.blockDef.clickActionDef)
 
-        action.performAction({
-          contextVars: props.contextVars,
-          database: props.database,
-          schema: props.schema,
-          locale: props.locale,
-          contextVarValues: props.contextVarValues,
-          pageStack: props.pageStack, 
-          getContextVarExprValue: props.getContextVarExprValue,
-          getFilters: props.getFilters
-        })
+        action.performAction(instanceCtx)
       }
     }
 
-    return this.renderImage(props.locale, handleClick)
+    return this.renderImage(instanceCtx.locale, handleClick)
   }
 
   renderEditor(props: DesignCtx) {
@@ -177,12 +162,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
               <ActionDefEditor 
                 value={value} 
                 onChange={onChange} 
-                locale={props.locale}
-                schema={props.schema}
-                dataSource={props.dataSource}
-                actionLibrary={props.actionLibrary} 
-                widgetLibrary={props.widgetLibrary}
-                contextVars={props.contextVars} />
+                designCtx={props} />
             )}
           </PropertyEditor>
         </LabeledProperty>

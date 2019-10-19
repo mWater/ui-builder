@@ -1,12 +1,11 @@
 import * as React from "react";
 import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
-import { WidgetLibrary } from "../designer/widgetLibrary";
-import { ActionLibrary } from "./ActionLibrary";
 import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
 import * as PropTypes from 'prop-types';
 import { EmbeddedExpr } from "../embeddedExprs";
+import { DesignCtx } from "../contexts";
 export declare class LabeledProperty extends React.Component<{
     label: string;
     help?: string;
@@ -65,12 +64,7 @@ export declare class ContextVarPropertyEditor extends React.Component<{
 export declare class ActionDefEditor extends React.Component<{
     value: ActionDef | null;
     onChange: (actionDef: ActionDef | null) => void;
-    locale: string;
-    contextVars: ContextVar[];
-    actionLibrary: ActionLibrary;
-    widgetLibrary: WidgetLibrary;
-    schema: Schema;
-    dataSource: DataSource;
+    designCtx: DesignCtx;
 }> {
     handleChangeAction: (type: string | null) => void;
     render(): JSX.Element;
