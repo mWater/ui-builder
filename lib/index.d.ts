@@ -8,6 +8,7 @@ export { defaultBlockPaletteEntries, BlockPaletteEntry } from './designer/blockP
 export * from './widgets/blocks';
 export { default as LeafBlock } from './widgets/LeafBlock';
 export * from './widgets/propertyEditors';
+export * from './contexts';
 export * from './PageStack';
 export * from './database/Database';
 export * from './widgets/columnValues';
