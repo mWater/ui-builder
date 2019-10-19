@@ -1,19 +1,18 @@
-import { RenderInstanceProps, ContextVar, BlockDef, CreateBlock, Filter, createExprVariables } from "./blocks";
+import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables } from "./blocks";
 import * as React from "react";
 import { Expr, ExprUtils, Schema, Variable } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
 import canonical from 'canonical-json'
 import * as _ from "lodash";
+import { InstanceCtx } from "../contexts";
 
 interface Props {
   injectedContextVar: ContextVar
   value: any
-  renderInstanceProps: RenderInstanceProps
+  instanceCtx: InstanceCtx
   contextVarExprs?: Expr[]
   initialFilters?: Filter[]
-  schema: Schema
-  database: Database
-  children: (renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => React.ReactElement<any>
+  children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any>
 }
 
 interface State {
@@ -45,7 +44,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       loading: true,
       refreshing: false,
       exprValues: {},
-      contextVarValues: props.renderInstanceProps.contextVarValues
+      contextVarValues: props.instanceCtx.contextVarValues
     }
 
     this.unmounted = false
@@ -55,7 +54,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     this.performQueries()
 
     // Listen for changes to database
-    this.props.database.addChangeListener(this.handleDatabaseChange)
+    this.props.instanceCtx.database.addChangeListener(this.handleDatabaseChange)
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
@@ -63,7 +62,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     // TODO context var value changes are only relevant if referenced as a variable. Could be optimized
     if (!_.isEqual(prevProps.value, this.props.value) 
       || !_.isEqual(prevState.filters, this.state.filters)
-      || !_.isEqual(this.props.renderInstanceProps.contextVarValues, this.state.contextVarValues)
+      || !_.isEqual(this.props.instanceCtx.contextVarValues, this.state.contextVarValues)
       ) {
       this.performQueries()
     }
@@ -71,7 +70,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
   componentWillUnmount() {
     this.unmounted = true
-    this.props.database.removeChangeListener(this.handleDatabaseChange)
+    this.props.instanceCtx.database.removeChangeListener(this.handleDatabaseChange)
   }
 
   handleDatabaseChange = () => {
@@ -107,7 +106,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
 
     // Add expressions as selects (only if aggregate for rowset)
-    const exprUtils = new ExprUtils(this.props.schema, variables)
+    const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
     const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
 
     // Add expressions as selects
@@ -138,13 +137,13 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const variables = createExprVariables(innerProps.contextVars)
     const variableValues = innerProps.contextVarValues
 
-    this.setState({ refreshing: true, contextVarValues: this.props.renderInstanceProps.contextVarValues })
+    this.setState({ refreshing: true, contextVarValues: this.props.instanceCtx.contextVarValues })
 
     // Query database if row 
     if (this.props.injectedContextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       // Special case of null row value
       if (this.props.value == null) {
-        this.setState({ exprValues: {}, loading: false, refreshing: false, contextVarValues: this.props.renderInstanceProps.contextVarValues })
+        this.setState({ exprValues: {}, loading: false, refreshing: false, contextVarValues: this.props.instanceCtx.contextVarValues })
         return
       }
 
@@ -155,7 +154,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       const queryOptions = this.createRowQueryOptions(table)
 
       try {
-        const rows = await this.props.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
+        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
         // Ignore if query options out of date
         if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
@@ -196,7 +195,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       // Perform query
       const queryOptions = this.createRowsetQueryOptions(table, variables)
       try {
-        const rows = await this.props.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
+        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
 
         // Ignore if query options out of date
         if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
@@ -213,7 +212,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
           return
         }
         
-        const exprUtils = new ExprUtils(this.props.schema, variables)
+        const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
         const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
 
         if (rows.length === 0) {
@@ -235,16 +234,16 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   /** Create props needed by inner component */
-  createInnerProps(): RenderInstanceProps {
-    const outer = this.props.renderInstanceProps
+  createInnerProps(): InstanceCtx {
+    const outer = this.props.instanceCtx
 
     // Get injected context variable value
     let value = this.props.value
 
     // Create inner props
-    const innerProps: RenderInstanceProps = {
+    const innerProps: InstanceCtx = {
       ...outer,
-      database: this.props.database,
+      database: this.props.instanceCtx.database,
       contextVars: outer.contextVars.concat(this.props.injectedContextVar),
       contextVarValues: { ...outer.contextVarValues, [this.props.injectedContextVar.id]: value },
       getContextVarExprValue: (contextVarId, expr) => {

@@ -1,10 +1,11 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
 import { LocalizedString } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface LabeledBlockDef extends BlockDef {
   type: "labeled"
@@ -28,7 +29,7 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleAdd = (addedBlockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: LabeledBlockDef) => { 
         b.child = addedBlockDef 
@@ -52,7 +53,7 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
+  renderInstance(props: InstanceCtx) {
     const labelText = localize(this.blockDef.label, props.locale)
     const helpText = localize(this.blockDef.help, props.locale)
 
@@ -69,16 +70,16 @@ export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
     )
   }
   
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Label">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="label">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="label">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Help">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="help">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="help">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>

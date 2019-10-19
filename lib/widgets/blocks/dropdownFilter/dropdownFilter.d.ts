@@ -1,8 +1,8 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, Filter, ContextVar } from '../../blocks';
+import { BlockDef, ValidateBlockOptions, Filter, ContextVar } from '../../blocks';
 import { Expr, Schema, LocalizedString } from 'mwater-expressions';
-import { WidgetLibrary } from '../../../designer/widgetLibrary';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface DropdownFilterBlockDef extends BlockDef {
     type: "dropdownFilter";
     /** Placeholder in box */
@@ -17,13 +17,8 @@ export interface DropdownFilterBlockDef extends BlockDef {
 export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
     createFilter(schema: Schema, contextVars: ContextVar[], value: any): Filter;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    getInitialFilters(options: {
-        contextVarId: string;
-        widgetLibrary: WidgetLibrary;
-        schema: Schema;
-        contextVars: ContextVar[];
-    }): Filter[];
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

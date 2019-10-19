@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
@@ -12,6 +12,7 @@ import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -122,7 +123,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
   }
 
   /** Get list of expressions used in a row by content blocks */
-  getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] {
+  getRowExprs(contextVars: ContextVar[], ctx: DesignCtx | InstanceCtx): Expr[] {
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {
       return []
@@ -135,28 +136,25 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     // Get expressions for all content blocks
     for (const contentBlockDef of this.blockDef.contents) {
       if (contentBlockDef) {
-        exprs = exprs.concat(this.createBlock(contentBlockDef).getSubtreeContextVarExprs({
-          actionLibrary: actionLibrary,
-          widgetLibrary: widgetLibrary,
-          contextVars: contextVars.concat([rowCV]),
-          contextVar: rowCV,
-          createBlock: this.createBlock 
+        exprs = exprs.concat(this.createBlock(contentBlockDef).getSubtreeContextVarExprs(rowCV, {
+          ...ctx,
+          contextVars: contextVars.concat([rowCV])
         }))
       }
     }
 
     // Get action expressions too
     if (this.blockDef.rowClickAction) {
-      const action = actionLibrary.createAction(this.blockDef.rowClickAction)
+      const action = ctx.actionLibrary.createAction(this.blockDef.rowClickAction)
       exprs = exprs.concat(action.getContextVarExprs(rowCV))
     }
     return exprs
   }
 
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { 
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
     // Include action expressions
     if (this.blockDef.rowClickAction) {
-      const action = actionLibrary.createAction(this.blockDef.rowClickAction)
+      const action = ctx.actionLibrary.createAction(this.blockDef.rowClickAction)
       return action.getContextVarExprs(contextVar)
     }
 
@@ -195,7 +193,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     }
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const setHeader = (index: number, blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce(b => {
         b!.headers[index] = blockDef
@@ -251,18 +249,18 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
-    return <QueryTableBlockInstance block={this} renderInstanceProps={props}/>
+  renderInstance(props: InstanceCtx) {
+    return <QueryTableBlockInstance block={this} instanceCtx={props}/>
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     // Get rowset context variable
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     const rowCV = rowsetCV ? this.createRowContextVar(rowsetCV) : null
 
     const handleAddColumn = () => {
-      props.onChange(produce(this.blockDef, b => {
+      props.store.replaceBlock(produce(this.blockDef, b => {
         b.headers.push(null)
         b.contents.push(null)
       }))
@@ -270,7 +268,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
     // Remove last column
     const handleRemoveColumn = () => {
-      props.onChange(produce(this.blockDef, b => {
+      props.store.replaceBlock(produce(this.blockDef, b => {
         if (b.headers.length > 1) {
           b.headers.splice(b.headers.length - 1, 1)
           b.contents.splice(b.contents.length - 1, 1)
@@ -281,20 +279,20 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetContextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowsetContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Mode">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="mode">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="mode">
             {(value, onChange) => <Select value={value} onChange={onChange} options={[{ value: "singleRow", label: "One item per row" }, { value: "multiRow", label: "Multiple item per row" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         { rowsetCV ?
           <LabeledProperty label="Filter">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="where">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="where">
               {(value: Expr, onChange) => (
                   <ExprComponent 
                     value={value} 
@@ -311,7 +309,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
 
         { rowCV ? 
         <LabeledProperty label="Ordering">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="orderBy">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="orderBy">
             {(value, onChange) => 
               <OrderByArrayEditor 
                 value={value} 
@@ -325,14 +323,14 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
         : null }
 
         <LabeledProperty label="Maximum rows">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="limit">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="limit">
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
           </PropertyEditor>
         </LabeledProperty>
         
         { rowCV ? 
           <LabeledProperty label="When row clicked">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowClickAction">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowClickAction">
               {(value, onChange) => (
                 <ActionDefEditor 
                   value={value} 
@@ -349,23 +347,23 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
         : null } 
 
         <LabeledProperty label="Message to display when no rows">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="noRowsMessage">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="noRowsMessage">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="hideHeaders">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="hideHeaders">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Hide Headers</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Borders">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="borders">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="borders">
             {(value, onChange) => <Select value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Padding">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="padding">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="padding">
             {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>

@@ -1,9 +1,10 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
 import ReactElementPrinter from 'react-library/lib/ReactElementPrinter'
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block that can be printed by a print button at top right */
 export interface PrintBlockDef extends BlockDef {
@@ -27,7 +28,7 @@ export class PrintBlock extends CompoundBlock<PrintBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleAdd = (addedBlockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: PrintBlockDef) => { 
         b.content = addedBlockDef 
@@ -47,7 +48,7 @@ export class PrintBlock extends CompoundBlock<PrintBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
+  renderInstance(props: InstanceCtx) {
     const elem = props.renderChildBlock(props, this.blockDef.content)
 
     const handleClick = () => {

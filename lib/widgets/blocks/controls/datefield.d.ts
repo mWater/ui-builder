@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, LocalizedString } from 'mwater-expressions';
+import { DesignCtx } from '../../../contexts';
 export interface DatefieldBlockDef extends ControlBlockDef {
     type: "datefield";
     placeholder: LocalizedString | null;
@@ -12,7 +12,7 @@ export interface DatefieldBlockDef extends ControlBlockDef {
 export declare class DatefieldBlock extends ControlBlock<DatefieldBlockDef> {
     renderControl(props: RenderControlProps): JSX.Element;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-    renderControlEditor(props: RenderEditorProps): JSX.Element;
+    renderControlEditor(props: DesignCtx): JSX.Element;
     /** Filter the columns that this control is for */
     filterColumn(column: Column): boolean;
     /** Clear format */

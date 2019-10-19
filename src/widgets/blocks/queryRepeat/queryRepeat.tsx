@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryRepeatBlockInstance from './QueryRepeatBlockInstance';
@@ -11,6 +11,7 @@ import { NumberInput, Checkbox, Select } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { ActionLibrary } from '../../ActionLibrary';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 
 export interface QueryRepeatBlockDef extends BlockDef {
   type: "queryRepeat"
@@ -83,7 +84,7 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
   }
 
   /** Get list of expressions used in a row by content blocks */
-  getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] {
+  getRowExprs(contextVars: ContextVar[], ctx: DesignCtx | InstanceCtx): Expr[] {
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     if (!rowsetCV) {
       return []
@@ -95,18 +96,15 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
 
     // Get expressions for content
     if (this.blockDef.content) {
-      exprs = exprs.concat(this.createBlock(this.blockDef.content).getSubtreeContextVarExprs({
-        actionLibrary: actionLibrary,
-        widgetLibrary: widgetLibrary,
-        contextVars: contextVars.concat([rowCV]),
-        contextVar: rowCV,
-        createBlock: this.createBlock 
+      exprs = exprs.concat(this.createBlock(this.blockDef.content).getSubtreeContextVarExprs(rowCV, {
+        ...ctx,
+        contextVars: contextVars.concat([rowCV])
       }))
     }
     return exprs
   }
 
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { 
+  getContextVarExprs(): Expr[] { 
     return [] 
   }
 
@@ -119,7 +117,7 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
     return row.id
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const setContent = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce(b => {
         b.content = blockDef
@@ -139,11 +137,11 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
-    return <QueryRepeatBlockInstance block={this} renderInstanceProps={props}/>
+  renderInstance(props: InstanceCtx) {
+    return <QueryRepeatBlockInstance block={this} instanceCtx={props}/>
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     // Get rowset context variable
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
@@ -158,20 +156,20 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetContextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowsetContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Separator">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="separator">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="separator">
             {(value, onChange) => <Select value={value} onChange={onChange} options={separatorOptions} />}
           </PropertyEditor>
         </LabeledProperty>
 
         { rowsetCV ?
           <LabeledProperty label="Filter">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="where">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="where">
               {(value: Expr, onChange) => (
                   <ExprComponent 
                     value={value} 
@@ -188,7 +186,7 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
 
         { rowCV ? 
         <LabeledProperty label="Ordering">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="orderBy">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="orderBy">
             {(value, onChange) => 
               <OrderByArrayEditor 
                 value={value} 
@@ -202,13 +200,13 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
         : null }
 
         <LabeledProperty label="Maximum rows">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="limit">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="limit">
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Message to display when no rows">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="noRowsMessage">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="noRowsMessage">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>

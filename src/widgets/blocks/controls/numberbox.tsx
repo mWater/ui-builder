@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { NumberInput, Checkbox } from 'react-library/lib/bootstrap';
+import { DesignCtx } from '../../../contexts';
 
 export interface NumberboxBlockDef extends ControlBlockDef {
   type: "numberbox"
@@ -31,15 +31,15 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-  renderControlEditor(props: RenderEditorProps) {
+  renderControlEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Placeholder">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="placeholder">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="decimal">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="decimal">
           {(value, onChange) => <Checkbox 
             value={value} 
             onChange={onChange}> Decimal Number
@@ -48,7 +48,7 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
         </PropertyEditor>
         { this.blockDef.decimal ?
           <LabeledProperty label="Decimal Places">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="decimalPlaces">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="decimalPlaces">
               {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} /> }
             </PropertyEditor>
         </LabeledProperty>

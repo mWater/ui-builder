@@ -1,9 +1,10 @@
 import React from "react";
 import { TabbedBlockDef, TabbedBlockTab } from "./tabbed";
-import { RenderDesignProps, BlockDef } from "../../blocks";
+import { BlockDef } from "../../blocks";
+import { DesignCtx } from "../../../contexts";
 interface Props {
     tabbedBlockDef: TabbedBlockDef;
-    renderDesignProps: RenderDesignProps;
+    designCtx: DesignCtx;
 }
 interface State {
     activeIndex: number;

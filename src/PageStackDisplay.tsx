@@ -1,23 +1,17 @@
 import * as React from "react";
 import { Page, PageStack } from "./PageStack";
-import { CreateBlock, RenderInstanceProps, Filter, BlockDef } from "./widgets/blocks";
-import { Schema, Expr, DataSource } from "mwater-expressions";
+import { Filter, BlockDef } from "./widgets/blocks";
+import { Expr } from "mwater-expressions";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
-import { ActionLibrary } from "./widgets/ActionLibrary";
-import { WidgetLibrary } from "./designer/widgetLibrary";
+import { BaseCtx, InstanceCtx } from "./contexts";
 
 import './PageStackDisplay.css'
 import uuid = require("uuid");
 
 interface Props {
+  baseCtx: BaseCtx
   initialPage: Page
-  createBlock: CreateBlock
-  locale: string
-  schema: Schema
-  dataSource?: DataSource
-  actionLibrary: ActionLibrary
-  widgetLibrary: WidgetLibrary
 }
 
 interface State {
@@ -117,11 +111,11 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     return true
   }
 
-  renderChildBlock = (props: RenderInstanceProps, childBlockDef: BlockDef | null) => {
+  renderChildBlock = (instanceCtx: InstanceCtx, childBlockDef: BlockDef | null) => {
     // Create block
     if (childBlockDef) {
-      const block = this.props.createBlock(childBlockDef)
-      return block.renderInstance(props)
+      const block = instanceCtx.createBlock(childBlockDef)
+      return block.renderInstance(instanceCtx)
     }
     return null
   }
@@ -141,7 +135,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
   renderPageContents(page: Page, pageIndex: number) {
     // Lookup widget
-    const widgetDef = this.props.widgetLibrary.widgets[page.widgetId!]
+    const widgetDef = this.props.baseCtx.widgetLibrary.widgets[page.widgetId!]
 
     if (!widgetDef) {
       return <div className="alert alert-danger">Widget not found</div>
@@ -152,21 +146,16 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       return null
     }
 
-    // Create outer renderInstanceProps. Context variables will be injected after
-    const outerRenderInstanceProps: RenderInstanceProps = {
-      locale: this.props.locale,
-      database: page.database,
-      schema: this.props.schema,
-      dataSource: this.props.dataSource,
-      actionLibrary: this.props.actionLibrary,
-      widgetLibrary: this.props.widgetLibrary,
+    // Create outer instanceCtx. Context variables will be injected after
+    const outerInstanceCtx: InstanceCtx = {
+      ...this.props.baseCtx,
       pageStack: this,
       contextVars: [],
       contextVarValues: {},
-      getContextVarExprValue: (contextVarId: string, expr: Expr) => { throw new Error("Non-existant context variable") },
-      onSelectContextVar: (contextVarId: string, primaryKey: any) => { throw new Error("Non-existant context variable") },
-      setFilter: (contextVarId: string, filter: Filter) => { throw new Error("Non-existant context variable") },
-      getFilters: (contextVarId: string) => { throw new Error("Non-existant context variable") },
+      getContextVarExprValue: () => { throw new Error("Non-existant context variable") },
+      onSelectContextVar: () => { throw new Error("Non-existant context variable") },
+      setFilter: () => { throw new Error("Non-existant context variable") },
+      getFilters: () => { throw new Error("Non-existant context variable") },
       renderChildBlock: this.renderChildBlock,
       registerForValidation: this.registerChildForValidation.bind(null, pageIndex)
     }
@@ -174,19 +163,16 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     // Wrap in context var injector
     return <ContextVarsInjector 
       injectedContextVars={widgetDef.contextVars}
-      createBlock={this.props.createBlock}
       innerBlock={widgetDef.blockDef}
       injectedContextVarValues={page.contextVarValues}
-      renderInstanceProps={outerRenderInstanceProps}
-      schema={this.props.schema}
-      database={page.database}>
-        {(innerRenderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+      instanceCtx={{ ...outerInstanceCtx, database: page.database }}>
+        {(innerInstanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
           if (loading) {
             return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
           }
           return (
             <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { this.renderChildBlock(innerRenderInstanceProps, widgetDef.blockDef) }
+              { this.renderChildBlock(innerInstanceCtx, widgetDef.blockDef) }
             </div>
           )
         }}

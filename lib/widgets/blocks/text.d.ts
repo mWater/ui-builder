@@ -1,8 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks';
+import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { EmbeddedExpr } from '../../embeddedExprs';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface TextBlockDef extends BlockDef {
     type: "text";
     /** Text content */
@@ -28,10 +29,10 @@ export declare class TextBlock extends LeafBlock<TextBlockDef> {
         style: React.CSSProperties;
         className: string;
     }, HTMLElement>;
-    renderDesign(props: RenderDesignProps): React.DetailedReactHTMLElement<{
+    renderDesign(props: DesignCtx): React.DetailedReactHTMLElement<{
         style: React.CSSProperties;
         className: string;
     }, HTMLElement>;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

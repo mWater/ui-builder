@@ -1,7 +1,8 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar, ValidateBlockOptions } from '../blocks';
 import { Expr } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface ExpressionBlockDef extends BlockDef {
     type: "expression";
     /** Context variable (row or rowset) to use for expression */
@@ -23,9 +24,9 @@ export interface ExpressionBlockDef extends BlockDef {
 export declare class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
     validate(options: ValidateBlockOptions): string | null;
-    renderDesign(props: RenderDesignProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
     getClassName(): string;
     getStyle(): React.CSSProperties;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

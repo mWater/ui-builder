@@ -1,12 +1,13 @@
 import React from "react";
 import produce from "immer";
 import { TabbedBlockDef, TabbedBlockTab } from "./tabbed";
-import { RenderDesignProps, BlockDef } from "../../blocks";
+import { BlockDef } from "../../blocks";
 import { localize } from "../../localization";
+import { DesignCtx } from "../../../contexts";
 
 interface Props {
   tabbedBlockDef: TabbedBlockDef
-  renderDesignProps: RenderDesignProps
+  designCtx: DesignCtx
 }
 
 interface State {
@@ -23,7 +24,7 @@ export default class TabbedDesigner extends React.Component<Props, State> {
   }
   /** Handle adding a block to a tab */
   handleAddContent = (tabIndex: number, addedBlockDef: BlockDef) => {
-    this.props.renderDesignProps.store.alterBlock(this.props.tabbedBlockDef.id, produce((b: TabbedBlockDef) => { 
+    this.props.designCtx.store.alterBlock(this.props.tabbedBlockDef.id, produce((b: TabbedBlockDef) => { 
       b.tabs[tabIndex].content = addedBlockDef 
       return b
     }), addedBlockDef.id)
@@ -34,7 +35,7 @@ export default class TabbedDesigner extends React.Component<Props, State> {
   }
 
   renderTab(tab: TabbedBlockTab, index: number) {
-    const labelText = localize(tab.label, this.props.renderDesignProps.locale)
+    const labelText = localize(tab.label, this.props.designCtx.locale)
 
     return (
       <li className={(this.state.activeIndex === index) ? "active" : ""} key={index}>
@@ -49,7 +50,7 @@ export default class TabbedDesigner extends React.Component<Props, State> {
     const activeTab = this.props.tabbedBlockDef.tabs[this.state.activeIndex]
 
     const activeTabContent = activeTab ? 
-      this.props.renderDesignProps.renderChildBlock(this.props.renderDesignProps, activeTab.content, this.handleAddContent.bind(null, this.state.activeIndex))
+      this.props.designCtx.renderChildBlock(this.props.designCtx, activeTab.content, this.handleAddContent.bind(null, this.state.activeIndex))
       : null
 
     // Render tabs

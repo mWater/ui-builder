@@ -1,12 +1,13 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, EmbeddedExprsEditor } from '../propertyEditors'
 import { localize } from '../localization'
 import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import * as _ from 'lodash';
 import { EmbeddedExpr, formatEmbeddedExprString, validateEmbeddedExprs } from '../../embeddedExprs';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface TextBlockDef extends BlockDef {
   type: "text"
@@ -77,12 +78,12 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     return React.createElement(this.blockDef.style, { style: style, className: this.getClassName() }, content)
   }
   
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const text = localize(this.blockDef.text, props.locale)
     return this.renderText(text ? text : <span className="text-muted">Text</span>)
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     let text = localize(this.blockDef.text, props.locale)
 
     // Get any embedded expression values
@@ -101,11 +102,11 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     return this.renderText(text)
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Text">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="text">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="text">
             {(value, onChange) => 
               <LocalizedTextPropertyEditor 
                 value={value} 
@@ -117,7 +118,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Style">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="style">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="style">
             {(value, onChange) => 
               <Select 
                 value={value} 
@@ -134,20 +135,20 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="bold">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="bold">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Bold</Checkbox>}
         </PropertyEditor>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="italic">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="italic">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Italic</Checkbox>}
         </PropertyEditor>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="underline">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="underline">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Alignment">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
             {(value, onChange) => 
               <Toggle 
                 value={value || "left"} 
@@ -162,12 +163,12 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="multiline">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Color">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="color">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="color">
             {(value, onChange) => 
               <Select 
                 value={value || null} 
@@ -186,7 +187,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Embedded expressions" help="Reference in text as {0}, {1}, etc.">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="embeddedExprs">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="embeddedExprs">
             {(value: EmbeddedExpr[] | null, onChange) => (
               <EmbeddedExprsEditor 
                 value={value} 

@@ -1,7 +1,8 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, CreateBlock, ContextVar, ChildBlock } from '../blocks'
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface VerticalBlockDef extends BlockDef {
   type: "vertical"
@@ -46,7 +47,7 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     // Add keys
     return (
       <div style={{ paddingLeft: 5, paddingRight: 5 }}>
@@ -55,7 +56,7 @@ export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
     )      
   }
 
-  renderInstance(props: RenderInstanceProps) {
+  renderInstance(props: InstanceCtx) {
     return (
       <div>
         { this.blockDef.items.map((childBlockDef, index) => {

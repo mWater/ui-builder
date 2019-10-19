@@ -1,13 +1,14 @@
 import * as React from "react";
-import { SearchBlockDef, SearchBlock } from "./search";
-import { RenderInstanceProps, ContextVar, createExprVariables, Filter } from "../../blocks";
-import { Row, Expr, ExprUtils } from "mwater-expressions";
+import { SearchBlockDef } from "./search";
+import { createExprVariables, Filter } from "../../blocks";
+import { Expr, ExprUtils } from "mwater-expressions";
 import * as _ from "lodash";
 import { localize } from "../../localization";
+import { InstanceCtx } from "../../../contexts";
 
 interface Props {
   blockDef: SearchBlockDef
-  renderInstanceProps: RenderInstanceProps
+  instanceCtx: InstanceCtx
 }
 
 interface State {
@@ -26,7 +27,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     const blockDef = this.props.blockDef
 
     // Get table
-    const table = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!.table!
+    const table = this.props.instanceCtx.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!.table!
     
     if (searchText) {
       const searchExprs: Expr[] = blockDef.searchExprs.map(se => this.createExprFilter(se, searchText, table))
@@ -48,7 +49,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
   createExprFilter(expr: Expr, searchText: string, table: string) {
     const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
-    const exprUtils = new ExprUtils(this.props.renderInstanceProps.schema, createExprVariables(this.props.renderInstanceProps.contextVars))
+    const exprUtils = new ExprUtils(this.props.instanceCtx.schema, createExprVariables(this.props.instanceCtx.contextVars))
 
     // Get type of search expression
     const exprType = exprUtils.getExprType(expr)
@@ -67,7 +68,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
 
     if (exprType === "enum") {
       // Find matching enums
-      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.renderInstanceProps.locale).toLowerCase().includes(searchText.toLowerCase()))
+      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
       if (enumValues.length === 0) {
         return null
       }
@@ -84,7 +85,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
 
     if (exprType === "enumset") {
       // Find matching enums
-      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.renderInstanceProps.locale).toLowerCase().includes(searchText.toLowerCase()))
+      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
       if (enumValues.length === 0) {
         return null
       }
@@ -107,14 +108,14 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     this.setState({ searchText: value })
 
     // Set filter 
-    this.props.renderInstanceProps.setFilter(blockDef.rowsetContextVarId!, this.createFilter(value))
+    this.props.instanceCtx.setFilter(blockDef.rowsetContextVarId!, this.createFilter(value))
   }
 
   render() {
     return <SearchControl 
       value={this.state.searchText} 
       onChange={this.handleChange}
-      placeholder={localize(this.props.blockDef.placeholder, this.props.renderInstanceProps.locale)} />
+      placeholder={localize(this.props.blockDef.placeholder, this.props.instanceCtx.locale)} />
   }
 }
 

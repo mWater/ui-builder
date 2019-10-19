@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { NumberInput } from 'react-library/lib/bootstrap';
+import { DesignCtx } from '../../../contexts';
 
 export interface TextboxBlockDef extends ControlBlockDef {
   type: "textbox"
@@ -28,16 +28,16 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-  renderControlEditor(props: RenderEditorProps) {
+  renderControlEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Placeholder">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="placeholder">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Number of lines">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="numLines">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="numLines">
             {(value, onChange) => <NumberInput value={value || 1} onChange={onChange} decimal={false} />}
           </PropertyEditor>
         </LabeledProperty>

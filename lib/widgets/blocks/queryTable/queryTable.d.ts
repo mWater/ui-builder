@@ -1,11 +1,10 @@
 /// <reference types="react" />
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
 import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import { ActionDef } from '../../actions';
-import { WidgetLibrary } from '../../../designer/widgetLibrary';
-import { ActionLibrary } from '../../ActionLibrary';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface QueryTableBlockDef extends BlockDef {
     type: "queryTable";
     /** Determines if one table row contains one or multiple database table rows */
@@ -36,15 +35,15 @@ export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     createRowContextVar(rowsetCV: ContextVar): ContextVar;
     getRowContextVarId(): string;
     /** Get list of expressions used in a row by content blocks */
-    getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    getRowExprs(contextVars: ContextVar[], ctx: DesignCtx | InstanceCtx): Expr[];
+    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /**
      * Get the value of the row context variable for a specific row.
      * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
      * contextVars: includes rowsetCV and row one
      */
     getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): JSX.Element;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): JSX.Element;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

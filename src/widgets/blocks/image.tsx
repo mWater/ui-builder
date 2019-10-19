@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks'
 import { LabeledProperty, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { TextInput, Select } from 'react-library/lib/bootstrap';
 import { ActionDef } from '../actions';
@@ -9,6 +9,7 @@ import { ActionLibrary } from '../ActionLibrary';
 import { Expr } from 'mwater-expressions';
 import { localize } from '../localization';
 import produce from 'immer';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface ImageBlockDef extends BlockDef {
   type: "image"
@@ -55,10 +56,10 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     return null 
   }
 
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { 
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
     // Include action expressions
     if (this.blockDef.clickActionDef) {
-      const action = actionLibrary.createAction(this.blockDef.clickActionDef)
+      const action = ctx.actionLibrary.createAction(this.blockDef.clickActionDef)
       return action.getContextVarExprs(contextVar)
     }
 
@@ -100,11 +101,11 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     )
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     return this.renderImage(props.locale)
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     const handleClick = () => {
       // Confirm if confirm message
       if (this.blockDef.confirmMessage) {
@@ -133,7 +134,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     return this.renderImage(props.locale, handleClick)
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const locales = [
       "en",
       "fr",
@@ -153,13 +154,13 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     return (
       <div>
         <LabeledProperty label="URL">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="url">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="url">
             {(value, onChange) => <TextInput value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Size Mode">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="sizeMode">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="sizeMode">
             {(value, onChange) => 
               <Select value={value || "normal"} onChange={onChange}
               options={[
@@ -171,7 +172,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
         </LabeledProperty>
 
         <LabeledProperty label="When image clicked">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="clickActionDef">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="clickActionDef">
             {(value, onChange) => (
               <ActionDefEditor 
                 value={value} 
@@ -189,7 +190,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
         <LabeledProperty label="Locale-specific URL overrides">
         { locales.map(locale => {
           const onChange = (url: string | null) => {
-            props.onChange(produce(this.blockDef, bd => {
+            props.store.replaceBlock(produce(this.blockDef, bd => {
               if (url) {
                 bd.localizedUrls = bd.localizedUrls || {}
                 bd.localizedUrls[locale] = url

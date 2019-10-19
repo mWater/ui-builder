@@ -1,16 +1,14 @@
 import * as React from "react"
 import {v4 as uuid} from 'uuid'
 import { WidgetDef } from "../widgets/widgets";
-import { Schema, DataSource } from "mwater-expressions";
+import { DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
 import produce from "immer";
-import BlockFactory from "../widgets/BlockFactory";
 import * as _ from "lodash";
-import { ActionLibrary } from "../widgets/ActionLibrary";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
-import { Database } from "../database/Database";
 import { NewTab } from "./NewTab";
-import { getBlockTree } from "../widgets/blocks";
+import { getBlockTree, NullBlockStore } from "../widgets/blocks";
+import { BaseCtx, DesignCtx } from "../contexts";
 
 /** All widgets in current project */
 export interface WidgetLibrary {
@@ -18,12 +16,8 @@ export interface WidgetLibrary {
 }
 
 interface Props {
-  blockFactory: BlockFactory
-  database: Database
-  schema: Schema
+  baseCtx: BaseCtx
   dataSource: DataSource
-  actionLibrary: ActionLibrary
-  widgetLibrary: WidgetLibrary
   /** Ids of widgets in open tabs */
   openTabs: string[]
   blockPaletteEntries: BlockPaletteEntry[]
@@ -46,7 +40,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 
   handleTabChange = (widgetId: string, widgetDef: WidgetDef) => {
-    this.props.onWidgetLibraryChange(produce(this.props.widgetLibrary, (draft) => {
+    this.props.onWidgetLibraryChange(produce(this.props.baseCtx.widgetLibrary, (draft) => {
       draft.widgets[widgetId] = widgetDef
     }))
   }
@@ -56,7 +50,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 
   handleAddWidget = (widgetDef: WidgetDef) => {
-    const widgetLibrary = produce(this.props.widgetLibrary, (draft) => {
+    const widgetLibrary = produce(this.props.baseCtx.widgetLibrary, (draft) => {
       draft.widgets[widgetDef.id] = widgetDef
     })
     this.props.onWidgetLibraryChange(widgetLibrary)
@@ -65,7 +59,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
 
   handleDuplicateWidget = (widgetDef: WidgetDef) => {
     const newId = uuid()
-    const widgetLibrary = produce(this.props.widgetLibrary, (draft) => {
+    const widgetLibrary = produce(this.props.baseCtx.widgetLibrary, (draft) => {
       const newDef = _.cloneDeep(widgetDef)
       newDef.id = newId
       newDef.name = newDef.name + " (duplicate)"
@@ -87,12 +81,12 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 
   handleRemoveWidget = (widgetId: string) => {
-    const widget = this.props.widgetLibrary.widgets[widgetId]!
+    const widget = this.props.baseCtx.widgetLibrary.widgets[widgetId]!
     if (!confirm(`Permanently delete ${widget.name} widget?`)) {
       return
     }
 
-    const widgetLibrary = produce(this.props.widgetLibrary, (draft) => {
+    const widgetLibrary = produce(this.props.baseCtx.widgetLibrary, (draft) => {
       delete draft.widgets[widgetId]
     })
     this.props.onOpenTabsChange(_.without(this.props.openTabs, widgetId))
@@ -105,15 +99,21 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       return null
     }
 
-    for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.blockFactory.createBlock, widgetDef.contextVars)) {
-      const block = this.props.blockFactory.createBlock(childBlock.blockDef)
+    for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.baseCtx.createBlock, widgetDef.contextVars)) {
+      const block = this.props.baseCtx.createBlock(childBlock.blockDef)
+
+      // Create design context for validating
+      const designCtx: DesignCtx = {
+        ...this.props.baseCtx,
+        dataSource: this.props.dataSource,
+        contextVars: childBlock.contextVars,
+        store: new NullBlockStore(),
+        blockPaletteEntries: [],
+        selectedId: null,
+        renderChildBlock: () => { throw new Error("Not implemented") }
+      }
       
-      const error = block.validate({ 
-        schema: this.props.schema, 
-        actionLibrary: this.props.actionLibrary, 
-        widgetLibrary: this.props.widgetLibrary,
-        contextVars: childBlock.contextVars
-       })
+      const error = block.validate(designCtx)
        
        if (error) {
          return error
@@ -125,7 +125,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
 
   renderTab(index: number) {
     const activeTabId = this.props.openTabs[index]
-    const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
+    const widgetDef = this.props.baseCtx.widgetLibrary.widgets[activeTabId]
 
     // For immediately deleted tabs
     if (!widgetDef) {
@@ -146,7 +146,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   renderActiveTabContents() {
     if (this.state.activeTabIndex < this.props.openTabs.length) {
       const activeTabId = this.props.openTabs[this.state.activeTabIndex]
-      const widgetDef = this.props.widgetLibrary.widgets[activeTabId]
+      const widgetDef = this.props.baseCtx.widgetLibrary.widgets[activeTabId]
       // For immediately deleted tabs
       if (!widgetDef) {
         return null
@@ -155,20 +155,15 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       return <WidgetDesigner
         key={widgetDef.id}
         widgetDef={widgetDef}
-        createBlock={this.props.blockFactory.createBlock}
-        database={this.props.database}
-        schema={this.props.schema}
+        baseCtx={this.props.baseCtx}
         dataSource={this.props.dataSource}
-        actionLibrary={this.props.actionLibrary}
-        widgetLibrary={this.props.widgetLibrary}
         blockPaletteEntries={this.props.blockPaletteEntries}
         onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
-        locale="en"
       />
     }
     else {
       return <NewTab 
-        widgetLibrary={this.props.widgetLibrary} 
+        widgetLibrary={this.props.baseCtx.widgetLibrary} 
         onAddWidget={this.handleAddWidget} 
         onOpenWidget={this.handleOpenWidget} 
         onRemoveWidget={this.handleRemoveWidget}

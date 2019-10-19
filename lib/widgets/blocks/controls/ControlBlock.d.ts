@@ -1,8 +1,9 @@
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
+import { BlockDef, ValidateBlockOptions, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Database } from "../../../database/Database";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
     /** Row context variable id */
@@ -34,14 +35,14 @@ export interface RenderControlProps {
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
     abstract renderControl(props: RenderControlProps): React.ReactElement<any>;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-    abstract renderControlEditor(props: RenderEditorProps): React.ReactElement<any> | null;
+    abstract renderControlEditor(props: DesignCtx): React.ReactElement<any> | null;
     /** Filter the columns that this control is for */
     abstract filterColumn(column: Column): boolean;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): JSX.Element;
     /** Allow subclasses to clear/update other fields on the column changing */
     processColumnChanged(blockDef: T): T;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderEditor(props: DesignCtx): JSX.Element;
     getContextVarExprs(contextVar: ContextVar): Expr[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */
     validate(options: ValidateBlockOptions): string | null;

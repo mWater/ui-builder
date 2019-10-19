@@ -1,15 +1,16 @@
 import SearchBlockInstance, { SearchControl } from "./SearchBlockInstance";
 import { SearchBlockDef } from "./search";
-import { Filter, RenderInstanceProps } from "../../blocks";
+import { Filter } from "../../blocks";
 import { shallow } from "enzyme";
 import * as React from "react";
 import { Expr } from "mwater-expressions";
 import simpleSchema from "../../../__fixtures__/schema";
+import { InstanceCtx } from "../../../contexts";
 
 const getFilter = (blockDef: SearchBlockDef, searchText: string) => {
   return new Promise((resolve, reject) => {
-    // Create minimal renderInstanceProps
-    const renderInstanceProps = {
+    // Create minimal instanceCtx
+    const instanceCtx = {
       schema: simpleSchema(),
       setFilter: (contextVarId: string, filter: Filter) => {
         resolve({ contextVarId: contextVarId, filter: filter })
@@ -17,7 +18,7 @@ const getFilter = (blockDef: SearchBlockDef, searchText: string) => {
       contextVars: [{ id: "cv1", type: "rowset", table: "t1" }]
     }
 
-    const sbi = shallow(<SearchBlockInstance blockDef={blockDef} renderInstanceProps={renderInstanceProps as RenderInstanceProps}/>)
+    const sbi = shallow(<SearchBlockInstance blockDef={blockDef} instanceCtx={instanceCtx as InstanceCtx}/>)
     sbi.prop("onChange")(searchText)
   })
 } 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
 import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors';
 import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import { format } from 'd3-format'
 import moment from 'moment'
 import { Toggle, Checkbox, Select } from 'react-library/lib/bootstrap';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface ExpressionBlockDef extends BlockDef {
   type: "expression"
@@ -59,7 +60,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     return null
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
     const style = this.getStyle()
     const className = this.getClassName()
@@ -101,7 +102,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   }
 
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     if (!this.blockDef.contextVarId || !this.blockDef.expr) {
       return <div/>
     }
@@ -134,7 +135,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     )     
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)
 
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
@@ -144,10 +145,10 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       const newExprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(expr)
       
       if (newExprType !== exprType) {
-        props.onChange({ ...this.blockDef, expr: expr, format: null })
+        props.store.replaceBlock({ ...this.blockDef, expr: expr, format: null })
       }
       else {
-        props.onChange({ ...this.blockDef, expr: expr })
+        props.store.replaceBlock({ ...this.blockDef, expr: expr })
       }
     }
   
@@ -155,7 +156,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     return (
       <div>
         <LabeledProperty label="Row/Rowset Variable">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="contextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="contextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
@@ -177,7 +178,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
         { exprType === "number" ?
           <LabeledProperty label="Number Format">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
               {(value: string, onChange) => (
                 <NumberFormatEditor
                   value={value} 
@@ -190,7 +191,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
         { exprType === "date" ?
           <LabeledProperty label="Date Format">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
               {(value: string, onChange) => (
                 <DateFormatEditor
                   value={value} 
@@ -203,7 +204,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
         { exprType === "datetime" ?
           <LabeledProperty label="Date/time Format">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="format">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
               {(value: string, onChange) => (
                 <DatetimeFormatEditor
                   value={value} 
@@ -214,24 +215,24 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           : null
         }
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="bold">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="bold">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Bold</Checkbox>}
         </PropertyEditor>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="italic">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="italic">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Italic</Checkbox>}
         </PropertyEditor>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="underline">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="underline">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
         </PropertyEditor>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="multiline">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Alignment">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
             {(value, onChange) => 
               <Toggle 
                 value={value || "left"} 
@@ -247,7 +248,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Color">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="color">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="color">
             {(value, onChange) => 
               <Select 
                 value={value || null} 

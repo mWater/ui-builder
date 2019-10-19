@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, NullBlockStore, Filter, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks'
+import { BlockDef, CreateBlock, NullBlockStore, Filter, ContextVar, ValidateBlockOptions } from '../blocks'
 import { Expr, Schema } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
@@ -9,6 +9,7 @@ import { ActionLibrary } from '../ActionLibrary';
 import { LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
 import produce from 'immer';
+import { InstanceCtx, DesignCtx } from '../../contexts';
 
 /** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
@@ -45,21 +46,16 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     return null 
   }
 
-  getInitialFilters(options: {
-    contextVarId: string, 
-    widgetLibrary: WidgetLibrary, 
-    schema: Schema, 
-    contextVars: ContextVar[]
-  }): Filter[] { 
-    const widgetDef = options.widgetLibrary.widgets[this.blockDef.widgetId!]
+  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
+    const widgetDef = instanceCtx.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
       // Map contextVarId to internal id
       for (const key of Object.keys(this.blockDef.contextVarMap)) {
         const value = this.blockDef.contextVarMap[key]
-        if (value === options.contextVarId) {
-          return innerBlock.getInitialFilters({ ...options, contextVarId: key })
+        if (value === contextVarId) {
+          return innerBlock.getInitialFilters(key, instanceCtx)
         }
       }
     }
@@ -67,13 +63,13 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     return []
   }
 
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary) {
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx) {
     if (!this.blockDef.widgetId) {
       return []
     }
 
     // Get inner widget
-    const widgetDef = widgetLibrary.widgets[this.blockDef.widgetId]
+    const widgetDef = ctx.widgetLibrary.widgets[this.blockDef.widgetId]
 
     if (!widgetDef.blockDef) {
       return []
@@ -86,12 +82,8 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
 
     // Get complete context variables exprs of inner widget blocks
-    let contextVarExprs = this.createBlock(widgetDef.blockDef).getSubtreeContextVarExprs({
-      actionLibrary: actionLibrary,
-      widgetLibrary: widgetLibrary,
-      contextVars: widgetDef.contextVars,
-      contextVar: innerContextVar,
-      createBlock: this.createBlock
+    let contextVarExprs = this.createBlock(widgetDef.blockDef).getSubtreeContextVarExprs(innerContextVar, {
+      ...ctx, contextVars: widgetDef.contextVars,
     })
 
     // Map any variables of expressions that cross widget boundary
@@ -117,7 +109,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     })    
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     if (!this.blockDef.widgetId) {
       return <div style={{ fontStyle: "italic" }}>Select widget...</div>
     }
@@ -128,13 +120,10 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
       // Create props for rendering inner block
-      const innerProps : RenderDesignProps = {
-        schema: props.schema,
-        dataSource: props.dataSource,
+      const innerProps : DesignCtx = {
+        ...props,
         selectedId: null,
-        locale: props.locale,
         contextVars: widgetDef.contextVars,
-        widgetLibrary: props.widgetLibrary,
         store: new NullBlockStore(),
         blockPaletteEntries: [],
         renderChildBlock: (childProps, childBlockDef) => { 
@@ -160,7 +149,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     // Map context var values
     const mappedContextVarValues = {} as object
 
@@ -179,7 +168,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = this.createBlock(widgetDef.blockDef)
 
-      const innerProps : RenderInstanceProps = {
+      const innerProps : InstanceCtx = {
         ...props,
         contextVars: props.contextVars.concat(widgetDef.contextVars),
         contextVarValues: { ...props.contextVarValues, ...mappedContextVarValues }, 
@@ -225,12 +214,12 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     // Create widget options 
     const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
 
     const handleWidgetIdChange = (widgetId: string | null) => {
-      props.onChange({ ...this.blockDef, widgetId: widgetId, contextVarMap: {} })
+      props.store.replaceBlock({ ...this.blockDef, widgetId: widgetId, contextVarMap: {} })
     }
 
     const renderContextVarValues = () => {
@@ -250,7 +239,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
             { widgetDef.contextVars.map(contextVar => {
               const cv = this.blockDef.contextVarMap[contextVar.id]
               const handleCVChange = (contextVarId: string) => {
-                props.onChange(produce(this.blockDef, (draft) => {
+                props.store.replaceBlock(produce(this.blockDef, (draft) => {
                   draft.contextVarMap[contextVar.id] = contextVarId
                 }))
               }

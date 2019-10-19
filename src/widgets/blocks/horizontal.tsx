@@ -1,9 +1,10 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, CreateBlock, ContextVar, ChildBlock } from '../blocks'
 import { Select, Toggle } from 'react-library/lib/bootstrap';
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface HorizontalBlockDef extends BlockDef {
   type: "horizontal"
@@ -104,7 +105,7 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     }
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         { this.renderBlock(this.blockDef.items.map(childBlock => props.renderChildBlock(props, childBlock))) }
@@ -112,7 +113,7 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
+  renderInstance(props: InstanceCtx) {
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         { this.renderBlock(this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef))) }
@@ -120,11 +121,11 @@ export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     )
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Alignment">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="align">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
             {(value, onChange) => 
               <Toggle 
                 value={value || "justify"} 

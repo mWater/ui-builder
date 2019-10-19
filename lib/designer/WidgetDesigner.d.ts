@@ -1,22 +1,15 @@
 import * as React from "react";
 import { WidgetDef } from "../widgets/widgets";
-import { CreateBlock, BlockDef } from "../widgets/blocks";
+import { BlockDef } from "../widgets/blocks";
 import "./WidgetDesigner.css";
-import { Schema, DataSource } from "mwater-expressions";
-import { WidgetLibrary } from "./widgetLibrary";
-import { ActionLibrary } from "../widgets/ActionLibrary";
-import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
+import { BaseCtx, DesignCtx } from "../contexts";
+import { DataSource } from "mwater-expressions";
 interface WidgetDesignerProps {
+    baseCtx: BaseCtx;
+    dataSource: DataSource;
     widgetDef: WidgetDef;
     onWidgetDefChange(widgetDef: WidgetDef): void;
-    createBlock: CreateBlock;
-    database: Database;
-    schema: Schema;
-    dataSource: DataSource;
-    actionLibrary: ActionLibrary;
-    locale: string;
-    widgetLibrary: WidgetLibrary;
     blockPaletteEntries: BlockPaletteEntry[];
 }
 declare enum Mode {
@@ -42,7 +35,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     handleRemoveBlock: (blockId: string) => void;
     createBlockStore(): {
         alterBlock: (blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string | undefined) => void;
+        replaceBlock: (blockDef: BlockDef) => void;
     };
+    createDesignCtx(): DesignCtx;
     renderDesignBlock(): JSX.Element;
     renderEditor(): JSX.Element;
     handleSetMode: (mode: Mode) => void;

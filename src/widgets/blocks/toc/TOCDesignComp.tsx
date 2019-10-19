@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import _ from 'lodash'
 import { TOCBlockDef, TOCItem, alterItems, iterateItems } from "./toc"
-import { RenderDesignProps, BlockDef } from ".."
+import { BlockDef } from ".."
 import { useState } from "react"
 import produce from "immer"
 import uuid from "uuid"
@@ -10,11 +10,12 @@ import SplitPane from "./SplitPane"
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors"
 import { Select } from "react-library/lib/bootstrap"
 import { LocalizedString } from "mwater-expressions"
+import { DesignCtx } from "../../../contexts"
 
 /** Designer component for TOC */
 export default function TOCDesignComp(props: { 
   blockDef: TOCBlockDef
-  renderProps: RenderDesignProps 
+  renderProps: DesignCtx 
 }) {
   const { blockDef, renderProps } = props
 

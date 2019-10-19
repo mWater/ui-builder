@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables, CreateBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables, CreateBlock } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Schema, LiteralExpr, Expr } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
@@ -9,6 +9,7 @@ import { TextInput } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 import { ColumnValuesEditor, ContextVarExpr } from '../columnValues';
 import { Database } from '../../database/Database';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block which creates a new row and adds it as a context variable to its content */
 export interface AddRowBlockDef extends BlockDef {
@@ -114,7 +115,7 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     return Object.values(this.blockDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
   }
   
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleSetContent = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: AddRowBlockDef) => { 
         b.content = blockDef 
@@ -140,36 +141,33 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { 
+  renderInstance(props: InstanceCtx) { 
     const contextVar = this.createContextVar()!
     return <AddRowInstance
       blockDef={this.blockDef}
       contextVar={contextVar}
-      createBlock={this.createBlock}
-      database={props.database}
-      renderInstanceProps={props}
-      schema={props.schema} />
+      instanceCtx={props}/>
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <h3>Add Row</h3>
         <LabeledProperty label="Table">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="table">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="table">
             {(value, onChange) => 
               <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange}/>
             }
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Variable Name">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="name">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
             {(value, onChange) => <TextInput value={value} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table ? 
         <LabeledProperty label="Column Values">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="columnValues">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="columnValues">
             {(value, onChange) => 
               <ColumnValuesEditor 
                 value={value} 
@@ -190,11 +188,8 @@ export class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
 
 interface Props {
   contextVar: ContextVar
-  database: Database
   blockDef: AddRowBlockDef
-  renderInstanceProps: RenderInstanceProps
-  schema: Schema
-  createBlock: CreateBlock
+  instanceCtx: InstanceCtx
 }
 
 interface State {
@@ -223,7 +218,7 @@ class AddRowInstance extends React.Component<Props, State> {
       const contextVarExpr: ContextVarExpr = this.props.blockDef.columnValues[columnId]
 
       if (contextVarExpr.contextVarId != null) {
-        row[columnId] = this.props.renderInstanceProps.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
+        row[columnId] = this.props.instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
       }
       else {
         row[columnId] = contextVarExpr.expr ? (contextVarExpr.expr as LiteralExpr).value : null
@@ -231,7 +226,7 @@ class AddRowInstance extends React.Component<Props, State> {
     }
 
     try {
-      const txn = this.props.database.transaction()
+      const txn = this.props.instanceCtx.database.transaction()
       const addedRowId = await txn.addRow(this.props.blockDef.table!, row)
       await txn.commit()
       this.setState({ addedRowId })
@@ -252,18 +247,15 @@ class AddRowInstance extends React.Component<Props, State> {
     return <ContextVarsInjector 
       injectedContextVars={[this.props.contextVar]} 
       injectedContextVarValues={{ [this.props.contextVar.id]: this.state.addedRowId }}
-      createBlock={this.props.createBlock}
-      database={this.props.database}
       innerBlock={this.props.blockDef.content}
-      renderInstanceProps={this.props.renderInstanceProps}
-      schema={this.props.schema}>
-        {(renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+      instanceCtx={this.props.instanceCtx}>
+        {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
           if (loading) {
             return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
           }
           return (
             <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { this.props.renderInstanceProps.renderChildBlock(renderInstanceProps, this.props.blockDef.content) }
+              { this.props.instanceCtx.renderChildBlock(instanceCtx, this.props.blockDef.content) }
             </div>
           )
         }}

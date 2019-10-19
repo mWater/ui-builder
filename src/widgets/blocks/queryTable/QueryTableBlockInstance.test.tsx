@@ -1,7 +1,7 @@
 import { shallow, mount } from 'enzyme'
 import * as React from "react";
 
-import { ContextVar, RenderInstanceProps } from "../../blocks";
+import { ContextVar } from "../../blocks";
 import { QueryTableBlockDef, QueryTableBlock } from "./queryTable";
 import QueryTableBlockInstance from "./QueryTableBlockInstance";
 import simpleSchema from "../../../__fixtures__/schema";
@@ -11,6 +11,7 @@ import { QueryOptions, OrderByDir } from '../../../database/Database';
 import { Expr, DataSource } from 'mwater-expressions';
 import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';
+import { InstanceCtx } from '../../../contexts';
 
 // Outer context vars
 const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -37,13 +38,14 @@ const createBlock = new BlockFactory().createBlock
 
 const qtbSingle = new QueryTableBlock(qtbdSingle, createBlock)
 
-let rips: RenderInstanceProps;
+let rips: InstanceCtx;
 let database: any
 
 beforeEach(() => {
   database = mockDatabase()
 
   rips = {
+   createBlock: createBlock,
    contextVars: contextVars,
    database: database,
    getContextVarExprValue: jest.fn(),
@@ -67,7 +69,7 @@ beforeEach(() => {
 test("creates query", () => {
   (database.query as jest.Mock).mockResolvedValue([])
 
-  const inst = mount(<QueryTableBlockInstance block={qtbSingle} renderInstanceProps={rips} />)
+  const inst = mount(<QueryTableBlockInstance block={qtbSingle} instanceCtx={rips} />)
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions
   expect(queryOptions).toEqual({
     select: { 
@@ -97,7 +99,7 @@ test("adds filters, orderBy and where", () => {
       { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
     ]
   }) as QueryTableBlock
-  const inst = mount(<QueryTableBlockInstance block={qtb} renderInstanceProps={rips} />)
+  const inst = mount(<QueryTableBlockInstance block={qtb} instanceCtx={rips} />)
 
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions
   expect(queryOptions).toEqual({
@@ -128,9 +130,9 @@ test("adds filters, orderBy and where", () => {
 test("injects context variables", () => {
   (database.query as jest.Mock).mockResolvedValue([])
 
-  const inst = mount(<QueryTableBlockInstance block={qtbSingle} renderInstanceProps={rips} />)
+  const inst = mount(<QueryTableBlockInstance block={qtbSingle} instanceCtx={rips} />)
   inst.setState({ rows: [{ id: "r1", e0: "abc" }] })
-  const rowRips = (inst.instance() as QueryTableBlockInstance).createRowRenderInstanceProps(0) as RenderInstanceProps
+  const rowRips = (inst.instance() as QueryTableBlockInstance).createRowInstanceCtx(0) as InstanceCtx
 
   expect(rowRips.contextVarValues["123_row"]).toBe("r1")
 

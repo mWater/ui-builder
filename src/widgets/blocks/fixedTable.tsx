@@ -1,10 +1,11 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import CompoundBlock from '../CompoundBlock';
 import produce from 'immer';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Table with a fixed number of rows and columns */
 export interface FixedTableBlockDef extends BlockDef {
@@ -55,7 +56,7 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     // Handle setting of a cell contents
     const handleSet = (rowIndex: number, columnIndex: number, content: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: FixedTableBlockDef) => { 
@@ -89,7 +90,7 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     let className = "table"
     switch (this.blockDef.borders || "horizontal") {
       case "all":
@@ -116,19 +117,19 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
     )
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const handleNumRowsChange = (numRows: number) => {
       if (numRows < 1) {
         return
       }
-      props.onChange(setNumRows(this.blockDef, numRows))
+      props.store.replaceBlock(setNumRows(this.blockDef, numRows))
     }
 
     const handleNumColumnsChange = (numColumns: number) => {
       if (numColumns < 1) {
         return
       }
-      props.onChange(setNumColumns(this.blockDef, numColumns))
+      props.store.replaceBlock(setNumColumns(this.blockDef, numColumns))
     }
 
     return (
@@ -142,13 +143,13 @@ export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Borders">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="borders">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="borders">
             {(value, onChange) => <Select value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Padding">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="padding">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="padding">
             {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>

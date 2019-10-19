@@ -1,11 +1,12 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Expr } from 'mwater-expressions';
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import { ExprComponent } from 'mwater-expressions-ui';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block which only displays content if an expression is true */
 export interface ConditionalBlockDef extends BlockDef {
@@ -65,7 +66,7 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
     return (contextVar.id === this.blockDef.contextVarId && this.blockDef.expr) ? [this.blockDef.expr] : [] 
   }
   
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleSetContent = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: ConditionalBlockDef) => { 
         b.content = blockDef 
@@ -82,7 +83,7 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { 
+  renderInstance(props: InstanceCtx) { 
     // Check expression value
     const value = props.getContextVarExprValue(this.blockDef.contextVarId!, this.blockDef.expr)
 
@@ -93,7 +94,7 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
     return <div>{props.renderChildBlock(props, this.blockDef.content)}</div>
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)
 
     // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
@@ -101,7 +102,7 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
       <div>
         <h3>Rowset</h3>
         <LabeledProperty label="Row/Rowset Variable">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="contextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="contextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
@@ -109,7 +110,7 @@ export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
         { contextVar && contextVar.table 
           ?
           <LabeledProperty label="Conditional Expression">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="expr">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="expr">
               {(value, onChange) => 
                 <ExprComponent 
                   value={value} 

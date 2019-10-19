@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock, RenderEditorProps } from '../../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../../blocks'
 import CompoundBlock from '../../CompoundBlock'
 import produce from 'immer'
 import { LocalizedString } from 'mwater-expressions'
@@ -9,6 +9,7 @@ import TOCInstanceComp from './TOCInstanceComp'
 import './toc.css'
 import { PropertyEditor } from '../../propertyEditors'
 import { Checkbox } from 'react-library/lib/bootstrap'
+import { DesignCtx, InstanceCtx } from '../../../contexts'
 
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
@@ -86,18 +87,18 @@ export class TOCBlock extends CompoundBlock<TOCBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     return <TOCDesignComp renderProps={props} blockDef={this.blockDef} />
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     return <TOCInstanceComp renderProps={props} blockDef={this.blockDef} createBlock={this.createBlock} />
   }
   
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="removePadding">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removePadding">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Remove Padding (for top-level TOCs)</Checkbox>}
         </PropertyEditor>
       </div>

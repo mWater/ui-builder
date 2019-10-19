@@ -11,11 +11,11 @@ import ListEditor from "../widgets/ListEditor";
 import * as _ from "lodash";
 import { TextInput, Select } from "react-library/lib/bootstrap";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
+import { DesignCtx } from "../contexts";
 
 interface WidgetEditorProps {
+  designCtx: DesignCtx
   widgetDef: WidgetDef
-  schema: Schema
-  dataSource: DataSource
   onWidgetDefChange(widgetDef: WidgetDef): void
 }
 
@@ -39,7 +39,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       </LabeledProperty>
       <LabeledProperty label="Variables">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
-          { (value, onChange) => <ContextVarsEditor contextVars={value} onChange={onChange} schema={this.props.schema} /> }
+          { (value, onChange) => <ContextVarsEditor contextVars={value} onChange={onChange} schema={this.props.designCtx.schema} /> }
         </PropertyEditor>
       </LabeledProperty>
       <LabeledProperty label="Preview Variable Values">
@@ -48,8 +48,8 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             key={contextVar.id}
             contextVar={contextVar} 
             widgetDef={this.props.widgetDef} 
-            schema={this.props.schema}
-            dataSource={this.props.dataSource}
+            schema={this.props.designCtx.schema}
+            dataSource={this.props.designCtx.dataSource}
             onWidgetDefChange={this.props.onWidgetDefChange}
             />
         })}

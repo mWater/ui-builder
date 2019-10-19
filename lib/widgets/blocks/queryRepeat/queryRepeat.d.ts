@@ -1,10 +1,9 @@
 import * as React from 'react';
 import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../../blocks';
 import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
-import { WidgetLibrary } from '../../../designer/widgetLibrary';
-import { ActionLibrary } from '../../ActionLibrary';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface QueryRepeatBlockDef extends BlockDef {
     type: "queryRepeat";
     /** Contents to repeat */
@@ -27,15 +26,15 @@ export declare class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef>
     createRowContextVar(rowsetCV: ContextVar): ContextVar;
     getRowContextVarId(): string;
     /** Get list of expressions used in a row by content blocks */
-    getRowExprs(contextVars: ContextVar[], widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    getRowExprs(contextVars: ContextVar[], ctx: DesignCtx | InstanceCtx): Expr[];
+    getContextVarExprs(): Expr[];
     /**
      * Get the value of the row context variable for a specific row.
      * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
      * contextVars: includes rowsetCV and row one
      */
     getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any;
-    renderDesign(props: RenderDesignProps): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
-    renderInstance(props: RenderInstanceProps): JSX.Element;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    renderInstance(props: InstanceCtx): JSX.Element;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

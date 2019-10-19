@@ -1,9 +1,10 @@
 /// <reference types="react" />
 import { TOCBlockDef } from "./toc";
-import { RenderInstanceProps, CreateBlock } from '../../blocks';
+import { CreateBlock } from '../../blocks';
+import { InstanceCtx } from "../../../contexts";
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: {
     blockDef: TOCBlockDef;
-    renderProps: RenderInstanceProps;
+    renderProps: InstanceCtx;
     createBlock: CreateBlock;
 }): JSX.Element;

@@ -1,10 +1,11 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
 import { LocalizedString } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Header with line underneath */
 export interface HeaderBlockDef extends BlockDef {
@@ -26,7 +27,7 @@ export class HeaderBlock extends CompoundBlock<HeaderBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleAdd = (addedBlockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: HeaderBlockDef) => { 
         b.child = addedBlockDef 
@@ -41,7 +42,7 @@ export class HeaderBlock extends CompoundBlock<HeaderBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
+  renderInstance(props: InstanceCtx) {
     return (
       <div className="header-block">
         { props.renderChildBlock(props, this.blockDef.child) }

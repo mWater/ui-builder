@@ -1,12 +1,13 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, createExprVariables } from '../../blocks'
+import { BlockDef, ValidateBlockOptions, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import SearchBlockInstance, { SearchControl } from './SearchBlockInstance';
 import ListEditor from '../../ListEditor';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { localize } from '../../localization';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 
 export interface SearchBlockDef extends BlockDef {
   type: "search"
@@ -52,29 +53,29 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
     return null
   }
   
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     return <SearchControl value="" placeholder={localize(this.blockDef.placeholder, props.locale)} />
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
-    return <SearchBlockInstance blockDef={this.blockDef} renderInstanceProps={props} />
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
+    return <SearchBlockInstance blockDef={this.blockDef} instanceCtx={props} />
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     // Get rowset context variable
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetContextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowsetContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         { rowsetCV ? 
           <LabeledProperty label="Search expressions">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="searchExprs">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="searchExprs">
             {(value, onItemsChange) => {
 
               const handleAddSearchExpr = () => {
@@ -98,7 +99,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
         : null}
 
         <LabeledProperty label="Placeholder">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="placeholder">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>

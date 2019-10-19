@@ -1,10 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks';
+import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks';
 import { ActionDef } from '../actions';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
 import { Expr } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface ImageBlockDef extends BlockDef {
     type: "image";
     /** URL of image */
@@ -25,9 +24,9 @@ export interface ImageBlockDef extends BlockDef {
 /** Simple static image block */
 export declare class ImageBlock extends LeafBlock<ImageBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     renderImage(locale: string, handleClick?: () => void): JSX.Element;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

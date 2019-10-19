@@ -1,6 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks';
+import { BlockDef } from '../blocks';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface SpacerBlockDef extends BlockDef {
     type: "spacer";
     /** Width in ems (null/undefined is auto) */
@@ -11,7 +12,7 @@ export interface SpacerBlockDef extends BlockDef {
 /** Creates a fixed size spacer to separate blocks */
 export declare class SpacerBlock extends LeafBlock<SpacerBlockDef> {
     validate(): null;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

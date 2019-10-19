@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, CreateBlock, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
@@ -10,6 +10,7 @@ import { FilterExprComponent } from 'mwater-expressions-ui';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 import { localize } from '../localization';
 import { useEffect, useState } from 'react';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
@@ -68,7 +69,7 @@ export class RowBlock extends CompoundBlock<RowBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleSetContent = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: RowBlockDef) => { 
         b.content = blockDef 
@@ -94,7 +95,7 @@ export class RowBlock extends CompoundBlock<RowBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { 
+  renderInstance(props: InstanceCtx) { 
     const contextVar = this.createContextVar()!
     return <RowInstance
       contextVar={contextVar}
@@ -103,10 +104,10 @@ export class RowBlock extends CompoundBlock<RowBlockDef> {
       createBlock={this.createBlock} />
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const handleTableChange = (tableId: string) => {
       const table = props.schema.getTable(tableId)!
-      props.onChange(produce(this.blockDef, (bd) => {
+      props.store.replaceBlock(produce(this.blockDef, (bd) => {
         bd.table = tableId
         bd.name = bd.name || localize(table.name)
       }))
@@ -119,13 +120,13 @@ export class RowBlock extends CompoundBlock<RowBlockDef> {
           <TableSelect schema={props.schema} locale={props.locale} value={this.blockDef.table || null} onChange={handleTableChange}/>
         </LabeledProperty>
         <LabeledProperty label="Name">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="name">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
             {(value, onChange) => <TextInput value={value} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table ? 
         <LabeledProperty label="Filter" help="Should only match one row">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="filter">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
             {(value, onChange) => 
               <FilterExprComponent 
                 value={value} 
@@ -145,7 +146,7 @@ export class RowBlock extends CompoundBlock<RowBlockDef> {
 
 const RowInstance = (props: {
   blockDef: RowBlockDef
-  instanceProps: RenderInstanceProps
+  instanceProps: InstanceCtx
   contextVar: ContextVar
   createBlock: CreateBlock
 }) => {
@@ -196,18 +197,15 @@ const RowInstance = (props: {
   return <ContextVarsInjector 
     injectedContextVars={[contextVar]} 
     injectedContextVarValues={{ [contextVar.id]: id }}
-    createBlock={createBlock}
-    database={instanceProps.database}
     innerBlock={blockDef.content!}
-    renderInstanceProps={instanceProps}
-    schema={instanceProps.schema}>
-      {(renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+    instanceCtx={instanceProps}>
+      {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
         if (loading) {
           return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
         }
         return (
           <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-            { instanceProps.renderChildBlock(renderInstanceProps, blockDef.content) }
+            { instanceProps.renderChildBlock(instanceCtx, blockDef.content) }
           </div>
         )
       }}

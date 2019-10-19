@@ -1,14 +1,14 @@
 import * as React from "react";
-import { QueryTableBlockDef, QueryTableBlock } from "./queryTable";
-import { RenderInstanceProps, ContextVar } from "../../blocks";
+import { QueryTableBlock } from "./queryTable";
 import { Row, Expr } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
 import { localize } from "../../localization";
+import { InstanceCtx } from "../../../contexts";
 
 interface Props {
   block: QueryTableBlock
-  renderInstanceProps: RenderInstanceProps
+  instanceCtx: InstanceCtx
 }
 
 interface State {
@@ -29,7 +29,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   componentDidMount() {
-    this.props.renderInstanceProps.database.addChangeListener(this.handleChange)
+    this.props.instanceCtx.database.addChangeListener(this.handleChange)
     this.performQuery()
   }
 
@@ -42,7 +42,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   componentWillUnmount() {
-    this.props.renderInstanceProps.database.removeChangeListener(this.handleChange)
+    this.props.instanceCtx.database.removeChangeListener(this.handleChange)
   }
 
   /** Change listener to refresh database */
@@ -51,12 +51,12 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   createQuery(): QueryOptions {
-    const rips = this.props.renderInstanceProps
+    const rips = this.props.instanceCtx
     const block = this.props.block
 
     // Get expressions
     const rowsetCV = rips.contextVars.find(cv => cv.id === block.blockDef.rowsetContextVarId)!
-    const rowExprs = block.getRowExprs(this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.widgetLibrary, this.props.renderInstanceProps.actionLibrary)
+    const rowExprs = block.getRowExprs(this.props.instanceCtx.contextVars, this.props.instanceCtx)
     const rowsetCVValue = rips.contextVarValues[rowsetCV.id]
 
     // Create where
@@ -108,7 +108,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     // Mark as refreshing
     this.setState({ refreshing: true })
 
-    this.props.renderInstanceProps.database.query(queryOptions, this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.contextVarValues).then(rows => {
+    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, this.props.instanceCtx.contextVarValues).then(rows => {
       // Check if still relevant
       if (_.isEqual(queryOptions, this.createQuery())) {
         this.setState({ rows, refreshing: false })
@@ -118,20 +118,20 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     })
   }
 
-  createRowRenderInstanceProps(rowIndex: number): RenderInstanceProps {
-    const rips = this.props.renderInstanceProps
+  createRowInstanceCtx(rowIndex: number): InstanceCtx {
+    const rips = this.props.instanceCtx
 
     // Row context variable
-    const rowsetCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id === this.props.block.blockDef.rowsetContextVarId)!
+    const rowsetCV = this.props.instanceCtx.contextVars.find(cv => cv.id === this.props.block.blockDef.rowsetContextVarId)!
     const rowcv = this.props.block.createRowContextVar(rowsetCV!)
 
     // TODO move out of here to be faster
-    const rowExprs = this.props.block.getRowExprs(this.props.renderInstanceProps.contextVars, this.props.renderInstanceProps.widgetLibrary, this.props.renderInstanceProps.actionLibrary)
+    const rowExprs = this.props.block.getRowExprs(this.props.instanceCtx.contextVars, this.props.instanceCtx)
 
     const innerContextVars = rips.contextVars.concat(rowcv)
 
     // Row context variable value
-    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.renderInstanceProps.schema, rowsetCV, innerContextVars)
+    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.instanceCtx.schema, rowsetCV, innerContextVars)
 
     return {
       ...rips, 
@@ -149,19 +149,19 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   renderRow(row: Row, rowIndex: number) {
-    const rowRIProps = this.createRowRenderInstanceProps(rowIndex)
+    const rowRIProps = this.createRowInstanceCtx(rowIndex)
 
     const handleRowClick = () => {
       // Run action
       if (this.props.block.blockDef.rowClickAction) {
         const actionDef = this.props.block.blockDef.rowClickAction
-        const action = this.props.renderInstanceProps.actionLibrary.createAction(actionDef)
+        const action = this.props.instanceCtx.actionLibrary.createAction(actionDef)
 
         action.performAction({
           contextVars: rowRIProps.contextVars,
           database: rowRIProps.database,
           locale: rowRIProps.locale,
-          schema: this.props.renderInstanceProps.schema,
+          schema: this.props.instanceCtx.schema,
           contextVarValues: rowRIProps.contextVarValues,
           pageStack: rowRIProps.pageStack, 
           getContextVarExprValue: rowRIProps.getContextVarExprValue,
@@ -210,7 +210,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       return (
         <tr>
           <td colSpan={this.props.block.blockDef.contents.length} style={{ fontStyle: "italic" }}>
-            {localize(this.props.block.blockDef.noRowsMessage, this.props.renderInstanceProps.locale)}
+            {localize(this.props.block.blockDef.noRowsMessage, this.props.instanceCtx.locale)}
           </td>
         </tr>
       )
@@ -220,7 +220,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   render() {
-    const riProps = this.props.renderInstanceProps
+    const riProps = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
 
     const style: React.CSSProperties = {

@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import { TOCBlockDef } from "./toc";
-import { RenderDesignProps } from "..";
+import { DesignCtx } from "../../../contexts";
 /** Designer component for TOC */
 export default function TOCDesignComp(props: {
     blockDef: TOCBlockDef;
-    renderProps: RenderDesignProps;
+    renderProps: DesignCtx;
 }): JSX.Element;

@@ -1,33 +1,27 @@
 import BlockWrapper from "./BlockWrapper"
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
-import { CreateBlock, BlockDef, findBlockAncestry, RenderEditorProps, RenderDesignProps, getBlockTree } from "../widgets/blocks"
+import { BlockDef, findBlockAncestry, getBlockTree, ContextVar } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
-import { Schema, DataSource } from "mwater-expressions";
 import { Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
-import { WidgetLibrary } from "./widgetLibrary";
-import { ActionLibrary } from "../widgets/ActionLibrary";
 import { Database } from "../database/Database";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import ErrorBoundary from "./ErrorBoundary";
 import VirtualDatabase from "../database/VirtualDatabase";
 import AddWizardPalette from "./AddWizardPalette"
 import ClipboardPalette from "./ClipboardPalette"
+import { BaseCtx, DesignCtx } from "../contexts"
+import { DataSource } from "mwater-expressions"
 
 interface WidgetDesignerProps {
+  baseCtx: BaseCtx
+  dataSource: DataSource
   widgetDef: WidgetDef
   onWidgetDefChange(widgetDef: WidgetDef): void
-  createBlock: CreateBlock
-  database: Database
-  schema: Schema
-  dataSource: DataSource
-  actionLibrary: ActionLibrary
-  locale: string
-  widgetLibrary: WidgetLibrary
   blockPaletteEntries: BlockPaletteEntry[]
 }
 
@@ -85,8 +79,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   handleBlockDefChange = (blockDef: BlockDef | null) => {
     // Canonicalize
     if (blockDef) {
-      blockDef = this.props.createBlock(blockDef).process(this.props.createBlock, (b: BlockDef) => {
-        return this.props.createBlock(b).canonicalize()
+      blockDef = this.props.baseCtx.createBlock(blockDef).process(this.props.baseCtx.createBlock, (b: BlockDef) => {
+        return this.props.baseCtx.createBlock(b).canonicalize()
       })
     }
     this.handleWidgetDefChange({ ...this.props.widgetDef, blockDef })
@@ -95,96 +89,99 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   handleUnselect = () => { this.setState({ selectedBlockId: null }) }
 
   handleRemoveBlock = (blockId: string) => {
-    const block = this.props.createBlock(this.props.widgetDef.blockDef!)
-    this.handleBlockDefChange(block.process(this.props.createBlock, (b: BlockDef) => (b.id === blockId) ? null : b))
+    const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef!)
+    this.handleBlockDefChange(block.process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === blockId) ? null : b))
   }
 
   createBlockStore() {
-    const block = this.props.createBlock(this.props.widgetDef.blockDef!)
+    const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef!)
 
-    return {
-      alterBlock: (blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string) => {
-        let newBlockDef
+    const alterBlock = (blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string) => {
+      let newBlockDef
 
-        // Do not allow self-removal in drag
-        if (removeBlockId === this.props.widgetDef.blockDef!.id) {
-          return
-        }
+      // Do not allow self-removal in drag
+      if (removeBlockId === this.props.widgetDef.blockDef!.id) {
+        return
+      }
 
-        // Remove source block
-        if (removeBlockId) {
-          newBlockDef = block.process(this.props.createBlock, (b: BlockDef) => (b.id === removeBlockId) ? null : b)
-        }
-        else {
-          newBlockDef = block.blockDef
-        }
+      // Remove source block
+      if (removeBlockId) {
+        newBlockDef = block.process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === removeBlockId) ? null : b)
+      }
+      else {
+        newBlockDef = block.blockDef
+      }
 
-        // If nothing left
-        if (!newBlockDef) {
-          this.handleBlockDefChange(null)
-          return
-        }
+      // If nothing left
+      if (!newBlockDef) {
+        this.handleBlockDefChange(null)
+        return
+      }
 
-        newBlockDef = this.props.createBlock(newBlockDef).process(this.props.createBlock, (b: BlockDef) => (b.id === blockId) ? action(b) : b)
-        this.handleBlockDefChange(newBlockDef)
+      newBlockDef = this.props.baseCtx.createBlock(newBlockDef).process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === blockId) ? action(b) : b)
+      this.handleBlockDefChange(newBlockDef)
+    }
+
+    const replaceBlock = (blockDef: BlockDef) => {
+      alterBlock(blockDef.id, () => blockDef)
+    }
+
+    return { alterBlock, replaceBlock }
+  }
+
+  createDesignCtx() {
+    // Create block store
+    const store = this.createBlockStore()
+
+    const designCtx : DesignCtx = {
+      ...this.props.baseCtx,
+      dataSource: this.props.dataSource,
+      selectedId: this.state.selectedBlockId,
+      contextVars: this.props.widgetDef.contextVars,
+      store,
+      blockPaletteEntries: this.props.blockPaletteEntries,
+      // Will be set below
+      renderChildBlock: {} as any
+    }
+
+    // Create renderChildBlock
+    const renderChildBlock = (childDesignCtx: DesignCtx, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void) => {
+      if (childBlockDef) {
+        const childBlock = this.props.baseCtx.createBlock(childBlockDef)
+        const validationError = childBlock.validate(childDesignCtx)
+
+        // Gets the label of the block which is displayed on hover
+        const label = childBlock.getLabel()
+    
+        return (
+          <BlockWrapper 
+            blockDef={childBlockDef} 
+            selectedBlockId={this.state.selectedBlockId} 
+            onSelect={this.handleSelect.bind(null, childBlockDef.id)} 
+            onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)} 
+            store={store}
+            validationError={validationError}
+            label={label}>
+            {childBlock.renderDesign(childDesignCtx)}
+          </BlockWrapper>
+        )
+      }
+      else {
+        return <BlockPlaceholder onSet={onSet}/>
       }
     }
+
+    designCtx.renderChildBlock = renderChildBlock
+    return designCtx
   }
 
   renderDesignBlock() {
     // If there is an existing block, render it
     if (this.props.widgetDef.blockDef) {
-      const block = this.props.createBlock(this.props.widgetDef.blockDef)
-
-      // Create block store
-      const store = this.createBlockStore()
-
-      // Create renderChildBlock
-      const renderChildBlock = (props: RenderDesignProps, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void) => {
-        if (childBlockDef) {
-          const childBlock = this.props.createBlock(childBlockDef)
-          const validationError = childBlock.validate({
-            schema: this.props.schema, 
-            contextVars: props.contextVars,
-            actionLibrary: this.props.actionLibrary,
-            widgetLibrary: this.props.widgetLibrary
-          })
-
-          // Gets the label of the block which is displayed on hover
-          const label = childBlock.getLabel()
-      
-          return (
-            <BlockWrapper 
-              blockDef={childBlockDef} 
-              selectedBlockId={this.state.selectedBlockId} 
-              onSelect={this.handleSelect.bind(null, childBlockDef.id)} 
-              onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)} 
-              store={store}
-              validationError={validationError}
-              label={label}
-            >
-              {childBlock.renderDesign(props)}
-            </BlockWrapper>
-          )
-        }
-        else {
-          return <BlockPlaceholder onSet={onSet}/>
-        }
-      }
-
-      const renderDesignProps : RenderDesignProps = {
-        schema: this.props.schema,
-        dataSource: this.props.dataSource,
-        selectedId: this.state.selectedBlockId,
-        widgetLibrary: this.props.widgetLibrary,
-        locale: "en",
-        contextVars: this.props.widgetDef.contextVars,
-        store,
-        blockPaletteEntries: this.props.blockPaletteEntries,
-        renderChildBlock: renderChildBlock
-      }
+      const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef)
+      const designCtx = this.createDesignCtx()
     
-      return renderChildBlock(renderDesignProps, block.blockDef, this.handleBlockDefChange)
+      return designCtx.renderChildBlock(designCtx, block.blockDef, this.handleBlockDefChange)
     }
     else {
       // Create placeholder
@@ -198,41 +195,27 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
       // Find selected block ancestry
       const contextVars = this.props.widgetDef.contextVars
-      const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.createBlock, contextVars, this.state.selectedBlockId)
+      const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars, this.state.selectedBlockId)
 
       // Create props
       if (selectedBlockAncestry) {
         const selectedChildBlock = selectedBlockAncestry[selectedBlockAncestry.length - 1]
 
-        const props : RenderEditorProps = {
-          contextVars: selectedChildBlock.contextVars,
-          locale: "en",
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          actionLibrary: this.props.actionLibrary,
-          widgetLibrary: this.props.widgetLibrary,
-          onChange: (blockDef: BlockDef) => {
-            store.alterBlock(blockDef.id, () => blockDef)
-          }
-        }
-
         // Create block
-        const selectedBlock = this.props.createBlock(selectedChildBlock.blockDef)
+        const selectedBlock = this.props.baseCtx.createBlock(selectedChildBlock.blockDef)
+
+        // Use context variables for the block
+        const designCtx = { ...this.createDesignCtx(), contextVars: selectedChildBlock.contextVars }
 
         // Check for errors
-        const validationError = selectedBlock.validate({
-          schema: this.props.schema, 
-          contextVars: props.contextVars,
-          actionLibrary: this.props.actionLibrary,
-          widgetLibrary: this.props.widgetLibrary
-        })
+        const validationError = selectedBlock.validate(designCtx)
 
         return (
           <div key="editor" className="widget-designer-editor">
             { validationError ? 
               <div className="text-danger"><i className="fa fa-exclamation-circle"/> {validationError}</div> 
             : null }
-            {selectedBlock.renderEditor(props)}
+            {selectedBlock.renderEditor(designCtx)}
           </div>
         )
       }
@@ -240,7 +223,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     return (
       <div key="editor" className="widget-designer-editor">
-        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.handleWidgetDefChange} schema={this.props.schema} dataSource={this.props.dataSource}/>
+        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.handleWidgetDefChange} designCtx={this.createDesignCtx()}/>
       </div>
     )
   }
@@ -252,15 +235,13 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     // Verify before allowing preview
     if (mode === Mode.Preview) {
-      for (const childBlock of getBlockTree(this.props.widgetDef.blockDef, this.props.createBlock, this.props.widgetDef.contextVars)) {
-        const block = this.props.createBlock(childBlock.blockDef)
+      for (const childBlock of getBlockTree(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, this.props.widgetDef.contextVars)) {
+        const block = this.props.baseCtx.createBlock(childBlock.blockDef)
         
-        if (block.validate({ 
-          schema: this.props.schema, 
-          actionLibrary: this.props.actionLibrary, 
-          widgetLibrary: this.props.widgetLibrary,
-          contextVars: childBlock.contextVars
-         })) {
+        // Use context vars for the block
+        const designCtx = { ...this.createDesignCtx(), contextVars: childBlock.contextVars }
+
+        if (block.validate(designCtx)) {
            alert("Correct errors first")
            return
          }
@@ -286,13 +267,13 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return null 
     }
 
-    let database: Database = this.props.database
+    let database: Database = this.props.baseCtx.database
 
     const virtualizeDatabase = false
 
     if (virtualizeDatabase) {
       // Make non-live TODO needed? Could make big queries for counts/sums if mutated
-      database = new VirtualDatabase(database, this.props.schema, this.props.locale)
+      database = new VirtualDatabase(database, this.props.baseCtx.schema, this.props.baseCtx.locale)
     }
 
     // Create normal page to display
@@ -303,14 +284,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       widgetId: this.props.widgetDef.id
     }
     const pageElem = <PageStackDisplay 
-      initialPage={page} 
-      locale="en" 
-      schema={this.props.schema} 
-      dataSource={this.props.dataSource}
-      createBlock={this.props.createBlock} 
-      actionLibrary={this.props.actionLibrary} 
-      widgetLibrary={this.props.widgetLibrary}
-      />
+      baseCtx={this.props.baseCtx}
+      initialPage={page} />
 
     return [
       (<div key="preview" className="widget-preview-block">
@@ -328,7 +303,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         <div className="widget-designer-header">
           <AddWizardPalette onSelect={this.handleSelect}/>
           <div style={{float: "right"}}>
-            <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.createBlock}/>
+            <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.baseCtx.createBlock}/>
             <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
               <i className="fa fa-undo"/> Undo              
             </button>

@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, CreateBlock, ContextVar, ChildBlock, ValidateBlockOptions, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
@@ -9,6 +9,7 @@ import { TextInput } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 import { localize } from '../localization';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block which creates a new rowset context variable */
 export interface RowsetBlockDef extends BlockDef {
@@ -67,7 +68,7 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleSetContent = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: RowsetBlockDef) => { 
         b.content = blockDef 
@@ -93,35 +94,32 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { 
+  renderInstance(props: InstanceCtx) { 
     const contextVar = this.createContextVar()!
     
     // Inject context variable
     return <ContextVarsInjector 
       injectedContextVars={[contextVar]} 
       injectedContextVarValues={{ [contextVar.id]: this.blockDef.filter }}
-      createBlock={this.createBlock}
-      database={props.database}
       innerBlock={this.blockDef.content!}
-      renderInstanceProps={props}
-      schema={props.schema}>
-        {(renderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+      instanceCtx={props}>
+        {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
           if (loading) {
             return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
           }
           return (
             <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { props.renderChildBlock(renderInstanceProps, this.blockDef.content) }
+              { props.renderChildBlock(instanceCtx, this.blockDef.content) }
             </div>
           )
         }}
       </ContextVarsInjector>
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const handleTableChange = (tableId: string) => {
       const table = props.schema.getTable(tableId)!
-      props.onChange(produce(this.blockDef, (bd) => {
+      props.store.replaceBlock(produce(this.blockDef, (bd) => {
         bd.table = tableId
         bd.name = bd.name || ("List of " + localize(table.name))
       }))
@@ -134,13 +132,13 @@ export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
           <TableSelect schema={props.schema} locale={props.locale} value={this.blockDef.table || null} onChange={handleTableChange}/>
         </LabeledProperty>
         <LabeledProperty label="Name">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="name">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
             {(value, onChange) => <TextInput value={value} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table ? 
         <LabeledProperty label="Filter">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="filter">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
             {(value, onChange) => 
               <FilterExprComponent 
                 value={value} 

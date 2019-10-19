@@ -3,12 +3,13 @@ import produce from 'immer'
 import { ExprComponent } from 'mwater-expressions-ui';
 import { default as React, useState, useEffect } from 'react';
 import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
+import { BlockDef, ContextVar, ValidateBlockOptions, createExprVariables } from '../blocks'
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
 import ListEditor from '../ListEditor';
 import { localize } from '../localization';
 import LeafBlock from '../LeafBlock';
 import { Checkbox } from 'react-library/lib/bootstrap';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {
@@ -65,17 +66,17 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
     return this.blockDef.validations.filter(v => v.contextVarId == contextVar.id).map(v => v.condition)
   }
   
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     return <div className="text-muted"><i className="fa fa-check"/> Validation</div>
   }
 
-  renderInstance(props: RenderInstanceProps) { 
+  renderInstance(props: InstanceCtx) { 
     return <ValidationBlockInstance renderProps={props} blockDef={this.blockDef} />
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const handleAdd = () => {
-      props.onChange(produce(this.blockDef, (bd) => {
+      props.store.replaceBlock(produce(this.blockDef, (bd) => {
         bd.validations.push({ contextVarId: null, condition: null, message: null })
       }))
     }
@@ -84,7 +85,7 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
       <div>
         <h3>Validation</h3>
         <LabeledProperty label="Validations">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="validations">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="validations">
             {(validations, onValidationsChange) =>
               <ListEditor items={validations} onItemsChange={onValidationsChange}>
                 {(validation: Validation, onValidationChange) => 
@@ -104,7 +105,7 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
             <i className="fa fa-plus"/> Add Validation
           </button>
         </LabeledProperty>
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="immediate">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="immediate">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Validate Immediately</Checkbox>}
         </PropertyEditor>
       </div>
@@ -160,7 +161,7 @@ const ValidationEditor = (props: {
   )  
 }
 
-const getValidationErrors = (blockDef: ValidationBlockDef,  renderProps: RenderInstanceProps) => {
+const getValidationErrors = (blockDef: ValidationBlockDef,  renderProps: InstanceCtx) => {
   const errors: string[] = []
 
   // Check validations
@@ -177,7 +178,7 @@ const getValidationErrors = (blockDef: ValidationBlockDef,  renderProps: RenderI
 
 const ValidationBlockInstance = (props: {
   blockDef: ValidationBlockDef
-  renderProps: RenderInstanceProps
+  renderProps: InstanceCtx
 }) => {
   // True if validating
   const [validating, setValidating] = useState(props.blockDef.immediate || false)

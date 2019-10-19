@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
+import { BlockDef, ValidateBlockOptions, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
 import ModalWindowComponent from 'react-library/lib/ModalWindowComponent'
 import { BlockPaletteEntry } from '../../designer/blockPaletteEntries';
 import { Schema, DataSource } from 'mwater-expressions';
@@ -11,6 +11,7 @@ import TabbedComponent from 'react-library/lib/TabbedComponent'
 import { localize } from '../localization';
 import uuid = require('uuid');
 import { ExpressionBlock, ExpressionBlockDef } from './expression';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -29,7 +30,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
     return null 
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleSet = (newBlockDef: BlockDef | null) => {
       if (newBlockDef) {
         // Duplicate but keep top level id so that selected
@@ -47,10 +48,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
         isOpen={true}
         onRequestClose={() => handleSet(null)}>
           <AddWizardPane
-            blockPaletteEntries={props.blockPaletteEntries}
-            createBlock={this.createBlock}
-            schema={props.schema}
-            dataSource={props.dataSource}
+            designCtx={props}
             onSelect={handleSet}
             contextVars={props.contextVars}
           />
@@ -58,7 +56,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     return <div/>
   }
 }
@@ -68,13 +66,11 @@ var defaultCurrentTabId = "palette"
 
 /** Pane with search and allowing clicking on a widget to add */
 const AddWizardPane = (props: {
-  blockPaletteEntries: BlockPaletteEntry[]
-  createBlock: CreateBlock
-  schema: Schema
-  dataSource: DataSource
+  designCtx: DesignCtx
   onSelect: (blockDef: BlockDef) => void
   contextVars: ContextVar[]
 }) => {
+  const { designCtx } = props
   const [search, setSearch] = useState("")
   const [currentTabId, setCurrentTabId] = useState(defaultCurrentTabId)
 
@@ -93,7 +89,7 @@ const AddWizardPane = (props: {
     // Find context var of type row
     for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {
       // Get columns
-      const columns = props.schema.getColumns(contextVar.table!)
+      const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
         const createLabeledBlock = (child: BlockDef) => {
@@ -160,7 +156,7 @@ const AddWizardPane = (props: {
     // Find context var of type row
     for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {  
       // Get columns
-      const columns = props.schema.getColumns(contextVar.table!)
+      const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
         allEntries.push({ 
@@ -190,10 +186,7 @@ const AddWizardPane = (props: {
         return <PaletteItem 
           entry={entry}
           key={index}
-          createBlock={props.createBlock}
-          schema={props.schema}
-          dataSource={props.dataSource}
-          contextVars={props.contextVars}
+          designCtx={designCtx}
           onSelect={() => props.onSelect(typeof entry.blockDef == "function" ? entry.blockDef(props.contextVars) : entry.blockDef)} />
       })}
     </div>
@@ -211,7 +204,7 @@ const AddWizardPane = (props: {
       }}
       tabs={
         [
-          { id: "palette", label: "Palette", elem: displayAndFilterEntries(props.blockPaletteEntries) },
+          { id: "palette", label: "Palette", elem: displayAndFilterEntries(designCtx.blockPaletteEntries) },
           { id: "controls", label: "Controls", elem: displayAndFilterEntries(getControlEntries()) },
           { id: "expressions", label: "Expressions", elem: displayAndFilterEntries(getExpressionEntries()) }
         ]
@@ -223,32 +216,28 @@ const AddWizardPane = (props: {
 /** Single item in the palette of block choices */
 class PaletteItem extends React.Component<{
   entry: BlockPaletteEntry
-  createBlock: CreateBlock
-  schema: Schema
-  dataSource: DataSource
-  contextVars: ContextVar[]
+  designCtx: DesignCtx
   onSelect: () => void
 }> {
   renderContents() {
+    const designCtx = this.props.designCtx
+
     if (this.props.entry.elem) {
       return this.props.entry.elem
     }
 
     const entry = this.props.entry
-    const block = this.props.createBlock(typeof entry.blockDef == "function" ? entry.blockDef(this.props.contextVars) : entry.blockDef)
+    const block = designCtx.createBlock(typeof entry.blockDef == "function" ? entry.blockDef(designCtx.contextVars) : entry.blockDef)
 
     return block.renderDesign({
+      ...designCtx,
       selectedId: null,
-      schema: this.props.schema,
-      dataSource: this.props.dataSource,
-      locale: "en",
-      widgetLibrary: { widgets: {} },
       contextVars: [],
       store: new NullBlockStore(),
       blockPaletteEntries: [],
       renderChildBlock: (props, childBlockDef) => {
         if (childBlockDef) {
-          const childBlock = this.props.createBlock(childBlockDef)
+          const childBlock = designCtx.createBlock(childBlockDef)
           return childBlock.renderDesign(props)
         }
         else {

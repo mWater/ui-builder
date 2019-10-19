@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, CreateBlock, ValidateBlockOptions } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock, CreateBlock, ValidateBlockOptions } from '../blocks'
 import { localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
@@ -11,6 +11,7 @@ import { LocalizedString, Expr } from 'mwater-expressions';
 import uuid = require('uuid');
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -75,7 +76,7 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleAdd = (addedBlockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: SaveCancelBlockDef) => { 
         b.child = addedBlockDef 
@@ -103,53 +104,47 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
   }
 
   /** Special case as the inner block will have a virtual database and its own expression evaluator */
-  getSubtreeContextVarExprs(options: {
-    contextVar: ContextVar,
-    widgetLibrary: WidgetLibrary, 
-    actionLibrary: ActionLibrary, 
-    /** All context variables */
-    contextVars: ContextVar[], 
-    createBlock: CreateBlock }): Expr[] {
+  getSubtreeContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx) {
     return []
   }
 
-  renderInstance(props: RenderInstanceProps) {
-    return <SaveCancelInstance renderInstanceProps={props} blockDef={this.blockDef} createBlock={this.createBlock} />
+  renderInstance(props: InstanceCtx) {
+    return <SaveCancelInstance instanceCtx={props} blockDef={this.blockDef} createBlock={this.createBlock} />
   }
   
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Save Label">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="saveLabel">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="saveLabel">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Cancel Label">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="cancelLabel">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="cancelLabel">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Confirm Discard Message">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="confirmDiscardMessage">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="confirmDiscardMessage">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Optional Delete Target">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="deleteContextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="deleteContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row"]} />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.deleteContextVarId ?
           <LabeledProperty label="Delete Label">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="deleteLabel">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="deleteLabel">
               {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
             </PropertyEditor>
           </LabeledProperty>
         : null }
         { this.blockDef.deleteContextVarId ?
           <LabeledProperty label="Optional Confirm Delete Message">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="confirmDeleteMessage">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="confirmDeleteMessage">
               {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
             </PropertyEditor>
           </LabeledProperty>
@@ -160,7 +155,7 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
 }
 
 interface SaveCancelInstanceProps {
-  renderInstanceProps: RenderInstanceProps
+  instanceCtx: InstanceCtx
   blockDef: SaveCancelBlockDef
   createBlock: CreateBlock
 }
@@ -191,14 +186,14 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     this.validationRegistrations = {}
 
     this.state = {
-      virtualDatabase: new VirtualDatabase(props.renderInstanceProps.database, props.renderInstanceProps.schema, props.renderInstanceProps.locale), 
+      virtualDatabase: new VirtualDatabase(props.instanceCtx.database, props.instanceCtx.schema, props.instanceCtx.locale), 
       destroyed: false,
       saving: false
     }
   }
 
   componentDidMount() {
-    this.unregisterValidation = this.props.renderInstanceProps.registerForValidation(this.validate)
+    this.unregisterValidation = this.props.instanceCtx.registerForValidation(this.validate)
   }
 
   componentWillUnmount() {
@@ -208,7 +203,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
   validate = () => {
     // Confirm if changes present
     if (this.state.virtualDatabase.mutations.length > 0) {
-      if (!confirm(localize(this.props.blockDef.confirmDiscardMessage, this.props.renderInstanceProps.locale))) {
+      if (!confirm(localize(this.props.blockDef.confirmDiscardMessage, this.props.instanceCtx.locale))) {
         // Return empty string to block without message
         return ""
       }
@@ -246,27 +241,27 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       return
     }
     this.setState({ saving: false, destroyed: true })
-    this.props.renderInstanceProps.pageStack.closePage()
+    this.props.instanceCtx.pageStack.closePage()
   }
 
   handleCancel = () => {
     this.state.virtualDatabase.rollback()
     this.setState({ destroyed: true })
-    this.props.renderInstanceProps.pageStack.closePage()
+    this.props.instanceCtx.pageStack.closePage()
   }
 
   handleDelete = async () => {
     // Confirm deletion
-    if (this.props.blockDef.confirmDeleteMessage && !confirm(localize(this.props.blockDef.confirmDeleteMessage, this.props.renderInstanceProps.locale))) {
+    if (this.props.blockDef.confirmDeleteMessage && !confirm(localize(this.props.blockDef.confirmDeleteMessage, this.props.instanceCtx.locale))) {
       return     
     }
     // Do actual deletion
-    const db = this.props.renderInstanceProps.database
-    const deleteCV = this.props.renderInstanceProps.contextVars.find(cv => cv.id == this.props.blockDef.deleteContextVarId)
+    const db = this.props.instanceCtx.database
+    const deleteCV = this.props.instanceCtx.contextVars.find(cv => cv.id == this.props.blockDef.deleteContextVarId)
     if (!deleteCV) {
       throw new Error("Missing delete CV")
     }
-    const rowId = this.props.renderInstanceProps.contextVarValues[deleteCV.id]
+    const rowId = this.props.instanceCtx.contextVarValues[deleteCV.id]
     if (!rowId) {
       throw new Error("Missing delete row id")
     }
@@ -283,7 +278,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
 
     this.state.virtualDatabase.rollback()
     this.setState({ destroyed: true })
-    this.props.renderInstanceProps.pageStack.closePage()
+    this.props.instanceCtx.pageStack.closePage()
   }
 
   /** Stores the registration for validation of a child block and returns an unregister function */
@@ -300,13 +295,13 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       return null
     }
 
-    const saveLabelText = localize(this.props.blockDef.saveLabel, this.props.renderInstanceProps.locale)
-    const cancelLabelText = localize(this.props.blockDef.cancelLabel, this.props.renderInstanceProps.locale)
-    const deleteLabelText = localize(this.props.blockDef.deleteLabel, this.props.renderInstanceProps.locale)
+    const saveLabelText = localize(this.props.blockDef.saveLabel, this.props.instanceCtx.locale)
+    const cancelLabelText = localize(this.props.blockDef.cancelLabel, this.props.instanceCtx.locale)
+    const deleteLabelText = localize(this.props.blockDef.deleteLabel, this.props.instanceCtx.locale)
 
     // Replace renderChildBlock with function that keeps all instances for validation
-    const renderInstanceProps = { 
-      ...this.props.renderInstanceProps, 
+    const instanceCtx = { 
+      ...this.props.instanceCtx, 
       registerForValidation: this.registerChildForValidation 
     }
 
@@ -315,27 +310,24 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     return (
       <div>
         <ContextVarsInjector 
-          createBlock={this.props.createBlock} 
-          database={this.state.virtualDatabase}
-          injectedContextVars={renderInstanceProps.contextVars}
-          injectedContextVarValues={renderInstanceProps.contextVarValues}
+          injectedContextVars={instanceCtx.contextVars}
+          injectedContextVarValues={instanceCtx.contextVarValues}
           innerBlock={this.props.blockDef.child}
-          renderInstanceProps={renderInstanceProps}
-          schema={renderInstanceProps.schema}>
-          { (innerRenderInstanceProps: RenderInstanceProps, loading: boolean, refreshing: boolean) => {
+          instanceCtx={{ ...instanceCtx, database: this.state.virtualDatabase}}>
+          { (innerInstanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
             if (loading) {
               return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
             return (
               <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-                { innerRenderInstanceProps.renderChildBlock(innerRenderInstanceProps, this.props.blockDef.child) }
+                { innerInstanceCtx.renderChildBlock(innerInstanceCtx, this.props.blockDef.child) }
               </div>
             )
           }}
           </ContextVarsInjector>
 
         <div className="save-cancel-footer">
-          { this.props.blockDef.deleteContextVarId && this.props.renderInstanceProps.contextVarValues[this.props.blockDef.deleteContextVarId] ?
+          { this.props.blockDef.deleteContextVarId && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] ?
             <button type="button" className="btn btn-danger" onClick={this.handleDelete} style={{float: "left"}}>{deleteLabelText}</button>
           : null}
           <button type="button" className="btn btn-primary" onClick={this.handleSave} disabled={this.state.saving}>

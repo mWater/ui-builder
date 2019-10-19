@@ -1,10 +1,11 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { Toggle } from 'react-library/lib/bootstrap';
 import CompoundBlock from '../CompoundBlock';
 import produce from 'immer';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Floats some content either right or left of main content */
 export interface FloatBlockDef extends BlockDef {
@@ -38,7 +39,7 @@ export class FloatBlock extends CompoundBlock<FloatBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const handleSetMainContent = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: FloatBlockDef) => { 
         b.mainContent = blockDef 
@@ -60,7 +61,7 @@ export class FloatBlock extends CompoundBlock<FloatBlockDef> {
       verticalAlign={this.blockDef.verticalAlign} />
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     const mainContentNode = props.renderChildBlock(props, this.blockDef.mainContent)
     const floatContentNode = props.renderChildBlock(props, this.blockDef.floatContent)
 
@@ -71,11 +72,11 @@ export class FloatBlock extends CompoundBlock<FloatBlockDef> {
       verticalAlign={this.blockDef.verticalAlign} />
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Direction">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="direction">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="direction">
             {(value, onChange) => 
               <Toggle 
                 value={value} 
@@ -88,7 +89,7 @@ export class FloatBlock extends CompoundBlock<FloatBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Vertical Alignment">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="verticalAlign">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="verticalAlign">
             {(value, onChange) => 
               <Toggle 
                 value={value} 

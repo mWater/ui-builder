@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ContextVar, ChildBlock, RenderEditorProps } from '../../blocks';
+import { BlockDef, ContextVar, ChildBlock } from '../../blocks';
 import CompoundBlock from '../../CompoundBlock';
 import { LocalizedString } from 'mwater-expressions';
 import './toc.css';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
     type: "toc";
@@ -41,7 +42,7 @@ export declare class TOCBlock extends CompoundBlock<TOCBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

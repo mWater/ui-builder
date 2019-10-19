@@ -1,6 +1,6 @@
 import ContextVarInjector from "./ContextVarInjector";
 import { shallow, mount } from 'enzyme'
-import { RenderInstanceProps, Filter, ContextVar } from "./blocks";
+import { Filter, ContextVar } from "./blocks";
 import { Database, QueryOptions } from "../database/Database";
 import * as React from "react";
 import { Expr, Schema, DataSource } from "mwater-expressions";
@@ -8,9 +8,10 @@ import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
 import { ActionLibrary } from "./ActionLibrary";
 import { PageStack } from "../PageStack";
+import { InstanceCtx } from "../contexts";
 
 let database: Database
-let outerRenderProps: RenderInstanceProps
+let outerRenderProps: InstanceCtx
 const schema = simpleSchema()
 
 beforeEach(() => {
@@ -22,7 +23,7 @@ beforeEach(() => {
   outerRenderProps = {
     locale: "en",
     database: database,
-    schema: {} as Schema,
+    schema: schema,
     dataSource: {} as DataSource,
     contextVars: [],
     actionLibrary: {} as ActionLibrary,
@@ -34,6 +35,7 @@ beforeEach(() => {
     setFilter: jest.fn(),
     getFilters: jest.fn(),
     renderChildBlock: jest.fn(),
+    createBlock: jest.fn(),
     registerForValidation: () => () => {}
   }  
 })
@@ -45,18 +47,16 @@ test("inner contains extra context vars", () => {
     { type: "field", table: "t1", column: "c1" }
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
     
   const x = shallow((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
-      schema={schema}
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
       value={value}
-      database={database}
       contextVarExprs={contextVarExprs}>
-      { (renderInstanceProps: RenderInstanceProps) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx) => {
+          innerRenderProps = instanceCtx
           return <div/>
       }}
     </ContextVarInjector>))
@@ -72,18 +72,16 @@ test("exprs are computed for row variables", (done) => {
     { type: "field", table: "t1", column: "c1" }
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
     
   const x = shallow((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
-      schema={schema}
-      database={database}
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
       value={value}
       contextVarExprs={contextVarExprs}>
-      { (renderInstanceProps: RenderInstanceProps) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx) => {
+          innerRenderProps = instanceCtx
           return <div/>
       }}
     </ContextVarInjector>))
@@ -121,18 +119,16 @@ test("exprs are null for null row variables", (done) => {
     { type: "field", table: "t1", column: "c1" }
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
     
   const x = shallow((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
-      schema={schema}
-      database={database}
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
       value={value}
       contextVarExprs={contextVarExprs}>
-      { (renderInstanceProps: RenderInstanceProps) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx) => {
+          innerRenderProps = instanceCtx
           return <div/>
       }}
     </ContextVarInjector>))
@@ -157,18 +153,16 @@ test("exprs are computed for rowset variables, excluding non-aggregates", (done)
     { type: "op", table: "t1", op: "count", exprs: [] }
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
     
   const x = shallow((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
-      schema={schema}
-      database={database}
       value={value}
       contextVarExprs={contextVarExprs}>
-      { (renderInstanceProps: RenderInstanceProps) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx) => {
+          innerRenderProps = instanceCtx
           return <div/>
       }}
     </ContextVarInjector>))
@@ -205,21 +199,19 @@ test("filters are applied for rowset variables", (done) => {
     { id: "f1", expr: { type: "field", table: "t1", column: "c2" }}
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
   let innerIsLoading = false
     
   // Need mount as shallow rendering fails to call lifecycle componentDidUpdate
   const x = mount((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
       value={value}
-      schema={schema}
-      database={database}
       contextVarExprs={contextVarExprs}
       initialFilters={initialFilters}>
-      { (renderInstanceProps: RenderInstanceProps, isLoading: boolean) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx, isLoading: boolean) => {
+          innerRenderProps = instanceCtx
           innerIsLoading = isLoading
           return <div/>
       }}
@@ -278,21 +270,19 @@ test("null filters are ignored for rowset variables", (done) => {
     { id: "f1", expr: null}
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
   let innerIsLoading = false
     
   // Need mount as shallow rendering fails to call lifecycle componentDidUpdate
   const x = mount((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
       value={value}
-      schema={schema}
-      database={database}
       contextVarExprs={contextVarExprs}
       initialFilters={initialFilters}>
-      { (renderInstanceProps: RenderInstanceProps, isLoading: boolean) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx, isLoading: boolean) => {
+          innerRenderProps = instanceCtx
           innerIsLoading = isLoading
           return <div/>
       }}
@@ -351,21 +341,19 @@ test("filters are not applied for rowset variables to variable value", (done) =>
     { id: "f1", expr: { type: "field", table: "t1", column: "c2" }}
   ]
 
-  let innerRenderProps: RenderInstanceProps
+  let innerRenderProps: InstanceCtx
   let innerIsLoading = false
     
   // Need mount as shallow rendering fails to call lifecycle componentDidUpdate
   const x = mount((
     <ContextVarInjector 
-      renderInstanceProps={outerRenderProps} 
+      instanceCtx={outerRenderProps} 
       injectedContextVar={contextVar} 
       value={value}
-      schema={schema}
-      database={database}
       contextVarExprs={contextVarExprs}
       initialFilters={initialFilters}>
-      { (renderInstanceProps: RenderInstanceProps, isLoading: boolean) => {
-          innerRenderProps = renderInstanceProps
+      { (instanceCtx: InstanceCtx, isLoading: boolean) => {
+          innerRenderProps = instanceCtx
           innerIsLoading = isLoading
           return <div/>
       }}

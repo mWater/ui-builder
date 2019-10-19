@@ -1,7 +1,8 @@
 import { TextBlockDef, TextBlock } from "./text";
 import { shallow } from "enzyme";
-import { RenderInstanceProps, ContextVar } from "../blocks";
+import { ContextVar } from "../blocks";
 import simpleSchema from "../../__fixtures__/schema";
+import { InstanceCtx } from "../../contexts";
 
 const tbd: TextBlockDef = {
   type: "text",
@@ -32,7 +33,7 @@ test("renders with format", () => {
 
   props.getContextVarExprValue.mockReturnValue(1234)
 
-  const inst = shallow(tb.renderInstance((props as any) as RenderInstanceProps))
+  const inst = shallow(tb.renderInstance((props as any) as InstanceCtx))
 
   expect(props.getContextVarExprValue.mock.calls[0]).toEqual(["cv1", { type: "field", table: "t1", column: "number" }])
   expect(inst.text()).toBe("A 1,234 B")

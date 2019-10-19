@@ -1,9 +1,9 @@
 import React from "react";
 import { TabbedBlockDef, TabbedBlockTab } from "./tabbed";
-import { RenderInstanceProps } from "../../blocks";
+import { InstanceCtx } from "../../../contexts";
 interface Props {
     tabbedBlockDef: TabbedBlockDef;
-    renderInstanceProps: RenderInstanceProps;
+    instanceCtx: InstanceCtx;
 }
 interface State {
     /** Index of currently active tab */

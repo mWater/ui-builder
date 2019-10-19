@@ -1,10 +1,8 @@
 import * as React from "react";
 import { WidgetDef } from "../widgets/widgets";
-import { Schema, DataSource } from "mwater-expressions";
-import BlockFactory from "../widgets/BlockFactory";
-import { ActionLibrary } from "../widgets/ActionLibrary";
+import { DataSource } from "mwater-expressions";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
-import { Database } from "../database/Database";
+import { BaseCtx } from "../contexts";
 /** All widgets in current project */
 export interface WidgetLibrary {
     widgets: {
@@ -12,12 +10,8 @@ export interface WidgetLibrary {
     };
 }
 interface Props {
-    blockFactory: BlockFactory;
-    database: Database;
-    schema: Schema;
+    baseCtx: BaseCtx;
     dataSource: DataSource;
-    actionLibrary: ActionLibrary;
-    widgetLibrary: WidgetLibrary;
     /** Ids of widgets in open tabs */
     openTabs: string[];
     blockPaletteEntries: BlockPaletteEntry[];

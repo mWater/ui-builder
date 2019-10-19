@@ -1,4 +1,4 @@
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from "../../blocks";
+import { BlockDef, ValidateBlockOptions, ContextVar } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
@@ -7,6 +7,7 @@ import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
 import { Database } from "../../../database/Database";
 import { DataSourceDatabase } from "../../../database/DataSourceDatabase";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -48,12 +49,12 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   abstract renderControl(props: RenderControlProps): React.ReactElement<any>
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-  abstract renderControlEditor(props: RenderEditorProps): React.ReactElement<any> | null
+  abstract renderControlEditor(props: DesignCtx): React.ReactElement<any> | null
 
   /** Filter the columns that this control is for */
   abstract filterColumn(column: Column): boolean
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const renderControlProps: RenderControlProps = {
       value: null, 
       rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
@@ -75,8 +76,8 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     )
   }
 
-  renderInstance(props: RenderInstanceProps) {
-    return <ControlInstance renderInstanceProps={props} block={this}/>      
+  renderInstance(props: InstanceCtx) {
+    return <ControlInstance instanceCtx={props} block={this}/>      
   }
 
   /** Allow subclasses to clear/update other fields on the column changing */
@@ -85,17 +86,17 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     return blockDef
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
 
     const handleColumnChanged = (blockDef: T) => {
-      props.onChange(this.processColumnChanged(blockDef))
+      props.store.replaceBlock(this.processColumnChanged(blockDef))
     }
 
     return (
       <div>
         <LabeledProperty label="Context Variable">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowContextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row"]} />}
           </PropertyEditor>
         </LabeledProperty>
@@ -113,13 +114,13 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
           </LabeledProperty>
           : null }
 
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="required">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="required">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Required</Checkbox>}
         </PropertyEditor>
 
         { this.blockDef.required ?
           <LabeledProperty label="Required Message">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="requiredMessage">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="requiredMessage">
               {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
             </PropertyEditor>
           </LabeledProperty>
@@ -168,7 +169,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
 
 interface Props {
   block: ControlBlock<ControlBlockDef>
-  renderInstanceProps: RenderInstanceProps
+  instanceCtx: InstanceCtx
 }
 
 interface State {
@@ -187,7 +188,7 @@ class ControlInstance extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.unregisterValidation = this.props.renderInstanceProps.registerForValidation(this.validate)
+    this.unregisterValidation = this.props.instanceCtx.registerForValidation(this.validate)
   }
 
   componentWillUnmount() {
@@ -195,33 +196,33 @@ class ControlInstance extends React.Component<Props, State> {
   }
 
   getValue() {
-    const renderInstanceProps = this.props.renderInstanceProps
+    const instanceCtx = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
-    const contextVar = renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
 
     // Get current value
-    return renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: blockDef.column! })
+    return instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: blockDef.column! })
   }
 
   /** Validate the instance. Returns null if correct, message if not */
   validate = () => {
     // Check for null
     if (this.getValue() == null && this.props.block.blockDef.required) {
-      return localize(this.props.block.blockDef.requiredMessage!, this.props.renderInstanceProps.locale)
+      return localize(this.props.block.blockDef.requiredMessage!, this.props.instanceCtx.locale)
     }
     return null
   }
 
   handleChange = async (newValue: any) => {
-    const renderInstanceProps = this.props.renderInstanceProps
+    const instanceCtx = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
-    const contextVar = renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
-    const id = renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
+    const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Update database
     this.setState({ updating: true })
     try {
-      const txn = this.props.renderInstanceProps.database.transaction()
+      const txn = this.props.instanceCtx.database.transaction()
       await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
       await txn.commit()
     } catch (err) {
@@ -238,22 +239,22 @@ class ControlInstance extends React.Component<Props, State> {
   }
 
   render() {
-    const renderInstanceProps = this.props.renderInstanceProps
+    const instanceCtx = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
-    const contextVar = renderInstanceProps.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
-    const id = renderInstanceProps.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
+    const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     const renderControlProps: RenderControlProps = {
       value: this.getValue(),
       onChange: this.handleChange,
-      schema: this.props.renderInstanceProps.schema,
-      dataSource: this.props.renderInstanceProps.dataSource,
-      database: this.props.renderInstanceProps.database,
-      locale: this.props.renderInstanceProps.locale,
+      schema: this.props.instanceCtx.schema,
+      dataSource: this.props.instanceCtx.dataSource,
+      database: this.props.instanceCtx.database,
+      locale: this.props.instanceCtx.locale,
       rowContextVar: contextVar,
       disabled: id == null,
-      contextVars: this.props.renderInstanceProps.contextVars,
-      contextVarValues: this.props.renderInstanceProps.contextVarValues
+      contextVars: this.props.instanceCtx.contextVars,
+      contextVarValues: this.props.instanceCtx.contextVarValues
     }
 
     return (

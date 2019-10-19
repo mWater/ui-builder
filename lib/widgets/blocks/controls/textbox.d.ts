@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { RenderEditorProps } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, LocalizedString } from 'mwater-expressions';
+import { DesignCtx } from '../../../contexts';
 export interface TextboxBlockDef extends ControlBlockDef {
     type: "textbox";
     placeholder: LocalizedString | null;
@@ -12,7 +12,7 @@ export interface TextboxBlockDef extends ControlBlockDef {
 export declare class TextboxBlock extends ControlBlock<TextboxBlockDef> {
     renderControl(props: RenderControlProps): JSX.Element;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-    renderControlEditor(props: RenderEditorProps): JSX.Element;
+    renderControlEditor(props: DesignCtx): JSX.Element;
     /** Filter the columns that this control is for */
     filterColumn(column: Column): boolean;
 }

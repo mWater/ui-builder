@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ContextVar, ChildBlock } from '../blocks';
+import { BlockDef, ContextVar, ChildBlock } from '../blocks';
 import CompoundBlock from '../CompoundBlock';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Table with a fixed number of rows and columns */
 export interface FixedTableBlockDef extends BlockDef {
     type: "fixedTable";
@@ -27,9 +28,9 @@ export declare class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }
 /** Function to set the number of rows, adding/removing as necessary */
 export declare function setNumRows(blockDef: FixedTableBlockDef, numRows: number): FixedTableBlockDef;

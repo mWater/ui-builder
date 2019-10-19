@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps, Filter, ContextVar, createExprVariables } from '../../blocks'
+import { BlockDef, ValidateBlockOptions, Filter, ContextVar, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator, Schema, ExprUtils, LocalizedString } from 'mwater-expressions';
 import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { ExprComponent } from 'mwater-expressions-ui';
@@ -11,6 +11,7 @@ import TextInstance from './TextInstance';
 import DateExprComponent, { toExpr, DateValue } from './DateExprComponent';
 import produce from 'immer';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -87,7 +88,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     throw new Error("Unknown type")
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     const styles = {
@@ -124,21 +125,16 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     return <div style={{ padding: 5 }}><ReactSelect styles={styles}/></div>
   }
 
-  getInitialFilters(options: { 
-    contextVarId: string, 
-    widgetLibrary: WidgetLibrary, 
-    schema: Schema, 
-    contextVars: ContextVar[]
-  }): Filter[] { 
-    if (options.contextVarId == this.blockDef.rowsetContextVarId) {
+  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
+    if (contextVarId == this.blockDef.rowsetContextVarId) {
       if (this.blockDef.defaultValue) {
-        return [this.createFilter(options.schema, options.contextVars, this.blockDef.defaultValue)]
+        return [this.createFilter(instanceCtx.schema, instanceCtx.contextVars, this.blockDef.defaultValue)]
       }
     }
     return [] 
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)!
     const filter = props.getFilters(this.blockDef.rowsetContextVarId!).find(f => f.id === this.blockDef.id)
     const value = filter ? filter.memo : null
@@ -201,12 +197,12 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     return <div style={{ padding: 5 }}>{elem}</div>
   }    
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     // Get rowset context variable
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     const handleExprChange = (expr: Expr) => {
-      props.onChange(produce(this.blockDef, (draft) => {
+      props.store.replaceBlock(produce(this.blockDef, (draft) => {
         // Clear default value if expression changes
         draft.filterExpr = expr
         delete draft.defaultValue
@@ -216,7 +212,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="rowsetContextVarId">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowsetContextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
@@ -234,7 +230,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
         : null}
 
         <LabeledProperty label="Placeholder">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="placeholder">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>

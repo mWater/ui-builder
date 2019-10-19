@@ -1,11 +1,11 @@
 import * as React from "react";
 import { QueryRepeatBlock } from "./queryRepeat";
-import { RenderInstanceProps } from "../../blocks";
 import { Row } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
+import { InstanceCtx } from "../../../contexts";
 interface Props {
     block: QueryRepeatBlock;
-    renderInstanceProps: RenderInstanceProps;
+    instanceCtx: InstanceCtx;
 }
 interface State {
     rows?: Row[];
@@ -24,7 +24,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     handleChange: () => void;
     createQuery(): QueryOptions;
     performQuery(): void;
-    createRowRenderInstanceProps(rowIndex: number): RenderInstanceProps;
+    createRowInstanceCtx(rowIndex: number): InstanceCtx;
     renderSeparator(): JSX.Element | null;
     renderRow(row: Row, rowIndex: number): JSX.Element;
     renderRows(): JSX.Element | JSX.Element[];

@@ -1,9 +1,8 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, CreateBlock, Filter, RenderEditorProps, ContextVar, ValidateBlockOptions } from '../blocks';
-import { Expr, Schema } from 'mwater-expressions';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
+import { BlockDef, CreateBlock, Filter, ContextVar, ValidateBlockOptions } from '../blocks';
+import { Expr } from 'mwater-expressions';
+import { InstanceCtx, DesignCtx } from '../../contexts';
 /** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
     widgetId: string | null;
@@ -15,17 +14,12 @@ export declare class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     createBlock: CreateBlock;
     constructor(blockDef: WidgetBlockDef, createBlock: CreateBlock);
     validate(options: ValidateBlockOptions): "Widget required" | "Invalid widget" | "Missing context variable in mapping" | null;
-    getInitialFilters(options: {
-        contextVarId: string;
-        widgetLibrary: WidgetLibrary;
-        schema: Schema;
-        contextVars: ContextVar[];
-    }): Filter[];
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];
+    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /** Maps variables in an expression from inner variable names to outer ones */
     mapInnerToOuterVariables(expr: Expr): Expr;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }
 export declare const mapObjectTree: (obj: any, mapping: (input: any) => any) => any;

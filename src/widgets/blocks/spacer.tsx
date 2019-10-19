@@ -1,8 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps } from '../blocks'
+import { BlockDef } from '../blocks'
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { NumberInput } from 'react-library/lib/bootstrap';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface SpacerBlockDef extends BlockDef {
   type: "spacer"
@@ -18,7 +19,7 @@ export interface SpacerBlockDef extends BlockDef {
 export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
   validate() { return null }
   
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     const style: React.CSSProperties = {
       backgroundImage: "linear-gradient(45deg, #dddddd 8.33%, #ffffff 8.33%, #ffffff 50%, #dddddd 50%, #dddddd 58.33%, #ffffff 58.33%, #ffffff 100%)",
       backgroundSize: "8.49px 8.49px"
@@ -33,7 +34,7 @@ export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
     return <div style={style}/>
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     const style: React.CSSProperties = {}
 
     if (this.blockDef.width) {
@@ -45,16 +46,16 @@ export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
     return <div style={style}/>
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Width in ems (blank for auto)">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="width">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="width">
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={true} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Height in ems (blank for auto)">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="height">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="height">
             {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={true} />}
           </PropertyEditor>
         </LabeledProperty>

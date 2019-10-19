@@ -1,10 +1,11 @@
 import produce from 'immer'
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks'
+import { BlockDef, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
 import { PropertyEditor } from '../propertyEditors';
 import { Checkbox } from 'react-library/lib/bootstrap';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface CollapsibleBlockDef extends BlockDef {
   type: "collapsible"
@@ -30,7 +31,7 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
     })
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     // Allow dropping
     const handleSetLabel = (blockDef: BlockDef) => {
       props.store.alterBlock(this.id, produce((b: CollapsibleBlockDef) => { 
@@ -58,7 +59,7 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
     )
   }
 
-  renderInstance(props: RenderInstanceProps) { 
+  renderInstance(props: InstanceCtx) { 
     const labelNode = this.blockDef.label ?
       this.createBlock(this.blockDef.label).renderInstance(props) : null
 
@@ -74,10 +75,10 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
     )
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="initialCollapsed">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="initialCollapsed">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Initially Collapsed</Checkbox>}
         </PropertyEditor>
       </div>

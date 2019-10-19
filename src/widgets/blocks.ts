@@ -1,12 +1,10 @@
 import * as React from 'react'
 import {v4 as uuid} from 'uuid'
-import { Database } from '../database/Database'
-import { Schema, Expr, DataSource, Variable, LiteralType } from 'mwater-expressions'
+import { Schema, Expr, Variable, LiteralType } from 'mwater-expressions'
 import { WidgetLibrary } from '../designer/widgetLibrary';
 import { ActionLibrary } from './ActionLibrary';
-import { PageStack } from '../PageStack';
+import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css"
-import { BlockPaletteEntry } from '../designer/blockPaletteEntries';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -21,6 +19,9 @@ export interface BlockStore {
   /** Replace block with specified id with either another block or nothing. 
    * Optionally removes another id first (for dragging where block should disappear and re-appear somewhere else) */
   alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string): void
+
+  /** Convenience method to alter a single block */
+  replaceBlock(blockDef: BlockDef): void
 }
 
 /** Store which throws on any operation */
@@ -28,6 +29,9 @@ export class NullBlockStore implements BlockStore {
   alterBlock(blockId: string, action: (blockDef: BlockDef) => BlockDef | null): void {
     throw new Error("Not allowed")
   }  
+  replaceBlock(blockDef: BlockDef) {
+    throw new Error("Not allowed")
+  }
 }
 
 /** Block definition */
@@ -47,74 +51,6 @@ export interface ContextVar {
   table?: string;  // table of database (when type = "rowset" or "row")
   // aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
   // selectable?: boolean;  // true if row can be selected (when type = "rowset")
-}
-
-export interface RenderInstanceProps {
-  /** locale to display (e.g. "en") */
-  locale: string,
-  database: Database,
-  schema: Schema,
-  /** Data source might not be available in instance rendering as it supports full SQL queries */
-  dataSource?: DataSource
-  contextVars: ContextVar[]
-  actionLibrary: ActionLibrary
-  widgetLibrary: WidgetLibrary
-  pageStack: PageStack
-
-  /** Values of context variables. Note: filters are not incorporated automatically into rowset values! */
-  contextVarValues: { [contextVarId: string]: any }
-
-  /**
-   * Gets the value of an expression based off of a context variable
-   * @param contextVarId id of context variable
-   * @param expr expression to get value of
-   */
-  getContextVarExprValue(contextVarId: string, expr: Expr): any
-
-  /** Selection call on context var (when type = "rowset" and selectable) */
-  onSelectContextVar(contextVarId: string, primaryKey: any): void
-
-  /** Set a filter on a rowset context variable */
-  setFilter(contextVarId: string, filter: Filter): void
-
-  /** Get any filters set on a rowset context variable  */
-  getFilters(contextVarId: string): Filter[]
-
-  /** All sub-block elements must rendered using this function. */
-  renderChildBlock(props: RenderInstanceProps, childBlockDef: BlockDef | null): React.ReactElement<any> | null
-
-  /** Registers an instance for validation. Returns a function which must be called to unregister when the instance goes away.
-   * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show
-   */
-  registerForValidation(validate: () => string | null): (() => void)
-}
-
-export interface RenderDesignProps {
-  /** locale to use (e.g. "en") */
-  locale: string,
-  contextVars: ContextVar[],
-  store: BlockStore,
-  schema: Schema,
-  dataSource: DataSource
-  widgetLibrary: WidgetLibrary
-  blockPaletteEntries: BlockPaletteEntry[]
-
-  /** Selected block id as some blocks may display differently when selected */
-  selectedId: string | null,
-
-  /** All sub-block elements must rendered using this function. onSet will be called only when transitioning from null to a value */
-  renderChildBlock(props: RenderDesignProps, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void): React.ReactElement<any>
-}
-
-export interface RenderEditorProps {
-  contextVars: ContextVar[]
-  /** locale of the editor (e.g. "en") */
-  locale: string
-  schema: Schema
-  dataSource: DataSource
-  actionLibrary: ActionLibrary
-  widgetLibrary: WidgetLibrary
-  onChange(blockDef: BlockDef): void
 }
 
 export interface ValidateBlockOptions {
@@ -150,41 +86,35 @@ export abstract class Block<T extends BlockDef> {
   get id() { return this.blockDef.id; }
 
   /** Render the block as it looks in design mode. This may use bootstrap */
-  abstract renderDesign(props: RenderDesignProps): React.ReactElement<any>
+  abstract renderDesign(props: DesignCtx): React.ReactElement<any>
 
   /** Render a live instance of the block. This may use bootstrap for now */
-  abstract renderInstance(props: RenderInstanceProps): React.ReactElement<any>
+  abstract renderInstance(props: InstanceCtx): React.ReactElement<any>
 
   /** Render an optional property editor for the block. This may use bootstrap */
-  renderEditor(props: RenderEditorProps): React.ReactElement<any> | null { return null }
+  renderEditor(designCtx: DesignCtx): React.ReactElement<any> | null { return null }
 
   /** Get any context variables expressions that this block needs (not including child blocks) */
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { return [] }
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { return [] }
 
   /** Get any context variables expressions that this block needs *including* child blocks. Can be overridden */
-  getSubtreeContextVarExprs(options: {
-    contextVar: ContextVar,
-    widgetLibrary: WidgetLibrary, 
-    actionLibrary: ActionLibrary, 
-    /** All context variables */
-    contextVars: ContextVar[], 
-    createBlock: CreateBlock }): Expr[] { 
+  getSubtreeContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
     // Get own exprs
-    let ownExprs = this.getContextVarExprs(options.contextVar, options.widgetLibrary, options.actionLibrary)
+    let ownExprs = this.getContextVarExprs(contextVar, ctx)
 
     // Append child ones
-    for (const childBlock of this.getChildren(options.contextVars)) {
-      const block = options.createBlock(childBlock.blockDef)
-      ownExprs = ownExprs.concat(block.getSubtreeContextVarExprs(options))
+    for (const childBlock of this.getChildren(ctx.contextVars)) {
+      const block = ctx.createBlock(childBlock.blockDef)
+      ownExprs = ownExprs.concat(block.getSubtreeContextVarExprs(contextVar, ctx))
     }
     return ownExprs
   }
 
   /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
-  abstract getChildren(contextVars: ContextVar[]): ChildBlock[]
+  abstract getChildren(contextVars: ContextVar[]): ChildBlock[] // TODO
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
-  abstract validate(options: ValidateBlockOptions): string | null
+  abstract validate(designCtx: DesignCtx): string | null
 
   /** 
    * Processes entire tree, starting at bottom. Allows 
@@ -209,28 +139,17 @@ export abstract class Block<T extends BlockDef> {
   abstract processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef
 
   /** Get initial filters generated by this block. Does not include child blocks */
-  getInitialFilters(options: { 
-    contextVarId: string, 
-    widgetLibrary: WidgetLibrary, 
-    schema: Schema, 
-    contextVars: ContextVar[]
-  }): Filter[] { return [] }
+  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { return [] }
 
   /** Get initial filters generated by this block and any children */
-  getSubtreeInitialFilters(options: { 
-    contextVarId: string, 
-    widgetLibrary: WidgetLibrary, 
-    schema: Schema, 
-    contextVars: ContextVar[],
-    createBlock: CreateBlock
-  }): Filter[] { 
+  getSubtreeInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
     // Get own filters
-    let ownFilters = this.getInitialFilters(options)
+    let ownFilters = this.getInitialFilters(contextVarId, instanceCtx)
 
     // Append child ones
-    for (const childBlock of this.getChildren(options.contextVars)) {
-      const block = options.createBlock(childBlock.blockDef)
-      ownFilters = ownFilters.concat(block.getSubtreeInitialFilters(options))
+    for (const childBlock of this.getChildren(instanceCtx.contextVars)) {
+      const block = instanceCtx.createBlock(childBlock.blockDef)
+      ownFilters = ownFilters.concat(block.getSubtreeInitialFilters(contextVarId, instanceCtx))
     }
     return ownFilters
   }

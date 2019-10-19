@@ -1,4 +1,4 @@
-import { RenderInstanceProps, ContextVar, BlockDef } from "../blocks";
+import { ContextVar, BlockDef } from "../blocks";
 import simpleSchema from "../../__fixtures__/schema";
 import { SaveCancelBlockDef, SaveCancelBlock } from "./saveCancel";
 import { DataSource } from 'mwater-expressions';
@@ -9,6 +9,7 @@ import VirtualDatabase from "../../database/VirtualDatabase";
 import { NullDatabase, Database } from "../../database/Database";
 import BlockFactory from "../BlockFactory";
 import { ActionLibrary } from "../ActionLibrary";
+import { InstanceCtx } from "../../contexts";
 
 // Outer context vars
 const rowCV: ContextVar = { id: "cv1", type: "row", name: "", table: "t1" }
@@ -18,7 +19,7 @@ const schema = simpleSchema()
 
 const createBlock = new BlockFactory().createBlock
 
-let rips: RenderInstanceProps
+let rips: InstanceCtx
 let database: VirtualDatabase
 
 // Trap alerts
@@ -30,27 +31,28 @@ beforeEach(() => {
 
   // Create render instance props
   rips = {
-   contextVars: contextVars,
-   database: database,
-   getContextVarExprValue: jest.fn(),
-   actionLibrary: {} as ActionLibrary,
-   pageStack: {} as PageStack,
-   contextVarValues: { cv1: "123" },
-   getFilters: jest.fn(),
-   setFilter: jest.fn(),
-   locale: "en",
-   onSelectContextVar: jest.fn(),
-   schema: schema,
-   dataSource: {} as DataSource,
-   renderChildBlock: (props: RenderInstanceProps, childBlockDef: BlockDef | null) => {
-     if (childBlockDef) {
-       const childBlock = createBlock(childBlockDef)
-       return childBlock.renderInstance(props)
-     }
-     return <div/>
-   },
-   widgetLibrary: { widgets: {} },
-   registerForValidation: () => { return () => {} }
+    createBlock: createBlock,
+    contextVars: contextVars,
+    database: database,
+    getContextVarExprValue: jest.fn(),
+    actionLibrary: {} as ActionLibrary,
+    pageStack: {} as PageStack,
+    contextVarValues: { cv1: "123" },
+    getFilters: jest.fn(),
+    setFilter: jest.fn(),
+    locale: "en",
+    onSelectContextVar: jest.fn(),
+    schema: schema,
+    dataSource: {} as DataSource,
+    renderChildBlock: (props: InstanceCtx, childBlockDef: BlockDef | null) => {
+      if (childBlockDef) {
+        const childBlock = createBlock(childBlockDef)
+        return childBlock.renderInstance(props)
+      }
+      return <div/>
+    },
+    widgetLibrary: { widgets: {} },
+    registerForValidation: () => { return () => {} }
  }
 
  alertMessages = []

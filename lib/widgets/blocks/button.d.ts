@@ -1,10 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks';
+import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks';
 import { ActionDef } from '../actions';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
 import { Expr, LocalizedString } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface ButtonBlockDef extends BlockDef {
     type: "button";
     label: LocalizedString | null;
@@ -20,9 +19,9 @@ export interface ButtonBlockDef extends BlockDef {
 }
 export declare class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
-    getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[];
+    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     renderButton(locale: string, onClick: () => void): JSX.Element;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

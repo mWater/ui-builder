@@ -1,6 +1,7 @@
 import * as React from 'react';
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock } from '../blocks';
+import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface HorizontalBlockDef extends BlockDef {
     type: "horizontal";
     items: BlockDef[];
@@ -14,8 +15,8 @@ export declare class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
     canonicalize(): BlockDef | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderBlock(children: React.ReactNode[]): JSX.Element;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): JSX.Element;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): JSX.Element;
+    renderEditor(props: DesignCtx): JSX.Element;
     getLabel(): string;
 }

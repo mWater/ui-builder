@@ -14,6 +14,7 @@ import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
 import { Database } from './database/Database';
 import { DataSourceDatabase } from './database/DataSourceDatabase';
+import { BaseCtx } from './contexts';
 
 const basicBlockFactory = new BlockFactory()
 
@@ -62,17 +63,23 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
       return <div>Loading...</div>
     }
 
+    const baseCtx: BaseCtx = {
+      widgetLibrary: this.state.widgetLibrary,
+      createBlock: basicBlockFactory.createBlock,
+      actionLibrary: actionLibrary,
+      database: this.state.database,
+      schema: this.state.schema,
+      dataSource: dataSource,
+      locale: "en"
+    }
+
     return (
       <div style={{ padding: 5, height: "100vh" }}>
         <WidgetLibraryDesigner
+          baseCtx={baseCtx}
+          dataSource={dataSource}
           openTabs={this.state.openTabs}
           onOpenTabsChange={this.handleOpenTabsChange}
-          widgetLibrary={this.state.widgetLibrary} 
-          blockFactory={basicBlockFactory} 
-          actionLibrary={actionLibrary}
-          database={this.state.database}
-          schema={this.state.schema}
-          dataSource={dataSource}
           onWidgetLibraryChange={this.handleWidgetLibraryChange} 
           blockPaletteEntries={defaultBlockPaletteEntries}
           />

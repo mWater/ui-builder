@@ -1,8 +1,9 @@
 /// <reference types="react" />
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { ContextVarExpr } from '../columnValues';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Block which creates a new row and adds it as a context variable to its content */
 export interface AddRowBlockDef extends BlockDef {
     type: "addRow";
@@ -25,7 +26,7 @@ export declare class AddRowBlock extends CompoundBlock<AddRowBlockDef> {
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
     getContextVarExprs(contextVar: ContextVar): Expr[];
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): JSX.Element;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): JSX.Element;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

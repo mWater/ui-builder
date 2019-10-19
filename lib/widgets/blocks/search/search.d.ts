@@ -1,7 +1,8 @@
 import * as React from 'react';
 import LeafBlock from '../../LeafBlock';
-import { BlockDef, RenderDesignProps, RenderInstanceProps, ValidateBlockOptions, RenderEditorProps } from '../../blocks';
+import { BlockDef, ValidateBlockOptions } from '../../blocks';
 import { Expr, LocalizedString } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface SearchBlockDef extends BlockDef {
     type: "search";
     /** Placeholder in box */
@@ -13,7 +14,7 @@ export interface SearchBlockDef extends BlockDef {
 }
 export declare class SearchBlock extends LeafBlock<SearchBlockDef> {
     validate(options: ValidateBlockOptions): string | null;
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): React.ReactElement<any>;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

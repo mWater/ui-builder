@@ -1,10 +1,11 @@
 import * as React from "react";
 import { SearchBlockDef } from "./search";
-import { RenderInstanceProps, Filter } from "../../blocks";
+import { Filter } from "../../blocks";
 import { Expr } from "mwater-expressions";
+import { InstanceCtx } from "../../../contexts";
 interface Props {
     blockDef: SearchBlockDef;
-    renderInstanceProps: RenderInstanceProps;
+    instanceCtx: InstanceCtx;
 }
 interface State {
     searchText: string;

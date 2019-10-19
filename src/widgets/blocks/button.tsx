@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, RenderDesignProps, RenderInstanceProps, RenderEditorProps, ValidateBlockOptions, ContextVar } from '../blocks'
+import { BlockDef, ValidateBlockOptions, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { ActionDef } from '../actions';
@@ -8,6 +8,7 @@ import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { WidgetLibrary } from '../../designer/widgetLibrary';
 import { ActionLibrary } from '../ActionLibrary';
 import { Expr, LocalizedString } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface ButtonBlockDef extends BlockDef {
   type: "button"
@@ -47,10 +48,10 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     return null 
   }
 
-  getContextVarExprs(contextVar: ContextVar, widgetLibrary: WidgetLibrary, actionLibrary: ActionLibrary): Expr[] { 
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
     // Include action expressions
     if (this.blockDef.actionDef) {
-      const action = actionLibrary.createAction(this.blockDef.actionDef)
+      const action = ctx.actionLibrary.createAction(this.blockDef.actionDef)
       return action.getContextVarExprs(contextVar)
     }
 
@@ -94,11 +95,11 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     )
   }
 
-  renderDesign(props: RenderDesignProps) {
+  renderDesign(props: DesignCtx) {
     return this.renderButton(props.locale, (() => null))
   }
 
-  renderInstance(props: RenderInstanceProps): React.ReactElement<any> {
+  renderInstance(props: InstanceCtx): React.ReactElement<any> {
     const handleClick = () => {
       // Confirm if confirm message
       if (this.blockDef.confirmMessage) {
@@ -127,16 +128,16 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     return this.renderButton(props.locale, handleClick)
   }
 
-  renderEditor(props: RenderEditorProps) {
+  renderEditor(props: DesignCtx) {
     return (
       <div>
         <LabeledProperty label="Text">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="label">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="label">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Style">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="style">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="style">
             {(value, onChange) => 
             <Select value={value} onChange={onChange}
               options={[
@@ -148,7 +149,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Size">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="size">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="size">
             {(value, onChange) => 
             <Select value={value} onChange={onChange}
               options={[
@@ -160,7 +161,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Icon">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="icon">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="icon">
             {(value, onChange) => 
             <Select value={value} onChange={onChange}
               nullLabel="None"
@@ -172,11 +173,11 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>
-        <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="block">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="block">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Block-style</Checkbox>}
         </PropertyEditor>
         <LabeledProperty label="When button clicked">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="actionDef">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="actionDef">
             {(value, onChange) => (
               <ActionDefEditor 
                 value={value} 
@@ -192,7 +193,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Confirm message">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="confirmMessage">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="confirmMessage">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>

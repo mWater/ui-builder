@@ -1,5 +1,5 @@
 import { WidgetBlock, WidgetBlockDef, mapObjectTree } from './widget'
-import { ContextVar, RenderInstanceProps, Filter } from '../blocks';
+import { ContextVar, Filter } from '../blocks';
 import { WidgetDef } from '../widgets';
 import { Database } from '../../database/Database';
 import { Schema, DataSource, Expr } from 'mwater-expressions';
@@ -9,6 +9,7 @@ import { WidgetLibrary } from '../../designer/widgetLibrary';
 import BlockFactory from '../BlockFactory';
 import { ExpressionBlockDef } from './expression';
 import produce from 'immer';
+import { InstanceCtx } from '../../contexts';
 
 const innerBlockDef: ExpressionBlockDef = { 
   type: "expression", 
@@ -56,7 +57,7 @@ describe("getContextVarExprs", () => {
     const widgetBlock = new WidgetBlock(blockDef, createBlock)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], widgetLibrary, {} as ActionLibrary)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary } as InstanceCtx)
 
     expect(exprs).toEqual([
       { type: "field", table: "t1", column: "text" }
@@ -73,7 +74,7 @@ describe("getContextVarExprs", () => {
     const widgetBlock = new WidgetBlock(blockDef, createBlock)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], widgetLibrary2, {} as ActionLibrary)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary2 } as InstanceCtx)
 
     expect(exprs).toEqual([
       { type: "variable", variableId: "a1" }
@@ -95,15 +96,15 @@ describe("getInitialFilters", () => {
     createBlock.mockReturnValueOnce(innerBlock)
     innerBlock.getInitialFilters.mockReturnValue([{ id: "f1", memo: "m", expr: {} as Expr }])
 
-    const filters = widgetBlock.getInitialFilters({ contextVarId: "a1", widgetLibrary: widgetLibrary, schema: {} as Schema, contextVars: [] })
+    const filters = widgetBlock.getInitialFilters("a1", { widgetLibrary: widgetLibrary, contextVars: [] as ContextVar[] } as InstanceCtx)
     expect(filters).toEqual([{ id: "f1", memo: "m", expr: {} as Expr }])
-    expect(innerBlock.getInitialFilters.mock.calls[0][0].contextVarId).toBe("b1")
+    expect(innerBlock.getInitialFilters.mock.calls[0][0]).toBe("b1")
   })
 })
 
 describe("renderInstance", () => {
-  let renderInstanceProps : RenderInstanceProps
-  let innerRenderInstanceProps : RenderInstanceProps
+  let instanceCtx : InstanceCtx
+  let innerInstanceCtx : InstanceCtx
  
   // Render instance
   beforeEach(() => {
@@ -117,7 +118,8 @@ describe("renderInstance", () => {
     // Return inner block
     createBlock.mockReturnValueOnce(innerBlock)
   
-    renderInstanceProps = {
+    instanceCtx = {
+      createBlock: createBlock,
       locale: "en",
       database: {} as Database,
       schema: {} as Schema,
@@ -134,39 +136,39 @@ describe("renderInstance", () => {
       renderChildBlock: jest.fn(),
       registerForValidation: () => { return () => {} }      
     }
-    widgetBlock.renderInstance(renderInstanceProps)
+    widgetBlock.renderInstance(instanceCtx)
 
-    // Get inner renderInstanceProps
-    innerRenderInstanceProps = innerBlock.renderInstance.mock.calls[0][0] as RenderInstanceProps
+    // Get inner instanceCtx
+    innerInstanceCtx = innerBlock.renderInstance.mock.calls[0][0] as InstanceCtx
   })
 
   test("contextVars", () => {
-    expect(innerRenderInstanceProps.contextVars).toEqual(contextVars.concat(widgetDef.contextVars))
+    expect(innerInstanceCtx.contextVars).toEqual(contextVars.concat(widgetDef.contextVars))
   })
 
   test("contextVarValues maps", () => {
-    expect(innerRenderInstanceProps.contextVarValues.b1).toBe("a1")
+    expect(innerInstanceCtx.contextVarValues.b1).toBe("a1")
   })
   
   test("getContextVarExprValue maps variables", () => {
     const outerGetContextVarExprValue = jest.fn()
-    renderInstanceProps.getContextVarExprValue = outerGetContextVarExprValue
+    instanceCtx.getContextVarExprValue = outerGetContextVarExprValue
 
     outerGetContextVarExprValue.mockReturnValue("abc")
     const innerExpr: Expr = { type: "variable", variableId: "b1" }
-    expect(innerRenderInstanceProps.getContextVarExprValue("b1", innerExpr)).toBe("abc")
+    expect(innerInstanceCtx.getContextVarExprValue("b1", innerExpr)).toBe("abc")
     expect(outerGetContextVarExprValue.mock.calls[0][0]).toBe("a1")
     expect(outerGetContextVarExprValue.mock.calls[0][1]).toEqual({ type: "variable", variableId: "a1" })
   })
 
   test("onSelectContextVar maps", () => {
-    innerRenderInstanceProps.onSelectContextVar("b1", "pk")
-    expect((renderInstanceProps.onSelectContextVar as jest.Mock).mock.calls[0]).toEqual(["a1", "pk"])
+    innerInstanceCtx.onSelectContextVar("b1", "pk")
+    expect((instanceCtx.onSelectContextVar as jest.Mock).mock.calls[0]).toEqual(["a1", "pk"])
   })
 
   test("setFilter maps", () => {
-    innerRenderInstanceProps.setFilter("b1", {} as Filter)
-    expect((renderInstanceProps.setFilter as jest.Mock).mock.calls[0]).toEqual(["a1", {}])
+    innerInstanceCtx.setFilter("b1", {} as Filter)
+    expect((instanceCtx.setFilter as jest.Mock).mock.calls[0]).toEqual(["a1", {}])
   })
 })
 

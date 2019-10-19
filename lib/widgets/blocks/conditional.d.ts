@@ -1,7 +1,8 @@
 /// <reference types="react" />
 import CompoundBlock from '../CompoundBlock';
-import { BlockDef, RenderDesignProps, RenderEditorProps, RenderInstanceProps, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
+import { BlockDef, ContextVar, ChildBlock, ValidateBlockOptions } from '../blocks';
 import { Expr } from 'mwater-expressions';
+import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Block which only displays content if an expression is true */
 export interface ConditionalBlockDef extends BlockDef {
     type: "conditional";
@@ -18,7 +19,7 @@ export declare class ConditionalBlock extends CompoundBlock<ConditionalBlockDef>
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
     getContextVarExprs(contextVar: ContextVar): Expr[];
-    renderDesign(props: RenderDesignProps): JSX.Element;
-    renderInstance(props: RenderInstanceProps): JSX.Element;
-    renderEditor(props: RenderEditorProps): JSX.Element;
+    renderDesign(props: DesignCtx): JSX.Element;
+    renderInstance(props: InstanceCtx): JSX.Element;
+    renderEditor(props: DesignCtx): JSX.Element;
 }

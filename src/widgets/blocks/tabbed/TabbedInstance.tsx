@@ -1,12 +1,12 @@
 import React from "react"
 import * as _ from 'lodash'
 import { TabbedBlockDef, TabbedBlockTab } from "./tabbed"
-import { RenderInstanceProps, BlockDef } from "../../blocks"
 import { localize } from "../../localization"
+import { InstanceCtx } from "../../../contexts"
 
 interface Props {
   tabbedBlockDef: TabbedBlockDef
-  renderInstanceProps: RenderInstanceProps
+  instanceCtx: InstanceCtx
 }
 
 interface State {
@@ -37,7 +37,7 @@ export default class TabbedInstance extends React.Component<Props, State> {
   }
 
   renderTab(tab: TabbedBlockTab, index: number) {
-    const labelText = localize(tab.label, this.props.renderInstanceProps.locale)
+    const labelText = localize(tab.label, this.props.instanceCtx.locale)
 
     return (
       <li className={(this.state.activeIndex === index) ? "active" : ""} key={index}>
@@ -54,7 +54,7 @@ export default class TabbedInstance extends React.Component<Props, State> {
       return null
     }
     
-    const content = this.props.renderInstanceProps.renderChildBlock(this.props.renderInstanceProps, tab.content)
+    const content = this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, tab.content)
 
     return (
       <div key={index} style={{ display: (this.state.activeIndex === index) ? "block" : "none" }}>

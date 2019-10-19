@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BlockDef, RenderEditorProps, ValidateBlockOptions, createExprVariables } from '../../blocks';
+import { BlockDef, ValidateBlockOptions, createExprVariables } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, EnumValue, Expr, ExprValidator, ExprCompiler, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
@@ -7,6 +7,7 @@ import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EnumArray
 import ReactSelect from "react-select"
 import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
 import { IdDropdownComponent } from './IdDropdownComponent';
+import { DesignCtx } from '../../../contexts';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -191,7 +192,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-  renderControlEditor(props: RenderEditorProps) {
+  renderControlEditor(props: DesignCtx) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
     let column: Column | null = null
     
@@ -202,13 +203,13 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     return (
       <div>
         <LabeledProperty label="Placeholder">
-          <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="placeholder">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         { column && column.type === "join" ?
           <LabeledProperty label="Label Expression">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="idLabelExpr">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelExpr">
               {(value, onChange) => <ExprComponent 
                 value={value} 
                 onChange={onChange} 
@@ -223,7 +224,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         : null }
         { column && column.type === "join" ?
           <LabeledProperty label="Filter Expression">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="idFilterExpr">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idFilterExpr">
               {(value, onChange) => <FilterExprComponent 
                 value={value} 
                 onChange={onChange} 
@@ -237,7 +238,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
           <LabeledProperty label="Include Values">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="includeValues">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="includeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
                 onChange={onChange} 
@@ -249,7 +250,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
           <LabeledProperty label="Exclude Values">
-            <PropertyEditor obj={this.blockDef} onChange={props.onChange} property="excludeValues">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="excludeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
                 onChange={onChange} 

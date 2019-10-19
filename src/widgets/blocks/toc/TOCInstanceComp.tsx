@@ -1,16 +1,17 @@
 import { TOCBlockDef, iterateItems, TOCItem } from "./toc"
-import { RenderInstanceProps, CreateBlock } from '../../blocks'
+import { CreateBlock } from '../../blocks'
 import { useState, useRef } from "react"
 import { localize } from '../../localization'
 import SplitPane from "./SplitPane"
 import React from "react"
 import { Page } from "../../../PageStack"
 import { PageStackDisplay } from "../../../PageStackDisplay"
+import { InstanceCtx } from "../../../contexts"
 
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: { 
   blockDef: TOCBlockDef
-  renderProps: RenderInstanceProps 
+  renderProps: InstanceCtx 
   createBlock: CreateBlock
 }) {
   const { blockDef, renderProps } = props
@@ -111,12 +112,7 @@ export default function TOCInstanceComp(props: {
     // Create page stack
     return <PageStackDisplay
       key={selectedId}
-      actionLibrary={renderProps.actionLibrary}
-      createBlock={props.createBlock}
-      schema={renderProps.schema}
-      dataSource={renderProps.dataSource}
-      locale={renderProps.locale}
-      widgetLibrary={renderProps.widgetLibrary}
+      baseCtx={props.renderProps}
       initialPage={page}
       ref={pageStackRef}
       />
