@@ -94,10 +94,10 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 
   createBlockStore() {
-    const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef!)
-
     const alterBlock = (blockId: string, action: (blockDef: BlockDef) => BlockDef | null, removeBlockId?: string) => {
       let newBlockDef
+
+      const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef!)
 
       // Do not allow self-removal in drag
       if (removeBlockId === this.props.widgetDef.blockDef!.id) {
