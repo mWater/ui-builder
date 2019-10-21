@@ -79,7 +79,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Panel",
-    blockDef: { id: "", type: "panel", mainContent: null, headerContent: null, footerContent: null },
+    blockDef: { id: "", type: "panel", mainContent: null, headerContent: null },
   },
   {
     title: "Query Table",

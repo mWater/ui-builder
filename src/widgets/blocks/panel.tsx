@@ -111,7 +111,7 @@ const PanelComponent = (props: {
   return (<div className="panel panel-default">
     { props.header ?
       <div className="panel-heading">
-        <div className="panel-title">{props.header}</div>
+        {props.header}
       </div>
     : null }
     <div className="panel-body">
