@@ -2,7 +2,6 @@ import { HorizontalBlock, HorizontalBlockDef } from './blocks/horizontal';
 import { BlockDef, Block } from './blocks';
 import { VerticalBlock, VerticalBlockDef } from './blocks/vertical';
 import { WidgetBlock, WidgetBlockDef } from './blocks/widget';
-import { LookupWidget } from './widgets';
 import { TextBlock, TextBlockDef } from './blocks/text';
 import { LabeledBlock, LabeledBlockDef } from './blocks/labeled';
 import { CollapsibleBlock, CollapsibleBlockDef } from './blocks/collapsible';
@@ -31,6 +30,7 @@ import { SpacerBlock, SpacerBlockDef } from './blocks/spacer';
 import { PrintBlock, PrintBlockDef } from './blocks/print';
 import { QueryRepeatBlock, QueryRepeatBlockDef } from './blocks/queryRepeat/queryRepeat';
 import { RowBlockDef, RowBlock } from './blocks/row';
+import { PanelBlock, PanelBlockDef } from './blocks/panel';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -107,7 +107,9 @@ export default class BlockFactory {
         return new PrintBlock(blockDef as PrintBlockDef, this.createBlock)
       case "queryRepeat":
         return new QueryRepeatBlock(blockDef as QueryRepeatBlockDef, this.createBlock)
-    }
+      case "panel":
+        return new PanelBlock(blockDef as PanelBlockDef, this.createBlock)
+      }
 
     // Use custom blocks
     if (this.customBlocks[blockDef.type]) {

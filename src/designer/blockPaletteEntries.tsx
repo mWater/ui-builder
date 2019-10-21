@@ -78,6 +78,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "spacer", height: 5 },
   },
   {
+    title: "Panel",
+    blockDef: { id: "", type: "panel", mainContent: null, headerContent: null, footerContent: null },
+  },
+  {
     title: "Query Table",
     blockDef: (contextVars: ContextVar[]) => {
       const rowsetCV = contextVars.find(cv => cv.type == "rowset")
