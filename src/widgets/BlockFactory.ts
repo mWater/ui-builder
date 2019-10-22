@@ -31,6 +31,7 @@ import { PrintBlock, PrintBlockDef } from './blocks/print';
 import { QueryRepeatBlock, QueryRepeatBlockDef } from './blocks/queryRepeat/queryRepeat';
 import { RowBlockDef, RowBlock } from './blocks/row';
 import { PanelBlock, PanelBlockDef } from './blocks/panel';
+import { AlertBlock, AlertBlockDef } from './blocks/alert';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -97,6 +98,8 @@ export default class BlockFactory {
         return new TOCBlock(blockDef as TOCBlockDef, this.createBlock)
       case "header":
         return new HeaderBlock(blockDef as HeaderBlockDef, this.createBlock)
+      case "alert":
+        return new AlertBlock(blockDef as AlertBlockDef, this.createBlock)
       case "validation":
         return new ValidationBlock(blockDef as ValidationBlockDef)
       case "float":

@@ -3,6 +3,7 @@ import uuid from "uuid/v4"
 import React from "react";
 import { QueryTableBlockDef } from "src/widgets/blocks/queryTable/queryTable";
 import { TextBlockDef } from "src/widgets/blocks/text";
+import { AlertBlockDef } from "../widgets/blocks/alert";
 
 export interface BlockPaletteEntry {
   title: string
@@ -80,6 +81,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Panel",
     blockDef: { id: "", type: "panel", mainContent: null, headerContent: null },
+  },
+  {
+    title: "Alert",
+    blockDef: { id: "", type: "alert", content: null, style: "warning" } as AlertBlockDef,
   },
   {
     title: "Query Table",
