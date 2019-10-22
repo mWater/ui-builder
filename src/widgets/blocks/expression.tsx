@@ -5,7 +5,7 @@ import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormat
 import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
-import { format } from 'd3-format'
+import d3Format from 'd3-format'
 import moment from 'moment'
 import { Toggle, Checkbox, Select } from 'react-library/lib/bootstrap';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -111,13 +111,15 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
     const style = this.getStyle()
 
+    const formatLocale = props.formatLocale || d3Format
+
     let str
     if (value == null) {
       str = ""
     }
     else {
       if (exprType === "number") {
-        str = format(this.blockDef.format || "")(value)
+        str = formatLocale.format(this.blockDef.format || "")(value)
       }
       else if (exprType === "date" && value != null) {
         str = moment(value, moment.ISO_8601).format(this.blockDef.format || "ll")

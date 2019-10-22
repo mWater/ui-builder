@@ -33,6 +33,6 @@ export declare class TextBlock extends LeafBlock<TextBlockDef> {
         style: React.CSSProperties;
         className: string;
     }, HTMLElement>;
-    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
 }

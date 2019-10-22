@@ -1,5 +1,6 @@
 import { Expr, Schema } from "mwater-expressions";
 import { ContextVar } from "./widgets/blocks";
+import { default as d3Format } from 'd3-format';
 /** Expression which is embedded in the text string */
 export interface EmbeddedExpr {
     /** Context variable (row or rowset) to use for expression */
@@ -20,6 +21,7 @@ export declare const formatEmbeddedExprString: (options: {
     schema: Schema;
     contextVars: ContextVar[];
     locale: string;
+    formatLocale?: d3Format.FormatLocaleObject | undefined;
 }) => string;
 /** Validate embedded expressions, returning null if ok, message otherwise */
 export declare const validateEmbeddedExprs: (options: {

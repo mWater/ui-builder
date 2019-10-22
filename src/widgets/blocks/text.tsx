@@ -83,20 +83,21 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
     return this.renderText(text ? text : <span className="text-muted">Text</span>)
   }
 
-  renderInstance(props: InstanceCtx): React.ReactElement<any> {
-    let text = localize(this.blockDef.text, props.locale)
+  renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
+    let text = localize(this.blockDef.text, instanceCtx.locale)
 
     // Get any embedded expression values
-    const exprValues = _.map(this.blockDef.embeddedExprs || [], ee => props.getContextVarExprValue(ee.contextVarId!, ee.expr))
+    const exprValues = _.map(this.blockDef.embeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
 
     // Format and replace
     text = formatEmbeddedExprString({
       text: text, 
       embeddedExprs: this.blockDef.embeddedExprs || [],
       exprValues: exprValues,
-      schema: props.schema,
-      contextVars: props.contextVars,
-      locale: props.locale
+      schema: instanceCtx.schema,
+      contextVars: instanceCtx.contextVars,
+      locale: instanceCtx.locale,
+      formatLocale: instanceCtx.formatLocale
     })
     
     return this.renderText(text)

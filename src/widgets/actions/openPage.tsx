@@ -130,7 +130,8 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         exprValues: exprValues,
         schema: instanceCtx.schema,
         contextVars: instanceCtx.contextVars,
-        locale: instanceCtx.locale
+        locale: instanceCtx.locale, 
+        formatLocale: instanceCtx.formatLocale
       })
     }
 

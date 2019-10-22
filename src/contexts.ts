@@ -5,6 +5,7 @@ import { CreateBlock, ContextVar, BlockStore, Filter, BlockDef } from "./widgets
 import { Database } from "./database/Database";
 import { PageStack } from "./PageStack";
 import { BlockPaletteEntry } from "./designer/blockPaletteEntries";
+import { FormatLocaleObject } from "d3-format";
 
 /** Base context that all UI Builder needs */
 export interface BaseCtx {
@@ -16,6 +17,8 @@ export interface BaseCtx {
   actionLibrary: ActionLibrary
   createBlock: CreateBlock
   database: Database
+  /** Locale object to use for formatting */
+  formatLocale?: FormatLocaleObject
 }
 
 /** Context that all design-mode operations need */

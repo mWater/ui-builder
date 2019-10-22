@@ -1,9 +1,6 @@
-import { Expr, Schema, DataSource, ExprUtils, ExprValidator } from "mwater-expressions";
-import React from "react";
+import { Expr, Schema, ExprUtils, ExprValidator } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "./widgets/blocks";
-import { ExprComponent } from "mwater-expressions-ui";
-import { LabeledProperty } from "./widgets/propertyEditors";
-import { format as d3Format } from 'd3-format';
+import { default as d3Format, FormatLocaleObject } from 'd3-format';
 import moment from "moment";
 
 /** Expression which is embedded in the text string */
@@ -29,8 +26,11 @@ export const formatEmbeddedExprString = (options: {
   schema: Schema
   contextVars: ContextVar[]
   locale: string
+  formatLocale?: FormatLocaleObject
 }) => {
   let text = options.text
+
+  const formatLocale = options.formatLocale || d3Format
 
   // Format and replace
   for (let i = 0 ; i < options.exprValues.length ; i++) {
@@ -46,7 +46,7 @@ export const formatEmbeddedExprString = (options: {
     }
     else {
       if (exprType === "number" && value != null) {
-        str = d3Format(format || "")(value)
+        str = formatLocale.format(format || "")(value)
       }
       else if (exprType === "date" && value != null) {
         str = moment(value, moment.ISO_8601).format(format || "ll")
