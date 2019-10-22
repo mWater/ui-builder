@@ -17,7 +17,7 @@ export interface ButtonBlockDef extends BlockDef {
 
   style: "default" | "primary" | "link"
   size: "normal" | "small" | "large" | "extrasmall"
-  icon?: "plus" | "times" | "pencil" | "print"
+  icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download"
 
   /** True to make block-style button */
   block?: boolean
@@ -154,7 +154,9 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
                 { value: "plus", label: "Add"},
                 { value: "pencil", label: "Edit"},
                 { value: "times", label: "Remove"},
-                { value: "print", label: "Print"}
+                { value: "print", label: "Print"},
+                { value: "upload", label: "Upload"},
+                { value: "download", label: "Download"}
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>
