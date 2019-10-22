@@ -69,7 +69,13 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
       return error
     }
 
-    // TODO Validate order by
+    // Validate orderBy
+    for (const orderBy of this.blockDef.orderBy || []) {
+      error = exprValidator.validateExpr(orderBy.expr, { table: rowsetCV.table })
+      if (error) {
+        return error
+      }
+    }
 
     // Validate action
     if (this.blockDef.rowClickAction) {
