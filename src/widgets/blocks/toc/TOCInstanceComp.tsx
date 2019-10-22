@@ -25,6 +25,11 @@ export default function TOCInstanceComp(props: {
 
   // Select item
   const handleItemClick = (item: TOCItem) => { 
+    // Only allow selecting with content
+    if (!item.widgetId) {
+      return
+    }
+
     // Do nothing if same id
     if (item.id == selectedId) {
       return
@@ -37,10 +42,7 @@ export default function TOCInstanceComp(props: {
       }
     }
 
-    // Only allow selecting with content
-    if (item.widgetId) {
-      setSelectedId(item.id) 
-    }
+    setSelectedId(item.id) 
   }
 
   /** Render an item at a specified depth which starts at 0 */
@@ -50,7 +52,8 @@ export default function TOCInstanceComp(props: {
     // Determine style of item label
     const itemLabelStyle: React.CSSProperties = {
       padding: 5,
-      cursor: item.widgetId ? "pointer" : "default"
+      cursor: item.widgetId ? "pointer" : "default",
+      color: item.widgetId ? undefined : "#737373"
     }
     if (depth === 0) {
       itemLabelStyle.fontWeight = "bold"

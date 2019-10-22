@@ -41,7 +41,7 @@ export default class TabbedInstance extends React.Component<Props, State> {
 
     return (
       <li className={(this.state.activeIndex === index) ? "active" : ""} key={index}>
-        <a onClick={this.handleSelectTab.bind(null, index)}>
+        <a onClick={this.handleSelectTab.bind(null, index)} style={{ cursor: "pointer" }}>
           {labelText}
         </a>
       </li>

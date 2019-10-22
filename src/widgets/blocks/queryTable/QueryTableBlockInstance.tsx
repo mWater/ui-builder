@@ -164,8 +164,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     // Use row id if possible, otherwise just the index
     const rowKey = this.props.block.blockDef.mode == "singleRow" ? row.id : rowIndex
 
+    // Show pointer if works on click
+    const rowStyle: React.CSSProperties = {}
+    if (this.props.block.blockDef.rowClickAction) {
+      rowStyle.cursor = "pointer"
+    }
+
     return (
-      <tr key={rowKey}>
+      <tr key={rowKey} style={rowStyle}>
         { this.props.block.blockDef.contents.map((b, colIndex) => {
           return (
             <td key={colIndex} onClick={handleRowClick}>
