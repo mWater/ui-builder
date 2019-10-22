@@ -15,6 +15,8 @@ export interface Page {
 /** Manages the stack of pages, allowing opening and closing of pages */
 export interface PageStack {
     openPage(page: Page): void;
+    /** Replace current page with specified one. true for success, false for failure */
+    replacePage(page: Page): boolean;
     /** Close top page. Returns whether successful and pages still open */
     closePage(): {
         success: boolean;

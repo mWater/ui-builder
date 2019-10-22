@@ -40,6 +40,26 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     this.setState({ pages: this.state.pages.concat(page) })
   }
 
+  /** Replace current page with specified one */
+  replacePage(page: Page): boolean {
+    if (this.state.pages.length == 0) {
+      throw new Error("Zero pages in stack")
+    }
+
+    // Validate all instances within page
+    const pageIndex = this.state.pages.length - 1
+    const result = this.validatePage(pageIndex)
+    if (!result) {
+      return false
+    }
+
+    const pages = this.state.pages.slice()
+    pages.splice(pages.length - 1, 1)
+    pages.push(page)
+    this.setState({ pages })
+    return true
+  }
+
   /** Close top page. Returns whether successful and pages still open */
   closePage(): { success: boolean, pageCount: number } {
     if (this.state.pages.length == 0) {
@@ -48,6 +68,38 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
     // Validate all instances within page
     const pageIndex = this.state.pages.length - 1
+    const result = this.validatePage(pageIndex)
+    if (!result) {
+      return { success: false, pageCount: this.state.pages.length }
+    }
+
+    const pages = this.state.pages.slice()
+    pages.splice(pages.length - 1, 1)
+    this.setState({ pages })
+
+    return { success: true, pageCount: pages.length }
+  }
+
+  closeAllPages(): boolean {
+    const pages = this.state.pages.slice()
+
+    while (pages.length > 0) {
+      // Validate all instances within page
+      const pageIndex = pages.length - 1
+
+      const result = this.validatePage(pageIndex)
+      if (!result) {
+        return false
+      }
+      pages.splice(pages.length - 1, 1)
+    }
+    
+    this.setState({ pages: [] })
+    return true
+  }
+
+  /** Validates a single page (by pageIndex), showing an error if fails */
+  validatePage(pageIndex: number): boolean {
     const validationMessages: string[] = []
 
     for (const key of Object.keys(this.validationRegistrations)) {
@@ -67,47 +119,8 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       if (_.compact(validationMessages).length > 0) {
         alert(_.compact(validationMessages).join("\n"))
       }
-      return { success: false, pageCount: this.state.pages.length }
+      return false
     }
-
-    const pages = this.state.pages.slice()
-    pages.splice(pages.length - 1, 1)
-    this.setState({ pages })
-    return { success: true, pageCount: pages.length }
-  }
-
-  closeAllPages(): boolean {
-    const pages = this.state.pages.slice()
-
-    while (pages.length > 0) {
-      // Validate all instances within page
-      const pageIndex = pages.length - 1
-      const validationMessages: string[] = []
-
-      for (const key of Object.keys(this.validationRegistrations)) {
-        const value = this.validationRegistrations[key]!
-        if (value.pageIndex != pageIndex) {
-          continue
-        }
-
-        const msg = value.validate()
-        if (msg != null) {
-          validationMessages.push(msg)
-        }
-      }
-
-      if (validationMessages.length > 0) {
-        // "" just blocks
-        if (_.compact(validationMessages).length > 0) {
-          alert(_.compact(validationMessages).join("\n"))
-        }
-        return false
-      }
-
-      pages.splice(pages.length - 1, 1)
-    }
-    
-    this.setState({ pages: [] })
     return true
   }
 

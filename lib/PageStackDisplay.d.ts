@@ -23,12 +23,16 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     };
     constructor(props: Props);
     openPage(page: Page): void;
+    /** Replace current page with specified one */
+    replacePage(page: Page): boolean;
     /** Close top page. Returns whether successful and pages still open */
     closePage(): {
         success: boolean;
         pageCount: number;
     };
     closeAllPages(): boolean;
+    /** Validates a single page (by pageIndex), showing an error if fails */
+    validatePage(pageIndex: number): boolean;
     renderChildBlock: (instanceCtx: InstanceCtx, childBlockDef: BlockDef | null) => React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
     handleClose: () => void;
     /** Stores the registration for validation of a child block and returns an unregister function */

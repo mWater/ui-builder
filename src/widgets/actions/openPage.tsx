@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import * as React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
-import { Select } from 'react-library/lib/bootstrap';
+import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
 import { LocalizedString, Expr } from 'mwater-expressions';
@@ -10,6 +10,7 @@ import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '.
 import { ContextVar } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { Page } from '../../PageStack';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -36,6 +37,9 @@ export interface OpenPageActionDef extends ActionDef {
 
   /** Values of context variables that widget inside page needs */
   contextVarValues: { [contextVarId: string]: ContextVarRef }
+
+  /** True to replace current page */
+  replacePage?: boolean
 }
 
 export class OpenPageAction extends Action<OpenPageActionDef> {
@@ -130,13 +134,20 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       })
     }
 
-    instanceCtx.pageStack.openPage({
+    const page: Page = {
       type: this.actionDef.pageType,
       database: instanceCtx.database,
       widgetId: this.actionDef.widgetId!,
       contextVarValues: contextVarValues,
       title: title
-    })
+    }
+
+    if (this.actionDef.replacePage) {
+      instanceCtx.pageStack.replacePage(page)
+    }
+    else {
+      instanceCtx.pageStack.openPage(page)
+    }
 
     return Promise.resolve()
   }
@@ -202,6 +213,10 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         <LabeledProperty label="Page Widget">
           <Select value={actionDef.widgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
         </LabeledProperty>
+
+        <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="replacePage">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Replace current page</Checkbox>}
+        </PropertyEditor>
 
         <LabeledProperty label="Variables">
           {renderContextVarValues()}

@@ -24,6 +24,8 @@ export interface OpenPageActionDef extends ActionDef {
     contextVarValues: {
         [contextVarId: string]: ContextVarRef;
     };
+    /** True to replace current page */
+    replacePage?: boolean;
 }
 export declare class OpenPageAction extends Action<OpenPageActionDef> {
     validate(designCtx: DesignCtx): string | null;
