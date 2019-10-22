@@ -1,23 +1,12 @@
 import * as React from "react";
 import { SearchBlockDef } from "./search";
-import { Filter } from "../../blocks";
-import { Expr } from "mwater-expressions";
 import { InstanceCtx } from "../../../contexts";
-interface Props {
+/** Search block that filters the rowset */
+declare const SearchBlockInstance: (props: {
     blockDef: SearchBlockDef;
     instanceCtx: InstanceCtx;
-}
-interface State {
-    searchText: string;
-}
-/** Search block that filters the rowset */
-export default class SearchBlockInstance extends React.Component<Props, State> {
-    constructor(props: Props);
-    createFilter(searchText: string): Filter;
-    createExprFilter(expr: Expr, searchText: string, table: string): Expr;
-    handleChange: (value: string) => void;
-    render(): JSX.Element;
-}
+}) => JSX.Element;
+export default SearchBlockInstance;
 interface SearchControlProps {
     value: string;
     onChange?: (value: string) => void;
@@ -30,4 +19,3 @@ export declare class SearchControl extends React.Component<SearchControlProps> {
     focus(): void;
     render(): JSX.Element;
 }
-export {};

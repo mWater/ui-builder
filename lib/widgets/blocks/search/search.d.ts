@@ -11,6 +11,8 @@ export interface SearchBlockDef extends BlockDef {
     rowsetContextVarId: string | null;
     /** Text expressions to search on  */
     searchExprs: Expr[];
+    /** True to focus on load */
+    autoFocus?: boolean;
 }
 export declare class SearchBlock extends LeafBlock<SearchBlockDef> {
     validate(options: DesignCtx): string | null;

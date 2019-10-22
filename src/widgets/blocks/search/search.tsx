@@ -8,6 +8,7 @@ import ListEditor from '../../ListEditor';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { localize } from '../../localization';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
+import { Checkbox } from 'react-library/lib/bootstrap';
 
 export interface SearchBlockDef extends BlockDef {
   type: "search"
@@ -20,6 +21,9 @@ export interface SearchBlockDef extends BlockDef {
 
   /** Text expressions to search on  */
   searchExprs: Expr[]
+
+  /** True to focus on load */
+  autoFocus?: boolean
 }
 
 export class SearchBlock extends LeafBlock<SearchBlockDef> {
@@ -103,6 +107,11 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="autoFocus">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Automatically focus on load</Checkbox>}
+        </PropertyEditor>
+
       </div>
     )
   }

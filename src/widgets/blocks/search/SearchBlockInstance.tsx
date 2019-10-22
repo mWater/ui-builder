@@ -5,51 +5,28 @@ import { Expr, ExprUtils } from "mwater-expressions";
 import * as _ from "lodash";
 import { localize } from "../../localization";
 import { InstanceCtx } from "../../../contexts";
-
-interface Props {
-  blockDef: SearchBlockDef
-  instanceCtx: InstanceCtx
-}
-
-interface State {
-  searchText: string
-}
+import { useState, useRef, useEffect } from "react";
 
 /** Search block that filters the rowset */
-export default class SearchBlockInstance extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
+const SearchBlockInstance = (props: {
+  blockDef: SearchBlockDef
+  instanceCtx: InstanceCtx
+}) => {
+  const { blockDef, instanceCtx } = props
+  const [searchText, setSearchText] = useState("")
+  const searchControlRef = useRef<SearchControl>(null)
 
-    this.state = { searchText: "" }
-  }
-
-  createFilter(searchText: string): Filter {
-    const blockDef = this.props.blockDef
-
-    // Get table
-    const table = this.props.instanceCtx.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!.table!
-    
-    if (searchText) {
-      const searchExprs: Expr[] = blockDef.searchExprs.map(se => this.createExprFilter(se, searchText, table))
-
-      const expr: Expr = {
-        type: "op", 
-        op: "or",
-        table: table, 
-        exprs: searchExprs
-      }
-
-      return { id: blockDef.id, expr: expr }
+  // Focus if enabled
+  useEffect(() => {
+    if (blockDef.autoFocus && searchControlRef.current) {
+      searchControlRef.current.focus()
     }
-    else {
-      return { id: blockDef.id, expr: null }
-    }
-  }
+  }, [])
 
-  createExprFilter(expr: Expr, searchText: string, table: string) {
+  const createExprFilter = (expr: Expr, searchText: string, table: string) => {
     const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
-    const exprUtils = new ExprUtils(this.props.instanceCtx.schema, createExprVariables(this.props.instanceCtx.contextVars))
+    const exprUtils = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars))
 
     // Get type of search expression
     const exprType = exprUtils.getExprType(expr)
@@ -68,7 +45,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
 
     if (exprType === "enum") {
       // Find matching enums
-      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
+      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
       if (enumValues.length === 0) {
         return null
       }
@@ -85,7 +62,7 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
 
     if (exprType === "enumset") {
       // Find matching enums
-      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, this.props.instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
+      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
       if (enumValues.length === 0) {
         return null
       }
@@ -103,21 +80,44 @@ export default class SearchBlockInstance extends React.Component<Props, State> {
     throw new Error("Unsupported search type " + exprType) 
   }
 
-  handleChange = (value: string) => {
-    const blockDef = this.props.blockDef
-    this.setState({ searchText: value })
+
+  const createFilter = (searchText: string): Filter => {
+    // Get table
+    const table = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowsetContextVarId)!.table!
+    
+    if (searchText) {
+      const searchExprs: Expr[] = blockDef.searchExprs.map(se => createExprFilter(se, searchText, table))
+
+      const expr: Expr = {
+        type: "op", 
+        op: "or",
+        table: table, 
+        exprs: searchExprs
+      }
+
+      return { id: blockDef.id, expr: expr }
+    }
+    else {
+      return { id: blockDef.id, expr: null }
+    }
+  }
+
+
+  const handleChange = (value: string) => {
+    setSearchText(value)
 
     // Set filter 
-    this.props.instanceCtx.setFilter(blockDef.rowsetContextVarId!, this.createFilter(value))
+    instanceCtx.setFilter(blockDef.rowsetContextVarId!, createFilter(value))
   }
 
-  render() {
-    return <SearchControl 
-      value={this.state.searchText} 
-      onChange={this.handleChange}
-      placeholder={localize(this.props.blockDef.placeholder, this.props.instanceCtx.locale)} />
-  }
+  return <SearchControl 
+    value={searchText} 
+    onChange={handleChange}
+    ref={searchControlRef}
+    placeholder={localize(blockDef.placeholder, instanceCtx.locale)} />
 }
+
+export default SearchBlockInstance
 
 interface SearchControlProps {
   value: string
