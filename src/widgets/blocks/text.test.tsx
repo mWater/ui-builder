@@ -3,6 +3,7 @@ import { shallow } from "enzyme";
 import { ContextVar } from "../blocks";
 import simpleSchema from "../../__fixtures__/schema";
 import { InstanceCtx } from "../../contexts";
+import * as d3Format from 'd3-format'
 
 const tbd: TextBlockDef = {
   type: "text",
@@ -28,7 +29,8 @@ test("renders with format", () => {
   const props = {
     getContextVarExprValue: jest.fn(),
     contextVars: [],
-    schema: simpleSchema()
+    schema: simpleSchema(),
+    formatLocale: d3Format
   }
 
   props.getContextVarExprValue.mockReturnValue(1234)

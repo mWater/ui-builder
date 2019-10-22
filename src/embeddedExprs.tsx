@@ -1,6 +1,7 @@
 import { Expr, Schema, ExprUtils, ExprValidator } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "./widgets/blocks";
-import { default as d3Format, FormatLocaleObject } from 'd3-format';
+import * as d3Format from 'd3-format';
+import { FormatLocaleObject } from "d3-format";
 import moment from "moment";
 
 /** Expression which is embedded in the text string */

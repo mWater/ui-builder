@@ -5,7 +5,7 @@ import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormat
 import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
-import d3Format from 'd3-format'
+import * as d3Format from 'd3-format';
 import moment from 'moment'
 import { Toggle, Checkbox, Select } from 'react-library/lib/bootstrap';
 import { DesignCtx, InstanceCtx } from '../../contexts';
