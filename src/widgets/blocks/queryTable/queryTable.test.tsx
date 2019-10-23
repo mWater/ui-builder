@@ -25,7 +25,7 @@ const qtbdSingle: QueryTableBlockDef = {
 
 const createBlock = new BlockFactory().createBlock
 
-const qtbSingle = new QueryTableBlock(qtbdSingle, createBlock)
+const qtbSingle = new QueryTableBlock(qtbdSingle)
 
 const qtbdMultiple: QueryTableBlockDef = {
   id: "123",
@@ -40,7 +40,7 @@ const qtbdMultiple: QueryTableBlockDef = {
   rowClickAction: null
 }
 
-const qtbMultiple = new QueryTableBlock(qtbdMultiple, createBlock)
+const qtbMultiple = new QueryTableBlock(qtbdMultiple)
 
 const schema = simpleSchema()
 
@@ -86,16 +86,17 @@ test("gets row expressions", () => {
   // Create single expression in contents
   const expr = { type: "field", table: "t1", column: "text" }
   const qtbd = { ...qtbdSingle, contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: expr }] }
-  const qtb = new QueryTableBlock(qtbd, createBlock)
-  expect(qtb.getRowExprs(contextVars, {} as InstanceCtx)).toEqual([expr])
+  const qtb = new QueryTableBlock(qtbd)
+  expect(qtb.getRowExprs(contextVars, { createBlock: createBlock } as InstanceCtx)).toEqual([expr])
 })
 
 test("gets action expressions", () => {
   // Create simple action
   const expr = { type: "field", table: "t1", column: "text" }
   const qtbd = { ...qtbdSingle, rowClickAction: { type: "addRow", table: "t1", columnValues: { text: { contextVarId: "123_row", expr: expr }}}}
-  const qtb = new QueryTableBlock(qtbd, createBlock)
+  const qtb = new QueryTableBlock(qtbd)
   expect(qtb.getRowExprs(contextVars, {
+    createBlock: createBlock,
     actionLibrary: new ActionLibrary()
   } as InstanceCtx)).toEqual([expr])
 })

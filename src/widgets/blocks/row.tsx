@@ -100,8 +100,7 @@ export class RowBlock extends CompoundBlock<RowBlockDef> {
     return <RowInstance
       contextVar={contextVar}
       blockDef={this.blockDef}
-      instanceProps={props} 
-      createBlock={this.createBlock} />
+      instanceProps={props} />
   }
 
   renderEditor(props: DesignCtx) {
@@ -148,9 +147,8 @@ const RowInstance = (props: {
   blockDef: RowBlockDef
   instanceProps: InstanceCtx
   contextVar: ContextVar
-  createBlock: CreateBlock
 }) => {
-  const { blockDef, instanceProps, contextVar, createBlock } = props
+  const { blockDef, instanceProps, contextVar } = props
   const db = instanceProps.database
   const table = contextVar.table!
 

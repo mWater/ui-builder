@@ -23,7 +23,7 @@ const qrbd: QueryRepeatBlockDef = {
 
 const createBlock = new BlockFactory().createBlock
 
-const qrb = new QueryRepeatBlock(qrbd, createBlock)
+const qrb = new QueryRepeatBlock(qrbd)
 
 const schema = simpleSchema()
 
@@ -46,6 +46,6 @@ test("gets row expressions", () => {
   // Create single expression in contents
   const expr = { type: "field", table: "t1", column: "text" }
   const qrbd2 = { ...qrbd, content: { type: "expression", id: "re1", contextVarId: "123_row", expr: expr } }
-  const qrb = new QueryRepeatBlock(qrbd2, createBlock)
-  expect(qrb.getRowExprs(contextVars, {} as InstanceCtx)).toEqual([expr])
+  const qrb = new QueryRepeatBlock(qrbd2)
+  expect(qrb.getRowExprs(contextVars, { createBlock: createBlock } as InstanceCtx)).toEqual([expr])
 })

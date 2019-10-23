@@ -79,7 +79,7 @@ const saveCancelBlockDef: SaveCancelBlockDef = {
 }
 
 test("save writes to database", async () => {
-  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef, createBlock);
+  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef);
 
   // Add row to database
   const txn = database.transaction()
@@ -128,7 +128,7 @@ test("save writes to database", async () => {
 })
 
 test("prevent save if required blank", async () => {
-  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef, createBlock);
+  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef);
 
   // Add row to database
   const txn = database.transaction()

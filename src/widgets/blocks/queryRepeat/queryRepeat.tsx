@@ -94,7 +94,7 @@ export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
 
     // Get expressions for content
     if (this.blockDef.content) {
-      exprs = exprs.concat(this.createBlock(this.blockDef.content).getSubtreeContextVarExprs(rowCV, {
+      exprs = exprs.concat(ctx.createBlock(this.blockDef.content).getSubtreeContextVarExprs(rowCV, {
         ...ctx,
         contextVars: contextVars.concat([rowCV])
       }))

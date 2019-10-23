@@ -61,10 +61,10 @@ export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
 
   renderInstance(props: InstanceCtx) { 
     const labelNode = this.blockDef.label ?
-      this.createBlock(this.blockDef.label).renderInstance(props) : null
+      props.createBlock(this.blockDef.label).renderInstance(props) : null
 
     const contentNode = this.blockDef.content ?
-      this.createBlock(this.blockDef.content).renderInstance(props) : null
+      props.createBlock(this.blockDef.content).renderInstance(props) : null
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>

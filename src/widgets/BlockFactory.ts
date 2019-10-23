@@ -47,17 +47,17 @@ export default class BlockFactory {
   createBlock = (blockDef: BlockDef): Block<BlockDef> => {
     switch (blockDef.type) {
       case "addWizard":
-        return new AddWizardBlock(blockDef as AddWizardBlockDef, this.createBlock)
+        return new AddWizardBlock(blockDef as AddWizardBlockDef)
       case "horizontal":
-        return new HorizontalBlock(blockDef as HorizontalBlockDef, this.createBlock)
+        return new HorizontalBlock(blockDef as HorizontalBlockDef)
       case "vertical":
-        return new VerticalBlock(blockDef as VerticalBlockDef, this.createBlock)
+        return new VerticalBlock(blockDef as VerticalBlockDef)
       case "widget":
-        return new WidgetBlock(blockDef as WidgetBlockDef, this.createBlock)
+        return new WidgetBlock(blockDef as WidgetBlockDef)
       case "text":
         return new TextBlock(blockDef as TextBlockDef)
       case "labeled":
-        return new LabeledBlock(blockDef as LabeledBlockDef, this.createBlock)
+        return new LabeledBlock(blockDef as LabeledBlockDef)
       case "textbox":
         return new TextboxBlock(blockDef as TextboxBlockDef)
       case "numberbox":
@@ -65,15 +65,15 @@ export default class BlockFactory {
       case "dropdown":
         return new DropdownBlock(blockDef as DropdownBlockDef)
       case "collapsible":
-        return new CollapsibleBlock(blockDef as CollapsibleBlockDef, this.createBlock)
+        return new CollapsibleBlock(blockDef as CollapsibleBlockDef)
       case "expression":
         return new ExpressionBlock(blockDef as ExpressionBlockDef)
       case "conditional":
-        return new ConditionalBlock(blockDef as ConditionalBlockDef, this.createBlock)
+        return new ConditionalBlock(blockDef as ConditionalBlockDef)
       case "queryTable":
-        return new QueryTableBlock(blockDef as QueryTableBlockDef, this.createBlock)
+        return new QueryTableBlock(blockDef as QueryTableBlockDef)
       case "fixedTable":
-        return new FixedTableBlock(blockDef as FixedTableBlockDef, this.createBlock)
+        return new FixedTableBlock(blockDef as FixedTableBlockDef)
       case "search":
         return new SearchBlock(blockDef as SearchBlockDef)
       case "dropdownFilter":
@@ -81,37 +81,37 @@ export default class BlockFactory {
       case "button":
         return new ButtonBlock(blockDef as ButtonBlockDef)
       case "saveCancel":
-        return new SaveCancelBlock(blockDef as SaveCancelBlockDef, this.createBlock)
+        return new SaveCancelBlock(blockDef as SaveCancelBlockDef)
       case "rowset":
-        return new RowsetBlock(blockDef as RowsetBlockDef, this.createBlock)
+        return new RowsetBlock(blockDef as RowsetBlockDef)
       case "row":
-        return new RowBlock(blockDef as RowBlockDef, this.createBlock)
+        return new RowBlock(blockDef as RowBlockDef)
       case "addRow":
-        return new AddRowBlock(blockDef as AddRowBlockDef, this.createBlock)
+        return new AddRowBlock(blockDef as AddRowBlockDef)
       case "tabbed":
-        return new TabbedBlock(blockDef as TabbedBlockDef, this.createBlock)
+        return new TabbedBlock(blockDef as TabbedBlockDef)
       case "image":
         return new ImageBlock(blockDef as ImageBlockDef)
       case "datefield":
         return new DatefieldBlock(blockDef as DatefieldBlockDef)
       case "toc":
-        return new TOCBlock(blockDef as TOCBlockDef, this.createBlock)
+        return new TOCBlock(blockDef as TOCBlockDef)
       case "header":
-        return new HeaderBlock(blockDef as HeaderBlockDef, this.createBlock)
+        return new HeaderBlock(blockDef as HeaderBlockDef)
       case "alert":
-        return new AlertBlock(blockDef as AlertBlockDef, this.createBlock)
+        return new AlertBlock(blockDef as AlertBlockDef)
       case "validation":
         return new ValidationBlock(blockDef as ValidationBlockDef)
       case "float":
-        return new FloatBlock(blockDef as FloatBlockDef, this.createBlock)
+        return new FloatBlock(blockDef as FloatBlockDef)
       case "spacer":
         return new SpacerBlock(blockDef as SpacerBlockDef)
       case "print":
-        return new PrintBlock(blockDef as PrintBlockDef, this.createBlock)
+        return new PrintBlock(blockDef as PrintBlockDef)
       case "queryRepeat":
-        return new QueryRepeatBlock(blockDef as QueryRepeatBlockDef, this.createBlock)
+        return new QueryRepeatBlock(blockDef as QueryRepeatBlockDef)
       case "panel":
-        return new PanelBlock(blockDef as PanelBlockDef, this.createBlock)
+        return new PanelBlock(blockDef as PanelBlockDef)
       }
 
     // Use custom blocks

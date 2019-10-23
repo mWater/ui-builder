@@ -16,13 +16,6 @@ export interface WidgetBlockDef extends BlockDef {
 }
 
 export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
-  createBlock: CreateBlock
-
-  constructor(blockDef: WidgetBlockDef, createBlock: CreateBlock) {
-    super(blockDef)
-    this.createBlock = createBlock
-  }
-
   validate(options: DesignCtx) { 
     if (!this.blockDef.widgetId) {
       return "Widget required"
@@ -47,7 +40,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
     const widgetDef = instanceCtx.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
-      const innerBlock = this.createBlock(widgetDef.blockDef)
+      const innerBlock = instanceCtx.createBlock(widgetDef.blockDef)
 
       // Map contextVarId to internal id
       for (const key of Object.keys(this.blockDef.contextVarMap)) {
@@ -80,7 +73,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
 
     // Get complete context variables exprs of inner widget blocks
-    let contextVarExprs = this.createBlock(widgetDef.blockDef).getSubtreeContextVarExprs(innerContextVar, {
+    let contextVarExprs = ctx.createBlock(widgetDef.blockDef).getSubtreeContextVarExprs(innerContextVar, {
       ...ctx, contextVars: widgetDef.contextVars,
     })
 
@@ -115,7 +108,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     // Find the widget
     const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId]
     if (widgetDef && widgetDef.blockDef) {
-      const innerBlock = this.createBlock(widgetDef.blockDef)
+      const innerBlock = props.createBlock(widgetDef.blockDef)
 
       // Create props for rendering inner block
       const innerProps : DesignCtx = {
@@ -126,7 +119,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         blockPaletteEntries: [],
         renderChildBlock: (childProps, childBlockDef) => { 
           if (childBlockDef) {
-            const childBlock = this.createBlock(childBlockDef)
+            const childBlock = props.createBlock(childBlockDef)
             return childBlock.renderDesign(childProps)
           }
           else {
@@ -164,7 +157,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     // Find the widget
     const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
-      const innerBlock = this.createBlock(widgetDef.blockDef)
+      const innerBlock = props.createBlock(widgetDef.blockDef)
 
       const innerProps : InstanceCtx = {
         ...props,

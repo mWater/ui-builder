@@ -109,7 +109,7 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
   }
 
   renderInstance(props: InstanceCtx) {
-    return <SaveCancelInstance instanceCtx={props} blockDef={this.blockDef} createBlock={this.createBlock} />
+    return <SaveCancelInstance instanceCtx={props} blockDef={this.blockDef} />
   }
   
   renderEditor(props: DesignCtx) {
@@ -157,7 +157,6 @@ export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
 interface SaveCancelInstanceProps {
   instanceCtx: InstanceCtx
   blockDef: SaveCancelBlockDef
-  createBlock: CreateBlock
 }
 
 interface SaveCancelInstanceState {

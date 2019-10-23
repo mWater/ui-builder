@@ -1,5 +1,5 @@
 import { WidgetBlock, WidgetBlockDef, mapObjectTree } from './widget'
-import { ContextVar, Filter } from '../blocks';
+import { ContextVar, Filter, CreateBlock } from '../blocks';
 import { WidgetDef } from '../widgets';
 import { Database } from '../../database/Database';
 import { Schema, DataSource, Expr } from 'mwater-expressions';
@@ -54,10 +54,10 @@ const contextVars : ContextVar[] = [
 describe("getContextVarExprs", () => {
   test("gathers from inner widget and maps", () => {
     const createBlock = new BlockFactory().createBlock
-    const widgetBlock = new WidgetBlock(blockDef, createBlock)
+    const widgetBlock = new WidgetBlock(blockDef)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary } as InstanceCtx)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary, createBlock: createBlock } as InstanceCtx)
 
     expect(exprs).toEqual([
       { type: "field", table: "t1", column: "text" }
@@ -71,10 +71,10 @@ describe("getContextVarExprs", () => {
     })
 
     const createBlock = new BlockFactory().createBlock
-    const widgetBlock = new WidgetBlock(blockDef, createBlock)
+    const widgetBlock = new WidgetBlock(blockDef)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary2 } as InstanceCtx)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary2, createBlock: createBlock } as InstanceCtx)
 
     expect(exprs).toEqual([
       { type: "variable", variableId: "a1" }
@@ -85,7 +85,7 @@ describe("getContextVarExprs", () => {
 describe("getInitialFilters", () => {
   test("translates", () => {
     const createBlock = jest.fn()
-    const widgetBlock = new WidgetBlock(blockDef, createBlock)
+    const widgetBlock = new WidgetBlock(blockDef)
 
     const innerBlock = {
       getInitialFilters: jest.fn()
@@ -96,7 +96,7 @@ describe("getInitialFilters", () => {
     createBlock.mockReturnValueOnce(innerBlock)
     innerBlock.getInitialFilters.mockReturnValue([{ id: "f1", memo: "m", expr: {} as Expr }])
 
-    const filters = widgetBlock.getInitialFilters("a1", { widgetLibrary: widgetLibrary, contextVars: [] as ContextVar[] } as InstanceCtx)
+    const filters = widgetBlock.getInitialFilters("a1", { widgetLibrary: widgetLibrary, contextVars: [] as ContextVar[], createBlock: createBlock as CreateBlock } as InstanceCtx)
     expect(filters).toEqual([{ id: "f1", memo: "m", expr: {} as Expr }])
     expect(innerBlock.getInitialFilters.mock.calls[0][0]).toBe("b1")
   })
@@ -109,7 +109,7 @@ describe("renderInstance", () => {
   // Render instance
   beforeEach(() => {
     const createBlock = jest.fn()
-    const widgetBlock = new WidgetBlock(blockDef, createBlock)
+    const widgetBlock = new WidgetBlock(blockDef)
 
     const innerBlock = {
       renderInstance: jest.fn()

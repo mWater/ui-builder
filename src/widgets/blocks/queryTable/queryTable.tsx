@@ -136,7 +136,7 @@ export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
     // Get expressions for all content blocks
     for (const contentBlockDef of this.blockDef.contents) {
       if (contentBlockDef) {
-        exprs = exprs.concat(this.createBlock(contentBlockDef).getSubtreeContextVarExprs(rowCV, {
+        exprs = exprs.concat(ctx.createBlock(contentBlockDef).getSubtreeContextVarExprs(rowCV, {
           ...ctx,
           contextVars: contextVars.concat([rowCV])
         }))

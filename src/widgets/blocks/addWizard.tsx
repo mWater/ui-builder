@@ -19,11 +19,8 @@ export interface AddWizardBlockDef extends BlockDef {
 
 /** Displays a popup and transforms into any other kind of block */
 export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
-  createBlock: CreateBlock
-
-  constructor(blockDef: AddWizardBlockDef, createBlock: CreateBlock) {
+  constructor(blockDef: AddWizardBlockDef) {
     super(blockDef)
-    this.createBlock = createBlock;
   }
 
   validate(options: DesignCtx) { 
@@ -34,7 +31,7 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
     const handleSet = (newBlockDef: BlockDef | null) => {
       if (newBlockDef) {
         // Duplicate but keep top level id so that selected
-        const duplicatedBlockDef = duplicateBlockDef(newBlockDef, this.createBlock)
+        const duplicatedBlockDef = duplicateBlockDef(newBlockDef, props.createBlock)
         duplicatedBlockDef.id = this.blockDef.id
         props.store.alterBlock(this.blockDef.id, (bd) => duplicatedBlockDef)
       }
