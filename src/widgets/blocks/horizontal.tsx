@@ -1,8 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, ContextVar, ChildBlock } from '../blocks'
-import { Select, Toggle } from 'react-library/lib/bootstrap';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Toggle } from 'react-library/lib/bootstrap';
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -15,7 +14,7 @@ export interface HorizontalBlockDef extends BlockDef {
   align: "justify" | "right" | "left" | "center"
 }
 
-export class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
+export class HorizontalBlock extends Block<HorizontalBlockDef> {
   get id() { return this.blockDef.id }
 
   getChildren(contextVars: ContextVar[]): ChildBlock[] {

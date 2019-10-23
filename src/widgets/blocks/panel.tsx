@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
-import CompoundBlock from '../CompoundBlock';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -19,7 +18,7 @@ export interface PanelBlockDef extends BlockDef {
   footerContent?: BlockDef | null
 }
 
-export class PanelBlock extends CompoundBlock<PanelBlockDef> {
+export class PanelBlock extends Block<PanelBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get for all cells
     return _.compact([this.blockDef.mainContent, this.blockDef.headerContent, this.blockDef.footerContent]).map(bd => ({ blockDef: bd!, contextVars: contextVars }))

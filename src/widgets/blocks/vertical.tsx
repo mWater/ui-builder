@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock } from '../blocks'
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface VerticalBlockDef extends BlockDef {
@@ -9,7 +8,7 @@ export interface VerticalBlockDef extends BlockDef {
   items: BlockDef[]
 }
 
-export class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
+export class VerticalBlock extends Block<VerticalBlockDef> {
   get id() { return this.blockDef.id }
 
   getChildren(contextVars: ContextVar[]): ChildBlock[] {

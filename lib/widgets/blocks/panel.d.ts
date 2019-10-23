@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
-import CompoundBlock from '../CompoundBlock';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Panels with optional header and footer */
 export interface PanelBlockDef extends BlockDef {
@@ -12,7 +11,7 @@ export interface PanelBlockDef extends BlockDef {
     /** Bottom content of block. null is empty, undefined is not displayed in design mode */
     footerContent?: BlockDef | null;
 }
-export declare class PanelBlock extends CompoundBlock<PanelBlockDef> {
+export declare class PanelBlock extends Block<PanelBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

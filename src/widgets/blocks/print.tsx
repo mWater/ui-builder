@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
 import ReactElementPrinter from 'react-library/lib/ReactElementPrinter'
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -12,7 +11,7 @@ export interface PrintBlockDef extends BlockDef {
   content: BlockDef | null
 }
 
-export class PrintBlock extends CompoundBlock<PrintBlockDef> {
+export class PrintBlock extends Block<PrintBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.content ? [{ blockDef: this.blockDef.content, contextVars: contextVars}] : []
   }

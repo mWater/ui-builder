@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
 import { PropertyEditor } from '../propertyEditors';
 import { Checkbox } from 'react-library/lib/bootstrap';
@@ -15,7 +14,7 @@ export interface CollapsibleBlockDef extends BlockDef {
   initialCollapsed?: boolean
 }
 
-export class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
+export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return _.compact([this.blockDef.label, this.blockDef.content]).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
   }

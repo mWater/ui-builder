@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Select } from 'react-library/lib/bootstrap';
@@ -14,7 +13,7 @@ export interface AlertBlockDef extends BlockDef {
   style: "success" | "info" | "warning" | "danger"
 }
 
-export class AlertBlock extends CompoundBlock<AlertBlockDef> {
+export class AlertBlock extends Block<AlertBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.content ? [{ blockDef: this.blockDef.content, contextVars: contextVars}] : []
   }

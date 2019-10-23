@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, CreateBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock, CreateBlock } from '../blocks'
 import { localize } from '../localization';
 import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import VirtualDatabase from '../../database/VirtualDatabase';
@@ -35,7 +34,7 @@ export interface SaveCancelBlockDef extends BlockDef {
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
  * When either is clicked, the page is closed. Has optional delete button too.
  */
-export class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
+export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }

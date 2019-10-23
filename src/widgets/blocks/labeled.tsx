@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { localize } from '../localization';
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
 import { LocalizedString } from 'mwater-expressions';
@@ -15,7 +14,7 @@ export interface LabeledBlockDef extends BlockDef {
   child: BlockDef | null
 }
 
-export class LabeledBlock extends CompoundBlock<LabeledBlockDef> {
+export class LabeledBlock extends Block<LabeledBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }

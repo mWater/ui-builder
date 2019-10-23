@@ -1,9 +1,8 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { Toggle } from 'react-library/lib/bootstrap';
-import CompoundBlock from '../CompoundBlock';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -24,7 +23,7 @@ export interface FloatBlockDef extends BlockDef {
   floatContent: BlockDef | null
 }
 
-export class FloatBlock extends CompoundBlock<FloatBlockDef> {
+export class FloatBlock extends Block<FloatBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get for all cells
     return _.compact([this.blockDef.mainContent, this.blockDef.floatContent]).map(bd => ({ blockDef: bd!, contextVars: contextVars }))

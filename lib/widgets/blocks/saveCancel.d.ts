@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface SaveCancelBlockDef extends BlockDef {
@@ -20,7 +19,7 @@ export interface SaveCancelBlockDef extends BlockDef {
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
  * When either is clicked, the page is closed. Has optional delete button too.
  */
-export declare class SaveCancelBlock extends CompoundBlock<SaveCancelBlockDef> {
+export declare class SaveCancelBlock extends Block<SaveCancelBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(options: DesignCtx): "Save label required" | "Cancel label required" | "Confirm discard message required" | "Delete label required" | "Delete context variable not found" | "Delete context variable wrong type" | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

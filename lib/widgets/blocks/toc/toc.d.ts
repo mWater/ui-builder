@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { BlockDef, ContextVar, ChildBlock } from '../../blocks';
-import CompoundBlock from '../../CompoundBlock';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
 import { LocalizedString } from 'mwater-expressions';
 import './toc.css';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
@@ -37,7 +36,7 @@ export interface TOCItem {
 export declare const iterateItems: (items: TOCItem[]) => TOCItem[];
 /** Alter each item, allowing item to be mutated, replaced (return item or array of items) or deleted (return null) */
 export declare const alterItems: (items: TOCItem[], action: (item: TOCItem) => TOCItem | TOCItem[] | null | undefined) => TOCItem[];
-export declare class TOCBlock extends CompoundBlock<TOCBlockDef> {
+export declare class TOCBlock extends Block<TOCBlockDef> {
     /** Get child blocks */
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;

@@ -34,7 +34,7 @@ const qrbd: QueryRepeatBlockDef = {
 
 const createBlock = new BlockFactory().createBlock
 
-const qtb = new QueryRepeatBlock(qrbd, createBlock)
+const qtb = new QueryRepeatBlock(qrbd)
 
 let rips: InstanceCtx
 let database: any

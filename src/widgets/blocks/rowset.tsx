@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, CreateBlock, ContextVar, ChildBlock, createExprVariables } from '../blocks'
+import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
@@ -28,7 +27,7 @@ export interface RowsetBlockDef extends BlockDef {
   content: BlockDef | null
 }
 
-export class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
+export class RowsetBlock extends Block<RowsetBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     if (this.blockDef.content) {
       const contextVar = this.createContextVar()

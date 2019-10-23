@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import { BlockDef, ContextVar, ChildBlock } from '../../blocks'
-import CompoundBlock from '../../CompoundBlock'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
 import produce from 'immer'
 import { LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
@@ -69,7 +68,7 @@ export const alterItems = (items: TOCItem[], action: (item: TOCItem) => undefine
   return newItems
 }
 
-export class TOCBlock extends CompoundBlock<TOCBlockDef> {
+export class TOCBlock extends Block<TOCBlockDef> {
   /** Get child blocks */
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Iterate all 

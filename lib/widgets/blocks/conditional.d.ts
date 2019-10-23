@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Block which only displays content if an expression is true */
@@ -13,7 +12,7 @@ export interface ConditionalBlockDef extends BlockDef {
     /** Block which is in the passed the row */
     content: BlockDef | null;
 }
-export declare class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
+export declare class ConditionalBlock extends Block<ConditionalBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(options: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

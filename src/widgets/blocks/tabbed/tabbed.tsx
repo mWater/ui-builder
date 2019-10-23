@@ -1,8 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../../blocks'
-import { localize } from '../../localization';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../../propertyEditors';
 import TabbedDesigner from './TabbedDesigner';
 import ListEditor from '../../ListEditor';
@@ -24,7 +22,7 @@ export interface TabbedBlockDef extends BlockDef {
 }
 
 /** Tabbed control */
-export class TabbedBlock extends CompoundBlock<TabbedBlockDef> {
+export class TabbedBlock extends Block<TabbedBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.tabs.filter(tab => tab.content).map(tab => ({ blockDef: tab.content!, contextVars: contextVars}))
   }

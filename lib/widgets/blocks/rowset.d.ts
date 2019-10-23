@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Block which creates a new rowset context variable */
@@ -15,7 +14,7 @@ export interface RowsetBlockDef extends BlockDef {
     /** Block which is in the rowset */
     content: BlockDef | null;
 }
-export declare class RowsetBlock extends CompoundBlock<RowsetBlockDef> {
+export declare class RowsetBlock extends Block<RowsetBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     createContextVar(): ContextVar | null;
     validate(options: DesignCtx): string | null;

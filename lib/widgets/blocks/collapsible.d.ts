@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface CollapsibleBlockDef extends BlockDef {
     type: "collapsible";
@@ -9,7 +8,7 @@ export interface CollapsibleBlockDef extends BlockDef {
     /** True if collapsible section is initially collapsed */
     initialCollapsed?: boolean;
 }
-export declare class CollapsibleBlock extends CompoundBlock<CollapsibleBlockDef> {
+export declare class CollapsibleBlock extends Block<CollapsibleBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

@@ -1,8 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
-import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryRepeatBlockInstance from './QueryRepeatBlockInstance';
@@ -31,7 +30,7 @@ export interface QueryRepeatBlockDef extends BlockDef {
   noRowsMessage?: LocalizedString | null
 }
 
-export class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
+export class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get rowset context variable
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)

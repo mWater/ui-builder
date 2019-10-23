@@ -1,6 +1,5 @@
 import * as React from 'react';
-import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
 import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
@@ -18,7 +17,7 @@ export interface QueryRepeatBlockDef extends BlockDef {
     /** Message to display when there are no rows */
     noRowsMessage?: LocalizedString | null;
 }
-export declare class QueryRepeatBlock extends CompoundBlock<QueryRepeatBlockDef> {
+export declare class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(options: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

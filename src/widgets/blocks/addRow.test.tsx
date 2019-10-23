@@ -69,7 +69,7 @@ const addRowBlockDef: AddRowBlockDef = {
 }
 
 test("save writes to database", async () => {
-  const addRowBlock = new AddRowBlock(addRowBlockDef, createBlock);
+  const addRowBlock = new AddRowBlock(addRowBlockDef);
 
   const inst = mount(addRowBlock.renderInstance(rips))
 

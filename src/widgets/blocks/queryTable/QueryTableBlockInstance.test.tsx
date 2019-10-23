@@ -36,7 +36,7 @@ const qtbdSingle: QueryTableBlockDef = {
 
 const createBlock = new BlockFactory().createBlock
 
-const qtbSingle = new QueryTableBlock(qtbdSingle, createBlock)
+const qtbSingle = new QueryTableBlock(qtbdSingle)
 
 let rips: InstanceCtx;
 let database: any

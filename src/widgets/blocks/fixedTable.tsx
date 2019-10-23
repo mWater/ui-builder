@@ -1,9 +1,8 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
-import CompoundBlock from '../CompoundBlock';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -37,7 +36,7 @@ interface FixedTableCellDef {
   content: BlockDef | null
 }
 
-export class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
+export class FixedTableBlock extends Block<FixedTableBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get for all cells
     return _.compact(_.flatten(this.blockDef.rows.map(r => r.cells.map(c => c.content)))).map(bd => ({ blockDef: bd!, contextVars: contextVars }))

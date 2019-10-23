@@ -1,6 +1,5 @@
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface HorizontalBlockDef extends BlockDef {
     type: "horizontal";
@@ -8,7 +7,7 @@ export interface HorizontalBlockDef extends BlockDef {
     /** How to align child blocks */
     align: "justify" | "right" | "left" | "center";
 }
-export declare class HorizontalBlock extends CompoundBlock<HorizontalBlockDef> {
+export declare class HorizontalBlock extends Block<HorizontalBlockDef> {
     readonly id: string;
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;

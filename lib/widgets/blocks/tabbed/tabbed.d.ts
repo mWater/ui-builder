@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
 import { LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface TabbedBlockTab {
@@ -14,7 +13,7 @@ export interface TabbedBlockDef extends BlockDef {
     tabs: TabbedBlockTab[];
 }
 /** Tabbed control */
-export declare class TabbedBlock extends CompoundBlock<TabbedBlockDef> {
+export declare class TabbedBlock extends Block<TabbedBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

@@ -1,10 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks'
-import { localize } from '../localization';
-import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../propertyEditors';
-import { LocalizedString } from 'mwater-expressions';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Header with line underneath */
@@ -13,7 +9,7 @@ export interface HeaderBlockDef extends BlockDef {
   child: BlockDef | null
 }
 
-export class HeaderBlock extends CompoundBlock<HeaderBlockDef> {
+export class HeaderBlock extends Block<HeaderBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }

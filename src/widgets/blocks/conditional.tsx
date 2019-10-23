@@ -1,7 +1,6 @@
 import produce from 'immer'
 import * as React from 'react';
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, createExprVariables } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Expr } from 'mwater-expressions';
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
@@ -22,7 +21,7 @@ export interface ConditionalBlockDef extends BlockDef {
   content: BlockDef | null
 }
 
-export class ConditionalBlock extends CompoundBlock<ConditionalBlockDef> {
+export class ConditionalBlock extends Block<ConditionalBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     if (this.blockDef.content) {
       return [{ blockDef: this.blockDef.content, contextVars: contextVars }]

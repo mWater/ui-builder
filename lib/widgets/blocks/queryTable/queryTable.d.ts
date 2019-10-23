@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
 import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import { ActionDef } from '../../actions';
@@ -27,7 +26,7 @@ export interface QueryTableBlockDef extends BlockDef {
     /** Table padding (default is "normal") */
     padding?: "normal" | "compact";
 }
-export declare class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
+export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(designCtx: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

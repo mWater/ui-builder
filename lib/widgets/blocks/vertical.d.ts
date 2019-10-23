@@ -1,12 +1,11 @@
 /// <reference types="react" />
-import CompoundBlock from '../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface VerticalBlockDef extends BlockDef {
     type: "vertical";
     items: BlockDef[];
 }
-export declare class VerticalBlock extends CompoundBlock<VerticalBlockDef> {
+export declare class VerticalBlock extends Block<VerticalBlockDef> {
     readonly id: string;
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;

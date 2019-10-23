@@ -1,8 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
-import CompoundBlock from '../../CompoundBlock';
-import { BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
 import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
@@ -43,7 +42,7 @@ export interface QueryTableBlockDef extends BlockDef {
   padding?: "normal" | "compact"
 }
 
-export class QueryTableBlock extends CompoundBlock<QueryTableBlockDef> {
+export class QueryTableBlock extends Block<QueryTableBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get rowset context variable
     const rowsetCV = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)

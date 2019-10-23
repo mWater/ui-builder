@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
-import CompoundBlock from '../CompoundBlock';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Table with a fixed number of rows and columns */
 export interface FixedTableBlockDef extends BlockDef {
@@ -24,7 +23,7 @@ interface FixedTableRowDef {
 interface FixedTableCellDef {
     content: BlockDef | null;
 }
-export declare class FixedTableBlock extends CompoundBlock<FixedTableBlockDef> {
+export declare class FixedTableBlock extends Block<FixedTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

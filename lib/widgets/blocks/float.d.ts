@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { BlockDef, ContextVar, ChildBlock } from '../blocks';
-import CompoundBlock from '../CompoundBlock';
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Floats some content either right or left of main content */
 export interface FloatBlockDef extends BlockDef {
@@ -14,7 +13,7 @@ export interface FloatBlockDef extends BlockDef {
     /** Floated content of block */
     floatContent: BlockDef | null;
 }
-export declare class FloatBlock extends CompoundBlock<FloatBlockDef> {
+export declare class FloatBlock extends Block<FloatBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
