@@ -2,7 +2,7 @@ import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, PropertyEditor, ActionDefEditor } from '../propertyEditors';
-import { TextInput, Select } from 'react-library/lib/bootstrap';
+import { TextInput, Select, Toggle } from 'react-library/lib/bootstrap';
 import { ActionDef } from '../actions';
 import { Expr } from 'mwater-expressions';
 import { localize } from '../localization';
@@ -27,6 +27,9 @@ export interface ImageBlockDef extends BlockDef {
    * banner: stretches to 100% and includes reverse page margin to fill completely
    */
   sizeMode?: "normal" | "fullwidth" | "banner"
+
+  /** How to align image. Default is left */
+  align?: "left" | "center" | "right"
 }
 
 /** Simple static image block */
@@ -87,6 +90,8 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
       imageStyle.width = "100%"
       divStyle.margin = "-15px -20px 0px -20px"
     }
+
+    divStyle.textAlign = this.blockDef.align
 
     return (
       <div onClick={handleClick} style={divStyle}>
@@ -153,6 +158,21 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
                 { value: "fullwidth", label: "Full width"},
                 { value: "banner", label: "Banner"}
               ]}/> }
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Alignment">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
+            {(value, onChange) => 
+              <Toggle 
+                value={value || "left"} 
+                onChange={onChange} 
+                options={[
+                  { value: "left", label: <i className="fa fa-align-left"/> },
+                  { value: "center", label: <i className="fa fa-align-center"/> },
+                  { value: "right", label: <i className="fa fa-align-right"/> },
+                ]} />
+            }
           </PropertyEditor>
         </LabeledProperty>
 

@@ -20,6 +20,8 @@ export interface ImageBlockDef extends BlockDef {
      * banner: stretches to 100% and includes reverse page margin to fill completely
      */
     sizeMode?: "normal" | "fullwidth" | "banner";
+    /** How to align image. Default is left */
+    align?: "left" | "center" | "right";
 }
 /** Simple static image block */
 export declare class ImageBlock extends LeafBlock<ImageBlockDef> {
