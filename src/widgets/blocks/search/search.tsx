@@ -79,27 +79,27 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
 
         { rowsetCV ? 
           <LabeledProperty label="Search expressions">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="searchExprs">
-            {(value, onItemsChange) => {
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="searchExprs">
+              {(value, onItemsChange) => {
 
-              const handleAddSearchExpr = () => {
-                onItemsChange(value.concat(null))
-              }
-              return (
-                <div>
-                  <ListEditor items={value} onItemsChange={onItemsChange}>
-                    { (expr: Expr, onExprChange) => (
-                      <ExprComponent value={expr} schema={props.schema} dataSource={props.dataSource} onChange={onExprChange} table={rowsetCV.table!} types={["text", "enum", "enumset"]} />
-                    )}
-                  </ListEditor>
-                  <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>
-                    + Add Expression
-                  </button>
-                </div>
-              )
-            }}
-          </PropertyEditor>
-        </LabeledProperty>
+                const handleAddSearchExpr = () => {
+                  onItemsChange(value.concat(null))
+                }
+                return (
+                  <div>
+                    <ListEditor items={value} onItemsChange={onItemsChange}>
+                      { (expr: Expr, onExprChange) => (
+                        <ExprComponent value={expr} schema={props.schema} dataSource={props.dataSource} onChange={onExprChange} table={rowsetCV.table!} types={["text", "enum", "enumset"]} />
+                      )}
+                    </ListEditor>
+                    <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>
+                      + Add Expression
+                    </button>
+                  </div>
+                )
+              }}
+            </PropertyEditor>
+          </LabeledProperty>
         : null}
 
         <LabeledProperty label="Placeholder">

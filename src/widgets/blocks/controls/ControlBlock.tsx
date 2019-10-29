@@ -8,6 +8,7 @@ import { localize } from "../../localization";
 import { Database } from "../../../database/Database";
 import { DataSourceDatabase } from "../../../database/DataSourceDatabase";
 import { DesignCtx, InstanceCtx } from "../../../contexts";
+import { FormatLocaleObject } from "d3-format";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -41,6 +42,9 @@ export interface RenderControlProps {
   disabled: boolean
 
   onChange: (value: any) => void
+
+  /** Locale object to use for formatting */
+  formatLocale?: FormatLocaleObject
 }
 
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
@@ -54,18 +58,19 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   /** Filter the columns that this control is for */
   abstract filterColumn(column: Column): boolean
 
-  renderDesign(props: DesignCtx) {
+  renderDesign(designCtx: DesignCtx) {
     const renderControlProps: RenderControlProps = {
       value: null, 
-      rowContextVar: props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
+      rowContextVar: designCtx.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
       onChange: () => { return }, 
-      locale: props.locale,
-      database: new DataSourceDatabase(props.schema, props.dataSource),
-      schema: props.schema,
-      dataSource: props.dataSource,
+      locale: designCtx.locale,
+      database: new DataSourceDatabase(designCtx.schema, designCtx.dataSource),
+      schema: designCtx.schema,
+      dataSource: designCtx.dataSource,
       disabled: false,
-      contextVars: props.contextVars,
-      contextVarValues: {}
+      contextVars: designCtx.contextVars,
+      contextVarValues: {},
+      formatLocale: designCtx.formatLocale
     }
     
     return (

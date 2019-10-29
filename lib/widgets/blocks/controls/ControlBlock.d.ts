@@ -4,6 +4,7 @@ import * as React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Database } from "../../../database/Database";
 import { DesignCtx, InstanceCtx } from "../../../contexts";
+import { FormatLocaleObject } from "d3-format";
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
     /** Row context variable id */
@@ -30,6 +31,8 @@ export interface RenderControlProps {
     /** True if control should be disabled */
     disabled: boolean;
     onChange: (value: any) => void;
+    /** Locale object to use for formatting */
+    formatLocale?: FormatLocaleObject;
 }
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
@@ -38,7 +41,7 @@ export declare abstract class ControlBlock<T extends ControlBlockDef> extends Le
     abstract renderControlEditor(props: DesignCtx): React.ReactElement<any> | null;
     /** Filter the columns that this control is for */
     abstract filterColumn(column: Column): boolean;
-    renderDesign(props: DesignCtx): JSX.Element;
+    renderDesign(designCtx: DesignCtx): JSX.Element;
     renderInstance(props: InstanceCtx): JSX.Element;
     /** Allow subclasses to clear/update other fields on the column changing */
     processColumnChanged(blockDef: T): T;

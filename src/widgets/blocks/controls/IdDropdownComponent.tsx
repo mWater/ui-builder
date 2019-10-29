@@ -1,9 +1,10 @@
 import AsyncReactSelect from 'react-select/lib/Async'
-import { Database } from "../../../database/Database"
+import { Database, OrderBy, QueryOptions } from "../../../database/Database"
 import { Expr } from 'mwater-expressions';
 import { useState, useCallback, useEffect } from 'react'
 import React from 'react'
 import { ContextVar } from '../../blocks'
+import { getOptionValue } from 'react-select/lib/builtins';
 
 interface SingleProps<T> {
   database: Database
@@ -16,9 +17,19 @@ interface SingleProps<T> {
   /** True to select multiple values */
   multi: false
 
-  /** Expression to use for label */
-  labelExpr: Expr
+  /** Format the label given the label values */
+  formatLabel: (labelValues: any[]) => string
 
+  /** Expressions which are embedded in the label as {0}, {1}... */
+  labelEmbeddedExprs: Expr[]
+
+  /** Text/enum expressions to search on */
+  searchExprs: Expr[]
+
+  /** Sort order of results */
+  orderBy: OrderBy[]
+
+  /** Optional filter on options */
   filterExpr?: Expr
 
   contextVars: ContextVar[]
@@ -36,9 +47,19 @@ interface MultiProps<T> {
   /** True to select multiple values */
   multi: true
 
-  /** Expression to use for label */
-  labelExpr: Expr
+  /** Format the label given the label values */
+  formatLabel: (labelValues: any[]) => string
 
+  /** Expressions which are embedded in the label as {0}, {1}... */
+  labelEmbeddedExprs: Expr[]
+
+  /** Text/enum expressions to search on */
+  searchExprs: Expr[]
+
+  /** Sort order of results */
+  orderBy: OrderBy[]
+
+  /** Optional filter on options */
   filterExpr?: Expr
 
   contextVars: ContextVar[]
@@ -47,10 +68,26 @@ interface MultiProps<T> {
 
 type Props<T> = SingleProps<T> | MultiProps<T>
 
+/** One option of the control */
+interface Option<T> { 
+  /** Values of parts of the label */
+  labelValues: string[]
+  id: T 
+}
+
 /** Displays a combo box that allows selecting one text values from an expression */
 export function IdDropdownComponent<T>(props: Props<T>) {
-  const [currentValue, setCurrentValue] = useState<{ label: string, value: T}>()
+  const [currentValue, setCurrentValue] = useState<Option<T> | Option<T>[]>()
   const [loading, setLoading] = useState(false)
+
+  /** Creates an option from a query row that is in form { id:, label0:, label1:, ...} */
+  const rowToOption = (row: any) => {
+    const value: Option<T> = { id: row.id, labelValues: [] }
+    for (let i = 0; i < props.labelEmbeddedExprs.length ; i++) {
+      value.labelValues[i] = row[`label${i}`] 
+    }
+    return value
+  }
 
   // Load current value
   useEffect(() => {
@@ -68,19 +105,25 @@ export function IdDropdownComponent<T>(props: Props<T>) {
           { type: "literal", idTable: props.table, valueType: "id", value: props.value }
         ]}
 
-      const results = props.database.query({ 
+      const query: QueryOptions = { 
         select: {
-          value: { type: "id", table: props.table },
-          label: props.labelExpr
+          id: { type: "id", table: props.table }
         },
         from: props.table,
         where: where
-      }, props.contextVars, props.contextVarValues)
+      }
+
+      // Add label exprs
+      for (let i = 0; i < props.labelEmbeddedExprs.length ; i++) {
+        query.select[`label${i}`] = props.labelEmbeddedExprs[i]
+      }
+
+      const results = props.database.query(query, props.contextVars, props.contextVarValues)
 
       results.then((rows) => {
         if (props.multi) {
           if (rows[0]) {
-            setCurrentValue(rows as any)
+            setCurrentValue(rows.map(r => rowToOption(r)))
           }
           else {
             setCurrentValue(undefined)
@@ -88,7 +131,7 @@ export function IdDropdownComponent<T>(props: Props<T>) {
         }
         else {
           if (rows[0]) {
-            setCurrentValue(rows[0] as any)
+            setCurrentValue(rowToOption(rows[0]))
           }
           else {
             setCurrentValue(undefined)
@@ -108,42 +151,58 @@ export function IdDropdownComponent<T>(props: Props<T>) {
     // Determine filter expressions
     const filters: Expr[] = []
     if (input) {
-      filters.push({
-        type: "op", table: props.table, op: "~*", exprs: [
-          props.labelExpr,
-          { type: "literal", valueType: "text", value: "^" + escapeRegex(input) }
-        ]
-      })
+      const orFilter: Expr = { 
+        type: "op", table: props.table, op: "or", exprs: props.searchExprs.map(se => (
+          { type: "op", table: props.table, op: "~*", exprs: [
+            se,
+            { type: "literal", valueType: "text", value: "^" + escapeRegex(input) }
+          ]}))
+        }
+      filters.push(orFilter)
     }
     if (props.filterExpr) {
       filters.push(props.filterExpr)
     }
 
     // Perform query to get options
-    const results = props.database.query({ 
+    const query: QueryOptions = { 
       select: {
-        value: { type: "id", table: props.table },
-        label: props.labelExpr
+        id: { type: "id", table: props.table }
       },
       from: props.table,
       where: filters.length > 1 ? { type: "op", table: props.table, op: "and", exprs: filters } : filters[0],
-      orderBy: [{ expr: props.labelExpr, dir: "asc" }],
+      orderBy: props.orderBy,
       limit: 50
-    }, props.contextVars, props.contextVarValues)
+    }      
+
+    // Add label exprs
+    for (let i = 0; i < props.labelEmbeddedExprs.length ; i++) {
+      query.select[`label${i}`] = props.labelEmbeddedExprs[i]
+    }
+    
+    const results = props.database.query(query, props.contextVars, props.contextVarValues)
 
     results.then((rows) => {
-      callback(rows)
+      callback(rows.map(r => rowToOption(r)))
     })
-  }, [props.table, props.labelExpr, props.filterExpr])
+  }, [props.table, props.filterExpr])
 
-  const handleChange = useCallback((value: any) => {
+  const handleChange = useCallback((option: any) => {
     if (props.multi) {
-      props.onChange(value && value.length > 0 ? value.map((v: any) => v.value) : null) 
+      props.onChange(option && option.length > 0 ? option.map((v: Option<T>) => v.id) : null) 
     } 
     else {
-      props.onChange(value ? value.value : null)
+      props.onChange(option ? option.id : null)
     }
   }, [props.onChange])
+
+  const getOptionLabel = useCallback((option: Option<T>) => {
+    return props.formatLabel(option.labelValues)
+  }, [props.formatLabel])
+
+  const getOptionValue = useCallback((option: Option<T>) => {
+    return option.id + ""
+  }, [])
 
   return <div style={{ width: "100%", minWidth: 160 }}>
     <AsyncReactSelect
@@ -154,10 +213,12 @@ export function IdDropdownComponent<T>(props: Props<T>) {
       isClearable={true}
       isLoading={loading}
       onChange={handleChange}
-      noOptionsMessage={() => "Type to search"}
+      noOptionsMessage={() => "..."}
       defaultOptions={true}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
       styles={{
         // Keep menu above fixed data table headers and map
         menu: (style) => {

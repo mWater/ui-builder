@@ -395,7 +395,7 @@ export const EnumArrayEditor = (props: {
     />
 }
 
-/** Edits embedded expressions */
+/** Edits embedded expressions. */
 export const EmbeddedExprsEditor = (props: { 
   value: EmbeddedExpr[] | null
   onChange: (value: EmbeddedExpr[]) => void
@@ -406,7 +406,7 @@ export const EmbeddedExprsEditor = (props: {
   const { value, onChange, schema, dataSource, contextVars } = props
 
   const handleAddEmbeddedExpr = () => {
-    onChange((value || []).concat([{ contextVarId: null, expr: null, format: null }]))
+    onChange((value || []).concat([{ contextVarId: contextVars.length > 0 ? contextVars[contextVars.length - 1].id : null, expr: null, format: null }]))
   }
 
   return (

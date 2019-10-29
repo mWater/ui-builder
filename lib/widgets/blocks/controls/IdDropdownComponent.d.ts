@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Database } from "../../../database/Database";
+import { Database, OrderBy } from "../../../database/Database";
 import { Expr } from 'mwater-expressions';
 import { ContextVar } from '../../blocks';
 interface SingleProps<T> {
@@ -10,8 +10,15 @@ interface SingleProps<T> {
     placeholder?: string;
     /** True to select multiple values */
     multi: false;
-    /** Expression to use for label */
-    labelExpr: Expr;
+    /** Format the label given the label values */
+    formatLabel: (labelValues: any[]) => string;
+    /** Expressions which are embedded in the label as {0}, {1}... */
+    labelEmbeddedExprs: Expr[];
+    /** Text/enum expressions to search on */
+    searchExprs: Expr[];
+    /** Sort order of results */
+    orderBy: OrderBy[];
+    /** Optional filter on options */
     filterExpr?: Expr;
     contextVars: ContextVar[];
     contextVarValues: {
@@ -26,8 +33,15 @@ interface MultiProps<T> {
     placeholder?: string;
     /** True to select multiple values */
     multi: true;
-    /** Expression to use for label */
-    labelExpr: Expr;
+    /** Format the label given the label values */
+    formatLabel: (labelValues: any[]) => string;
+    /** Expressions which are embedded in the label as {0}, {1}... */
+    labelEmbeddedExprs: Expr[];
+    /** Text/enum expressions to search on */
+    searchExprs: Expr[];
+    /** Sort order of results */
+    orderBy: OrderBy[];
+    /** Optional filter on options */
     filterExpr?: Expr;
     contextVars: ContextVar[];
     contextVarValues: {

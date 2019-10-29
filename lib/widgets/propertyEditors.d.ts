@@ -145,7 +145,7 @@ export declare const EnumArrayEditor: (props: {
     locale?: string | undefined;
     placeholder?: string | undefined;
 }) => JSX.Element;
-/** Edits embedded expressions */
+/** Edits embedded expressions. */
 export declare const EmbeddedExprsEditor: (props: {
     value: EmbeddedExpr[] | null;
     onChange: (value: EmbeddedExpr[]) => void;
