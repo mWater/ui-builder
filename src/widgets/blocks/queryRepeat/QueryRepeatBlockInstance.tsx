@@ -36,7 +36,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
   componentDidUpdate(prevProps: Props) {
     // Redo query if changed
     const newQueryOptions = this.createQuery()
-    if (!_.isEqual(newQueryOptions, this.queryOptions)) {
+    if (!_.isEqual(newQueryOptions, this.queryOptions) || !_.isEqual(this.props.instanceCtx.contextVarValues, prevProps.instanceCtx.contextVarValues)) {
       this.performQuery()
     }
   }
