@@ -12,6 +12,11 @@ import { localize } from '../localization';
 import uuid = require('uuid');
 import { ExpressionBlock, ExpressionBlockDef } from './expression';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { LabeledBlockDef } from './labeled';
+import { TextboxBlockDef } from './controls/textbox';
+import { NumberboxBlockDef } from './controls/numberbox';
+import { DatefieldBlockDef } from './controls/datefield';
+import { DropdownBlockDef } from './controls/dropdown';
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -97,7 +102,7 @@ const AddWizardPane = (props: {
               type: "labeled", 
               label: column.name,
               child: child
-            }
+            } as LabeledBlockDef
           })
         }
     
@@ -107,7 +112,7 @@ const AddWizardPane = (props: {
             type: "textbox",
             rowContextVarId: contextVar.id,
             column: column.id
-          })
+          } as TextboxBlockDef)
         }
 
         if (column.type == "number") {
@@ -117,7 +122,7 @@ const AddWizardPane = (props: {
             decimal: true,
             rowContextVarId: contextVar.id,
             column: column.id
-          })
+          } as NumberboxBlockDef)
         }
 
         if (column.type == "date" || column.type == "datetime") {
@@ -126,7 +131,7 @@ const AddWizardPane = (props: {
             type: "datefield",
             rowContextVarId: contextVar.id,
             column: column.id
-          })
+          } as DatefieldBlockDef)
         }
 
         if (column.type === "enum" 
@@ -139,7 +144,7 @@ const AddWizardPane = (props: {
             type: "dropdown",
             rowContextVarId: contextVar.id,
             column: column.id
-          })
+          } as DropdownBlockDef)
         }
       }
     }

@@ -77,10 +77,10 @@ export class PanelBlock extends Block<PanelBlockDef> {
   }
 
   renderEditor(props: DesignCtx) {
-    const showHeader = () => { props.store.replaceBlock({ ...this.blockDef, headerContent: null }) }
-    const hideHeader = () => { props.store.replaceBlock({ ...this.blockDef, headerContent: undefined }) }
-    const showFooter = () => { props.store.replaceBlock({ ...this.blockDef, footerContent: null }) }
-    const hideFooter = () => { props.store.replaceBlock({ ...this.blockDef, footerContent: undefined }) }
+    const showHeader = () => { props.store.replaceBlock({ ...this.blockDef, headerContent: null } as PanelBlockDef) }
+    const hideHeader = () => { props.store.replaceBlock({ ...this.blockDef, headerContent: undefined } as PanelBlockDef) }
+    const showFooter = () => { props.store.replaceBlock({ ...this.blockDef, footerContent: null } as PanelBlockDef) }
+    const hideFooter = () => { props.store.replaceBlock({ ...this.blockDef, footerContent: undefined } as PanelBlockDef) }
 
     return (
       <div>

@@ -8,7 +8,7 @@ export interface RowsetBlockDef extends BlockDef {
     /** Table that the rowset if from */
     table?: string;
     /** Name of the rowset context variable */
-    name?: string;
+    name?: string | null;
     /** Filter which applies to rows in the rowset */
     filter: Expr;
     /** Block which is in the rowset */

@@ -12,6 +12,7 @@ import { Expr, DataSource } from 'mwater-expressions';
 import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';
 import { InstanceCtx } from '../../../contexts';
+import { ExpressionBlockDef } from '../expression';
 
 // Outer context vars
 const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -25,7 +26,7 @@ const qrbd: QueryRepeatBlockDef = {
   id: "123",
   type: "queryRepeat",
   separator: "solid_line",
-  content: { type: "expression", id: "re1", contextVarId: "123_row", expr: exprText },
+  content: { type: "expression", id: "re1", contextVarId: "123_row", expr: exprText } as ExpressionBlockDef,
   rowsetContextVarId: "cv1",
   orderBy: null,
   limit: 10,
@@ -95,7 +96,7 @@ test("adds filters, orderBy and where", () => {
     orderBy: [
       { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
     ]
-  }) as QueryRepeatBlock
+  } as QueryRepeatBlockDef) as QueryRepeatBlock
   const inst = mount(<QueryRepeatBlockInstance block={qtb} instanceCtx={rips} />)
 
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions

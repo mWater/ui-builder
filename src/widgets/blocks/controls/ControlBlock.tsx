@@ -22,7 +22,7 @@ export interface ControlBlockDef extends BlockDef {
   required: boolean
 
   /** Message to display if required is true and control is blank */
-  requiredMessage?: LocalizedString
+  requiredMessage?: LocalizedString | null
 }
 
 export interface RenderControlProps {

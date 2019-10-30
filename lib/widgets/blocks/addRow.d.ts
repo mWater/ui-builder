@@ -9,7 +9,7 @@ export interface AddRowBlockDef extends BlockDef {
     /** Table that the row will be added to */
     table?: string;
     /** Name of the row context variable */
-    name?: string;
+    name?: string | null;
     /** Expressions to generate column values */
     columnValues: {
         [columnId: string]: ContextVarExpr;

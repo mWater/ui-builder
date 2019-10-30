@@ -15,7 +15,7 @@ export interface NumberboxBlockDef extends ControlBlockDef {
   decimal: boolean
 
   /** Number of decimal places to always display/restrict to */
-  decimalPlaces?: number
+  decimalPlaces?: number | null
 }
 
 export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
@@ -26,7 +26,7 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
       style={{ width: "12em" }}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       decimal={this.blockDef.decimal}
-      decimalPlaces={this.blockDef.decimalPlaces}
+      decimalPlaces={this.blockDef.decimalPlaces != null ? this.blockDef.decimalPlaces : undefined}
     />
   }
 

@@ -9,7 +9,7 @@ export interface TabbedBlockTab {
     content: BlockDef | null;
 }
 export interface TabbedBlockDef extends BlockDef {
-    type: "tabs";
+    type: "tabbed";
     tabs: TabbedBlockTab[];
 }
 /** Tabbed control */

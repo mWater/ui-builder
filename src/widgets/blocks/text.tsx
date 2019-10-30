@@ -189,7 +189,7 @@ export class TextBlock extends LeafBlock<TextBlockDef> {
 
         <LabeledProperty label="Embedded expressions" help="Reference in text as {0}, {1}, etc.">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="embeddedExprs">
-            {(value: EmbeddedExpr[] | null, onChange) => (
+            {(value: EmbeddedExpr[] | null | undefined, onChange) => (
               <EmbeddedExprsEditor 
                 value={value} 
                 onChange={onChange} 

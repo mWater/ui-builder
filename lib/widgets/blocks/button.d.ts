@@ -8,7 +8,7 @@ export interface ButtonBlockDef extends BlockDef {
     type: "button";
     label: LocalizedString | null;
     /** Action to perform when button is clicked */
-    actionDef: ActionDef | null;
+    actionDef?: ActionDef | null;
     style: "default" | "primary" | "link";
     size: "normal" | "small" | "large" | "extrasmall";
     icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download";

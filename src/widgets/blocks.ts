@@ -3,6 +3,8 @@ import {v4 as uuid} from 'uuid'
 import { Expr, Variable, LiteralType } from 'mwater-expressions'
 import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css"
+import { HorizontalBlockDef } from './blocks/horizontal';
+import { VerticalBlockDef } from './blocks/vertical';
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -35,8 +37,7 @@ export class NullBlockStore implements BlockStore {
 /** Block definition */
 export interface BlockDef {
   id: string     // Unique id (globally)
-  type: string,  // Type of the block
-  [index: string]: any  // Other props
+  type: string  // Type of the block
 }
 
 export type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>
@@ -162,7 +163,7 @@ export function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, d
       items: [droppedBlockDef, targetBlockDef],
       type: "horizontal",
       align: "justify"
-    }
+    } as HorizontalBlockDef
   }
   if (dropSide === DropSide.right) {
     return {
@@ -170,21 +171,21 @@ export function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, d
       items: [targetBlockDef, droppedBlockDef],
       type: "horizontal",
       align: "justify"
-    }
+    } as HorizontalBlockDef
   }
   if (dropSide === DropSide.top) {
     return {
       id: uuid(),
       items: [droppedBlockDef, targetBlockDef],
       type: "vertical"
-    }
+    } as VerticalBlockDef
   }
   if (dropSide === DropSide.bottom) {
     return {
       id: uuid(),
       items: [targetBlockDef, droppedBlockDef],
       type: "vertical"
-    }
+    } as VerticalBlockDef
   }
   throw new Error("Unknown side")
 }

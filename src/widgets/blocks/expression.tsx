@@ -147,10 +147,10 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       const newExprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(expr)
       
       if (newExprType !== exprType) {
-        props.store.replaceBlock({ ...this.blockDef, expr: expr, format: null })
+        props.store.replaceBlock({ ...this.blockDef, expr: expr, format: null } as ExpressionBlockDef)
       }
       else {
-        props.store.replaceBlock({ ...this.blockDef, expr: expr })
+        props.store.replaceBlock({ ...this.blockDef, expr: expr } as ExpressionBlockDef)
       }
     }
   

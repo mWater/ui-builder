@@ -5,7 +5,7 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Header with line underneath */
 export interface HeaderBlockDef extends BlockDef {
-  type: "pageHeader"
+  type: "header"
   child: BlockDef | null
 }
 

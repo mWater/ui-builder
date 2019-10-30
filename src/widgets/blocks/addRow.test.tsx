@@ -10,6 +10,7 @@ import BlockFactory from "../BlockFactory";
 import { ActionLibrary } from "../ActionLibrary";
 import { AddRowBlockDef, AddRowBlock } from "./addRow";
 import { InstanceCtx } from "../../contexts";
+import { TextboxBlockDef } from "./controls/textbox";
 
 // Outer context vars
 const schema = simpleSchema()
@@ -65,7 +66,7 @@ const addRowBlockDef: AddRowBlockDef = {
     rowContextVarId: "ar1",
     column: "text",
     required: false
-  }
+  } as TextboxBlockDef
 }
 
 test("save writes to database", async () => {

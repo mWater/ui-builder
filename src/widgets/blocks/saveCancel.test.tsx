@@ -10,6 +10,7 @@ import { NullDatabase, Database } from "../../database/Database";
 import BlockFactory from "../BlockFactory";
 import { ActionLibrary } from "../ActionLibrary";
 import { InstanceCtx } from "../../contexts";
+import { TextboxBlockDef } from "./controls/textbox";
 
 // Outer context vars
 const rowCV: ContextVar = { id: "cv1", type: "row", name: "", table: "t1" }
@@ -75,7 +76,7 @@ const saveCancelBlockDef: SaveCancelBlockDef = {
     required: true,
     requiredMessage: { _base: "en", en: "text required" },
     placeholder: null
-  }
+  } as TextboxBlockDef
 }
 
 test("save writes to database", async () => {

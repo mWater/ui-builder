@@ -3,7 +3,7 @@ import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Header with line underneath */
 export interface HeaderBlockDef extends BlockDef {
-    type: "pageHeader";
+    type: "header";
     child: BlockDef | null;
 }
 export declare class HeaderBlock extends Block<HeaderBlockDef> {

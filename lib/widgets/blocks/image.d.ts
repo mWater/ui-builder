@@ -7,7 +7,7 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface ImageBlockDef extends BlockDef {
     type: "image";
     /** URL of image */
-    url?: string;
+    url?: string | null;
     /** Localized version of the urls that override above for images that vary with locale */
     localizedUrls?: {
         [locale: string]: string;

@@ -15,7 +15,7 @@ export declare class LabeledProperty extends React.Component<{
 /** Creates a property editor for a property */
 export declare class PropertyEditor<T, K extends keyof T> extends React.Component<{
     obj: T;
-    onChange: (obj: T) => void;
+    onChange: (obj: any) => void;
     property: K;
     children: (value: T[K], onChange: (value: T[K]) => void) => React.ReactElement<any>;
 }> {
@@ -49,7 +49,7 @@ export declare class DropdownPropertyEditor extends React.Component<{
 }
 /** Allows selecting a context variable */
 export declare class ContextVarPropertyEditor extends React.Component<{
-    value: string | null;
+    value?: string | null;
     onChange: (value: string) => void;
     contextVars: ContextVar[];
     types?: string[];
@@ -62,7 +62,7 @@ export declare class ContextVarPropertyEditor extends React.Component<{
 }
 /** Edits an action definition, allowing selection of action */
 export declare class ActionDefEditor extends React.Component<{
-    value: ActionDef | null;
+    value?: ActionDef | null;
     onChange: (actionDef: ActionDef | null) => void;
     designCtx: DesignCtx;
 }> {
@@ -71,7 +71,7 @@ export declare class ActionDefEditor extends React.Component<{
 }
 /** Edits an array of order by expressions */
 export declare class OrderByArrayEditor extends React.Component<{
-    value?: OrderBy[];
+    value?: OrderBy[] | null;
     onChange: (value: OrderBy[]) => void;
     table: string;
     schema: Schema;
@@ -125,7 +125,7 @@ interface TableSelectContext {
 export declare class TableSelect extends React.Component<{
     schema: Schema;
     locale: string;
-    value: string | null;
+    value?: string | null;
     onChange: (tableId: string) => void;
 }> {
     static contextTypes: {
@@ -139,7 +139,7 @@ export declare class TableSelect extends React.Component<{
 }
 /** Edits an array of enum values */
 export declare const EnumArrayEditor: (props: {
-    value?: string[] | undefined;
+    value?: string[] | null | undefined;
     onChange: (value: string[] | null) => void;
     enumValues: EnumValue[];
     locale?: string | undefined;

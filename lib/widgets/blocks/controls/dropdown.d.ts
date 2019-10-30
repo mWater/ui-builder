@@ -11,9 +11,9 @@ export interface DropdownBlockDef extends ControlBlockDef {
     /** Filter expression for entries of type id */
     idFilterExpr?: Expr;
     /** Values to include (if present, only include them) */
-    includeValues?: any[];
+    includeValues?: any[] | null;
     /** Values to exclude (if present, exclude them) */
-    excludeValues?: any[];
+    excludeValues?: any[] | null;
     /** There are two modes: simple (just a label expression) and advanced (custom format for label, separate search and order) */
     idMode?: "simple" | "advanced";
     /** Simple mode: Text expression to display for entries of type id */

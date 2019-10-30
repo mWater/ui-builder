@@ -17,7 +17,7 @@ export interface TabbedBlockTab {
 }
 
 export interface TabbedBlockDef extends BlockDef {
-  type: "tabs"
+  type: "tabbed"
   tabs: TabbedBlockTab[]
 }
 

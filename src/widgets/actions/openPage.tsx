@@ -218,7 +218,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         </LabeledProperty>
 
         <PropertyEditor obj={this.actionDef} onChange={onChange} property="replacePage">
-          {(value, onChange) => <Checkbox value={value || false} onChange={onChange}>Replace current page</Checkbox>}
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Replace current page</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Variables">

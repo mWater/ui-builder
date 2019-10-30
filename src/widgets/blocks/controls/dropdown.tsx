@@ -22,10 +22,10 @@ export interface DropdownBlockDef extends ControlBlockDef {
   idFilterExpr?: Expr
 
   /** Values to include (if present, only include them) */
-  includeValues?: any[]
+  includeValues?: any[] | null
 
   /** Values to exclude (if present, exclude them) */
-  excludeValues?: any[]
+  excludeValues?: any[] | null
 
   /** There are two modes: simple (just a label expression) and advanced (custom format for label, separate search and order) */
   idMode?: "simple" | "advanced"
@@ -68,7 +68,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         }
 
         // Validate expr
-        error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: idTable, types: ["text"] })
+        error = exprValidator.validateExpr(this.blockDef.idFilterExpr || null, { table: idTable, types: ["text"] })
         if (error) {
           return error
         }
@@ -364,7 +364,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
           <LabeledProperty label="Label Expression">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelExpr">
               {(value, onChange) => <ExprComponent 
-                value={value} 
+                value={value || null} 
                 onChange={onChange} 
                 schema={props.schema}
                 dataSource={props.dataSource}
@@ -384,7 +384,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
             </LabeledProperty>
             <LabeledProperty label="Embedded label expressions" help="Reference in text as {0}, {1}, etc.">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelEmbeddedExprs">
-                {(value: EmbeddedExpr[] | null, onChange) => (
+                {(value: EmbeddedExpr[] | null | undefined, onChange) => (
                   <EmbeddedExprsEditor 
                     value={value} 
                     onChange={onChange} 

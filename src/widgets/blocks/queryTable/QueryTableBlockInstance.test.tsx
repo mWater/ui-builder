@@ -12,6 +12,7 @@ import { Expr, DataSource } from 'mwater-expressions';
 import { ActionLibrary } from '../../ActionLibrary';
 import { PageStack } from '../../../PageStack';
 import { InstanceCtx } from '../../../contexts';
+import { ExpressionBlockDef } from '../expression';
 
 // Outer context vars
 const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -26,7 +27,7 @@ const qtbdSingle: QueryTableBlockDef = {
   type: "queryTable",
   mode: "singleRow",
   headers: [],
-  contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: exprText }],
+  contents: [{ type: "expression", id: "re1", contextVarId: "123_row", expr: exprText } as ExpressionBlockDef],
   rowsetContextVarId: "cv1",
   orderBy: null,
   limit: 10,
@@ -98,7 +99,7 @@ test("adds filters, orderBy and where", () => {
     orderBy: [
       { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
     ]
-  }) as QueryTableBlock
+  } as QueryTableBlockDef) as QueryTableBlock
   const inst = mount(<QueryTableBlockInstance block={qtb} instanceCtx={rips} />)
 
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions

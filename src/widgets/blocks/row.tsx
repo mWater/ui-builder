@@ -19,7 +19,7 @@ export interface RowBlockDef extends BlockDef {
   table?: string
   
   /** Name of the row context variable */
-  name?: string
+  name?: string | null
 
   /** Filter which applies to rows in the row */
   filter: Expr
@@ -119,7 +119,7 @@ export class RowBlock extends Block<RowBlockDef> {
         </LabeledProperty>
         <LabeledProperty label="Name">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
-            {(value, onChange) => <TextInput value={value} onChange={onChange} placeholder="Unnamed" />}
+            {(value, onChange) => <TextInput value={value || null} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table ? 

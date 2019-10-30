@@ -48,7 +48,7 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
       const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
       
       // Validate expr
-      error = exprValidator.validateExpr(this.blockDef.expr, { table: contextVar.table, types: ["boolean"] })
+      error = exprValidator.validateExpr(validation.condition, { table: contextVar.table, types: ["boolean"] })
       if (error) {
         return error
       }

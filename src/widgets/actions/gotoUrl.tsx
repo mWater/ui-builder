@@ -73,7 +73,7 @@ export class GotoUrlAction extends Action<GotoUrlActionDef> {
         </LabeledProperty>
 
         <PropertyEditor obj={this.actionDef} onChange={onChange} property="newTab">
-          {(value, onChange) => <Checkbox value={value || false} onChange={onChange}>Open in new tab</Checkbox>}
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Open in new tab</Checkbox>}
         </PropertyEditor>
       </div>
     )

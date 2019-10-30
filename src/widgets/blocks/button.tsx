@@ -13,7 +13,7 @@ export interface ButtonBlockDef extends BlockDef {
   label: LocalizedString | null
 
   /** Action to perform when button is clicked */
-  actionDef: ActionDef | null
+  actionDef?: ActionDef | null
 
   style: "default" | "primary" | "link"
   size: "normal" | "small" | "large" | "extrasmall"

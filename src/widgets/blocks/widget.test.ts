@@ -36,8 +36,7 @@ const blockDef : WidgetBlockDef = {
   widgetId: "w1",
   contextVarMap: {
     b1: "a1"
-  },
-  contextVarPreviewValues: {}
+  }
 }
 
 const widgetLibrary: WidgetLibrary = {
@@ -67,7 +66,7 @@ describe("getContextVarExprs", () => {
   test("gathers from inner widget and maps variables too", () => {
     // Alter widget block to have variable in expression
     const widgetLibrary2 = produce(widgetLibrary, (draft) => {
-      draft.widgets.w1!.blockDef!.expr = { type: "variable", variableId: "b1" }
+      ((draft.widgets.w1!.blockDef!) as any).expr = { type: "variable", variableId: "b1" }
     })
 
     const createBlock = new BlockFactory().createBlock

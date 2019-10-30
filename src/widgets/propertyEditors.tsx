@@ -33,7 +33,7 @@ export class LabeledProperty extends React.Component<{ label: string, help?: str
 /** Creates a property editor for a property */
 export class PropertyEditor<T, K extends keyof T> extends React.Component<{
   obj: T,
-  onChange: (obj: T) => void, 
+  onChange: (obj: any) => void, 
   property: K,
   children: (value: T[K], onChange: (value: T[K]) => void) => React.ReactElement<any>
 }> {
@@ -126,7 +126,7 @@ export class DropdownPropertyEditor extends React.Component<{
 
 /** Allows selecting a context variable */
 export class ContextVarPropertyEditor extends React.Component<{ 
-  value: string | null, 
+  value?: string | null, 
   onChange: (value: string) => void,
   contextVars: ContextVar[],
   types?: string[],
@@ -154,7 +154,7 @@ export class ContextVarPropertyEditor extends React.Component<{
 
 /** Edits an action definition, allowing selection of action */
 export class ActionDefEditor extends React.Component<{
-  value: ActionDef | null
+  value?: ActionDef | null
   onChange: (actionDef: ActionDef | null) => void
   designCtx: DesignCtx
 }> {
@@ -190,7 +190,7 @@ export class ActionDefEditor extends React.Component<{
 
 /** Edits an array of order by expressions */
 export class OrderByArrayEditor extends React.Component<{
-  value?: OrderBy[]
+  value?: OrderBy[] | null
   onChange: (value: OrderBy[]) => void
   table: string
   schema: Schema
@@ -325,7 +325,7 @@ interface TableSelectContext {
 export class TableSelect extends React.Component<{
   schema: Schema
   locale: string
-  value: string | null
+  value?: string | null
   onChange: (tableId: string) => void
 }> {
   static contextTypes = {
@@ -344,7 +344,7 @@ export class TableSelect extends React.Component<{
 
   render() {
     if (this.context.tableSelectElementFactory) {
-      return this.context.tableSelectElementFactory({ schema: this.props.schema, value: this.props.value, onChange: this.props.onChange })
+      return this.context.tableSelectElementFactory({ schema: this.props.schema, value: this.props.value || null, onChange: this.props.onChange })
     }
     
     const tables = _.sortBy(this.props.schema.getTables(), (table) => localize(table.name, this.props.locale))
@@ -361,7 +361,7 @@ export class TableSelect extends React.Component<{
 
 /** Edits an array of enum values */
 export const EnumArrayEditor = (props: {
-  value?: string[]
+  value?: string[] | null
   onChange: (value: string[] | null) => void
   enumValues: EnumValue[]
   locale?: string

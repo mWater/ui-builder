@@ -17,7 +17,7 @@ export interface AddRowBlockDef extends BlockDef {
   table?: string
   
   /** Name of the row context variable */
-  name?: string
+  name?: string | null
 
   /** Expressions to generate column values */
   columnValues: { [columnId: string]: ContextVarExpr }
@@ -160,7 +160,7 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
         </LabeledProperty>
         <LabeledProperty label="Variable Name">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
-            {(value, onChange) => <TextInput value={value} onChange={onChange} placeholder="Unnamed" />}
+            {(value, onChange) => <TextInput value={value || null} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table ? 

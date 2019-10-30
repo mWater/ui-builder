@@ -9,10 +9,10 @@ import { DesignCtx } from '../../../contexts';
 export interface TextboxBlockDef extends ControlBlockDef {
   type: "textbox"
 
-  placeholder: LocalizedString | null
+  placeholder?: LocalizedString | null
 
   /** Number of lines in the text box. Default is 1. */
-  numLines?: number
+  numLines?: number | null
 }
 
 /** Block that is a text input control linked to a specific field */
@@ -23,7 +23,7 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
       onChange={props.onChange}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       disabled={props.disabled}
-      numLines={this.blockDef.numLines}
+      numLines={this.blockDef.numLines || undefined}
       />
   }
 

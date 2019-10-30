@@ -18,7 +18,7 @@ export interface RowsetBlockDef extends BlockDef {
   table?: string
   
   /** Name of the rowset context variable */
-  name?: string
+  name?: string | null
 
   /** Filter which applies to rows in the rowset */
   filter: Expr
@@ -132,7 +132,7 @@ export class RowsetBlock extends Block<RowsetBlockDef> {
         </LabeledProperty>
         <LabeledProperty label="Name">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
-            {(value, onChange) => <TextInput value={value} onChange={onChange} placeholder="Unnamed" />}
+            {(value, onChange) => <TextInput value={value || null} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table ? 

@@ -8,7 +8,7 @@ export interface RowBlockDef extends BlockDef {
     /** Table that the row if from */
     table?: string;
     /** Name of the row context variable */
-    name?: string;
+    name?: string | null;
     /** Filter which applies to rows in the row */
     filter: Expr;
     /** Block which is in the row */

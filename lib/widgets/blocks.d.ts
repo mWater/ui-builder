@@ -26,7 +26,6 @@ export declare class NullBlockStore implements BlockStore {
 export interface BlockDef {
     id: string;
     type: string;
-    [index: string]: any;
 }
 export declare type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>;
 /** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset */

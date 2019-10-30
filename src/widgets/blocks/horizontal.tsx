@@ -34,7 +34,8 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
     }
     // Flatten out nested horizontal blocks
     return produce(this.blockDef, (draft) => {
-      draft.items = draft.items.map(item => item.type === "horizontal" ? item.items : item).reduce((a, b) => a.concat(b), [])
+      const items = draft.items.map(item => item.type === "horizontal" ? (item as HorizontalBlockDef).items : item)
+      draft.items = items.reduce((a: BlockDef[], b) => a.concat(b), []) as BlockDef[]
     })
   }
 

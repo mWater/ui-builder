@@ -4,7 +4,7 @@ import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { TextInput, Select, Toggle } from 'react-library/lib/bootstrap';
 import { ActionDef } from '../actions';
-import { Expr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 import { localize } from '../localization';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -13,7 +13,7 @@ export interface ImageBlockDef extends BlockDef {
   type: "image"
 
   /** URL of image */
-  url?: string
+  url?: string | null
 
   /** Localized version of the urls that override above for images that vary with locale */
   localizedUrls?: { [locale: string]: string }
@@ -106,13 +106,6 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
 
   renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
     const handleClick = () => {
-      // Confirm if confirm message
-      if (this.blockDef.confirmMessage) {
-        if (!confirm(localize(this.blockDef.confirmMessage, instanceCtx.locale))) {
-          return
-        }
-      }
-
       // Run action
       if (this.blockDef.clickActionDef) {
         const action = instanceCtx.actionLibrary.createAction(this.blockDef.clickActionDef)
@@ -145,7 +138,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
       <div>
         <LabeledProperty label="URL">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="url">
-            {(value, onChange) => <TextInput value={value} onChange={onChange} />}
+            {(value, onChange) => <TextInput value={value || null} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
 

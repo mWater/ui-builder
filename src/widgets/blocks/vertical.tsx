@@ -42,7 +42,8 @@ export class VerticalBlock extends Block<VerticalBlockDef> {
 
     // Flatten out nested vertical blocks
     return produce(this.blockDef, (draft) => {
-      draft.items = draft.items.map(item => item.type === "vertical" ? item.items : item).reduce((a, b) => a.concat(b), [])
+      const items = draft.items.map(item => item.type === "vertical" ? (item as VerticalBlockDef).items : item)
+      draft.items = items.reduce((a: BlockDef[], b) => a.concat(b), []) as BlockDef[]
     })
   }
 
