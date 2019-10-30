@@ -31,9 +31,11 @@ import { ValidationBlockDef } from "../widgets/blocks/validation";
 import { PrintBlockDef } from "../widgets/blocks/print";
 import { QueryRepeatBlockDef } from "../widgets/blocks/queryRepeat/queryRepeat";
 import { LabeledBlockDef } from "../widgets/blocks/labeled";
+import { DateInjectBlockDef } from "../widgets/blocks/dateInject";
 
 export interface BlockPaletteEntry {
   title: string
+  subtitle?: string
   blockDef: BlockDef | ((contextVars: ContextVar[]) => BlockDef)
   /** Element to display instead of design view */
   elem?: React.ReactElement<any>
@@ -177,7 +179,8 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       type: "addRow",
       columnValues: {},
       content: null
-    } as AddRowBlockDef
+    } as AddRowBlockDef,
+    subtitle: "Adds a new row to a database table and injects as row variable to inner block"
   },
   {
     title: "Tabbed",
@@ -203,6 +206,12 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Repeating Block",
-    blockDef: { id: "", type: "queryRepeat", content: null, separator: "solid_line", limit: 100 } as QueryRepeatBlockDef
+    blockDef: { id: "", type: "queryRepeat", content: null, separator: "solid_line", limit: 100 } as QueryRepeatBlockDef,
+    subtitle: "Repeats a block once for each result of a query"
+  },
+  {
+    title: "Date Inject",
+    blockDef: { id: "", type: "dateInject", content: null } as DateInjectBlockDef,
+    subtitle: "Allows selecting a date and injects that date as a variable to the inner block"
   }
 ]

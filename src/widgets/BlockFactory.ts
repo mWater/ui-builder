@@ -32,6 +32,7 @@ import { QueryRepeatBlock, QueryRepeatBlockDef } from './blocks/queryRepeat/quer
 import { RowBlockDef, RowBlock } from './blocks/row';
 import { PanelBlock, PanelBlockDef } from './blocks/panel';
 import { AlertBlock, AlertBlockDef } from './blocks/alert';
+import { DateInjectBlock, DateInjectBlockDef } from './blocks/dateInject';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -112,7 +113,9 @@ export default class BlockFactory {
         return new QueryRepeatBlock(blockDef as QueryRepeatBlockDef)
       case "panel":
         return new PanelBlock(blockDef as PanelBlockDef)
-      }
+      case "dateInject":
+        return new DateInjectBlock(blockDef as DateInjectBlockDef)
+    }
 
     // Use custom blocks
     if (this.customBlocks[blockDef.type]) {

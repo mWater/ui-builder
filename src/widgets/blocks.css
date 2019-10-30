@@ -30,6 +30,12 @@
   background-color: #EEE;
 }
 
+.add-wizard-palette-item-subtitle {
+  text-align: center;
+  font-size: 11px;
+  color: #888;
+}
+
 .add-wizard-palette-item-cover {
   position: absolute;
   left: 0;

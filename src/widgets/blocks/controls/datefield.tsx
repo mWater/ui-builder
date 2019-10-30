@@ -107,7 +107,7 @@ interface DatefieldProps {
   format: string
 }
 
-/** Text box that updates only on blur */
+/** Date field */
 class Datefield extends React.Component<DatefieldProps> {
   handleChange = (value: Moment) => {
     if (this.props.datetime) {

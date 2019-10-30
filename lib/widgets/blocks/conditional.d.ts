@@ -7,9 +7,9 @@ export interface ConditionalBlockDef extends BlockDef {
     type: "conditional";
     /** Context variable (row or rowset) to use for expression */
     contextVarId: string | null;
-    /** Expression to be displayed */
+    /** Expression to be evaluated */
     expr: Expr;
-    /** Block which is in the passed the row */
+    /** Content to be displayed */
     content: BlockDef | null;
 }
 export declare class ConditionalBlock extends Block<ConditionalBlockDef> {

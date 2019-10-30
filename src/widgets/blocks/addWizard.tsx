@@ -254,6 +254,7 @@ class PaletteItem extends React.Component<{
       <div className="add-wizard-palette-item">
         <div className="add-wizard-palette-item-title">{this.props.entry.title}</div>
         {this.renderContents()}
+        <div className="add-wizard-palette-item-subtitle">{this.props.entry.subtitle}</div>
         <div onClick={this.props.onSelect} className="add-wizard-palette-item-cover"/>
       </div>
     )
