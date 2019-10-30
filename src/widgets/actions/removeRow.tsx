@@ -41,10 +41,12 @@ export class RemoveRowAction extends Action<RemoveRowActionDef> {
   }
 
   renderEditor(props: RenderActionEditorProps) {
+    const onChange = props.onChange as (actionDef: RemoveRowActionDef) => void
+
     return (
       <div>
         <LabeledProperty label="Row Variable to delete">
-          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="contextVarId">
+          <PropertyEditor obj={this.actionDef} onChange={onChange} property="contextVarId">
             {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row"]} />}
           </PropertyEditor>
         </LabeledProperty>

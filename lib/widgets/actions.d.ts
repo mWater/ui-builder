@@ -5,7 +5,6 @@ import { DesignCtx, InstanceCtx } from '../contexts';
 /** Action definition. Something that can be performed */
 export interface ActionDef {
     type: string;
-    [index: string]: any;
 }
 export interface RenderActionEditorProps extends DesignCtx {
     onChange(actionDef: ActionDef): void;

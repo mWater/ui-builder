@@ -36,17 +36,17 @@ export class ActionLibrary {
           type: "addRow",
           table: null,
           columnValues: {}
-        }
+        } as AddRowActionDef
       case "removeRow": 
         return {
           type: "removeRow",
           contextVarId: null,
           idExpr: null
-        }
+        } as RemoveRowActionDef
       case "gotoUrl": 
         return {
           type: "gotoUrl"
-        }
+        } as GotoUrlActionDef
     }
     throw new Error("Unknown action type")
   }

@@ -50,7 +50,7 @@ export class PropertyEditor<T, K extends keyof T> extends React.Component<{
 }
 
 export class LocalizedTextPropertyEditor extends React.Component<{ 
-    value: LocalizedString | null, 
+    value?: LocalizedString | null, 
     onChange: (value: LocalizedString | null) => void, 
     locale: string, 
     placeholder?: string,
@@ -397,7 +397,7 @@ export const EnumArrayEditor = (props: {
 
 /** Edits embedded expressions. */
 export const EmbeddedExprsEditor = (props: { 
-  value: EmbeddedExpr[] | null
+  value?: EmbeddedExpr[] | null
   onChange: (value: EmbeddedExpr[]) => void
   schema: Schema
   dataSource: DataSource

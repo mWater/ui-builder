@@ -9,12 +9,10 @@ import { DesignCtx, InstanceCtx } from '../contexts';
 /** Action definition. Something that can be performed */
 export interface ActionDef {
   type: string,  // Type of the action
-  [index: string]: any  // Other props
 }
 
 export interface RenderActionEditorProps extends DesignCtx {
   onChange(actionDef: ActionDef): void
-
 }
 
 /** Actions are how blocks interact with things outside of themselves */

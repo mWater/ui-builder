@@ -99,10 +99,12 @@ export class AddRowAction extends Action<AddRowActionDef> {
   }
   
   renderEditor(props: RenderActionEditorProps) {
+    const onChange = props.onChange as (actionDef: AddRowActionDef) => void
+
     return (
       <div>
         <LabeledProperty label="Table">
-          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="table">
+          <PropertyEditor obj={this.actionDef} onChange={onChange} property="table">
             {(value, onChange) => 
               <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange}/>
             }
@@ -110,7 +112,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
         </LabeledProperty>
         { this.actionDef.table ? 
         <LabeledProperty label="Column Values">
-          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="columnValues">
+          <PropertyEditor obj={this.actionDef} onChange={onChange} property="columnValues">
             {(value, onChange) => 
               <ColumnValuesEditor 
                 value={value} 

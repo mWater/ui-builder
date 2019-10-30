@@ -160,8 +160,10 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     const actionDef = this.actionDef as OpenPageActionDef
 
+    const onChange = props.onChange as (actionDef: OpenPageActionDef) => void
+
     const handleWidgetIdChange = (widgetId: string | null) => {
-      props.onChange({ ...actionDef, widgetId: widgetId, contextVarValues: {} })
+      onChange({ ...actionDef, widgetId: widgetId, contextVarValues: {} })
     }
     
     const widgetDef: WidgetDef | null = actionDef.widgetId ? props.widgetLibrary.widgets[actionDef.widgetId] : null
@@ -206,7 +208,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     return (
       <div>
         <LabeledProperty label="Page Type">
-          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="pageType">
+          <PropertyEditor obj={this.actionDef} onChange={onChange} property="pageType">
             {(value, onChange) => <Select value={value} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "modal", label: "Modal" }]} />}
           </PropertyEditor>
         </LabeledProperty>
@@ -215,8 +217,8 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           <Select value={actionDef.widgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
         </LabeledProperty>
 
-        <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="replacePage">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Replace current page</Checkbox>}
+        <PropertyEditor obj={this.actionDef} onChange={onChange} property="replacePage">
+          {(value, onChange) => <Checkbox value={value || false} onChange={onChange}>Replace current page</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Variables">
@@ -224,7 +226,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Page Title">
-          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="title">
+          <PropertyEditor obj={this.actionDef} onChange={onChange} property="title">
             {(value, onChange) => 
               <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
             }
@@ -232,8 +234,8 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         </LabeledProperty>
 
         <LabeledProperty label="Page Title embedded expressions" help="Reference in text as {0}, {1}, etc.">
-          <PropertyEditor obj={this.actionDef} onChange={props.onChange} property="titleEmbeddedExprs">
-            {(value: EmbeddedExpr[] | null, onChange) => (
+          <PropertyEditor obj={this.actionDef} onChange={onChange} property="titleEmbeddedExprs">
+            {(value: EmbeddedExpr[] | null | undefined, onChange) => (
               <EmbeddedExprsEditor 
                 value={value} 
                 onChange={onChange} 

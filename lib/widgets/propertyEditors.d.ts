@@ -23,7 +23,7 @@ export declare class PropertyEditor<T, K extends keyof T> extends React.Componen
     render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
 }
 export declare class LocalizedTextPropertyEditor extends React.Component<{
-    value: LocalizedString | null;
+    value?: LocalizedString | null;
     onChange: (value: LocalizedString | null) => void;
     locale: string;
     placeholder?: string;
@@ -147,7 +147,7 @@ export declare const EnumArrayEditor: (props: {
 }) => JSX.Element;
 /** Edits embedded expressions. */
 export declare const EmbeddedExprsEditor: (props: {
-    value: EmbeddedExpr[] | null;
+    value?: EmbeddedExpr[] | null | undefined;
     onChange: (value: EmbeddedExpr[]) => void;
     schema: Schema;
     dataSource: DataSource;
