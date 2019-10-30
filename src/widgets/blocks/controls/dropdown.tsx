@@ -68,7 +68,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         }
 
         // Validate expr
-        error = exprValidator.validateExpr(this.blockDef.idFilterExpr || null, { table: idTable, types: ["text"] })
+        error = exprValidator.validateExpr(this.blockDef.idLabelExpr || null, { table: idTable, types: ["text"] })
         if (error) {
           return error
         }
