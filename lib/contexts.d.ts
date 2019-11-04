@@ -19,6 +19,8 @@ export interface BaseCtx {
     database: Database;
     /** Locale object to use for formatting */
     formatLocale?: FormatLocaleObject;
+    /** Global context variables that are passed to all blocks */
+    globalContextVars?: ContextVar[];
 }
 /** Context that all design-mode operations need */
 export interface DesignCtx extends BaseCtx {

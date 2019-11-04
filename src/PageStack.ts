@@ -12,7 +12,7 @@ export interface Page {
   /** Optional title of the page */
   title?: string
 
-  /** Values of context variables that widget needs */
+  /** Values of context variables that widget needs. Includes values of global context variables */
   contextVarValues: { [contextVarId: string]: any };  
 }
 

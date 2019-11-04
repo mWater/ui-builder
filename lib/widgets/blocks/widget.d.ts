@@ -17,7 +17,7 @@ export declare class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     /** Maps variables in an expression from inner variable names to outer ones */
     mapInnerToOuterVariables(expr: Expr): Expr;
     renderDesign(props: DesignCtx): JSX.Element;
-    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
 }
 export declare const mapObjectTree: (obj: any, mapping: (input: any) => any) => any;

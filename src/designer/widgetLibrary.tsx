@@ -99,7 +99,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       return null
     }
 
-    for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.baseCtx.createBlock, widgetDef.contextVars)) {
+    for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.baseCtx.createBlock, widgetDef.contextVars.concat(this.props.baseCtx.globalContextVars || []))) {
       const block = this.props.baseCtx.createBlock(childBlock.blockDef)
 
       // Create design context for validating

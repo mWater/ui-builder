@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Page, PageStack } from "./PageStack";
-import { Filter, BlockDef } from "./widgets/blocks";
-import { Expr } from "mwater-expressions";
+import { BlockDef } from "./widgets/blocks";
 import ContextVarsInjector from "./widgets/ContextVarsInjector";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { BaseCtx, InstanceCtx } from "./contexts";
@@ -175,7 +174,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
     // Wrap in context var injector
     return <ContextVarsInjector 
-      injectedContextVars={widgetDef.contextVars}
+      injectedContextVars={widgetDef.contextVars.concat(this.props.baseCtx.globalContextVars || [])}
       innerBlock={widgetDef.blockDef}
       injectedContextVarValues={page.contextVarValues}
       instanceCtx={{ ...outerInstanceCtx, database: page.database }}>

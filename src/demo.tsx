@@ -70,7 +70,10 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
       database: this.state.database,
       schema: this.state.schema,
       dataSource: dataSource,
-      locale: "en"
+      locale: "en",
+      globalContextVars: [
+        { type: "row", table: "users", id: "user", name: "User" }
+      ]
     }
 
     return (

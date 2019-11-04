@@ -11,10 +11,10 @@ import { InstanceCtx } from "../../../contexts"
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: { 
   blockDef: TOCBlockDef
-  renderProps: InstanceCtx 
+  instanceCtx: InstanceCtx 
   createBlock: CreateBlock
 }) {
-  const { blockDef, renderProps } = props
+  const { blockDef, instanceCtx: instanceCtx } = props
 
   // Ref to page stack to ensure closed properly
   const pageStackRef = useRef<PageStackDisplay>(null)
@@ -64,7 +64,7 @@ export default function TOCInstanceComp(props: {
 
     return <div>
       <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
-        {localize(item.label, renderProps.locale)}
+        {localize(item.label, instanceCtx.locale)}
       </div>
       { item.children.length > 0 ? 
         <div style={{ marginLeft: 10 }}>
@@ -76,9 +76,9 @@ export default function TOCInstanceComp(props: {
 
   const renderLeft = () => {
     return <div style={{ padding: 10 }}>
-      <div key="header">{ renderProps.renderChildBlock(renderProps, blockDef.header) }</div>
+      <div key="header">{ instanceCtx.renderChildBlock(instanceCtx, blockDef.header) }</div>
       { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
-      <div key="footer">{ renderProps.renderChildBlock(renderProps, blockDef.footer) }</div>
+      <div key="footer">{ instanceCtx.renderChildBlock(instanceCtx, blockDef.footer) }</div>
     </div>
   }
 
@@ -97,25 +97,30 @@ export default function TOCInstanceComp(props: {
     for (const innerContextVarId of Object.keys(selectedItem.contextVarMap || {})) {
       const outerContextVarId = (selectedItem.contextVarMap || {})[innerContextVarId]
       if (outerContextVarId) {
-        mappedContextVarValues[innerContextVarId] = renderProps.contextVarValues[outerContextVarId]
+        mappedContextVarValues[innerContextVarId] = instanceCtx.contextVarValues[outerContextVarId]
       }
       else {
         mappedContextVarValues[innerContextVarId] = null
       }
     }
 
+    // Include global context variables
+    for (const globalContextVar of props.instanceCtx.globalContextVars || []) {
+      mappedContextVarValues[globalContextVar.id] = props.instanceCtx.contextVarValues[globalContextVar.id]
+    }
+    
     const page: Page = {
       contextVarValues: mappedContextVarValues,
-      database: renderProps.database,
+      database: instanceCtx.database,
       type: "normal",
-      title: selectedItem.title ? localize(selectedItem.title, renderProps.locale) : undefined,
+      title: selectedItem.title ? localize(selectedItem.title, instanceCtx.locale) : undefined,
       widgetId: selectedWidgetId
     }
 
     // Create page stack
     return <PageStackDisplay
       key={selectedId}
-      baseCtx={props.renderProps}
+      baseCtx={props.instanceCtx}
       initialPage={page}
       ref={pageStackRef}
       />

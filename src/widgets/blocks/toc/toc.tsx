@@ -91,7 +91,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
-    return <TOCInstanceComp renderProps={props} blockDef={this.blockDef} createBlock={props.createBlock} />
+    return <TOCInstanceComp instanceCtx={props} blockDef={this.blockDef} createBlock={props.createBlock} />
   }
   
   renderEditor(props: DesignCtx) {

@@ -137,7 +137,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       ...this.props.baseCtx,
       dataSource: this.props.dataSource,
       selectedId: this.state.selectedBlockId,
-      contextVars: this.props.widgetDef.contextVars,
+      contextVars: this.props.widgetDef.contextVars.concat(this.props.baseCtx.globalContextVars || []),
       store,
       blockPaletteEntries: this.props.blockPaletteEntries,
       // Will be set below
@@ -191,10 +191,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
   renderEditor() {
     if (this.props.widgetDef.blockDef && this.state.selectedBlockId) {
-      const store = this.createBlockStore()
-
       // Find selected block ancestry
-      const contextVars = this.props.widgetDef.contextVars
+      const contextVars = this.props.widgetDef.contextVars.concat(this.props.baseCtx.globalContextVars || [])
       const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars, this.state.selectedBlockId)
 
       // Create props
@@ -235,7 +233,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     // Verify before allowing preview
     if (mode === Mode.Preview) {
-      for (const childBlock of getBlockTree(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, this.props.widgetDef.contextVars)) {
+      for (const childBlock of getBlockTree(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, this.props.widgetDef.contextVars.concat(this.props.baseCtx.globalContextVars || []))) {
         const block = this.props.baseCtx.createBlock(childBlock.blockDef)
         
         // Use context vars for the block

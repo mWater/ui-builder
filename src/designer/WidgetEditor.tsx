@@ -26,6 +26,9 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
   }
 
   render() {
+    // Get list of all context variables, including global
+    const allContextVars = this.props.widgetDef.contextVars.concat(this.props.designCtx.globalContextVars || [])
+
     return (<div>
       <LabeledProperty label="Name">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="name"> 
@@ -43,7 +46,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
         </PropertyEditor>
       </LabeledProperty>
       <LabeledProperty label="Preview Variable Values">
-        {this.props.widgetDef.contextVars.map((contextVar) => {
+        {allContextVars.map((contextVar) => {
           return <ContextVarPreviewValue 
             key={contextVar.id}
             contextVar={contextVar} 

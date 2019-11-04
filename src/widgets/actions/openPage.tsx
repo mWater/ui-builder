@@ -116,6 +116,11 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       contextVarValues[cvid] = outerCVValue
     }
 
+    // Include global context variables
+    for (const globalContextVar of instanceCtx.globalContextVars || []) {
+      contextVarValues[globalContextVar.id] = instanceCtx.contextVarValues[globalContextVar.id]
+    }
+
     // Get title
     let title = localize(this.actionDef.title, instanceCtx.locale)
 

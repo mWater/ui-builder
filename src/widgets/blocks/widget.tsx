@@ -67,9 +67,16 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
 
     // Map context variable
-    const innerContextVar = widgetDef.contextVars.find(cv => contextVar.id === this.blockDef.contextVarMap[cv.id])
+    let innerContextVar = widgetDef.contextVars.find(cv => contextVar.id === this.blockDef.contextVarMap[cv.id])
     if (!innerContextVar) {
-      return []
+      // Check if global variable
+      if ((ctx.globalContextVars || []).find(cv => cv.id == contextVar.id)) {
+        // Pass it straight through
+        innerContextVar = contextVar
+      }
+      else {
+        return []
+      }
     }
 
     // Get complete context variables exprs of inner widget blocks
@@ -140,37 +147,46 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     }
   }
 
-  renderInstance(props: InstanceCtx): React.ReactElement<any> {
+  renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
     // Map context var values
     const mappedContextVarValues = {} as object
 
     for (const innerContextVarId of Object.keys(this.blockDef.contextVarMap)) {
       const outerContextVarId = this.blockDef.contextVarMap[innerContextVarId]
       if (outerContextVarId) {
-        mappedContextVarValues[innerContextVarId] = props.contextVarValues[outerContextVarId]
+        mappedContextVarValues[innerContextVarId] = instanceCtx.contextVarValues[outerContextVarId]
       }
       else {
         mappedContextVarValues[innerContextVarId] = null
       }
     }
 
-    // Find the widget
-    const widgetDef = props.widgetLibrary.widgets[this.blockDef.widgetId!]
-    if (widgetDef && widgetDef.blockDef) {
-      const innerBlock = props.createBlock(widgetDef.blockDef)
+    // Include global context variables
+    for (const globalContextVar of instanceCtx.globalContextVars || []) {
+      mappedContextVarValues[globalContextVar.id] = instanceCtx.contextVarValues[globalContextVar.id]
+    }
 
-      const innerProps : InstanceCtx = {
-        ...props,
-        contextVars: props.contextVars.concat(widgetDef.contextVars),
-        contextVarValues: { ...props.contextVarValues, ...mappedContextVarValues }, 
+    // Find the widget
+    const widgetDef = instanceCtx.widgetLibrary.widgets[this.blockDef.widgetId!]
+    if (widgetDef && widgetDef.blockDef) {
+      const innerBlock = instanceCtx.createBlock(widgetDef.blockDef)
+
+      const innerInstanceCtx : InstanceCtx = {
+        ...instanceCtx,
+        contextVars: widgetDef.contextVars.concat(instanceCtx.globalContextVars || []),
+        contextVarValues: mappedContextVarValues,
         getContextVarExprValue: (contextVarId: string, expr: Expr) => {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
             // Map variable from inner to outer
-            return props.getContextVarExprValue(outerContextVarId, this.mapInnerToOuterVariables(expr))
+            return instanceCtx.getContextVarExprValue(outerContextVarId, this.mapInnerToOuterVariables(expr))
           }
           else {
+            // If global variable, pass through
+            if ((instanceCtx.globalContextVars || []).find(cv => cv.id == contextVarId)) {
+              return instanceCtx.getContextVarExprValue(contextVarId, expr)
+            }
             return
           }
         }, 
@@ -178,27 +194,27 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
-            props.onSelectContextVar(outerContextVarId, primaryKey)
+            instanceCtx.onSelectContextVar(outerContextVarId, primaryKey)
           }
         },
         setFilter: (contextVarId: string, filter: Filter) => {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
-            props.setFilter(outerContextVarId, filter)
+            instanceCtx.setFilter(outerContextVarId, filter)
           }
         },
         getFilters: (contextVarId: string) => {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
-            return props.getFilters(outerContextVarId)
+            return instanceCtx.getFilters(outerContextVarId)
           }
           return []
         }
       }
   
-      return innerBlock.renderInstance(innerProps)
+      return innerBlock.renderInstance(innerInstanceCtx)
     } 
     else { // Handle case of widget with null block
       return <div/>

@@ -5,6 +5,6 @@ import { InstanceCtx } from "../../../contexts";
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: {
     blockDef: TOCBlockDef;
-    renderProps: InstanceCtx;
+    instanceCtx: InstanceCtx;
     createBlock: CreateBlock;
 }): JSX.Element;
