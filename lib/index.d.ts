@@ -6,6 +6,7 @@ export { QueryCompiler } from './database/QueryCompiler';
 export { DataSourceDatabase } from './database/DataSourceDatabase';
 export { defaultBlockPaletteEntries, BlockPaletteEntry } from './designer/blockPaletteEntries';
 export * from './widgets/blocks';
+export * from './widgets/actions';
 export { default as LeafBlock } from './widgets/LeafBlock';
 export * from './widgets/propertyEditors';
 export * from './contexts';
