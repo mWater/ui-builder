@@ -6,6 +6,25 @@ import { RemoveRowAction, RemoveRowActionDef } from "./actions/removeRow";
 
 /** Library of actions */
 export class ActionLibrary {
+  customActions: { 
+    type: string, 
+    name: string, 
+    
+    /** Creates a default action definition */
+    actionDefFactory: (type: string) => ActionDef,
+
+    /** Creates an action */
+    actionFactory: (actionDef: ActionDef) => Action<ActionDef> 
+  }[]
+
+  constructor() {
+    this.customActions = []
+  }
+
+  registerCustomAction(type: string, name: string, actionDefFactory: (type: string) => ActionDef, actionFactory: (actionDef: ActionDef) => Action<ActionDef>) {
+    this.customActions.push({ type, name, actionDefFactory, actionFactory })
+  }
+
   /** Creates an action from an action def */
   createAction(actionDef: ActionDef): Action<ActionDef>  {
     switch(actionDef.type) {
@@ -17,6 +36,12 @@ export class ActionLibrary {
         return new RemoveRowAction(actionDef as RemoveRowActionDef)
       case "gotoUrl":
         return new GotoUrlAction(actionDef as GotoUrlActionDef)
+    }
+
+    for (const customAction of this.customActions) {
+      if (customAction.type == actionDef.type) {
+        return customAction.actionFactory(actionDef)
+      }
     }
     throw new Error("Unknown action type")
   }
@@ -48,16 +73,29 @@ export class ActionLibrary {
           type: "gotoUrl"
         } as GotoUrlActionDef
     }
+
+    for (const customAction of this.customActions) {
+      if (customAction.type == type) {
+        return customAction.actionDefFactory(type)
+      }
+    }
+
     throw new Error("Unknown action type")
   }
 
   /** Get a list of all known action types */
   getActionTypes(): Array<{ type: string, name: string }> {
-    return [
+    const list = [
       { type: "openPage", name: "Open Page" },
       { type: "addRow", name: "Add Row" },
       { type: "removeRow", name: "Remove Row" },
       { type: "gotoUrl", name: "Goto URL" }
     ]
+
+    for (const customAction of this.customActions) {
+      list.push({ type: customAction.type, name: customAction.name })
+    }
+
+    return list
   }
 }
