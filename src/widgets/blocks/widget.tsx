@@ -191,8 +191,11 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
       const innerInstanceCtx : InstanceCtx = {
         ...instanceCtx,
-        contextVars: widgetDef.contextVars.concat(instanceCtx.globalContextVars || []),
-        contextVarValues: mappedContextVarValues,
+        // Include outer context variables, even though widget does not technically need them
+        // They are included as the widget might receive expressions such as rowsets that reference
+        // variables that are only present in the outer scope.
+        contextVars: widgetDef.contextVars.concat(instanceCtx.globalContextVars || []).concat(instanceCtx.contextVars),
+        contextVarValues: { ...instanceCtx.contextVarValues, ...mappedContextVarValues },
         getContextVarExprValue: (contextVarId: string, expr: Expr) => {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
@@ -219,7 +222,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
-            instanceCtx.setFilter(outerContextVarId, filter)
+            instanceCtx.setFilter(outerContextVarId, { ...filter, expr: this.mapInnerToOuterVariables(filter.expr) })
           }
         },
         getFilters: (contextVarId: string) => {
