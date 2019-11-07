@@ -107,6 +107,24 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     })    
   }
 
+  /** Maps variables in an expression from outer variable names to inner ones */
+  mapOuterToInnerVariables(expr: Expr): Expr {
+    return mapObjectTree(expr, (e: any) => {
+      if (e.type === "variable") {
+        // Change outer id to inner id
+        for (const key in this.blockDef.contextVarMap) {
+          if (this.blockDef.contextVarMap[key] == e.variableId) {
+            return { ...e, variableId: key }
+          }
+        }
+        return e
+      }
+      else {
+        return e
+      }
+    })    
+  }
+  
   renderDesign(props: DesignCtx) {
     if (!this.blockDef.widgetId) {
       return <div style={{ fontStyle: "italic" }}>Select widget...</div>
@@ -205,10 +223,10 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           }
         },
         getFilters: (contextVarId: string) => {
-          // Lookup outer id
+          // Lookup outer id, mapping any variables
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
-            return instanceCtx.getFilters(outerContextVarId)
+            return instanceCtx.getFilters(outerContextVarId).map(f => ({ ...f, expr: this.mapOuterToInnerVariables(f.expr) }))
           }
           return []
         }

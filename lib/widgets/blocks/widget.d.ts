@@ -16,6 +16,8 @@ export declare class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /** Maps variables in an expression from inner variable names to outer ones */
     mapInnerToOuterVariables(expr: Expr): Expr;
+    /** Maps variables in an expression from outer variable names to inner ones */
+    mapOuterToInnerVariables(expr: Expr): Expr;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
