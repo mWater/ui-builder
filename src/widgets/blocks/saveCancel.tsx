@@ -234,7 +234,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     }
     catch (err) {
       // TODO localize
-      alert("Unable to save changes")
+      alert("Unable to save changes: " + err.message)
       this.setState({ saving: false })
       return
     }
@@ -270,7 +270,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       await tx.commit()
     } catch (err) {
       // TODO localize
-      alert("Unable to delete row")
+      alert("Unable to delete row: " + err.message)
       return
     }
 

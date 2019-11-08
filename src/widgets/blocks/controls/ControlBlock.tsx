@@ -232,7 +232,7 @@ class ControlInstance extends React.Component<Props, State> {
       await txn.commit()
     } catch (err) {
       // TODO localize
-      alert("Unable to save changes")
+      alert("Unable to save changes: " + err.message)
       console.error(err.message)
     } finally {
       this.setState({ updating: false })

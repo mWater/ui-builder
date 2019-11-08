@@ -230,7 +230,7 @@ class AddRowInstance extends React.Component<Props, State> {
       this.setState({ addedRowId })
     } catch (err) {
       // TODO localize
-      alert("Unable to add row")
+      alert("Unable to add row: " + err.message)
       return
     }
   }
