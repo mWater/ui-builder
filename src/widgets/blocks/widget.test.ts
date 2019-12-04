@@ -142,7 +142,7 @@ describe("renderInstance", () => {
   })
 
   test("contextVars", () => {
-    expect(innerInstanceCtx.contextVars).toEqual(widgetDef.contextVars)
+    expect(innerInstanceCtx.contextVars).toEqual(widgetDef.contextVars.concat(contextVars))
   })
 
   test("contextVarValues maps", () => {
