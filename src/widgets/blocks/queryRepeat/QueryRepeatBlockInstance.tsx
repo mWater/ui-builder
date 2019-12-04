@@ -97,7 +97,6 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     // The context variable that represents the row has a value which changes with each row
     // so replace it with { type: "id" ...} expression so that it evaluates as the row id
     queryOptions = mapObject(queryOptions, (input) => {
-      console.log(input)
       if (input && input.type == "variable" && input.variableId == this.props.block.getRowContextVarId()) {
         return { type: "id", table: queryOptions.from } as IdExpr
       }
