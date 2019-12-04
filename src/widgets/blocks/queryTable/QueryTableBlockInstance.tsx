@@ -1,6 +1,6 @@
 import * as React from "react";
 import { QueryTableBlock } from "./queryTable";
-import { Row, Expr } from "mwater-expressions";
+import { Row, Expr, IdExpr } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
 import { localize } from "../../localization";
@@ -72,7 +72,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       where.exprs.push(block.blockDef.where)
     }
 
-    const queryOptions: QueryOptions = {
+    let queryOptions: QueryOptions = {
       select: {},
       from: rowsetCV.table!,
       where: where.exprs.length > 0 ? where : null,
@@ -96,6 +96,16 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     }
     rowExprs.forEach((expr, index) => {
       queryOptions.select["e" + index] = expr
+    })
+
+    // The context variable that represents the row has a value which changes with each row
+    // so replace it with { type: "id" ...} expression so that it evaluates as the row id
+    queryOptions = mapObject(queryOptions, (input) => {
+      console.log(input)
+      if (input && input.type == "variable" && input.variableId == this.props.block.getRowContextVarId()) {
+        return { type: "id", table: queryOptions.from } as IdExpr
+      }
+      return input
     })
 
     return queryOptions
@@ -264,4 +274,21 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       </table>
     )  
   }
+}
+
+/** Replace every part of an object, including array members
+ * replacer should return input to leave unchanged
+ */
+const mapObject = (obj: any, replacer: (input: any) => any): any => {
+  obj = replacer(obj)
+  if (!obj) {
+    return obj
+  }
+  if (_.isArray(obj)) {
+    return _.map(obj, (item) => mapObject(item, replacer))
+  }
+  if (_.isObject(obj)) {
+    return _.mapValues(obj, (item) => mapObject(item, replacer))
+  }
+  return obj
 }
