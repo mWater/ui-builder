@@ -24,7 +24,9 @@ const defaultWidgetLibrary : WidgetLibrary = {
 
 const initialWidgetLibrary: WidgetLibrary = JSON.parse(window.localStorage.getItem("widgetLibrary") || "null") || defaultWidgetLibrary
 
-const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", null, { localCaching: false, serverCaching: false })
+const client = window.location.search ? window.location.search.substr(1) : null
+
+const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", client, { localCaching: false, serverCaching: false })
 
 const actionLibrary = new ActionLibrary()
 
@@ -40,7 +42,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
   }
 
   componentDidMount() {
-    fetch("https://api.mwater.co/v3/schema").then(req => req.json()).then(json => {
+    fetch("https://api.mwater.co/v3/schema?client=" + (client || "")).then(req => req.json()).then(json => {
       const schema = new Schema(json)
       const database = new DataSourceDatabase(schema, dataSource)
       this.setState({ schema, database })
