@@ -58,7 +58,7 @@ export default class VirtualDatabase implements Database {
       return this.database.query(query, contextVars, contextVarValues)
     }
     
-    const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
+    const exprEval = new PromiseExprEvaluator({ schema: this.schema, locale: this.locale, variables, variableValues })
 
     // Create rows to evaluate (just use where clause to filter)
     const evalRows = (await this.queryEvalRows(query.from, query.where || null, contextVars, contextVarValues))
@@ -256,10 +256,16 @@ export default class VirtualDatabase implements Database {
       getField: async (columnId: string) => {
         const column = this.schema.getColumn(from, columnId)!
 
-        // For non-joins, return simple value
-        if (column.type !== "join") {
+        // For included columns, return simple value
+        if (this.shouldIncludeColumn(column)) {
           return row["c_" + columnId]
         }
+
+        // Do not support reversable join field getting
+        throw new Error("getField not supported in non-included columns")
+      },
+      followJoin: async (columnId: string) => {
+        const column = this.schema.getColumn(from, columnId)!
 
         // For n-1 and 1-1 joins, create row
         if (column.join!.type === "n-1" || column.join!.type === "1-1") {
@@ -347,7 +353,7 @@ export default class VirtualDatabase implements Database {
     if (where) {
       const filteredRows: Row[] = []
 
-      const exprEval = new PromiseExprEvaluator(new ExprEvaluator(this.schema, this.locale, variables, variableValues))
+      const exprEval = new PromiseExprEvaluator({ schema: this.schema, locale: this.locale, variables, variableValues })
       for (const row of rows) {
         const evalRow = this.createEvalRow(row, from, contextVars, contextVarValues)
         if (await exprEval.evaluate(where, { row: evalRow })) {

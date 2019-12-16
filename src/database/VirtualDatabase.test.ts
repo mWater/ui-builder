@@ -86,12 +86,13 @@ describe("select, order, limit", () => {
       
       // Filter rows by where
       if (qo.where) {
-        const exprEval = new PromiseExprEvaluator(new ExprEvaluator(schema))
+        const exprEval = new PromiseExprEvaluator({ schema })
         const filteredRows: any[] = []
         for (const row of rows) {
           const evalRow: PromiseExprEvaluatorRow = {
             getPrimaryKey: () => Promise.resolve(row.id),
-            getField: (columnId) => Promise.resolve(row[columnId])
+            getField: (columnId) => Promise.resolve(row[columnId]),
+            followJoin: (columnId) => { throw new Error("Not implemented")}
           }
           if (await exprEval.evaluate(qo.where, { row: evalRow })) {
             filteredRows.push(row)
