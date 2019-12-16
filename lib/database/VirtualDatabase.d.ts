@@ -1,6 +1,5 @@
 import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
-import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
-import { Cache } from 'lru-cache';
+import { Schema, Column, ExprUtils, Row } from "mwater-expressions";
 import { ContextVar } from "../widgets/blocks";
 import { BatchingCache } from "./BatchingCache";
 /**
@@ -15,21 +14,18 @@ export default class VirtualDatabase implements Database {
     locale: string;
     mutations: Mutation[];
     changeListeners: DatabaseChangeListener[];
-    /** Cache of results of queryEvalRows. Must be reset at each mutation */
-    queryEvalRowsCache: BatchingCache<{
-        from: string;
-        where: Expr;
+    /** Cache of query results (of underlying database) to increase performance */
+    queryCache: BatchingCache<{
+        queryOptions: QueryOptions;
         contextVars: ContextVar[];
         contextVarValues: {
             [contextVarId: string]: any;
         };
-    }, PromiseExprEvaluatorRow[]>;
+    }, Row[]>;
     /** Array of temporary primary keys that will be replaced by real ones when the insertions are committed */
     tempPrimaryKeys: string[];
     /** True when database is destroyed by commit or rollback */
     destroyed: boolean;
-    /** Cache of query results to increase performance. Cached by canonical json key based on query options */
-    cache: Cache<string, Row[]>;
     constructor(database: Database, schema: Schema, locale: string);
     query(query: QueryOptions, contextVars: ContextVar[], contextVarValues: {
         [contextVarId: string]: any;
@@ -49,10 +45,8 @@ export default class VirtualDatabase implements Database {
     rollback(): void;
     /** Determine if a column should be included in the underlying query */
     shouldIncludeColumn(column: Column): boolean;
-    /** Create the rows as needed by ExprEvaluator for a query (checking cache first) */
-    private queryEvalRows;
     /** Create the rows as needed by ExprEvaluator for a query */
-    private internalQueryEvalRows;
+    private queryEvalRows;
     /** Replace temporary primary keys with different value */
     private replaceTempPrimaryKeys;
     /** Create a single row structured for evaluation from a row in format { id: <primary key>, c_<column id>: value, ... } */
@@ -60,8 +54,6 @@ export default class VirtualDatabase implements Database {
     /** Apply all known mutations to a set of rows */
     private mutateRows;
     private handleChange;
-    /** Reset cache of query eval rows */
-    resetInternalCache(): void;
 }
 export declare type Mutation = AddMutation | UpdateMutation | RemoveMutation;
 export interface AddMutation {

@@ -20,17 +20,14 @@ export default class VirtualDatabase implements Database {
   mutations: Mutation[]
   changeListeners: DatabaseChangeListener[]
 
-  /** Cache of results of queryEvalRows. Must be reset at each mutation */
-  queryEvalRowsCache: BatchingCache<{from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, PromiseExprEvaluatorRow[]>
+  /** Cache of query results (of underlying database) to increase performance */
+  queryCache: BatchingCache<{ queryOptions: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>
 
   /** Array of temporary primary keys that will be replaced by real ones when the insertions are committed */
   tempPrimaryKeys: string[]
 
   /** True when database is destroyed by commit or rollback */
   destroyed: boolean
-
-  /** Cache of query results to increase performance. Cached by canonical json key based on query options */
-  cache: Cache<string, Row[]>
 
   constructor(database: Database, schema: Schema, locale: string) {
     this.database = database
@@ -41,8 +38,11 @@ export default class VirtualDatabase implements Database {
     this.changeListeners = []
     this.tempPrimaryKeys = []
     this.destroyed = false
-    this.cache = new LRU<string, Row[]>()
-    this.queryEvalRowsCache = new BatchingCache(this.internalQueryEvalRows)
+
+    // Create cache that calls underlying database
+    this.queryCache = new BatchingCache<{ queryOptions: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
+      return this.database.query(request.queryOptions, request.contextVars, request.contextVarValues)
+    })
 
     database.addChangeListener(this.handleChange)
   }
@@ -189,16 +189,8 @@ export default class VirtualDatabase implements Database {
     return false
   }
 
-  /** Create the rows as needed by ExprEvaluator for a query (checking cache first) */
-  private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
-    return this.internalQueryEvalRows({ from, where, contextVars, contextVarValues })
-    return this.queryEvalRowsCache.get({ from, where, contextVars, contextVarValues })
-  }
-
   /** Create the rows as needed by ExprEvaluator for a query */
-  private internalQueryEvalRows = async (options: { from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any } }): Promise<PromiseExprEvaluatorRow[]> => {
-    const { from, where, contextVars, contextVarValues } = options
-
+  private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
     // Create query with c_ for all columns, id and just the where clause
     let queryOptions: QueryOptions = {
       select: {
@@ -223,12 +215,7 @@ export default class VirtualDatabase implements Database {
       rows = []
     }
     else {
-      const queryCacheKey = canonical({ queryOptions: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
-      rows = this.cache.get(queryCacheKey)
-      if (!rows) {
-        rows = await this.database.query(queryOptions, contextVars, contextVarValues)
-        this.cache.set(queryCacheKey, rows)
-      }
+      rows = await this.queryCache.get({ queryOptions: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
     }
 
     // Apply mutations
@@ -372,13 +359,9 @@ export default class VirtualDatabase implements Database {
     }
 
     // Clear caches
-    this.resetInternalCache()
-    this.cache.reset()
-  }
-
-  /** Reset cache of query eval rows */
-  resetInternalCache() {
-    this.queryEvalRowsCache = new BatchingCache(this.internalQueryEvalRows)
+    this.queryCache = new BatchingCache<{ queryOptions: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
+      return this.database.query(request.queryOptions, request.contextVars, request.contextVarValues)
+    })
   }
 }
 
@@ -394,9 +377,6 @@ class VirtualDatabaseTransaction implements Transaction {
   }
 
   addRow(table: string, values: { [column: string]: any }) {
-    // Clear cache
-    this.virtualDatabase.resetInternalCache()
-
     const primaryKey = uuid()
     
     // Save temporary primary key
@@ -413,9 +393,6 @@ class VirtualDatabaseTransaction implements Transaction {
   }
 
   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }) {
-    // Clear cache
-    this.virtualDatabase.resetInternalCache()
-
     this.mutations.push({
       type: "update",
       table: table,
@@ -426,9 +403,6 @@ class VirtualDatabaseTransaction implements Transaction {
   }
 
   removeRow(table: string, primaryKey: any) {
-    // Clear cache
-    this.virtualDatabase.resetInternalCache()
-
     // Remove locally if local
     if (this.virtualDatabase.tempPrimaryKeys.includes(primaryKey)) {
       this.mutations = this.mutations.filter(m => m.primaryKey !== primaryKey)
