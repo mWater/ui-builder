@@ -3,7 +3,7 @@ import * as React from "react";
 import { Expr, ExprUtils, Schema, Variable } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
 import canonical from 'canonical-json'
-import * as _ from "lodash";
+import _ from "lodash";
 import { InstanceCtx } from "../contexts";
 
 interface Props {

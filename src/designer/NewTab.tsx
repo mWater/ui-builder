@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { WidgetLibrary } from "./widgetLibrary"
 import { WidgetDef } from "../widgets/widgets"
 import { useState, useRef, useEffect } from "react"

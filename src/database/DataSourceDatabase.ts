@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
 import { DataSource, Schema, Row } from "mwater-expressions";
 import { QueryCompiler } from "./QueryCompiler";
