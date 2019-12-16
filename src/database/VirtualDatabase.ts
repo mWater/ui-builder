@@ -191,6 +191,7 @@ export default class VirtualDatabase implements Database {
 
   /** Create the rows as needed by ExprEvaluator for a query (checking cache first) */
   private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
+    return this.internalQueryEvalRows({ from, where, contextVars, contextVarValues })
     return this.queryEvalRowsCache.get({ from, where, contextVars, contextVarValues })
   }
 
