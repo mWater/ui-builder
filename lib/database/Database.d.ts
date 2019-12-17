@@ -66,7 +66,7 @@ declare class NullTransaction implements Transaction {
     removeRow(table: string, primaryKey: any): Promise<void>;
     commit(): Promise<void>;
 }
-/** Evaluates a database query given a set of rows of the type that are needed by the ExprEvaluator.
+/** Evaluates a database query given a set of rows of the type that are needed by the PromiseExprEvaluator.
  * Useful for performing a query on a non-SQL database, e.g. in memory or MongoDb, etc.
  */
 export declare function performEvalQuery(options: {

@@ -1,9 +1,7 @@
 import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery, getWherePrimaryKey } from "./Database";
-import { Schema, Column, ExprEvaluator, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
+import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
 import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
-import LRU, { Cache } from 'lru-cache'
-import canonical from 'canonical-json'
 import { ContextVar, createExprVariables } from "../widgets/blocks";
 import { BatchingCache } from "./BatchingCache";
 
@@ -189,7 +187,7 @@ export default class VirtualDatabase implements Database {
     return false
   }
 
-  /** Create the rows as needed by ExprEvaluator for a query */
+  /** Create the rows as needed by PromiseExprEvaluator for a query */
   private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
     // Create query with c_ for all columns, id and just the where clause
     let queryOptions: QueryOptions = {

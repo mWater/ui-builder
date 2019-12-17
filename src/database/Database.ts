@@ -73,7 +73,7 @@ class NullTransaction implements Transaction {
   async commit() { return }
 }
 
-/** Evaluates a database query given a set of rows of the type that are needed by the ExprEvaluator.
+/** Evaluates a database query given a set of rows of the type that are needed by the PromiseExprEvaluator.
  * Useful for performing a query on a non-SQL database, e.g. in memory or MongoDb, etc.
  */
 export async function performEvalQuery(options: {

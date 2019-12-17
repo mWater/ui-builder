@@ -2,7 +2,7 @@ import VirtualDatabase from "./VirtualDatabase";
 import mockDatabase from "../__fixtures__/mockDatabase";
 import simpleSchema from "../__fixtures__/schema";
 import { QueryOptions } from "./Database";
-import { Expr, ExprEvaluator, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions";
+import { Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions";
 import * as _ from "lodash";
 
 const schema = simpleSchema()

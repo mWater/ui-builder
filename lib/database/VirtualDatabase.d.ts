@@ -45,7 +45,7 @@ export default class VirtualDatabase implements Database {
     rollback(): void;
     /** Determine if a column should be included in the underlying query */
     shouldIncludeColumn(column: Column): boolean;
-    /** Create the rows as needed by ExprEvaluator for a query */
+    /** Create the rows as needed by PromiseExprEvaluator for a query */
     private queryEvalRows;
     /** Replace temporary primary keys with different value */
     private replaceTempPrimaryKeys;
