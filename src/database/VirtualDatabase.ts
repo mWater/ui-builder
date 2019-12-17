@@ -243,16 +243,10 @@ export default class VirtualDatabase implements Database {
       getField: async (columnId: string) => {
         const column = this.schema.getColumn(from, columnId)!
 
-        // For included columns, return simple value
-        if (this.shouldIncludeColumn(column)) {
+        // For non-joins, return simple value
+        if (column.type !== "join") {
           return row["c_" + columnId]
         }
-
-        // Do not support reversable join field getting
-        throw new Error("getField not supported in non-included columns")
-      },
-      followJoin: async (columnId: string) => {
-        const column = this.schema.getColumn(from, columnId)!
 
         // For n-1 and 1-1 joins, create row
         if (column.join!.type === "n-1" || column.join!.type === "1-1") {
