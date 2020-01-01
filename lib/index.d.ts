@@ -16,3 +16,4 @@ export * from './widgets/columnValues';
 export { default as ListEditor } from './widgets/ListEditor';
 export { ControlBlock, ControlBlockDef, RenderControlProps } from './widgets/blocks/controls/ControlBlock';
 export * from './embeddedExprs';
+export * from './database/VirtualDatabase';
