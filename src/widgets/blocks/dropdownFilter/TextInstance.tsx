@@ -1,6 +1,7 @@
-import React, { CSSProperties } from "react";
+import _ from 'lodash'
+import React from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
-import { Schema, ExprUtils, EnumValue } from "mwater-expressions";
+import { Schema, ExprUtils } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
 import Async from 'react-select/lib/Async'

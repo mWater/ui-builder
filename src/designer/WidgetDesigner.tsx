@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import BlockWrapper from "./BlockWrapper"
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"

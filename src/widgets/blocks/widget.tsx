@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, CreateBlock, NullBlockStore, Filter, ContextVar } from '../blocks'
-import { Expr, Schema } from 'mwater-expressions'
+import { BlockDef, NullBlockStore, Filter, ContextVar } from '../blocks'
+import { Expr } from 'mwater-expressions'
 import BlockPlaceholder from '../BlockPlaceholder';
 import { LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
