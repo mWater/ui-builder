@@ -8,7 +8,12 @@ export interface AddRowBlockDef extends BlockDef {
     type: "addRow";
     /** Table that the row will be added to */
     table?: string;
-    /** Name of the row context variable */
+    /** Context variable (row) to re-use if it has a value.
+     * This allows the add row block to either add a row or just reuse an existing
+     * one, making it work for both editing and adding.
+     */
+    existingContextVarId?: string | null;
+    /** Name of the row context variable (if not using existing) */
     name?: string | null;
     /** Expressions to generate column values */
     columnValues: {

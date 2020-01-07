@@ -4,7 +4,7 @@ import { BlockDef, ContextVar, ChildBlock, createExprVariables, CreateBlock, Blo
 import * as _ from 'lodash';
 import { ExprValidator, Schema, LiteralExpr, Expr } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
-import { TextInput } from 'react-library/lib/bootstrap';
+import { TextInput, Select, Radio } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 import { ColumnValuesEditor, ContextVarExpr } from '../columnValues';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -15,8 +15,14 @@ export interface AddRowBlockDef extends BlockDef {
 
   /** Table that the row will be added to */
   table?: string
+
+  /** Context variable (row) to re-use if it has a value. 
+   * This allows the add row block to either add a row or just reuse an existing
+   * one, making it work for both editing and adding.
+   */
+  existingContextVarId?: string | null
   
-  /** Name of the row context variable */
+  /** Name of the row context variable (if not using existing) */
   name?: string | null
 
   /** Expressions to generate column values */
@@ -36,7 +42,8 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
   }
 
   createContextVar(): ContextVar | null {
-    if (this.blockDef.table) {
+    // Don't create new context variable if reusing existing
+    if (this.blockDef.table && !this.blockDef.existingContextVarId) {
       return { type: "row", id: this.blockDef.id, name: this.blockDef.name || "Added row", table: this.blockDef.table }
     }
     return null
@@ -48,6 +55,17 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
     // Check that table is present
     if (!this.blockDef.table || !options.schema.getTable(this.blockDef.table)) {
       return "Table required"
+    }
+
+    // Check that existing context variable from same table
+    if (this.blockDef.table && this.blockDef.existingContextVarId) {
+      const cv = options.contextVars.find(cv => cv.id == this.blockDef.existingContextVarId)
+      if (!cv) {
+        return "Existing context variable not found"
+      }
+      if (cv.table != this.blockDef.table) {
+        return "Existing context variable from wrong table"
+      }
     }
 
     // Check each column value
@@ -140,7 +158,7 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
   }
 
   renderInstance(props: InstanceCtx) { 
-    const contextVar = this.createContextVar()!
+    const contextVar = this.createContextVar() || props.contextVars.find(cv => cv.id == this.blockDef.existingContextVarId)!
     return <AddRowInstance
       blockDef={this.blockDef}
       contextVar={contextVar}
@@ -158,6 +176,20 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
             }
           </PropertyEditor>
         </LabeledProperty>
+        { this.blockDef.table ?
+        <LabeledProperty label="Mode">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="existingContextVarId">
+            {(value, onChange) => 
+              <div>
+                <Radio key="null" radioValue={null} value={value || null} onChange={onChange}>Always add new row</Radio>
+                { props.contextVars.filter(cv => cv.table == this.blockDef.table && cv.type == "row").map(cv => (
+                  <Radio key={cv.id} radioValue={cv.id} value={value} onChange={onChange}>Use <i>{cv.name}</i> if it has a value</Radio>
+                ))}
+              </div>
+            }
+          </PropertyEditor>
+        </LabeledProperty>
+        : null }
         <LabeledProperty label="Variable Name">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
             {(value, onChange) => <TextInput value={value || null} onChange={onChange} placeholder="Unnamed" />}
@@ -205,7 +237,14 @@ class AddRowInstance extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.performAdd()
+    // Only perform add if not reusing
+    if (this.doesNeedAdd()) {
+      this.performAdd()
+    }
+  }
+
+  doesNeedAdd() {
+    return !this.props.blockDef.existingContextVarId || !this.props.instanceCtx.contextVarValues[this.props.blockDef.existingContextVarId]
   }
 
   async performAdd() {
@@ -236,27 +275,33 @@ class AddRowInstance extends React.Component<Props, State> {
   }
 
   render() {
-    // Render wait while adding
-    if (!this.state.addedRowId) {
-      return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
-    }
+    if (this.doesNeedAdd()) {
+      // Render wait while adding
+      if (!this.state.addedRowId) {
+        return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+      }
 
-    // Inject context variable
-    return <ContextVarsInjector 
-      injectedContextVars={[this.props.contextVar]} 
-      injectedContextVarValues={{ [this.props.contextVar.id]: this.state.addedRowId }}
-      innerBlock={this.props.blockDef.content}
-      instanceCtx={this.props.instanceCtx}>
-        {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
-          if (loading) {
-            return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
-          }
-          return (
-            <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { this.props.instanceCtx.renderChildBlock(instanceCtx, this.props.blockDef.content) }
-            </div>
-          )
-        }}
-      </ContextVarsInjector>
+      // Inject context variable
+      return <ContextVarsInjector 
+        injectedContextVars={[this.props.contextVar]} 
+        injectedContextVarValues={{ [this.props.contextVar.id]: this.state.addedRowId }}
+        innerBlock={this.props.blockDef.content}
+        instanceCtx={this.props.instanceCtx}>
+          {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
+            if (loading) {
+              return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+            }
+            return (
+              <div style={{ opacity: refreshing ? 0.6 : undefined }}>
+                { this.props.instanceCtx.renderChildBlock(instanceCtx, this.props.blockDef.content) }
+              </div>
+            )
+          }}
+        </ContextVarsInjector>
+    }
+    else {
+      // Just render if add not needed
+      return this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, this.props.blockDef.content) 
+    }
   }
 }

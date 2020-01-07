@@ -83,3 +83,59 @@ test("save writes to database", async () => {
 
   expect(inst.find("input").prop("value")).toBe("abc")
 })
+
+test("reuses existing", async () => {
+  const rips2: InstanceCtx = { ...rips, 
+    contextVars: [{ id: "existing", type: "row", table: "t1", name: "Existing" }],
+    contextVarValues: { existing: "123" }
+  }
+
+  const addRowBlock = new AddRowBlock({ 
+    ...addRowBlockDef, 
+    existingContextVarId: "existing",
+    content: { 
+      type: "textbox", 
+      id: "tb1",
+      rowContextVarId: "existing",
+      column: "text",
+      required: false
+    } as TextboxBlockDef
+  })
+
+  const inst = mount(addRowBlock.renderInstance(rips2))
+
+  // Wait for load
+  await pause()
+  inst.update()
+
+  // Expect no added row
+  expect(database.mutations.length).toBe(0)
+})
+
+test("does not reuse non-existing existing", async () => {
+  const rips2: InstanceCtx = { ...rips, 
+    contextVars: [{ id: "existing", type: "row", table: "t1", name: "Existing" }],
+    contextVarValues: { existing: null }
+  }
+
+  const addRowBlock = new AddRowBlock({ 
+    ...addRowBlockDef, 
+    existingContextVarId: "existing",
+    content: { 
+      type: "textbox", 
+      id: "tb1",
+      rowContextVarId: "existing",
+      column: "text",
+      required: false
+    } as TextboxBlockDef
+  })
+
+  const inst = mount(addRowBlock.renderInstance(rips2))
+
+  // Wait for load
+  await pause()
+  inst.update()
+
+  // Expect added row
+  expect(database.mutations[0].type).toBe("add")
+})

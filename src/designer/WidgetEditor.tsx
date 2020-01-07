@@ -232,7 +232,7 @@ class ContextVarPreviewValue extends React.Component<{
   }
 
   renderValue(value: any) {
-    if (this.props.contextVar.type === "row") {
+    if (this.props.contextVar.type === "row" && this.props.schema.getTable(this.props.contextVar.table!)) {
       return <IdLiteralComponent 
         schema={this.props.schema} 
         dataSource={this.props.dataSource}
