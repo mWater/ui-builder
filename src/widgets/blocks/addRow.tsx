@@ -190,11 +190,13 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         : null }
+        { !this.blockDef.existingContextVarId ? 
         <LabeledProperty label="Variable Name">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
             {(value, onChange) => <TextInput value={value || null} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
+        : null }
         { this.blockDef.table ? 
         <LabeledProperty label="Column Values">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="columnValues">
