@@ -1,9 +1,9 @@
 import * as React from 'react';
-import LeafBlock from '../LeafBlock';
-import { BlockDef, ContextVar } from '../blocks';
+import { ContextVar } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
-export interface ExpressionBlockDef extends BlockDef {
+import { TextualBlockDef, TextualBlock } from './textual';
+export interface ExpressionBlockDef extends TextualBlockDef {
     type: "expression";
     /** Context variable (row or rowset) to use for expression */
     contextVarId: string | null;
@@ -11,22 +11,14 @@ export interface ExpressionBlockDef extends BlockDef {
     expr: Expr;
     /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
     format: string | null;
-    bold?: boolean;
-    italic?: boolean;
-    underline?: boolean;
-    /** Color of text. Default is no coloring */
-    color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger";
-    /** How to align text. Default is left */
-    align?: "left" | "center" | "right" | "justify";
-    /** True to make multiple lines break */
-    multiline?: boolean;
 }
-export declare class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
+export declare class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
     validate(options: DesignCtx): string | null;
-    renderDesign(props: DesignCtx): JSX.Element;
-    getClassName(): string;
-    getStyle(): React.CSSProperties;
+    renderDesign(props: DesignCtx): React.DetailedReactHTMLElement<{
+        style: React.CSSProperties;
+        className: string;
+    }, HTMLElement>;
     renderInstance(props: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
 }

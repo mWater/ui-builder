@@ -7,10 +7,10 @@ import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import * as d3Format from 'd3-format';
 import moment from 'moment'
-import { Toggle, Checkbox, Select } from 'react-library/lib/bootstrap';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { TextualBlockDef, TextualBlock } from './textual';
 
-export interface ExpressionBlockDef extends BlockDef {
+export interface ExpressionBlockDef extends TextualBlockDef {
   type: "expression"
   
   /** Context variable (row or rowset) to use for expression */
@@ -21,22 +21,9 @@ export interface ExpressionBlockDef extends BlockDef {
 
   /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
   format: string | null
-
-  bold?: boolean
-  italic?: boolean
-  underline?: boolean
-
-  /** Color of text. Default is no coloring */
-  color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger" 
-
-  /** How to align text. Default is left */
-  align?: "left" | "center" | "right" | "justify"
-
-  /** True to make multiple lines break */
-  multiline?: boolean
 }
 
-export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
+export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   getContextVarExprs(contextVar: ContextVar): Expr[] { 
     return (contextVar.id === this.blockDef.contextVarId && this.blockDef.expr) ? [this.blockDef.expr] : [] 
   }
@@ -63,44 +50,15 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
   renderDesign(props: DesignCtx) {
     const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
     const style = this.getStyle()
-    const className = this.getClassName()
 
-    return (
-      <div style={style}>
+    return this.renderText(
+      <div>
         <span className="text-muted">&lt;</span>
-        <span className={this.getClassName()}>{summary}</span>
+        {summary}
         <span className="text-muted">&gt;</span>
       </div>
     )     
   }
-
-  getClassName() {
-    if (this.blockDef.color) {
-      return "text-" + this.blockDef.color
-    }
-    return ""
-  }
-
-  getStyle() {
-    const style: React.CSSProperties = {}
-    if (this.blockDef.bold) {
-      style.fontWeight = "bold"
-    }
-    if (this.blockDef.italic) {
-      style.fontStyle = "italic"
-    }
-    if (this.blockDef.underline) {
-      style.textDecoration = "underline"
-    }
-    if (this.blockDef.align) {
-      style.textAlign = this.blockDef.align
-    }
-    if (this.blockDef.multiline) {
-      style.whiteSpace = "pre-line"
-    }
-    return style
-  }
-
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
     if (!this.blockDef.contextVarId || !this.blockDef.expr) {
@@ -109,7 +67,6 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
 
     const value = props.getContextVarExprValue(this.blockDef.contextVarId, this.blockDef.expr)
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
-    const style = this.getStyle()
 
     const formatLocale = props.formatLocale || d3Format
 
@@ -132,9 +89,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
       }
     }
     
-    return (
-      <div style={style} className={this.getClassName()}>{str}</div>
-    )     
+    return this.renderText(str)
   }
 
   renderEditor(props: DesignCtx) {
@@ -217,56 +172,7 @@ export class ExpressionBlock extends LeafBlock<ExpressionBlockDef> {
           : null
         }
 
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="bold">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Bold</Checkbox>}
-        </PropertyEditor>
-
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="italic">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Italic</Checkbox>}
-        </PropertyEditor>
-
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="underline">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
-        </PropertyEditor>
-
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
-        </PropertyEditor>
-
-        <LabeledProperty label="Alignment">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
-            {(value, onChange) => 
-              <Toggle 
-                value={value || "left"} 
-                onChange={onChange} 
-                options={[
-                  { value: "left", label: <i className="fa fa-align-left"/> },
-                  { value: "center", label: <i className="fa fa-align-center"/> },
-                  { value: "right", label: <i className="fa fa-align-right"/> },
-                  { value: "justify", label: <i className="fa fa-align-justify"/> }
-                ]} />
-            }
-          </PropertyEditor>
-        </LabeledProperty>
-
-        <LabeledProperty label="Color">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="color">
-            {(value, onChange) => 
-              <Select 
-                value={value || null} 
-                onChange={onChange} 
-                options={[
-                  { value: null, label: "Default" },
-                  { value: "muted", label: "Muted" },
-                  { value: "primary", label: "Primary" },
-                  { value: "info", label: "Info" },
-                  { value: "success", label: "Success" },
-                  { value: "warning", label: "Warning" },
-                  { value: "danger", label: "Danger" }
-                ]} />
-            }
-          </PropertyEditor>
-        </LabeledProperty>
+        { this.renderTextualEditor(props) }
       </div>
     )
   }
