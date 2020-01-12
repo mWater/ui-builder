@@ -10,6 +10,10 @@ interface ContextVarRef {
     /** Context variable whose value should be used */
     contextVarId: string;
 }
+/** Null value for context value */
+interface ContextVarNull {
+    type: "null";
+}
 /** Action which opens a page */
 export interface OpenPageActionDef extends ActionDef {
     type: "openPage";
@@ -22,7 +26,7 @@ export interface OpenPageActionDef extends ActionDef {
     widgetId: string | null;
     /** Values of context variables that widget inside page needs */
     contextVarValues: {
-        [contextVarId: string]: ContextVarRef;
+        [contextVarId: string]: ContextVarRef | ContextVarNull;
     };
     /** True to replace current page */
     replacePage?: boolean;
