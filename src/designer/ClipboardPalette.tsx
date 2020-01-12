@@ -67,10 +67,10 @@ const collect = (connect: DragSourceConnector) => {
   return { connectDragSource: connect.dragSource() }
 }
 
-const dropTarget = DropTarget("block", blockTargetSpec, (connect, monitor) => ({
+const dropTarget = DropTarget("ui-builder-block", blockTargetSpec, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver({ shallow: true }),
   canDrop: monitor.canDrop()
 }))(ClipboardPalette)
 
-export default DragSource("block", blockSourceSpec, collect)(dropTarget)
+export default DragSource("ui-builder-block", blockSourceSpec, collect)(dropTarget)

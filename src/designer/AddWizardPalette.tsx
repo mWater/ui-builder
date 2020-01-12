@@ -38,4 +38,4 @@ const collect = (connect: DragSourceConnector) => {
   return { connectDragSource: connect.dragSource() }
 }
 
-export default DragSource("block", blockSourceSpec, collect)(AddWizardPalette)
+export default DragSource("ui-builder-block", blockSourceSpec, collect)(AddWizardPalette)

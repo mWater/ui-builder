@@ -46,7 +46,7 @@ class BlockPlaceholder extends React.Component<Props> {
   }
 }
 
-export default DropTarget("block", blockTargetSpec, (connect, monitor) => ({
+export default DropTarget("ui-builder-block", blockTargetSpec, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver({ shallow: true }),
   canDrop: monitor.canDrop()

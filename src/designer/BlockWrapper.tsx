@@ -199,13 +199,13 @@ class BlockWrapper extends React.Component<Props, State> {
   }
 }
 
-const dropTarget = DropTarget("block", blockTargetSpec, (connect, monitor) => ({
+const dropTarget = DropTarget("ui-builder-block", blockTargetSpec, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver({ shallow: true }),
   canDrop: monitor.canDrop()
 }))(BlockWrapper)
 
-export default DragSource("block", blockSourceSpec, (connect, monitor) => ({
+export default DragSource("ui-builder-block", blockSourceSpec, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
 }))(dropTarget)
