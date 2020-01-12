@@ -11,6 +11,7 @@ import { ContextVar } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
+import { callbackify } from 'util';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -19,6 +20,12 @@ interface ContextVarRef {
   /** Context variable whose value should be used */
   contextVarId: string
 }
+
+/** Null value for context value */
+interface ContextVarNull {
+  type: "null"
+}
+
 
 /** Action which opens a page */
 export interface OpenPageActionDef extends ActionDef {
@@ -36,7 +43,7 @@ export interface OpenPageActionDef extends ActionDef {
   widgetId: string | null
 
   /** Values of context variables that widget inside page needs */
-  contextVarValues: { [contextVarId: string]: ContextVarRef }
+  contextVarValues: { [contextVarId: string]: ContextVarRef | ContextVarNull }
 
   /** True to replace current page */
   replacePage?: boolean
@@ -63,9 +70,12 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       }
 
       // Ensure that mapping is to available context var
-      const srcCV = designCtx.contextVars.find(cv => cv.id === this.actionDef.contextVarValues[widgetCV.id].contextVarId)
-      if (!srcCV || srcCV.table !== widgetCV.table || srcCV.type !== widgetCV.type) {
-        return "Invalid context variable"
+      const contextVarValue = this.actionDef.contextVarValues[widgetCV.id]
+      if (contextVarValue.type == "ref") {
+        const srcCV = designCtx.contextVars.find(cv => cv.id === contextVarValue.contextVarId)
+        if (!srcCV || srcCV.table !== widgetCV.table || srcCV.type !== widgetCV.type) {
+          return "Invalid context variable"
+        }
       }
     }
 
@@ -94,26 +104,32 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     // Perform mappings 
     for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
-      // Look up outer context variable
-      const outerCV = instanceCtx.contextVars.find(cv => cv.id == this.actionDef.contextVarValues[cvid].contextVarId)
-      if (!outerCV) {
-        throw new Error("Outer context variable not found")
-      }
-
-      // Get value 
-      let outerCVValue = instanceCtx.contextVarValues[outerCV.id]
-
-      // Add filters if rowset
-      if (outerCV.type == "rowset") {
-        outerCVValue = {
-          type: "op",
-          op: "and",
-          table: outerCV.table!,
-          exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), f => f.expr)))
+      const contextVarValue = this.actionDef.contextVarValues[cvid]
+      if (contextVarValue.type == "ref") {
+        // Look up outer context variable
+        const outerCV = instanceCtx.contextVars.find(cv => cv.id == contextVarValue.contextVarId)
+        if (!outerCV) {
+          throw new Error("Outer context variable not found")
         }
-      }
 
-      contextVarValues[cvid] = outerCVValue
+        // Get value 
+        let outerCVValue = instanceCtx.contextVarValues[outerCV.id]
+
+        // Add filters if rowset
+        if (outerCV.type == "rowset") {
+          outerCVValue = {
+            type: "op",
+            op: "and",
+            table: outerCV.table!,
+            exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), f => f.expr)))
+          }
+        }
+
+        contextVarValues[cvid] = outerCVValue
+      }
+      else if (contextVarValue.type == "null") {
+        contextVarValues[cvid] = null
+      }
     }
 
     // Include global context variables
@@ -183,22 +199,32 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           <tbody>
             { widgetDef.contextVars.map(contextVar => {
               const cvr = actionDef.contextVarValues[contextVar.id]
-              const handleCVRChange = (contextVarId: string) => {
+              const handleCVRChange = (cvr: ContextVarNull | ContextVarRef) => {
                 props.onChange(produce(actionDef, (draft) => {
-                  draft.contextVarValues[contextVar.id] = { type: "ref", contextVarId: contextVarId }
+                  draft.contextVarValues[contextVar.id] = cvr
                 }))
+              }
+
+              // Create options list
+              const options: { value: ContextVarNull | ContextVarRef, label: string }[] = [
+                { value: { type: "null" }, label: "No Value" }
+              ]
+              
+              for (const cv of props.contextVars){
+                if (cv.type == contextVar.type && cv.table == contextVar.table) {
+                  options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
+                }
               }
 
               return (
                 <tr key={contextVar.id}>
                   <td>{contextVar.name}</td>
                   <td>
-                    <ContextVarPropertyEditor 
-                      contextVars={props.contextVars}  
-                      types={[contextVar.type]}
-                      table={contextVar.table}
-                      value={ cvr ? cvr.contextVarId : null }
-                      onChange={ handleCVRChange }
+                    <Select
+                      options={options}                    
+                      value={cvr}
+                      onChange={handleCVRChange}
+                      nullLabel="Select..."
                     />
                     { !cvr ? <span className="text-warning">Value not set</span> : null}          
                   </td>
