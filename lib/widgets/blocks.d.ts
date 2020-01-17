@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Expr, Variable, LiteralType } from 'mwater-expressions';
+import { Expr, Variable, LiteralType, EnumValue } from 'mwater-expressions';
 import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css";
 /** Side on which another block is dropped on a block */
@@ -30,10 +30,15 @@ export interface BlockDef {
 export declare type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>;
 /** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset */
 export interface ContextVar {
+    /** Id of context variable */
     id: string;
+    /** Name of context variable */
     name: string;
     type: "row" | "rowset" | LiteralType;
+    /** table of database (when type = "rowset" or "row") */
     table?: string;
+    /** Enum values when type is enum or enumset */
+    enumValues?: EnumValue[];
 }
 /** A filter that applies to a particular rowset context variable */
 export interface Filter {

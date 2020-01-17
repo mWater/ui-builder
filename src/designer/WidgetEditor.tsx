@@ -252,6 +252,15 @@ class ContextVarPreviewValue extends React.Component<{
         onChange={this.handleChange}
         />
     }
+
+    if (this.props.contextVar.type == "enum") {
+      return <Select
+        value={value}
+        onChange={this.handleChange}
+        options={this.props.contextVar.enumValues!.map(ev => ({ value: ev.id, label: localize(ev.name) }))}
+        />
+    }
+    
     return <i>Not supported</i>
   }
   render() {
