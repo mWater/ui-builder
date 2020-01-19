@@ -1,5 +1,5 @@
 import { Expr, Schema, ExprUtils, ExprValidator } from "mwater-expressions";
-import { ContextVar, createExprVariables } from "./widgets/blocks";
+import { ContextVar, createExprVariables, validateContextVarExpr } from "./widgets/blocks";
 import * as d3Format from 'd3-format';
 import { FormatLocaleObject } from "d3-format";
 import moment from "moment";
@@ -73,17 +73,13 @@ export const validateEmbeddedExprs = (options: {
   contextVars: ContextVar[]
 }) => {
   for (const embeddedExpr of options.embeddedExprs) {
-    // Validate cv
-    const contextVar = options.contextVars.find(cv => cv.id === embeddedExpr.contextVarId && (cv.type === "rowset" || cv.type === "row"))
-    if (!contextVar) {
-      return "Context variable required"
-    }
+    const error = validateContextVarExpr({
+      contextVars: options.contextVars,
+      schema: options.schema,
+      contextVarId: embeddedExpr.contextVarId,
+      expr: embeddedExpr.expr
+    })
 
-    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-    let error: string | null
-    
-    // Validate expr
-    error = exprValidator.validateExpr(embeddedExpr.expr, { table: contextVar.table })
     if (error) {
       return error
     }

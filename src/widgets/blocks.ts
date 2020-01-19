@@ -1,6 +1,7 @@
+import _ from 'lodash'
 import * as React from 'react'
 import {v4 as uuid} from 'uuid'
-import { Expr, Variable, LiteralType, EnumValue } from 'mwater-expressions'
+import { Expr, Variable, LiteralType, EnumValue, ExprValidator, AggrStatus, Schema } from 'mwater-expressions'
 import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css"
 import { HorizontalBlockDef } from './blocks/horizontal';
@@ -263,4 +264,48 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
 /** Make a duplicate of a block */
 export function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef {
   return createBlock(blockDef).process(createBlock, (bd) => bd ? ({ ...bd, id: uuid() }) : null)!
+}
+
+/** Validates a context variable/expr combo. Null if ok */
+export function validateContextVarExpr(options: {
+  contextVars: ContextVar[],
+  schema: Schema,
+  contextVarId: string | null, 
+  expr: Expr,
+  types?: LiteralType[]
+  aggrStatuses?: AggrStatus[]
+  idTable?: string
+  enumValueIds?: string[]
+}) {
+  let error: string | null
+
+  // Validate cv
+  let contextVar
+  if (options.contextVarId) {
+    contextVar = options.contextVars.find(cv => cv.id === options.contextVarId && (cv.type === "rowset" || cv.type === "row"))
+    if (!contextVar) {
+      return "Context variable not found"
+    }
+  }
+
+  // Only include context variables before up to an including one referenced, or all context variables if null
+  // This is because an outer context var expr cannot reference an inner context variable
+  const cvIndex = options.contextVars.findIndex(cv => cv.id === options.contextVarId)
+  const availContextVars = cvIndex >= 0 ? _.take(options.contextVars, cvIndex + 1)  : options.contextVars
+
+  const exprValidator = new ExprValidator(options.schema, createExprVariables(availContextVars))
+
+  // Validate expr
+  error = exprValidator.validateExpr(options.expr, { 
+    table: contextVar ? contextVar.table : undefined, 
+    types: options.types,
+    aggrStatuses: options.aggrStatuses,
+    idTable: options.idTable,
+    enumValueIds: options.enumValueIds
+   })
+  if (error) {
+    return error
+  }
+
+  return null
 }

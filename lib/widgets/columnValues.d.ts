@@ -21,8 +21,7 @@ export declare class ColumnValuesEditor extends React.Component<{
     contextVars: ContextVar[];
     locale: string;
 }> {
-    handleContextVarChange: (columnId: string, contextVarId: string) => void;
-    handleExprChange: (columnId: string, expr: Expr) => void;
+    handleContextVarExprChange: (columnId: string, contextVarId: string | null, expr: Expr) => void;
     handleRemove: (columnId: string) => void;
     handleAdd: (option?: {
         label: string;

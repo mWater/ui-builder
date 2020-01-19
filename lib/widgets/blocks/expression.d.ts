@@ -14,7 +14,7 @@ export interface ExpressionBlockDef extends TextualBlockDef {
 }
 export declare class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];
-    validate(options: DesignCtx): string | null;
+    validate(ctx: DesignCtx): string | null;
     renderDesign(props: DesignCtx): React.DetailedReactHTMLElement<{
         style: React.CSSProperties;
         className: string;

@@ -1,10 +1,10 @@
 import _ from 'lodash'
-import { Expr, Schema, DataSource } from "mwater-expressions";
+import { Expr, Schema, DataSource, LiteralType } from "mwater-expressions";
 import React from "react";
 import { ContextVar } from "./blocks";
 import produce from "immer";
 import { localize } from "./localization";
-import { LabeledProperty, ContextVarPropertyEditor } from "./propertyEditors";
+import { LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from "./propertyEditors";
 import { ExprComponent } from "mwater-expressions-ui";
 import ReactSelect from 'react-select'
 
@@ -32,14 +32,9 @@ export class ColumnValuesEditor extends React.Component<{
   locale: string
 }> {
 
-  handleContextVarChange = (columnId: string, contextVarId: string) => {
+  handleContextVarExprChange = (columnId: string, contextVarId: string | null, expr: Expr) => {
     this.props.onChange(produce(this.props.value, (draft) => {
       draft[columnId].contextVarId = contextVarId
-    }))
-  }
-
-  handleExprChange = (columnId: string, expr: Expr) => {
-    this.props.onChange(produce(this.props.value, (draft) => {
       draft[columnId].expr = expr
     }))
   }
@@ -73,25 +68,17 @@ export class ColumnValuesEditor extends React.Component<{
     return <tr key={columnId}>
       <td>{localize(column.name, this.props.locale)}</td>
       <td>
-        <LabeledProperty label="Variable">
-          <ContextVarPropertyEditor 
-            contextVars={this.props.contextVars} 
-            value={contextVarExpr.contextVarId} 
-            onChange={this.handleContextVarChange.bind(null, columnId)}
-            allowNone={true}
-            types={["row", "rowset"]}
-            />
-        </LabeledProperty>
         <LabeledProperty label="Expression">
-          <ExprComponent 
+          <ContextVarExprPropertyEditor 
+            contextVarId={contextVarExpr.contextVarId} 
+            expr={contextVarExpr.expr}
+            onChange={this.handleContextVarExprChange.bind(null, columnId)}
+            contextVars={this.props.contextVars} 
             schema={this.props.schema} 
             dataSource={this.props.dataSource}
             idTable={column.idTable || (column.type === "join" ? column.join!.toTable : undefined)}
             enumValues={column.enumValues}
-            table={contextVar ? contextVar.table! : null}
-            value={contextVarExpr.expr}
-            types={[columnType]}
-            onChange={this.handleExprChange.bind(null, columnId)}
+            types={[columnType as LiteralType]}
           />
         </LabeledProperty>
       </td>

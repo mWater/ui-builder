@@ -3,8 +3,8 @@ import produce from 'immer'
 import { ExprComponent } from 'mwater-expressions-ui';
 import { default as React, useState, useEffect } from 'react';
 import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
-import { BlockDef, ContextVar, createExprVariables } from '../blocks'
-import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
+import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
+import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
 import ListEditor from '../ListEditor';
 import { localize } from '../localization';
 import LeafBlock from '../LeafBlock';
@@ -39,16 +39,13 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
     let error: string | null
 
     for (const validation of this.blockDef.validations) {
-      // Validate cv
-      const contextVar = options.contextVars.find(cv => cv.id === validation.contextVarId && (cv.type === "rowset" || cv.type === "row"))
-      if (!contextVar) {
-        return "Context variable required"
-      }
-  
-      const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-      
-      // Validate expr
-      error = exprValidator.validateExpr(validation.condition, { table: contextVar.table, types: ["boolean"] })
+      error = validateContextVarExpr({
+        schema: options.schema,
+        contextVars: options.contextVars,
+        contextVarId: validation.contextVarId,
+        expr: validation.condition,
+        types: ["boolean"]
+      })
       if (error) {
         return error
       }
@@ -91,7 +88,7 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
                 {(validation: Validation, onValidationChange) => 
                   <ValidationEditor 
                     validation={validation}
-                    onValidationsChange={onValidationChange}
+                    onValidationChange={onValidationChange}
                     contextVars={props.contextVars} 
                     schema={props.schema} 
                     dataSource={props.dataSource}
@@ -116,7 +113,7 @@ export class ValidationBlock extends LeafBlock<ValidationBlockDef> {
 /** Editor for a single validation */
 const ValidationEditor = (props: {
   validation: Validation
-  onValidationsChange: (validation: Validation) => void
+  onValidationChange: (validation: Validation) => void
   contextVars: ContextVar[]
   schema: Schema
   dataSource: DataSource
@@ -126,32 +123,22 @@ const ValidationEditor = (props: {
   
   return (
     <div>
-      <LabeledProperty label="Row/Rowset Variable">
-        <PropertyEditor obj={props.validation} onChange={props.onValidationsChange} property="contextVarId">
-          {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
-        </PropertyEditor>
+      <LabeledProperty label="Condition that must be not be false">
+        <ContextVarExprPropertyEditor
+          contextVars={props.contextVars}
+          schema={props.schema} 
+          dataSource={props.dataSource} 
+          aggrStatuses={["individual", "aggregate", "literal"]}
+          types={["boolean"]}
+          contextVarId={props.validation.contextVarId}
+          expr={props.validation.condition} 
+          onChange={(contextVarId, condition) => {
+            props.onValidationChange({ ...props.validation, contextVarId, condition })
+          }} />
       </LabeledProperty>
 
-      { contextVar && contextVar.table ?
-        <LabeledProperty label="Condition that must be not be false">
-          <PropertyEditor obj={props.validation} onChange={props.onValidationsChange} property="condition">
-            { (value, onChange) => 
-              <ExprComponent 
-                value={value} 
-                onChange={onChange} 
-                schema={props.schema} 
-                dataSource={props.dataSource} 
-                types={["boolean"]}
-                aggrStatuses={["aggregate", "individual", "literal"]}
-                variables={createExprVariables(props.contextVars)}
-                table={contextVar.table!}/>
-            }
-          </PropertyEditor>
-        </LabeledProperty>
-        : null }
-
       <LabeledProperty label="Error Message">
-        <PropertyEditor obj={props.validation} onChange={props.onValidationsChange} property="message">
+        <PropertyEditor obj={props.validation} onChange={props.onValidationChange} property="message">
           { (value, onChange) => 
             <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
           }

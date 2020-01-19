@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
-import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, AggrStatus, LiteralType } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
 import * as PropTypes from 'prop-types';
 import { EmbeddedExpr } from "../embeddedExprs";
@@ -54,12 +54,28 @@ export declare class ContextVarPropertyEditor extends React.Component<{
     contextVars: ContextVar[];
     types?: string[];
     table?: string;
-    /** Makes null say "None", not "Select..." */
-    allowNone?: boolean;
+    /** Makes null say something other than "Select..." */
+    nullLabel?: string;
     filter?: (contextVar: ContextVar) => boolean;
 }> {
     render(): JSX.Element;
 }
+/** Edits both a context variable selection and a related expression */
+export declare const ContextVarExprPropertyEditor: (props: {
+    schema: Schema;
+    dataSource: DataSource;
+    contextVars: ContextVar[];
+    contextVarId: string | null;
+    expr: Expr;
+    onChange: (contextVarId: string | null, expr: Expr) => void;
+    aggrStatuses?: AggrStatus[] | undefined;
+    types?: LiteralType[] | undefined;
+    enumValues?: {
+        id: string;
+        name: LocalizedString;
+    }[] | undefined;
+    idTable?: string | undefined;
+}) => JSX.Element;
 /** Edits an action definition, allowing selection of action */
 export declare class ActionDefEditor extends React.Component<{
     value?: ActionDef | null;
@@ -154,14 +170,11 @@ export declare const EmbeddedExprsEditor: (props: {
     contextVars: ContextVar[];
 }) => JSX.Element;
 /** Allows editing of an embedded expression */
-export declare class EmbeddedExprEditor extends React.Component<{
+export declare const EmbeddedExprEditor: (props: {
     value: EmbeddedExpr;
     onChange: (embeddedExpr: EmbeddedExpr) => void;
-    contextVars: ContextVar[];
     schema: Schema;
     dataSource: DataSource;
-}> {
-    handleExprChange: (expr: Expr) => void;
-    render(): JSX.Element;
-}
+    contextVars: ContextVar[];
+}) => JSX.Element;
 export {};

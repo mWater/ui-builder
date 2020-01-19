@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ContextVar, createExprVariables } from '../blocks'
-import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor } from '../propertyEditors';
+import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
+import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
 import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
@@ -28,23 +28,13 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     return (contextVar.id === this.blockDef.contextVarId && this.blockDef.expr) ? [this.blockDef.expr] : [] 
   }
 
-  validate(options: DesignCtx) {
-    // Validate cv
-    const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
-    if (!contextVar) {
-      return "Context variable required"
-    }
-
-    const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-    let error: string | null
-    
-    // Validate expr
-    error = exprValidator.validateExpr(this.blockDef.expr, { table: contextVar.table })
-    if (error) {
-      return error
-    }
-
-    return null
+  validate(ctx: DesignCtx) {
+    return validateContextVarExpr({
+      schema: ctx.schema,
+      contextVars: ctx.contextVars,
+      contextVarId: this.blockDef.contextVarId,
+      expr: this.blockDef.expr
+    })
   }
 
   renderDesign(props: DesignCtx) {
@@ -109,29 +99,21 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
       }
     }
   
-    // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
     return (
       <div>
-        <LabeledProperty label="Row/Rowset Variable">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="contextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
-          </PropertyEditor>
+        <LabeledProperty label="Expression">
+          <ContextVarExprPropertyEditor
+            contextVars={props.contextVars}
+            schema={props.schema} 
+            dataSource={props.dataSource} 
+            aggrStatuses={["individual", "aggregate", "literal"]}
+            contextVarId={this.blockDef.contextVarId}
+            expr={this.blockDef.expr} 
+            onChange={(contextVarId, expr) => {
+              props.store.replaceBlock({ ...this.blockDef, contextVarId, expr } as ExpressionBlockDef)
+            }}
+            />
         </LabeledProperty>
-
-        { contextVar && contextVar.table 
-          ?
-          <LabeledProperty label="Expression">
-            <ExprComponent 
-              value={this.blockDef.expr} 
-              onChange={handleExprChange} 
-              schema={props.schema} 
-              dataSource={props.dataSource} 
-              aggrStatuses={["individual", "aggregate", "literal"]}
-              variables={createExprVariables(props.contextVars)}
-              table={contextVar.table!}/>
-          </LabeledProperty>
-          : null
-        }
 
         { exprType === "number" ?
           <LabeledProperty label="Number Format">

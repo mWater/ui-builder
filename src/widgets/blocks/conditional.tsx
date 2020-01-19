@@ -1,11 +1,12 @@
 import produce from 'immer'
 import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Expr } from 'mwater-expressions';
-import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { validateEmbeddedExprs } from '../../embeddedExprs';
 
 /** Block which only displays content if an expression is true */
 export interface ConditionalBlockDef extends BlockDef {
@@ -30,30 +31,17 @@ export class ConditionalBlock extends Block<ConditionalBlockDef> {
   }
 
   validate(ctx: DesignCtx) { 
-    let error: string | null
-
     if (!this.blockDef.content) {
       return "Content required"
     }
 
-    // Validate cv
-    let contextVar
-    if (this.blockDef.contextVarId) {
-      contextVar = ctx.contextVars.find(cv => cv.id === this.blockDef.contextVarId && (cv.type === "rowset" || cv.type === "row"))
-      if (!contextVar) {
-        return "Context variable required"
-      }
-    }
-
-    const exprValidator = new ExprValidator(ctx.schema, createExprVariables(ctx.contextVars))
-    
-    // Validate expr
-    error = exprValidator.validateExpr(this.blockDef.expr, { table: contextVar ? contextVar.table : undefined, types: ["boolean"] })
-    if (error) {
-      return error
-    }
-
-    return null
+    return validateContextVarExpr({
+      schema: ctx.schema,
+      contextVars: ctx.contextVars,
+      contextVarId: this.blockDef.contextVarId,
+      expr: this.blockDef.expr,
+      types: ["boolean"]
+    })
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
@@ -87,7 +75,7 @@ export class ConditionalBlock extends Block<ConditionalBlockDef> {
 
   renderInstance(props: InstanceCtx) { 
     // Check expression value
-    const value = props.getContextVarExprValue(this.blockDef.contextVarId!, this.blockDef.expr)
+    const value = props.getContextVarExprValue(this.blockDef.contextVarId, this.blockDef.expr)
 
     if (!value) {
       return <div/>
@@ -97,32 +85,22 @@ export class ConditionalBlock extends Block<ConditionalBlockDef> {
   }
 
   renderEditor(props: DesignCtx) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)
-
-    // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
     return (
       <div>
-        <h3>Rowset</h3>
-        <LabeledProperty label="Row/Rowset Variable">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="contextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row", "rowset"]} />}
-          </PropertyEditor>
-        </LabeledProperty>
-
+        <h3>Conditional</h3>
         <LabeledProperty label="Conditional Expression">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="expr">
-            {(value, onChange) => 
-              <ExprComponent 
-                value={value} 
-                onChange={onChange} 
-                schema={props.schema} 
-                dataSource={props.dataSource} 
-                aggrStatuses={["individual", "aggregate", "literal"]}
-                types={["boolean"]}
-                variables={createExprVariables(props.contextVars)}
-                table={contextVar ? contextVar.table || null : null}/>
-            }
-          </PropertyEditor>
+          <ContextVarExprPropertyEditor
+            contextVars={props.contextVars}
+            schema={props.schema} 
+            dataSource={props.dataSource} 
+            aggrStatuses={["individual", "aggregate", "literal"]}
+            types={["boolean"]}
+            contextVarId={this.blockDef.contextVarId}
+            expr={this.blockDef.expr} 
+            onChange={(contextVarId, expr) => {
+              props.store.replaceBlock({ ...this.blockDef, contextVarId, expr } as ConditionalBlockDef)
+            }}
+            />
         </LabeledProperty>
       </div>
     )

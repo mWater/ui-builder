@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import * as React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
@@ -11,7 +11,6 @@ import { ContextVar } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
-import { callbackify } from 'util';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {

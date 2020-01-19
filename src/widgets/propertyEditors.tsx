@@ -3,7 +3,7 @@ import * as React from "react";
 import { Select } from "react-library/lib/bootstrap";
 import { ContextVar, createExprVariables } from "./blocks";
 import { ActionDef } from "./actions";
-import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, ExprUtils } from "mwater-expressions";
+import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, ExprUtils, AggrStatus, LiteralType } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
 import ListEditor from "./ListEditor";
 import { ExprComponent } from "mwater-expressions-ui";
@@ -132,8 +132,8 @@ export class ContextVarPropertyEditor extends React.Component<{
   contextVars: ContextVar[],
   types?: string[],
   table?: string, 
-  /** Makes null say "None", not "Select..." */
-  allowNone?: boolean, 
+  /** Makes null say something other than "Select..." */
+  nullLabel?: string
   filter?: (contextVar: ContextVar) => boolean
 }> {
 
@@ -147,10 +147,54 @@ export class ContextVarPropertyEditor extends React.Component<{
     return <Select
       value={this.props.value}
       onChange={this.props.onChange}
-      nullLabel={this.props.allowNone ? "None" : "Select..."}
+      nullLabel={this.props.nullLabel ? this.props.nullLabel : "Select..."}
       options={contextVars.map(cv => ({ label: cv.name, value: cv.id }))}
     />
   }
+}
+
+/** Edits both a context variable selection and a related expression */
+export const ContextVarExprPropertyEditor = (props: { 
+  schema: Schema
+  dataSource: DataSource
+  contextVars: ContextVar[]
+  contextVarId: string | null
+  expr: Expr
+  onChange: (contextVarId: string | null, expr: Expr) => void
+  aggrStatuses?: AggrStatus[]
+  types?: LiteralType[]
+  enumValues?: Array<{ id: string, name: LocalizedString }>
+  idTable?: string
+}) => {
+  const contextVar = props.contextVars.find(cv => cv.id === props.contextVarId)
+
+  // Get all context variables up to an including one above. All context variables if null
+  // This is because an outer context var expr cannot reference an inner context variable
+  const cvIndex = props.contextVars.findIndex(cv => cv.id === props.contextVarId)
+  const availContextVars = cvIndex >= 0 ? _.take(props.contextVars, cvIndex + 1)  : props.contextVars
+
+  return <div style={{ border: "solid 1px #DDD", borderRadius: 5, padding: 10 }}>
+    <ContextVarPropertyEditor 
+      value={props.contextVarId} 
+      onChange={cv => { props.onChange(cv, null)} }
+      nullLabel="No Row/Rowset"
+      contextVars={props.contextVars} 
+      types={["row", "rowset"]} />
+
+    <div style={{ paddingTop: 10 }}>
+      <ExprComponent 
+        value={props.expr} 
+        onChange={expr => { props.onChange(props.contextVarId, expr)} }
+        schema={props.schema} 
+        dataSource={props.dataSource} 
+        aggrStatuses={props.aggrStatuses}
+        types={props.types}
+        variables={createExprVariables(availContextVars)}
+        table={contextVar ? contextVar.table || null : null}
+        enumValues={props.enumValues}
+        idTable={props.idTable} />
+    </div>
+  </div>
 }
 
 /** Edits an action definition, allowing selection of action */
@@ -425,95 +469,80 @@ export const EmbeddedExprsEditor = (props: {
 }
 
 /** Allows editing of an embedded expression */
-export class EmbeddedExprEditor extends React.Component<{
+export const EmbeddedExprEditor = (props: {
   value: EmbeddedExpr
   onChange: (embeddedExpr: EmbeddedExpr) => void
-  contextVars: ContextVar[]
   schema: Schema
   dataSource: DataSource
-}> {
+  contextVars: ContextVar[]
+}) => {
+  const { schema, dataSource, contextVars } = props
 
-  handleExprChange = (expr: Expr) => {
-    const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
-    const newExprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(expr)
+  const handleChange = (contextVarId: string | null, expr: Expr) => {
+    const exprType = new ExprUtils(schema, createExprVariables(contextVars)).getExprType(props.value.expr)
+    const newExprType = new ExprUtils(schema, createExprVariables(contextVars)).getExprType(expr)
     
     if (newExprType !== exprType) {
-      this.props.onChange({ ...this.props.value, expr: expr, format: null })
+      props.onChange({ ...props.value, contextVarId: contextVarId, expr: expr, format: null })
     }
     else {
-      this.props.onChange({ ...this.props.value, expr: expr })
+      props.onChange({ ...props.value, contextVarId: contextVarId, expr: expr })
     }
   }
 
-  render() {
-    // TODO ensure expressions do not use context variables after the one that has been selected (as the parent injector will not have access to the variable value)
+  const exprType = new ExprUtils(schema, createExprVariables(contextVars)).getExprType(props.value.expr)
 
-    const contextVar = this.props.contextVars.find(cv => cv.id === this.props.value.contextVarId)
-    const exprType = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprType(this.props.value.expr)
+  return (
+    <div>
+      <LabeledProperty label="Expression">
+        <ContextVarExprPropertyEditor 
+          contextVarId={props.value.contextVarId}
+          expr={props.value.expr} 
+          onChange={handleChange} 
+          schema={schema}
+          dataSource={dataSource}
+          contextVars={contextVars}
+          aggrStatuses={["individual", "aggregate", "literal"]} />
+      </LabeledProperty>
 
-    return (
-      <div>
-        <LabeledProperty label="Row/Rowset Variable">
-          <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="contextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={this.props.contextVars} types={["row", "rowset"]} />}
+      { exprType === "number" ?
+        <LabeledProperty label="Number Format">
+          <PropertyEditor obj={props.value} onChange={props.onChange} property="format">
+            {(value: string, onChange) => (
+              <NumberFormatEditor
+                value={value} 
+                onChange={onChange} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-    
-        { contextVar && contextVar.table 
-          ?
-          <LabeledProperty label="Expression">
-            <ExprComponent 
-              value={this.props.value.expr} 
-              onChange={this.handleExprChange} 
-              schema={this.props.schema} 
-              dataSource={this.props.dataSource} 
-              aggrStatuses={["individual", "aggregate", "literal"]}
-              variables={createExprVariables(this.props.contextVars)}
-              table={contextVar.table!}/>
-          </LabeledProperty>
-          : null
-        }
+        : null
+      }
 
-        { exprType === "number" ?
-          <LabeledProperty label="Number Format">
-            <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="format">
-              {(value: string, onChange) => (
-                <NumberFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
-            </PropertyEditor>
-          </LabeledProperty>
-          : null
-        }
+      { exprType === "date" ?
+        <LabeledProperty label="Date Format">
+          <PropertyEditor obj={props.value} onChange={props.onChange} property="format">
+            {(value: string, onChange) => (
+              <DateFormatEditor
+                value={value} 
+                onChange={onChange} />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+        : null
+      }
 
-        { exprType === "date" ?
-          <LabeledProperty label="Date Format">
-            <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="format">
-              {(value: string, onChange) => (
-                <DateFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
-            </PropertyEditor>
-          </LabeledProperty>
-          : null
-        }
-
-        { exprType === "datetime" ?
-          <LabeledProperty label="Date/time Format">
-            <PropertyEditor obj={this.props.value} onChange={this.props.onChange} property="format">
-              {(value: string, onChange) => (
-                <DatetimeFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
-            </PropertyEditor>
-          </LabeledProperty>
-          : null
-        }
-      </div>
-    )
-  }
+      { exprType === "datetime" ?
+        <LabeledProperty label="Date/time Format">
+          <PropertyEditor obj={props.value} onChange={props.onChange} property="format">
+            {(value: string, onChange) => (
+              <DatetimeFormatEditor
+                value={value} 
+                onChange={onChange} />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+        : null
+      }
+    </div>
+  )
 }
-

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Expr, Variable, LiteralType, EnumValue } from 'mwater-expressions';
+import { Expr, Variable, LiteralType, EnumValue, AggrStatus, Schema } from 'mwater-expressions';
 import { InstanceCtx, DesignCtx } from '../contexts';
 import "./blocks.css";
 /** Side on which another block is dropped on a block */
@@ -103,3 +103,14 @@ export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: Create
 export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
 /** Make a duplicate of a block */
 export declare function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef;
+/** Validates a context variable/expr combo. Null if ok */
+export declare function validateContextVarExpr(options: {
+    contextVars: ContextVar[];
+    schema: Schema;
+    contextVarId: string | null;
+    expr: Expr;
+    types?: LiteralType[];
+    aggrStatuses?: AggrStatus[];
+    idTable?: string;
+    enumValueIds?: string[];
+}): string | null;
