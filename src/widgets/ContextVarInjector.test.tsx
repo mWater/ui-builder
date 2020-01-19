@@ -366,3 +366,31 @@ test("filters are not applied for rowset variables to variable value", (done) =>
   
 })
   
+test("exprs are computed for null variable with variable-based expression", (done) => {
+  const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "number" }
+  const value = 1234
+  const contextVarExprs : Expr[] = [
+    { type: "op", op: "+", exprs: [{ type: "variable", variableId: "cv1" }, { type: "literal", valueType: "number", value: 1}]}
+  ]
+
+  let innerRenderProps: InstanceCtx
+    
+  const x = shallow((
+    <ContextVarInjector 
+      instanceCtx={outerRenderProps} 
+      injectedContextVar={contextVar} 
+      value={value}
+      contextVarExprs={contextVarExprs}>
+      { (instanceCtx: InstanceCtx) => {
+          innerRenderProps = instanceCtx
+          return <div/>
+      }}
+    </ContextVarInjector>))
+  
+  setImmediate(() => {
+    // Should get the value
+    expect(innerRenderProps!.getContextVarExprValue(null, contextVarExprs[0])).toBe(1235)
+  
+    done()
+  })
+})

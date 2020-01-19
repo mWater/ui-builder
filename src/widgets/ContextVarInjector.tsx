@@ -1,6 +1,6 @@
 import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables } from "./blocks";
 import * as React from "react";
-import { Expr, ExprUtils, Schema, Variable } from "mwater-expressions";
+import { Expr, ExprUtils, Schema, Variable, PromiseExprEvaluator } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
 import canonical from 'canonical-json'
 import _ from "lodash";
@@ -240,13 +240,31 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     // Get injected context variable value
     let value = this.props.value
 
+    const contextVars = outer.contextVars.concat(this.props.injectedContextVar)
+    const contextVarValues = { ...outer.contextVarValues, [this.props.injectedContextVar.id]: value }
+
     // Create inner props
     const innerProps: InstanceCtx = {
       ...outer,
       database: this.props.instanceCtx.database,
-      contextVars: outer.contextVars.concat(this.props.injectedContextVar),
-      contextVarValues: { ...outer.contextVarValues, [this.props.injectedContextVar.id]: value },
+      contextVars: contextVars,
+      contextVarValues: contextVarValues,
       getContextVarExprValue: (contextVarId, expr) => {
+        // Null expression has null value
+        if (!expr) {
+          return null
+        }
+
+        // If no context variable, evaluate expression
+        if (contextVarId == null) {
+          return new PromiseExprEvaluator({ 
+            schema: outer.schema, 
+            locale: outer.locale,
+            variables: createExprVariables(contextVars),
+            variableValues: contextVarValues
+          }).evaluateSync(expr)
+        }
+
         if (contextVarId === this.props.injectedContextVar.id) {
           return this.state.exprValues[canonical(expr)]
         }

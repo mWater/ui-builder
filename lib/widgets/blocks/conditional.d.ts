@@ -14,7 +14,7 @@ export interface ConditionalBlockDef extends BlockDef {
 }
 export declare class ConditionalBlock extends Block<ConditionalBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
-    validate(options: DesignCtx): string | null;
+    validate(ctx: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Get context variable expressions needed to add */
     getContextVarExprs(contextVar: ContextVar): Expr[];

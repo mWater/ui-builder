@@ -47,6 +47,7 @@ export interface DesignCtx extends BaseCtx {
 export interface InstanceCtx extends BaseCtx {
   pageStack: PageStack
 
+  /** Context variables that are present */
   contextVars: ContextVar[]
 
   /** Values of context variables. Note: filters are not incorporated automatically into rowset values! */
@@ -60,10 +61,10 @@ export interface InstanceCtx extends BaseCtx {
 
   /**
    * Gets the value of an expression based off of a context variable
-   * @param contextVarId id of context variable
+   * @param contextVarId id of context variable. null for expr not based on context variable row/rowset
    * @param expr expression to get value of
    */
-  getContextVarExprValue(contextVarId: string, expr: Expr): any
+  getContextVarExprValue(contextVarId: string | null, expr: Expr): any
 
   /** Selection call on context var (when type = "rowset" and selectable) */
   onSelectContextVar(contextVarId: string, primaryKey: any): void

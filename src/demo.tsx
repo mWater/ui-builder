@@ -76,7 +76,11 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
       dataSource: dataSource,
       locale: "en",
       globalContextVars: [
-        { type: "row", table: "users", id: "user", name: "User" }
+        { type: "row", table: "users", id: "user", name: "User" },
+        { type: "enum", id: "setting", name: "Setting", enumValues: [
+          { id: "a", name: { _base: "en", en: "A" }},
+          { id: "b", name: { _base: "en", en: "B" }},
+        ] }
       ]
     }
 
