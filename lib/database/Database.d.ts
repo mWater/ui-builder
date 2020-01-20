@@ -1,6 +1,5 @@
 import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator, Row } from 'mwater-expressions';
 import { ContextVar } from '../widgets/blocks';
-import { QueryOptions } from "./Database";
 import { ExprUtils } from "mwater-expressions";
 export declare type OrderByDir = "asc" | "desc";
 export interface OrderBy {
@@ -81,4 +80,6 @@ export declare function getWherePrimaryKey(where?: Expr): any;
 export declare function isQueryAggregate(query: QueryOptions, exprUtils: ExprUtils): boolean;
 /** Stable sort on field */
 export declare function stableSort<T>(items: T[], iteratee: (item: T) => any, direction: "asc" | "desc"): T[];
+/** Hook to listen for database changes. Returns an integer that increments with each change */
+export declare function useDatabaseChangeListener(database: Database): number;
 export {};

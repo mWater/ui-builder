@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import { Expr, PromiseExprEvaluatorRow, PromiseExprEvaluator, Row, LiteralExpr } from 'mwater-expressions'
 import { ContextVar } from '../widgets/blocks';
-import { QueryOptions } from "./Database"
 import stable from 'stable'
 import { ExprUtils } from "mwater-expressions"
+import { useEffect, useState, useCallback } from 'react';
 
 export type OrderByDir = "asc" | "desc"
 
@@ -274,4 +274,22 @@ function normalCompare(a: any, b: any): number {
     return a > b ? 1 : (a < b ? -1 : 0)
   }
   return String(a).localeCompare(b)
+}
+
+/** Hook to listen for database changes. Returns an integer that increments with each change */
+export function useDatabaseChangeListener(database: Database) {
+  const [incr, setIncr] = useState(0)
+
+  const listener = useCallback(() => {
+    setIncr(cur => cur + 1)
+  }, [])
+
+  useEffect(() => {
+    database.addChangeListener(listener)
+    return () => {
+      database.removeChangeListener(listener)
+    }
+  }, [database])
+
+  return incr
 }
