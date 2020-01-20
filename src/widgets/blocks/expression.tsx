@@ -39,7 +39,6 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
 
   renderDesign(props: DesignCtx) {
     const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
-    const style = this.getStyle()
 
     return this.renderText(
       <div>
@@ -51,7 +50,7 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
-    if (!this.blockDef.contextVarId || !this.blockDef.expr) {
+    if (!this.blockDef.expr) {
       return <div/>
     }
 
