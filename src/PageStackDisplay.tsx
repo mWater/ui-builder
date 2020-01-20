@@ -175,7 +175,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
     // Wrap in context var injector
     return <ContextVarsInjector 
-      injectedContextVars={widgetDef.contextVars.concat(this.props.baseCtx.globalContextVars || [])}
+      injectedContextVars={(this.props.baseCtx.globalContextVars || []).concat(widgetDef.contextVars)}
       innerBlock={widgetDef.blockDef}
       injectedContextVarValues={page.contextVarValues}
       instanceCtx={{ ...outerInstanceCtx, database: page.database }}>
