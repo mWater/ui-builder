@@ -25,7 +25,9 @@ export default class ContextVarsInjector extends React.Component<Props> {
 
     const allContextVars = this.props.instanceCtx.contextVars.concat(this.props.injectedContextVars)
 
-    for (const contextVar of this.props.injectedContextVars) {
+    // Do in reverse order, as the inner most one is done first
+    const reverseInjectedContextVars = this.props.injectedContextVars.slice().reverse()
+    for (const contextVar of reverseInjectedContextVars) {
       const innerBlock = this.props.innerBlock ? this.props.instanceCtx.createBlock(this.props.innerBlock) : null
 
       // Get context var exprs
