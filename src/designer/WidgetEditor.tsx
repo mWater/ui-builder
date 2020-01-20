@@ -27,7 +27,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
 
   render() {
     // Get list of all context variables, including global
-    const allContextVars = this.props.widgetDef.contextVars.concat(this.props.designCtx.globalContextVars || [])
+    const allContextVars = (this.props.designCtx.globalContextVars || []).concat(this.props.widgetDef.contextVars)
 
     return (<div>
       <LabeledProperty label="Name">
