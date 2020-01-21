@@ -220,6 +220,12 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
             </ModalPage>
           </div>
         )
+      case "inline":
+        return (
+          <div style={{ display: invisible ? "none" : "block" }} key={index}>
+            {contents}
+          </div>
+        )
     }
   }
  

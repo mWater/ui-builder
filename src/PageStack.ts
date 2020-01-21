@@ -1,8 +1,11 @@
 import { Database } from "./database/Database";
 
 export interface Page {
-  /** Whether page is a normal page or a modal */
-  type: "modal" | "normal"
+  /** Whether page is a normal page or a modal. "inline" is displayed as 
+   * an inline widget without padding. It assumes that all child pages
+   * will be modals 
+   */
+  type: "modal" | "normal" | "inline"
 
   /** Widget to display in page */
   widgetId: string
