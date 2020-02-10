@@ -153,6 +153,20 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         // Look up expression
         const exprIndex = rowExprs.findIndex(rowExpr => _.isEqual(expr, rowExpr))
         return this.state.rows![rowIndex]["e" + exprIndex]
+      },
+      getFilters: (cvid) => {
+        // If this creates a rowset, it has no filters as it can't be filtered
+        if (cvid == rowcv.id) {
+          return []
+        }
+        return rips.getFilters(cvid)
+      },
+      setFilter: (cvid, filter) => {
+        // Can't set filter for rowset
+        if (cvid == rowcv.id) {
+          throw new Error("Can't set filter for query table rowset")
+        }
+        rips.setFilter(cvid, filter)
       }
     }
   }
