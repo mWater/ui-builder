@@ -17,6 +17,7 @@ import { TextboxBlockDef } from './controls/textbox';
 import { NumberboxBlockDef } from './controls/numberbox';
 import { DatefieldBlockDef } from './controls/datefield';
 import { DropdownBlockDef } from './controls/dropdown';
+import { WidgetBlockDef } from './widget';
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -176,6 +177,30 @@ const AddWizardPane = (props: {
 
     return allEntries
   }
+
+  /** Get entries that are other embedded widgets */
+  const getWidgetEntries = () => {
+    const allEntries: BlockPaletteEntry[] = []
+
+    for (const widgetId in props.designCtx.widgetLibrary.widgets) {
+      const widget = props.designCtx.widgetLibrary.widgets[widgetId]
+
+      // TODO Skip self 
+      allEntries.push({
+        title: widget.name,
+        subtitle: widget.description,
+        blockDef: {
+          id: uuid(),
+          type: "widget",
+          widgetId: widgetId,
+          contextVarMap: {}
+         } as WidgetBlockDef,
+         elem: <div/>
+      })
+    }
+
+    return allEntries
+  }
   
   const displayAndFilterEntries = (entries: BlockPaletteEntry[]) => {
     // Compute visible entries
@@ -208,7 +233,8 @@ const AddWizardPane = (props: {
         [
           { id: "palette", label: "Palette", elem: displayAndFilterEntries(designCtx.blockPaletteEntries) },
           { id: "controls", label: "Controls", elem: displayAndFilterEntries(getControlEntries()) },
-          { id: "expressions", label: "Expressions", elem: displayAndFilterEntries(getExpressionEntries()) }
+          { id: "expressions", label: "Expressions", elem: displayAndFilterEntries(getExpressionEntries()) },
+          { id: "widgets", label: "Widgets", elem: displayAndFilterEntries(getWidgetEntries()) }
         ]
       }    
     />

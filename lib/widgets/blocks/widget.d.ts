@@ -5,6 +5,7 @@ import { Expr } from 'mwater-expressions';
 import { InstanceCtx, DesignCtx } from '../../contexts';
 /** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
+    type: "widget";
     widgetId: string | null;
     contextVarMap: {
         [internalContextVarId: string]: string;

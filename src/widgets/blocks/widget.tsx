@@ -11,6 +11,7 @@ import { InstanceCtx, DesignCtx } from '../../contexts';
 
 /** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
+  type: "widget"
   widgetId: string | null   // Id of the widget
   contextVarMap: { [internalContextVarId: string]: string }  // Maps each internal widgets' context variable id to an external one
 }
