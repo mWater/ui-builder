@@ -19,7 +19,6 @@ export default class TextInstance extends React.Component<{
 }> {
 
   getOptions = async (input: string) => {
-    const exprUtils = new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprEnumValues(this.props.blockDef.filterExpr)
     const contextVar = this.props.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!
     const table = contextVar.table!
     const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
@@ -62,14 +61,16 @@ export default class TextInstance extends React.Component<{
   render() {
     const currentValue = this.props.value ? { value: this.props.value, label: this.props.value } : null
 
+    // Make minimum size to fit text
+    const minWidth = Math.min(300, Math.max(this.props.value ? this.props.value.length * 8 + 90 : 0, 150))
+
     const noOptionsMessage = () => "Type to search"
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 }),
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: minWidth }),
       // Keep menu above other controls
       menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })      
     }
 
-    // TODO key: JSON.stringify(@props.filters)  # Include to force a change when filters change
     return <Async 
       placeholder={localize(this.props.blockDef.placeholder, this.props.locale)}
       value={currentValue}
@@ -81,9 +82,5 @@ export default class TextInstance extends React.Component<{
       noOptionsMessage={noOptionsMessage}
       styles={styles}
     />
-      // styles: { 
-      //   # Keep menu above fixed data table headers
-      //   menu: (style) => _.extend({}, style, zIndex: 2)
-      // }
   }
 }

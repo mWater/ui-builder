@@ -22,8 +22,12 @@ export default class EnumInstance extends React.Component<{
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, this.props.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
     const handleChange = (ev: EnumValue | null) => this.props.onChange(ev ? ev.id : null)
+
+    // Make minimum size to fit text
+    const minWidth = Math.min(300, Math.max(enumValue ? getOptionLabel(enumValue).length * 8 + 90 : 0, 150))
+
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 }),
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: minWidth }),
       // Keep menu above other controls
       menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 }),
       menuPortal: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
