@@ -176,6 +176,19 @@ export default class DateExprComponent extends React.Component<Props, State> {
     }
   }
 
+  toDate(value: string | null): Date | null {
+    if (!value) {
+      return null
+    }
+
+    if (this.props.datetime) {
+      return moment(value, moment.ISO_8601).toDate()
+    }
+    else {
+      return moment(value, "YYYY-MM-DD").toDate()
+    }
+  }
+
   fromMoment(value?: moment.Moment) {
     if (!value) {
       return null
@@ -197,7 +210,9 @@ export default class DateExprComponent extends React.Component<Props, State> {
     this.setState({ custom: true })
   }
 
-  handleStartChange = (value: moment.Moment) => {
+  handleStartChange = (dateValue: Date) => {
+    const value = moment(dateValue)
+    
     // Clear end if after
     if (_.isArray(this.props.value) && this.props.value[1] && this.fromMoment(value)! > this.props.value[1]!) {
       this.props.onChange([this.fromMoment(value), null])
@@ -207,7 +222,9 @@ export default class DateExprComponent extends React.Component<Props, State> {
     }
   }
 
-  handleEndChange = (value: moment.Moment) => {
+  handleEndChange = (dateValue: Date) => {
+    let value = moment(dateValue)
+
     // Go to end of day if datetime
     if (this.props.datetime) {
       value = moment(value)
@@ -305,8 +322,8 @@ export default class DateExprComponent extends React.Component<Props, State> {
   }
 
   renderCustomDropdown() {
-    const startDate = this.toMoment(_.isArray(this.props.value) ? this.props.value[0] : null) || undefined
-    const endDate = this.toMoment(_.isArray(this.props.value) ? this.props.value[1] : null) || undefined
+    const startDate = this.toDate(_.isArray(this.props.value) ? this.props.value[0] : null) || undefined
+    const endDate = this.toDate(_.isArray(this.props.value) ? this.props.value[1] : null) || undefined
 
     return (
       <div style={{ position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  }}>
