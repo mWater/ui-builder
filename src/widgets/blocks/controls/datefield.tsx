@@ -109,48 +109,25 @@ interface DatefieldProps {
 
 /** Date field */
 class Datefield extends React.Component<DatefieldProps> {
-  handleChange = (value: Date) => {
+  handleChange = (value: Moment) => {
     if (this.props.datetime) {
       this.props.onChange(value ? value.toISOString() : null)
     }
     else {
-      this.props.onChange(value ? moment(value).format("YYYY-MM-DD") : null)
+      this.props.onChange(value ? value.format("YYYY-MM-DD") : null)
     }
   }
 
   render() {
-    // Convert moment format to date-fns. Needed since react-datepicker was updated
-    let dateFormat = this.props.format
-    switch (this.props.format) {
-      case "ll":
-        dateFormat = "PP"
-        break
-      case "LL":
-        dateFormat = "PPP"
-        break
-      case "lll":
-        dateFormat = "PPp"
-        break
-      case "LLL":
-        dateFormat = "PPPp"
-        break
-      case "llll":
-        dateFormat = "PPPp"
-        break
-      case "LLLL":
-        dateFormat = "PPPPp"
-        break
-    }
-
     return (
       <DatePicker
         placeholderText={this.props.placeholder}
         disabled={this.props.disabled}
-        selected={this.props.value ? new Date(this.props.value) : null}
+        selected={this.props.value ? moment(this.props.value, moment.ISO_8601) : null}
         onChange={this.handleChange}
         showTimeSelect={this.props.datetime}
         timeFormat="HH:mm"
-        dateFormat={dateFormat}
+        dateFormat={this.props.format}
         className="form-control"
       />
     )

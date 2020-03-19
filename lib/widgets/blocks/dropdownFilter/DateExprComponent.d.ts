@@ -29,12 +29,11 @@ export declare const toExpr: (table: string, expr: Expr, datetime: boolean, valu
 export default class DateExprComponent extends React.Component<Props, State> {
     constructor(props: Props);
     toMoment(value: string | null): moment.Moment | null;
-    toDate(value: string | null): Date | null;
     fromMoment(value?: moment.Moment): string | null;
     handleClickOut: () => void;
     handleCustom: () => void;
-    handleStartChange: (dateValue: Date) => void;
-    handleEndChange: (dateValue: Date) => void;
+    handleStartChange: (value: moment.Moment) => void;
+    handleEndChange: (value: moment.Moment) => void;
     handlePreset: (preset: Preset) => void;
     handleOpen: () => void;
     renderClear(): JSX.Element;

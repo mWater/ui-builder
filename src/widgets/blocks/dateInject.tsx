@@ -66,9 +66,9 @@ export class DateInjectBlock extends Block<DateInjectBlockDef> {
       <div>
         <div>
           <DatePicker
-            selected={new Date()}
+            selected={moment()}
             onChange={() => {}}
-            dateFormat="PPP"
+            dateFormat="ll"
             className="form-control"
           />
         </div>
@@ -98,9 +98,9 @@ const DateInjectInstance = (props: { block: DateInjectBlock, instanceCtx: Instan
     <div>
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         <DatePicker
-          selected={moment(date, "YYYY-MM-DD").toDate()}
-          onChange={(d) => { setDate(moment(d!).format("YYYY-MM-DD")) }}
-          dateFormat="PPP"
+          selected={moment(date, "YYYY-MM-DD")}
+          onChange={(momentDate) => { setDate(momentDate!.format("YYYY-MM-DD")) }}
+          dateFormat="ll"
           isClearable={false}
           className="form-control"
         />
