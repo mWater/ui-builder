@@ -121,6 +121,7 @@ class Datefield extends React.Component<DatefieldProps> {
   render() {
     return (
       <DatePicker
+        isClearable={true}
         placeholderText={this.props.placeholder}
         disabled={this.props.disabled}
         selected={this.props.value ? moment(this.props.value, moment.ISO_8601) : null}
