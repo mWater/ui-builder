@@ -5,7 +5,7 @@ import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
 import ReactSelect from "react-select"
 
-export default class EnumInstance extends React.Component<{
+export default class EnumsetInstance extends React.Component<{
   blockDef: DropdownFilterBlockDef
   schema: Schema
   contextVars: ContextVar[]
@@ -17,14 +17,15 @@ export default class EnumInstance extends React.Component<{
   render() {
     const enumValues = this.props.blockDef.filterExpr ? new ExprUtils(this.props.schema, createExprVariables(this.props.contextVars)).getExprEnumValues(this.props.blockDef.filterExpr) : null
 
-    const enumValue = enumValues ? enumValues.find(ev => ev.id === this.props.value) : null
+    // Get selected values as enum values
+    const selectedValues = enumValues && this.props.value ? this.props.value.map((v: any) => enumValues.find(ev => ev.id == v)) : null
 
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, this.props.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
-    const handleChange = (ev: EnumValue | null) => this.props.onChange(ev ? ev.id : null)
+    const handleChange = (evs: EnumValue[] | null) => this.props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
 
-    // Make minimum size to fit text
-    const minWidth = Math.min(300, Math.max(enumValue ? getOptionLabel(enumValue).length * 8 + 90 : 0, 150))
+    // Make minimum size to fit text TODO just max for now
+    const minWidth = 400 //Math.min(300, Math.max(selectedValue ? getOptionLabel(selectedValue).length * 8 + 90 : 0, 150))
 
     const styles = {
       control: (base: React.CSSProperties) => ({ ...base, height: 40, minHeight: 40, minWidth: minWidth }),
@@ -34,7 +35,8 @@ export default class EnumInstance extends React.Component<{
     }
 
     return <ReactSelect
-      value={enumValue} 
+      value={selectedValues} 
+      isMulti={true}
       onChange={handleChange}
       options={enumValues || undefined}
       placeholder={localize(this.props.blockDef.placeholder, this.props.locale)}

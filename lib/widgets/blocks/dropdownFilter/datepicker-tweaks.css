@@ -29,3 +29,8 @@
   border-left-color: #ccc;
   right: 1em;
 }
+
+/* https://github.com/Hacker0x01/react-datepicker/issues/1141 */
+.react-datepicker-popper {
+  width: max-content;
+}

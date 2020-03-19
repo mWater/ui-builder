@@ -66,7 +66,7 @@ export default class TextInstance extends React.Component<{
 
     const noOptionsMessage = () => "Type to search"
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: minWidth }),
+      control: (base: React.CSSProperties) => ({ ...base, height: 40, minHeight: 40, minWidth: minWidth }),
       // Keep menu above other controls
       menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })      
     }

@@ -12,6 +12,7 @@ import DateExprComponent, { toExpr, DateValue } from './DateExprComponent';
 import produce from 'immer';
 import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
+import EnumsetInstance from './EnumsetInstance';
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -45,7 +46,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
     // Validate expr
     let error
-    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "text", "date", "datetime"] })
+    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "enumset", "text", "date", "datetime"] })
     if (error) {
       return error
     }
@@ -63,6 +64,12 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
         return {
           id: this.blockDef.id,
           expr: value ? { type: "op", table: table, op: "=", exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "enum", value: value }]} : null,
+          memo: value
+        }
+      case "enumset":
+        return {
+          id: this.blockDef.id,
+          expr: value ? { type: "op", table: table, op: "intersects", exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "enumset", value: value }]} : null,
           memo: value
         }
       case "text":
@@ -92,7 +99,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 }),
+      control: (base: React.CSSProperties) => ({ ...base, height: 40, minHeight: 40, minWidth: 150 }),
       // Keep menu above other controls
       menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 }),
       menuPortal: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
@@ -153,6 +160,15 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     switch (valueType) {
       case "enum":
         elem = <EnumInstance 
+          blockDef={this.blockDef}
+          schema={props.schema}
+          contextVars={props.contextVars}
+          value={value}
+          onChange={handleChange}
+          locale={props.locale} />
+        break
+      case "enumset":
+        elem = <EnumsetInstance 
           blockDef={this.blockDef}
           schema={props.schema}
           contextVars={props.contextVars}
@@ -225,7 +241,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
               dataSource={props.dataSource} 
               onChange={handleExprChange} 
               table={rowsetCV.table!} 
-              types={["enum", "text", "date", "datetime"]} />
+              types={["enum", "enumset", "text", "date", "datetime"]} />
           </LabeledProperty>
         : null}
 

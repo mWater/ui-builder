@@ -236,7 +236,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
   renderClear() {
     return (
-      <div style={{ position: "absolute", right: 10, top: 7, color: "#AAA" }} onClick={this.props.onChange.bind(null, null)}>
+      <div style={{ position: "absolute", right: 10, top: 9, color: "#AAA" }} onClick={this.props.onChange.bind(null, null)}>
         <i className="fa fa-remove"/>
       </div>
     )
@@ -341,7 +341,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
     return (
       <ClickOutHandler onClickOut={this.handleClickOut}>
         <div style={{ display: "inline-block", position: "relative" }}>
-          <div className="form-control" style={{ width: 220, height: 36 }} onClick={this.handleOpen}>
+          <div className="form-control" style={{ width: 220, height: 40, paddingTop: 9 }} onClick={this.handleOpen}>
             {this.renderSummary()}
           </div>
           { this.props.value && this.props.onChange ?
