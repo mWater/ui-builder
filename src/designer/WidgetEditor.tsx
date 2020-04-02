@@ -47,14 +47,16 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       </LabeledProperty>
       <LabeledProperty label="Preview Variable Values">
         {allContextVars.map((contextVar) => {
-          return <ContextVarPreviewValue 
-            key={contextVar.id}
-            contextVar={contextVar} 
-            widgetDef={this.props.widgetDef} 
-            schema={this.props.designCtx.schema}
-            dataSource={this.props.designCtx.dataSource}
-            onWidgetDefChange={this.props.onWidgetDefChange}
-            />
+          return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
+            <ContextVarPreviewValue 
+              key={contextVar.id}
+              contextVar={contextVar} 
+              widgetDef={this.props.widgetDef} 
+              schema={this.props.designCtx.schema}
+              dataSource={this.props.designCtx.dataSource}
+              onWidgetDefChange={this.props.onWidgetDefChange}
+              />
+          </div>
         })}
       </LabeledProperty>
       <div style={{ color: "#EEE", fontSize: 9 }}>{this.props.widgetDef.id}</div>
@@ -259,6 +261,15 @@ class ContextVarPreviewValue extends React.Component<{
         value={value}
         onChange={this.handleChange}
         options={this.props.contextVar.enumValues!.map(ev => ({ value: ev.id, label: localize(ev.name) }))}
+        />
+    }
+
+    if (this.props.contextVar.type == "boolean") {
+      return <Select
+        nullLabel=""
+        value={value}
+        onChange={this.handleChange}
+        options={[{ value: true, label: "True" }, { value: false, label: "False" }]}
         />
     }
 
