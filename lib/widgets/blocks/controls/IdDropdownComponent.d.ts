@@ -2,6 +2,7 @@
 import { Database, OrderBy } from "../../../database/Database";
 import { Expr } from 'mwater-expressions';
 import { ContextVar } from '../../blocks';
+import { Styles } from 'react-select/lib/styles';
 interface SingleProps<T> {
     database: Database;
     table: string;
@@ -24,6 +25,8 @@ interface SingleProps<T> {
     contextVarValues: {
         [contextVarId: string]: any;
     };
+    /** Styling for react-select */
+    styles: Partial<Styles>;
 }
 interface MultiProps<T> {
     database: Database;
@@ -47,6 +50,8 @@ interface MultiProps<T> {
     contextVarValues: {
         [contextVarId: string]: any;
     };
+    /** Optional styling for react-select */
+    styles?: Partial<Styles>;
 }
 declare type Props<T> = SingleProps<T> | MultiProps<T>;
 /** Displays a combo box that allows selecting one text values from an expression */

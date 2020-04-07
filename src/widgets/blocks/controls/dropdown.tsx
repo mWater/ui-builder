@@ -13,6 +13,16 @@ import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '.
 import { OrderBy } from '../../../database/Database';
 import { Toggle } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
+import { Styles } from 'react-select/lib/styles';
+
+/** Styles for react-select */
+const dropdownStyles: Partial<Styles> = { 
+  // Keep menu above other controls
+  menu: style => ({ ...style, zIndex: 2000 }),
+  menuPortal: style => ({ ...style, zIndex: 2000 }),
+  control: style => ({ ...style, minHeight: 34, height: 34 }),
+  valueContainer: style => ({ ...style, top: -2 })
+}
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -136,7 +146,14 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   renderControl(props: RenderControlProps) {
     // If can't be rendered due to missing context variable, just show placeholder
     if (!props.rowContextVar || !this.blockDef.column) {
-      return <ReactSelect/>
+      // TODO height
+      return <ReactSelect
+        styles={{ 
+          // Keep menu above other controls
+          menu: (style) => ({ ...style, zIndex: 2000 }),
+          menuPortal: (style) => ({ ...style, zIndex: 2000 }),
+          control: style => ({ ...style, minHeight: 34, height: 34 })
+        }} />
     }
 
     // Get column
@@ -192,11 +209,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       isClearable={true}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
-      styles={{ 
-        // Keep menu above other controls
-        menu: (style) => ({ ...style, zIndex: 2000 }),
-        menuPortal: (style) => ({ ...style, zIndex: 2000 })
-      }}
+      styles={dropdownStyles}
       />
   }
 
@@ -235,11 +248,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       isMulti={true}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
-      styles={{ 
-        // Keep menu above other controls
-        menu: (style) => ({ ...style, zIndex: 2000 }),
-        menuPortal: (style) => ({ ...style, zIndex: 2000 })
-      }}
+      styles={dropdownStyles}
       />
   }
 
@@ -291,7 +300,8 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       filterExpr={this.blockDef.idFilterExpr || null}
       formatLabel={this.formatIdLabel.bind(null, props)}
       contextVars={props.contextVars}
-      contextVarValues={props.contextVarValues} />
+      contextVarValues={props.contextVarValues}
+      styles={dropdownStyles} />
   }
 
   renderIds(props: RenderControlProps, column: Column) {

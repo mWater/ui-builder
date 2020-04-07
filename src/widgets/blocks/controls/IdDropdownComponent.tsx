@@ -5,7 +5,7 @@ import { Expr } from 'mwater-expressions';
 import { useState, useCallback, useEffect } from 'react'
 import React from 'react'
 import { ContextVar } from '../../blocks'
-import { getOptionValue } from 'react-select/lib/builtins';
+import { Styles } from 'react-select/lib/styles';
 
 interface SingleProps<T> {
   database: Database
@@ -35,6 +35,9 @@ interface SingleProps<T> {
 
   contextVars: ContextVar[]
   contextVarValues: { [contextVarId: string]: any }
+
+  /** Styling for react-select */
+  styles: Partial<Styles>
 }
 
 interface MultiProps<T> {
@@ -65,6 +68,9 @@ interface MultiProps<T> {
 
   contextVars: ContextVar[]
   contextVarValues: { [contextVarId: string]: any }
+
+  /** Optional styling for react-select */
+  styles?: Partial<Styles>
 }
 
 type Props<T> = SingleProps<T> | MultiProps<T>
@@ -220,19 +226,7 @@ export function IdDropdownComponent<T>(props: Props<T>) {
       menuPortalTarget={document.body}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      styles={{
-        // Keep menu above fixed data table headers and map
-        menu: (style) => {
-          return _.extend({}, style, {
-            zIndex: 2000
-          });
-        },
-        menuPortal: (style) => {
-          return _.extend({}, style, {
-            zIndex: 2000
-          });
-        }
-      }} />
+      styles={props.styles} />
   </div>
 }
 
