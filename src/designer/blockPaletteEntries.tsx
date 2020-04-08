@@ -32,6 +32,7 @@ import { PrintBlockDef } from "../widgets/blocks/print";
 import { QueryRepeatBlockDef } from "../widgets/blocks/queryRepeat/queryRepeat";
 import { LabeledBlockDef } from "../widgets/blocks/labeled";
 import { DateInjectBlockDef } from "../widgets/blocks/dateInject";
+import { ToggleBlockDef } from "../widgets/blocks/controls/toggle";
 
 export interface BlockPaletteEntry {
   title: string
@@ -82,6 +83,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Dropdown Control",
     blockDef: { id: "", type: "dropdown", rowContextVarId: null, column: null } as DropdownBlockDef,
+  },
+  {
+    title: "Toggle Control",
+    blockDef: { id: "", type: "toggle", rowContextVarId: null, column: null } as ToggleBlockDef,
   },
   {
     title: "Date/Datetime Control",

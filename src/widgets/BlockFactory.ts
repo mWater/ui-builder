@@ -33,6 +33,7 @@ import { RowBlockDef, RowBlock } from './blocks/row';
 import { PanelBlock, PanelBlockDef } from './blocks/panel';
 import { AlertBlock, AlertBlockDef } from './blocks/alert';
 import { DateInjectBlock, DateInjectBlockDef } from './blocks/dateInject';
+import { ToggleBlockDef, ToggleBlock } from './blocks/controls/toggle';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -65,6 +66,8 @@ export default class BlockFactory {
         return new NumberboxBlock(blockDef as NumberboxBlockDef)
       case "dropdown":
         return new DropdownBlock(blockDef as DropdownBlockDef)
+      case "toggle":
+        return new ToggleBlock(blockDef as ToggleBlockDef)
       case "collapsible":
         return new CollapsibleBlock(blockDef as CollapsibleBlockDef)
       case "expression":
