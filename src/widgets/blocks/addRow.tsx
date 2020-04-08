@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import { BlockDef, ContextVar, ChildBlock, createExprVariables, CreateBlock, Block } from '../blocks'
 import * as _ from 'lodash';
-import { ExprValidator, Schema, LiteralExpr, Expr } from 'mwater-expressions';
+import { ExprValidator, Schema, LiteralExpr, Expr, ExprCompiler, ExprUtils } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput, Select, Radio } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
@@ -86,6 +86,7 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
     }
 
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
+    const exprUtils = new ExprUtils(options.schema, createExprVariables(options.contextVars))
 
     // Get type of column
     const columnType = (column.type === "join") ? "id" : column.type
@@ -103,7 +104,8 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
     else {
       contextVar = undefined
       // Must be literal
-      if (contextVarExpr.expr && contextVarExpr.expr.type !== "literal") {
+      const aggrStatus = exprUtils.getExprAggrStatus(contextVarExpr.expr)
+      if (aggrStatus && aggrStatus !== "literal") {
         return "Literal value required"
       }
     }
@@ -256,12 +258,7 @@ class AddRowInstance extends React.Component<Props, State> {
     for (const columnId of Object.keys(this.props.blockDef.columnValues)) {
       const contextVarExpr: ContextVarExpr = this.props.blockDef.columnValues[columnId]
 
-      if (contextVarExpr.contextVarId != null) {
-        row[columnId] = this.props.instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
-      }
-      else {
-        row[columnId] = contextVarExpr.expr ? (contextVarExpr.expr as LiteralExpr).value : null
-      }
+      row[columnId] = this.props.instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId, contextVarExpr.expr) 
     }
 
     try {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash'
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { ExprValidator, LiteralExpr, Expr } from 'mwater-expressions';
+import { ExprValidator, LiteralExpr, Expr, ExprUtils } from 'mwater-expressions';
 import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
 import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
@@ -60,6 +60,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
     }
 
     const exprValidator = new ExprValidator(designCtx.schema, createExprVariables(designCtx.contextVars))
+    const exprUtils = new ExprUtils(designCtx.schema, createExprVariables(designCtx.contextVars))
 
     // Get type of column
     const columnType = (column.type === "join") ? "id" : column.type
@@ -77,7 +78,8 @@ export class AddRowAction extends Action<AddRowActionDef> {
     else {
       contextVar = undefined
       // Must be literal
-      if (contextVarExpr.expr && contextVarExpr.expr.type !== "literal") {
+      const aggrStatus = exprUtils.getExprAggrStatus(contextVarExpr.expr)
+      if (aggrStatus && aggrStatus !== "literal") {
         return "Literal value required"
       }
     }

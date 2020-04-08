@@ -107,11 +107,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
     // Add expressions as selects (only if aggregate for rowset)
     const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
-    const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
+    const aggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
 
     // Add expressions as selects
-    for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
-      queryOptions.select["e" + i] = nonAggrExpressions[i]
+    for (let i = 0 ; i < aggrExpressions.length ; i++) {
+      queryOptions.select["e" + i] = aggrExpressions[i]
     }
 
     // Add filters
