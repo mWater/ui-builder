@@ -73,3 +73,6 @@
     page-break-before: always;
   }
 }
+
+/* Fix react datepicker behind button groups */
+.react-datepicker-popper { z-index: 2000 }
