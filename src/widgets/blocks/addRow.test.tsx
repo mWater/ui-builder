@@ -70,9 +70,11 @@ const addRowBlockDef: AddRowBlockDef = {
 }
 
 test("save writes to database", async () => {
+  (rips.getContextVarExprValue as jest.Mock).mockReturnValue("abc")
+  
   const addRowBlock = new AddRowBlock(addRowBlockDef);
 
-  const inst = mount(addRowBlock.renderInstance(rips))
+  const inst = mount(addRowBlock.renderInstance(rips));
 
   // Wait for load
   await pause()
