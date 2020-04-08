@@ -9,8 +9,12 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface LabeledBlockDef extends BlockDef {
   type: "labeled"
   label: LocalizedString | null,
-  /** Optional help text */
+  /** Optional help text shown at bottom */
   help?: LocalizedString | null,
+
+  /** Optional hint text shown after label in faded */
+  hint?: LocalizedString | null,
+
   child: BlockDef | null
 }
 
@@ -37,12 +41,18 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
     }
 
     const labelText = localize(this.blockDef.label, props.locale)
+    const hintText = localize(this.blockDef.hint, props.locale)
     const helpText = localize(this.blockDef.help, props.locale)
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <div style={{fontWeight: "bold"}}>
-          { labelText ? labelText : <span className="text-muted">Label</span>}
+        <div key="label">
+          <span key="label" style={{fontWeight: "bold"}}>
+            { labelText ? labelText : <span className="text-muted">Label</span>}
+          </span>
+          { hintText ?
+            <span key="hint" className="text-muted"> - {hintText}</span>
+          : null }
         </div>
         { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
         <p className="help-block" style={{ marginLeft: 5 }}>
@@ -54,12 +64,18 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
 
   renderInstance(props: InstanceCtx) {
     const labelText = localize(this.blockDef.label, props.locale)
+    const hintText = localize(this.blockDef.hint, props.locale)
     const helpText = localize(this.blockDef.help, props.locale)
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <div style={{fontWeight: "bold"}}>
-          {labelText}
+        <div key="label">
+          <span key="label" style={{fontWeight: "bold"}}>
+            {labelText}
+          </span>
+          { hintText ?
+            <span key="hint" className="text-muted"> - {hintText}</span>
+          : null }
         </div>
         { props.renderChildBlock(props, this.blockDef.child) }
         <p className="help-block" style={{ marginLeft: 5 }}>
@@ -74,6 +90,11 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
       <div>
         <LabeledProperty label="Label">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="label">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
+        <LabeledProperty label="Hint">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="hint">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>

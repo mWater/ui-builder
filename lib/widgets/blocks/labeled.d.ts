@@ -5,8 +5,10 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface LabeledBlockDef extends BlockDef {
     type: "labeled";
     label: LocalizedString | null;
-    /** Optional help text */
+    /** Optional help text shown at bottom */
     help?: LocalizedString | null;
+    /** Optional hint text shown after label in faded */
+    hint?: LocalizedString | null;
     child: BlockDef | null;
 }
 export declare class LabeledBlock extends Block<LabeledBlockDef> {
