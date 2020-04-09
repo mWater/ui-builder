@@ -4,8 +4,10 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface HorizontalBlockDef extends BlockDef {
     type: "horizontal";
     items: BlockDef[];
-    /** How to align child blocks */
-    align: "justify" | "right" | "left" | "center";
+    /** How to align child blocks. Default is "justify" */
+    align?: "justify" | "right" | "left" | "center";
+    /** How to vertically align child blocks. Default is top */
+    verticalAlign?: "top" | "middle" | "bottom";
 }
 export declare class HorizontalBlock extends Block<HorizontalBlockDef> {
     readonly id: string;

@@ -4,14 +4,18 @@ import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { Toggle } from 'react-library/lib/bootstrap';
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { CSSProperties } from 'react';
 
 export interface HorizontalBlockDef extends BlockDef {
   type: "horizontal"
 
   items: BlockDef[]
 
-  /** How to align child blocks */
-  align: "justify" | "right" | "left" | "center"
+  /** How to align child blocks. Default is "justify" */
+  align?: "justify" | "right" | "left" | "center"
+
+  /** How to vertically align child blocks. Default is top */
+  verticalAlign?: "top" | "middle" | "bottom"
 }
 
 export class HorizontalBlock extends Block<HorizontalBlockDef> {
@@ -58,8 +62,17 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
         return (
           <div>
             { children.map((child, index) => {
+              const style: CSSProperties = { 
+                display: "inline-block", 
+                width: (100/children.length) + "%", 
+                verticalAlign: this.blockDef.verticalAlign || "top" 
+              }
+              if (index > 0) {
+                style.paddingLeft = 5
+              }
+
               return (
-                <div key={index} style={{ display: "inline-block", width: (100/children.length) + "%", verticalAlign: "top" }}>
+                <div key={index} style={style}>
                   {child}
                 </div>
               )})
@@ -70,8 +83,16 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
         return (
           <div>
             { children.map((child, index) => {
+              const style: CSSProperties = { 
+                display: "inline-block", 
+                verticalAlign: this.blockDef.verticalAlign || "top"
+              }
+              if (index > 0) {
+                style.paddingLeft = 5
+              }
+
               return (
-                <div key={index} style={{ display: "inline-block", verticalAlign: "top" }}>
+                <div key={index} style={style}>
                   {child}
                 </div>
               )})
@@ -82,8 +103,16 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
         return (
           <div style={{ textAlign: "right" }}>
             { children.map((child, index) => {
+              const style: CSSProperties = { 
+                display: "inline-block", 
+                verticalAlign: this.blockDef.verticalAlign || "top"
+              }
+              if (index > 0) {
+                style.paddingLeft = 5
+              }
+
               return (
-                <div key={index} style={{ display: "inline-block", verticalAlign: "top" }}>
+                <div key={index} style={style}>
                   {child}
                 </div>
               )})
@@ -94,8 +123,16 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
         return (
           <div style={{ textAlign: "center" }}>
             { children.map((child, index) => {
+              const style: CSSProperties = { 
+                display: "inline-block", 
+                verticalAlign: this.blockDef.verticalAlign || "top"
+              }
+              if (index > 0) {
+                style.paddingLeft = 5
+              }
+
               return (
-                <div key={index} style={{ display: "inline-block", verticalAlign: "top" }}>
+                <div key={index} style={style}>
                   {child}
                 </div>
               )})
@@ -124,7 +161,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
   renderEditor(props: DesignCtx) {
     return (
       <div>
-        <LabeledProperty label="Alignment">
+        <LabeledProperty label="Horizontal Alignment">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
             {(value, onChange) => 
               <Toggle 
@@ -135,6 +172,21 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
                   { value: "left", label: <i className="fa fa-align-left"/> },
                   { value: "center", label: <i className="fa fa-align-center"/> },
                   { value: "right", label: <i className="fa fa-align-right"/> }
+                ]} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Vertical Alignment">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="verticalAlign">
+            {(value, onChange) => 
+              <Toggle 
+                value={value || "top"} 
+                onChange={onChange} 
+                options={[
+                  { value: "top", label: "Top" },
+                  { value: "middle", label: "Middle" },
+                  { value: "bottom", label: "Bottom" }
                 ]} />
             }
           </PropertyEditor>

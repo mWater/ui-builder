@@ -172,16 +172,14 @@ export function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: BlockDef, d
     return {
       id: uuid(),
       items: [droppedBlockDef, targetBlockDef],
-      type: "horizontal",
-      align: "justify"
+      type: "horizontal"
     } as HorizontalBlockDef
   }
   if (dropSide === DropSide.right) {
     return {
       id: uuid(),
       items: [targetBlockDef, droppedBlockDef],
-      type: "horizontal",
-      align: "justify"
+      type: "horizontal"
     } as HorizontalBlockDef
   }
   if (dropSide === DropSide.top) {
