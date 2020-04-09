@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, EmbeddedExprsEditor } from '../propertyEditors'
 import { localize } from '../localization'
-import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import * as _ from 'lodash';
 import { EmbeddedExpr, formatEmbeddedExprString, validateEmbeddedExprs } from '../../embeddedExprs';
@@ -37,7 +36,7 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
 
   renderDesign(props: DesignCtx) {
     const text = localize(this.blockDef.text, props.locale)
-    return this.renderText(text ? text : <span className="text-muted">Text</span>)
+    return this.renderText(text ? this.processMarkdown(text) : <span className="text-muted">Text</span>)
   }
 
   renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
@@ -57,7 +56,7 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
       formatLocale: instanceCtx.formatLocale
     })
     
-    return this.renderText(text)
+    return this.renderText(this.processMarkdown(text))
   }
 
   renderEditor(props: DesignCtx) {
@@ -70,7 +69,7 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
                 value={value} 
                 onChange={onChange} 
                 locale={props.locale} 
-                multiline={this.blockDef.multiline} 
+                multiline={this.blockDef.multiline || this.blockDef.markdown} 
                 allowCR={this.blockDef.multiline} />
             }
           </PropertyEditor>

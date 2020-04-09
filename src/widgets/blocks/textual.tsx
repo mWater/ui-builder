@@ -5,6 +5,7 @@ import { DesignCtx } from "../../contexts";
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from "../propertyEditors";
 import { Select } from "react-library/lib/bootstrap";
 import { Checkbox, Toggle } from "react-library/lib/bootstrap";
+import Markdown from 'markdown-it'
 
 /** Common base class for text and expression */
 export interface TextualBlockDef extends BlockDef {
@@ -16,13 +17,16 @@ export interface TextualBlockDef extends BlockDef {
   style?: "p" | "div" | "h1" | "h2" | "h3" | "h4" | "h5"
 
   /** Color of text. Default is no coloring */
-  color?: null | "muted" | "primary" | "success" | "info" | "warning" //| "danger" 
+  color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger" 
 
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
 
-  /** True to make multiple lines break */
+  /** True to make multiple lines break. No effect if markdown is true */
   multiline?: boolean
+
+  /** True to interpret as markdown */
+  markdown?: boolean
 }
 
 export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<T> {
@@ -33,6 +37,7 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
     return ""
   }
 
+  /** Gets applied styles as CSS properties */
   getStyle() {
     const style: React.CSSProperties = {}
     if (this.blockDef.bold) {
@@ -47,16 +52,27 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
     if (this.blockDef.align) {
       style.textAlign = this.blockDef.align
     }
-    if (this.blockDef.multiline) {
+    // Multiline is only when not markdown
+    if (this.blockDef.multiline && !this.blockDef.markdown) {
       style.whiteSpace = "pre-line"
     }
     return style
   }
 
+  /** Renders content with the appropriate styling. If markdown, should already be processed */
   renderText(content: React.ReactNode) {
     const style = this.getStyle()
 
     return React.createElement(this.blockDef.style || "div", { style: style, className: this.getClassName() }, content)
+  }
+
+  /** Processes markdown if markdown is turned on, otherwise passthrough */
+  processMarkdown(text: string) {
+    if (!this.blockDef.markdown) {
+      return text
+    }
+
+    return <div dangerouslySetInnerHTML={{ __html: new Markdown().render(text) }} />
   }
 
   renderTextualEditor(props: DesignCtx) {
@@ -108,8 +124,14 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
           </PropertyEditor>
         </LabeledProperty>
 
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
+        { !this.blockDef.markdown ? 
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
+            {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
+          </PropertyEditor>
+        : null }
+
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="markdown">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Markdown</Checkbox>}
         </PropertyEditor>
 
         <LabeledProperty label="Color">

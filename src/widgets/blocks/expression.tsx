@@ -78,7 +78,7 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
       }
     }
     
-    return this.renderText(str)
+    return this.renderText(this.processMarkdown(str))
   }
 
   renderEditor(props: DesignCtx) {

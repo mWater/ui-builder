@@ -88,7 +88,7 @@ export class LocalizedTextPropertyEditor extends React.Component<{
 
     return (this.props.multiline 
       ?      
-        <textarea className="form-control" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
+        <textarea className="form-control" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} rows={5} />
       :
         <input className="form-control" type="text" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
     )
