@@ -73,12 +73,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       formatLocale: designCtx.formatLocale
     }
     
-    return (
-      <div>
-        {this.blockDef.required ? <div className="required-control">*</div> : null}
-        {this.renderControl(renderControlProps)}
-      </div>
-    )
+    return this.renderControl(renderControlProps)
   }
 
   renderInstance(props: InstanceCtx) {
@@ -239,10 +234,6 @@ class ControlInstance extends React.Component<Props, State> {
     }
   }
 
-  renderRequired() {
-    return this.props.block.blockDef.required ? <div className="required-control">*</div> : null
-  }
-
   render() {
     const instanceCtx = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
@@ -264,7 +255,6 @@ class ControlInstance extends React.Component<Props, State> {
 
     return (
       <div style={{ opacity: this.state.updating ? 0.6 : undefined }}>
-        { this.renderRequired() }
         { this.props.block.renderControl(renderControlProps) }
       </div>
     )

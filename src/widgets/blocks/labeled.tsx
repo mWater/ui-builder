@@ -69,7 +69,7 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <div key="label">
+        <div key="label" style={{ paddingBottom: 5 }}>
           <span key="label" style={{fontWeight: "bold"}}>
             {labelText}
           </span>
@@ -78,7 +78,7 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
           : null }
         </div>
         { props.renderChildBlock(props, this.blockDef.child) }
-        <p className="help-block" style={{ marginLeft: 5 }}>
+        <p className="help-block">
           {helpText}
         </p>
       </div>
