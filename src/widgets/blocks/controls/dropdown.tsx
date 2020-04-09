@@ -14,6 +14,7 @@ import { OrderBy } from '../../../database/Database';
 import { Toggle } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { Styles } from 'react-select/lib/styles';
+import { ToggleBlockDef } from './toggle';
 
 /** Styles for react-select */
 const dropdownStyles: Partial<Styles> = { 
@@ -349,15 +350,28 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     const idMode = this.blockDef.idMode || "simple"
     const idTable = column && column.join ? column.join.toTable : (column ? column.idTable : null)
 
+    const handleConvertToToggle = () => {
+      props.store.replaceBlock({
+        id: this.blockDef.id,
+        type: "toggle",
+        column: this.blockDef.column,
+        required: this.blockDef.required,
+        requiredMessage: this.blockDef.requiredMessage,
+        rowContextVarId: this.blockDef.rowContextVarId,
+        includeValues: this.blockDef.includeValues,
+        excludeValues: this.blockDef.excludeValues
+      } as ToggleBlockDef)
+    }
+
     return (
       <div>
-        <LabeledProperty label="Placeholder">
+        <LabeledProperty label="Placeholder" key="placeholder">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
           </PropertyEditor>
         </LabeledProperty>
         { isIdType ?
-          <LabeledProperty label="Mode">
+          <LabeledProperty label="Mode" key="mode">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idMode">
               {(value, onChange) => 
                 <Toggle 
@@ -372,7 +386,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
           </LabeledProperty>
         : null }
         { isIdType && idMode == "simple" ?
-          <LabeledProperty label="Label Expression">
+          <LabeledProperty label="Label Expression" key="idLabelExpr">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelExpr">
               {(value, onChange) => <ExprComponent 
                 value={value || null} 
@@ -388,12 +402,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         : null }
         { isIdType && idMode == "advanced" ?
           <div>
-            <LabeledProperty label="Label">
+            <LabeledProperty label="Label" key="idLabelText">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelText">
                 {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
               </PropertyEditor>
             </LabeledProperty>
-            <LabeledProperty label="Embedded label expressions" help="Reference in text as {0}, {1}, etc.">
+            <LabeledProperty label="Embedded label expressions" help="Reference in text as {0}, {1}, etc." key="idLabelEmbeddedExprs">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelEmbeddedExprs">
                 {(value: EmbeddedExpr[] | null | undefined, onChange) => (
                   <EmbeddedExprsEditor 
@@ -405,7 +419,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
                 )}
               </PropertyEditor>
             </LabeledProperty>
-            <LabeledProperty label="Option ordering">
+            <LabeledProperty label="Option ordering" key="idOrderBy">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idOrderBy">
                 {(value, onChange) => 
                   <OrderByArrayEditor 
@@ -417,7 +431,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
                     table={idTable!} /> }
               </PropertyEditor>
             </LabeledProperty>
-            <LabeledProperty label="Search expressions">
+            <LabeledProperty label="Search expressions" key="idSearchExprs">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idSearchExprs">
                 {(value, onItemsChange) => {
                   const handleAddSearchExpr = () => {
@@ -441,7 +455,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
           </div>
         : null }
         { isIdType ?
-          <LabeledProperty label="Filter Expression">
+          <LabeledProperty label="Filter Expression" key="idFilterExpr">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idFilterExpr">
               {(value, onChange) => <FilterExprComponent 
                 value={value} 
@@ -455,7 +469,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
           </LabeledProperty>
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
-          <LabeledProperty label="Include Values">
+          <LabeledProperty label="Include Values" key="includeValues">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="includeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
@@ -467,7 +481,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
           </LabeledProperty>
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
-          <LabeledProperty label="Exclude Values">
+          <LabeledProperty label="Exclude Values" key="excludeValues">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="excludeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
@@ -477,6 +491,11 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
               }
             </PropertyEditor>
           </LabeledProperty>
+        : null }
+        { !isIdType ? 
+          <div key="convert_to_toggle">
+            <button className="btn btn-link btn-sm" onClick={handleConvertToToggle}>Convert to Toggle</button>
+          </div>
         : null }
       </div>
     )

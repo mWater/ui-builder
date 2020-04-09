@@ -152,7 +152,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
 
   renderInstance(props: InstanceCtx) {
     return (
-      <div style={{ paddingTop: 5, paddingBottom: 5 }}>
+      <div>
         { this.renderBlock(this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef))) }
       </div>
     )
