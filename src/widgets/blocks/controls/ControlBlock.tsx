@@ -279,7 +279,7 @@ class ControlInstance extends React.Component<Props, State> {
     }
 
     // Add red border if required
-    if (this.state.requiredError) {
+    if (this.state.requiredError != null) {
       style.border = "1px solid rgb(169, 68, 66)",
       style.padding = 3
       style.backgroundColor = "rgb(169, 68, 66)"
