@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import produce from 'immer'
 import { ExprComponent } from 'mwater-expressions-ui';
-import { default as React, useState, useEffect } from 'react';
+import { default as React, useState, useEffect, useRef } from 'react';
 import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
 import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
@@ -10,6 +10,7 @@ import { localize } from '../localization';
 import LeafBlock from '../LeafBlock';
 import { Checkbox } from 'react-library/lib/bootstrap';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { getScrollParent } from '../scrolling';
 
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {
@@ -170,13 +171,26 @@ const ValidationBlockInstance = (props: {
   // True if validating
   const [validating, setValidating] = useState(props.blockDef.immediate || false)
 
-  const validate = () => {
+  const controlRef = useRef<HTMLDivElement>(null)
+
+  const validate = (isFirstError: boolean) => {
     // Now validating
     setValidating(true) 
 
     const errors = getValidationErrors(props.blockDef, props.renderProps)
     if (errors.length > 0) {
-      return errors[0]
+      // Scroll into view if first error (check scrollIntoView for test environments without that function)
+      if (isFirstError && controlRef.current && controlRef.current.scrollIntoView) {
+        controlRef.current.scrollIntoView(true)
+        
+        // Add some padding
+        const scrollParent = getScrollParent(controlRef.current)
+        if (scrollParent) {
+          scrollParent.scrollBy(0, -30)
+        }
+      }
+      
+      return ""
     }
     return null
   }
@@ -197,7 +211,7 @@ const ValidationBlockInstance = (props: {
     return null
   }
 
-  return <div className="alert alert-danger">
+  return <div className="alert alert-danger" ref={controlRef}>
     { errors.map((e, index) => <div key={index}><i className="fa fa-exclamation-triangle"/> {e}</div>) }
   </div>
 }

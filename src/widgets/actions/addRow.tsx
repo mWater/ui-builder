@@ -22,13 +22,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
 
     for (const columnId of Object.keys(this.actionDef.columnValues)) {
       const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
-
-      if (contextVarExpr.contextVarId != null) {
-        row[columnId] = instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
-      }
-      else {
-        row[columnId] = contextVarExpr.expr ? (contextVarExpr.expr as LiteralExpr).value : null
-      }
+      row[columnId] = instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
     }
 
     const txn = instanceCtx.database.transaction()

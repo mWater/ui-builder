@@ -58,7 +58,8 @@ export interface InstanceCtx extends BaseCtx {
     /** All sub-block elements must rendered using this function. */
     renderChildBlock(ctx: InstanceCtx, childBlockDef: BlockDef | null): React.ReactElement<any> | null;
     /** Registers an instance for validation. Returns a function which must be called to unregister when the instance goes away.
-     * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show
+     * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show alert
+     * isFirstError is true if first block to potentially fail validation. This allows the block to scroll into view on error
      */
-    registerForValidation(validate: () => string | null): (() => void);
+    registerForValidation(validate: (isFirstError: boolean) => string | null): (() => void);
 }

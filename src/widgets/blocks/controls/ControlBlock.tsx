@@ -9,6 +9,7 @@ import { Database } from "../../../database/Database";
 import { DataSourceDatabase } from "../../../database/DataSourceDatabase";
 import { DesignCtx, InstanceCtx } from "../../../contexts";
 import { FormatLocaleObject } from "d3-format";
+import { getScrollParent } from "../../scrolling";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -159,10 +160,6 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       return "Valid column required"
     }
 
-    if (this.blockDef.required && !this.blockDef.requiredMessage) {
-      return "Required message required"
-    }
-
     return null
   }
 }
@@ -174,16 +171,25 @@ interface Props {
 
 interface State {
   updating: boolean
+
+  /** Message if a required error is present. null for no error */
+  requiredError: string | null
 }
 
 class ControlInstance extends React.Component<Props, State> {
+  controlRef: React.RefObject<HTMLDivElement>
+
   /** Function to call to unregister validation */
   unregisterValidation: () => void
 
   constructor(props: Props) {
     super(props)
+
+    this.controlRef = React.createRef()
+
     this.state = {
-      updating: false
+      updating: false,
+      requiredError: null
     }
   }
 
@@ -205,12 +211,27 @@ class ControlInstance extends React.Component<Props, State> {
   }
 
   /** Validate the instance. Returns null if correct, message if not */
-  validate = () => {
+  validate = (isFirstError: boolean) => {
     // Check for null
     if (this.getValue() == null && this.props.block.blockDef.required) {
-      return localize(this.props.block.blockDef.requiredMessage!, this.props.instanceCtx.locale)
+      this.setState({ requiredError: this.props.block.blockDef.requiredMessage ? localize(this.props.block.blockDef.requiredMessage, this.props.instanceCtx.locale) : "" })
+
+      // Scroll into view if first error
+      if (isFirstError && this.controlRef.current && this.controlRef.current.scrollIntoView) {
+        this.controlRef.current.scrollIntoView(true)
+
+        // Add some padding
+        const scrollParent = getScrollParent(this.controlRef.current)
+        if (scrollParent)
+          scrollParent.scrollBy(0, -30)
+      }
+
+      return ""
     }
-    return null
+    else {
+      this.setState({ requiredError: null })
+      return null
+    }
   }
 
   handleChange = async (newValue: any) => {
@@ -253,9 +274,25 @@ class ControlInstance extends React.Component<Props, State> {
       contextVarValues: this.props.instanceCtx.contextVarValues
     }
 
+    const style: React.CSSProperties = {
+      opacity: this.state.updating ? 0.6 : undefined
+    }
+
+    // Add red border if required
+    if (this.state.requiredError) {
+      style.border = "1px solid rgb(169, 68, 66)",
+      style.padding = 3
+      style.backgroundColor = "rgb(169, 68, 66)"
+    }
+
     return (
-      <div style={{ opacity: this.state.updating ? 0.6 : undefined }}>
-        { this.props.block.renderControl(renderControlProps) }
+      <div>
+        <div style={style} ref={this.controlRef} key="control">
+          { this.props.block.renderControl(renderControlProps) }
+        </div>
+        { this.state.requiredError ? 
+          <div key="error" className="text-danger">{this.state.requiredError}</div>
+        : null}
       </div>
     )
   }

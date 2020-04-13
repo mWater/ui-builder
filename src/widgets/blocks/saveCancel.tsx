@@ -173,7 +173,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
   /** Stores validation registrations for all sub-components so that they can be validated
    * before being saved. 
    */
-  validationRegistrations: { [key: string]: (() => string | null) }
+  validationRegistrations: { [key: string]: ((isFirstError: boolean) => string | null) }
 
   /** Function to call to unregister validation */
   unregisterValidation: () => void
@@ -214,7 +214,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     const validationMessages: string[] = []
 
     for (const key of Object.keys(this.validationRegistrations)) {
-      const msg = this.validationRegistrations[key]()
+      const msg = this.validationRegistrations[key](validationMessages.length == 0)
       if (msg != null) {
         validationMessages.push(msg)
       }
@@ -280,7 +280,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
   }
 
   /** Stores the registration for validation of a child block and returns an unregister function */
-  registerChildForValidation = (validate: () => string | null): (() => void) => {
+  registerChildForValidation = (validate: (isFirstError: boolean) => string | null): (() => void) => {
     const key = uuid()
     this.validationRegistrations[key] = validate
     return () => {

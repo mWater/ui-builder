@@ -157,5 +157,5 @@ test("prevent save if required blank", async () => {
   inst.update()
 
   expect(closePage.mock.calls.length).toBe(0)
-  expect(alertMessages).toEqual(["text required"])
+  expect(alertMessages).toEqual([])
 })
