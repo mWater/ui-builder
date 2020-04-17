@@ -15,20 +15,19 @@ import { DesignCtx } from "../contexts";
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
-export class LabeledProperty extends React.Component<{ label: string, help?: string }> {
-  render() {
-    return (
-      <div className="form-group">
-        <label>{this.props.label}</label>
-        <div style={{ paddingLeft: 5 }}>
-          {this.props.children}
-        </div>
-        <p className="help-block" style={{ marginLeft: 5 }}>
-          {this.props.help}
-        </p>
+/** Labeled group */
+export const LabeledProperty: React.FC<{ label: string, help?: string, hint?: string }> = (props) => {
+  return (
+    <div className="form-group">
+      <label>{props.label} { props.hint ? <span className="text-muted"> - {props.hint}</span> : null}</label>
+      <div style={{ paddingLeft: 5 }}>
+        {props.children}
       </div>
-    )
-  }
+      <p className="help-block" style={{ marginLeft: 5 }}>
+        {props.help}
+      </p>
+    </div>
+  )
 }
 
 /** Creates a property editor for a property */

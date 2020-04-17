@@ -6,12 +6,12 @@ import { OrderBy } from "../database/Database";
 import * as PropTypes from 'prop-types';
 import { EmbeddedExpr } from "../embeddedExprs";
 import { DesignCtx } from "../contexts";
-export declare class LabeledProperty extends React.Component<{
+/** Labeled group */
+export declare const LabeledProperty: React.FC<{
     label: string;
     help?: string;
-}> {
-    render(): JSX.Element;
-}
+    hint?: string;
+}>;
 /** Creates a property editor for a property */
 export declare class PropertyEditor<T, K extends keyof T> extends React.Component<{
     obj: T;

@@ -8,8 +8,12 @@ export interface QueryTableBlockDef extends BlockDef {
     type: "queryTable";
     /** Determines if one table row contains one or multiple database table rows */
     mode: "singleRow" | "multiRow";
-    headers: Array<BlockDef | null>;
+    /** Content blocks. The length of this array determines number of columns */
     contents: Array<BlockDef | null>;
+    /** Header blocks. Always same length as contents. */
+    headers: Array<BlockDef | null>;
+    /** Column information. May not be present in legacy block defs. Can be null if no info */
+    columnInfos?: Array<QueryTableColumnInfo | null>;
     /** Id of context variable of rowset for table to use */
     rowsetContextVarId: string | null;
     limit: number | null;
@@ -25,6 +29,14 @@ export interface QueryTableBlockDef extends BlockDef {
     borders?: "horizontal" | "all";
     /** Table padding (default is "normal") */
     padding?: "normal" | "compact";
+}
+interface QueryTableColumnInfo {
+    /** Column order expressions. When present for a column, makes it orderable via icon at top */
+    orderExpr: Expr;
+    /** Initial order of ordered column. Null for not initially ordered. Only first column with this set
+     * is used as the initial ordering.
+     */
+    initialOrderDir: "asc" | "desc" | null;
 }
 export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
@@ -46,3 +58,4 @@ export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     renderInstance(props: InstanceCtx): JSX.Element;
     renderEditor(props: DesignCtx): JSX.Element;
 }
+export {};

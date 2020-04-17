@@ -5,6 +5,7 @@ import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
 import { localize } from "../../localization";
 import { InstanceCtx } from "../../../contexts";
+import { BlockDef } from "../../blocks";
 
 interface Props {
   block: QueryTableBlock
@@ -15,6 +16,12 @@ interface State {
   rows?: Row[]
   refreshing: boolean
   error?: Error
+
+  /** Which column is being ordered on, if any */
+  columnOrderIndex: number | null
+
+  /** Ordering of column. Default to asc */
+  columnOrderDir: "asc" | "desc"
 }
 
 /** Instance of a query table */
@@ -25,7 +32,23 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   constructor(props: Props) {
     super(props)
 
-    this.state = { refreshing: false }
+    // First column with initial ordering sets the initial ordering
+    let columnOrderIndex: number | null = null
+    let columnOrderDir: "asc" | "desc" = "asc"
+
+    const blockDef = this.props.block.blockDef
+    for (let colIndex = 0 ; colIndex < blockDef.contents.length ; colIndex++) {
+      if (blockDef.columnInfos && blockDef.columnInfos[colIndex] && blockDef.columnInfos[colIndex]!.orderExpr && blockDef.columnInfos[colIndex]!.initialOrderDir) {
+        columnOrderIndex = colIndex
+        columnOrderDir = blockDef.columnInfos[colIndex]!.initialOrderDir!
+      }
+    }
+    
+    this.state = { 
+      refreshing: false,
+      columnOrderIndex,
+      columnOrderDir
+    }
   }
 
   componentDidMount() {
@@ -78,6 +101,11 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       where: where.exprs.length > 0 ? where : null,
       orderBy: [],
       limit: block.blockDef.limit
+    }
+
+    // Add column ordering if present
+    if (this.state.columnOrderIndex != null) {
+      queryOptions.orderBy!.push({ expr: block.blockDef.columnInfos![this.state.columnOrderIndex]!.orderExpr, dir: this.state.columnOrderDir })
     }
     
     // Add order by
@@ -239,6 +267,49 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     return this.state.rows.map((row, rowIndex) => this.renderRow(row, rowIndex))
   }
 
+  /** Render one header of the table */
+  renderHeader(header: BlockDef | null, index: number) {
+    const riProps = this.props.instanceCtx
+    const blockDef = this.props.block.blockDef
+
+    const renderOrder = () => {
+      if (!blockDef.columnInfos || !blockDef.columnInfos[index] || !blockDef.columnInfos[index]!.orderExpr) {
+        return null
+      }
+
+      const handleOrderClick = () => {
+        // Get current order
+        const currentOrder = this.state.columnOrderIndex == index ? this.state.columnOrderDir : null
+
+        if (currentOrder == "asc") {
+          this.setState({ columnOrderDir: "desc" })
+        }
+        else if (currentOrder == "desc") {
+          this.setState({ columnOrderIndex: null })
+        }
+        else { 
+          this.setState({ columnOrderDir: "asc", columnOrderIndex: index })
+        }
+      }
+
+      // If not sorted 
+      if (this.state.columnOrderIndex != index) {
+        return <div key="order" style={{ float: "right", color: "#CCC", cursor: "pointer" }} onClick={handleOrderClick}>
+          <i className="fa fa-sort fa-fw"/>
+        </div>
+      }
+
+      return <div key="order" style={{ float: "right", cursor: "pointer" }} onClick={handleOrderClick}>
+        { this.state.columnOrderDir == "asc" ? <i className="fa fa-sort-asc fa-fw"/> : <i className="fa fa-sort-desc fa-fw"/> }
+      </div>
+    }
+    
+    return <th key={index}>
+      { renderOrder() }      
+      {riProps.renderChildBlock(riProps, header)}
+    </th>
+  }
+
   render() {
     const riProps = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
@@ -275,9 +346,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         { !blockDef.hideHeaders ? 
         <thead>
           <tr>
-            { blockDef.headers.map((b, index) => {
-              return <th key={index}>{riProps.renderChildBlock(riProps, b)}</th>
-            })}
+            { blockDef.headers.map((b, index) => this.renderHeader(b, index)) }
           </tr>
         </thead>
         : null }

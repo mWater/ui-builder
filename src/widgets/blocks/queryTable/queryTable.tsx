@@ -2,11 +2,11 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
-import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row } from 'mwater-expressions';
+import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row, DataSource, Column } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import { NumberInput, Select, Checkbox } from 'react-library/lib/bootstrap';
+import { NumberInput, Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
@@ -16,8 +16,15 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Determines if one table row contains one or multiple database table rows */
   mode: "singleRow" | "multiRow"  
-  headers: Array<BlockDef | null>
+
+  /** Content blocks. The length of this array determines number of columns */
   contents: Array<BlockDef | null>
+
+  /** Header blocks. Always same length as contents. */
+  headers: Array<BlockDef | null>
+
+  /** Column information. May not be present in legacy block defs. Can be null if no info */
+  columnInfos?: Array<QueryTableColumnInfo | null>
 
   /** Id of context variable of rowset for table to use */
   rowsetContextVarId: string | null
@@ -40,6 +47,16 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Table padding (default is "normal") */
   padding?: "normal" | "compact"
+}
+
+interface QueryTableColumnInfo {
+  /** Column order expressions. When present for a column, makes it orderable via icon at top */
+  orderExpr: Expr
+
+  /** Initial order of ordered column. Null for not initially ordered. Only first column with this set
+   * is used as the initial ordering.
+   */
+  initialOrderDir: "asc" | "desc" | null
 }
 
 export class QueryTableBlock extends Block<QueryTableBlockDef> {
@@ -260,17 +277,21 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
     const handleAddColumn = () => {
       props.store.replaceBlock(produce(this.blockDef, b => {
-        b.headers.push(null)
-        b.contents.push(null)
+        setLength(b.contents, this.blockDef.contents.length + 1)
+        setLength(b.headers, this.blockDef.contents.length + 1)
+        b.columnInfos = b.columnInfos || []
+        setLength(b.columnInfos, this.blockDef.contents.length + 1)
       }))
     }
 
     // Remove last column
     const handleRemoveColumn = () => {
       props.store.replaceBlock(produce(this.blockDef, b => {
-        if (b.headers.length > 1) {
-          b.headers.splice(b.headers.length - 1, 1)
-          b.contents.splice(b.contents.length - 1, 1)
+        if (b.contents.length > 1) {
+          setLength(b.contents, this.blockDef.contents.length - 1)
+          setLength(b.headers, this.blockDef.contents.length - 1)
+          b.columnInfos = b.columnInfos || []
+          setLength(b.columnInfos, this.blockDef.headers.length - 1)
         }
       }))
     }
@@ -362,6 +383,20 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
+        { rowCV ? 
+          <LabeledProperty label="Column Sort Icons" hint="Allow dynamic sorting if present">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="columnInfos">
+              {(value, onChange) => <ColumnOrderExprsEditor
+                value={value}
+                onChange={onChange}
+                schema={props.schema}
+                dataSource={props.dataSource}
+                table={rowCV.table!}
+                numColumns={this.blockDef.contents.length}
+                /> }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
         <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
           <i className="fa fa-plus"/> Add Column
         </button>
@@ -373,3 +408,68 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
   }
 }
 
+/** Edits a list of column order expressions */
+const ColumnOrderExprsEditor = (props: { 
+  value?: Array<QueryTableColumnInfo | null>
+  onChange: (value: Array<QueryTableColumnInfo | null>) => void 
+  numColumns: number
+  table: string
+  schema: Schema
+  dataSource: DataSource
+}) => {
+  const handleOrderExprChange = (colIndex: number, expr: Expr) => {
+    props.onChange(produce(props.value || [], draft => {
+      // Make sure exists
+      draft[colIndex] = draft[colIndex] || { orderExpr: null, initialOrderDir: null }
+      draft[colIndex]!.orderExpr = expr
+    }))
+  }
+
+  const handleInitialOrderDirChange = (colIndex: number, initialOrderDir: "asc" | "desc" | null) => {
+    props.onChange(produce(props.value || [], draft => {
+      // Make sure exists
+      draft[colIndex] = draft[colIndex] || { orderExpr: null, initialOrderDir: null }
+      draft[colIndex]!.initialOrderDir = initialOrderDir
+    }))
+  }
+
+  return <div>
+    { _.map(_.range(props.numColumns), colIndex => (
+      <div key={colIndex}>
+        {`#${colIndex + 1}:`}
+        <div style={{ display: "inline-block", paddingLeft: 5, paddingRight: 10 }}>
+          <ExprComponent 
+            schema={props.schema}
+            dataSource={props.dataSource}
+            onChange={handleOrderExprChange.bind(null, colIndex)}
+            table={props.table}
+            value={props.value && props.value[colIndex] ? props.value[colIndex]!.orderExpr : null}
+            types={["text", "number", "date", "datetime"]}
+            />
+        </div>
+        { props.value && props.value[colIndex] && props.value[colIndex]!.orderExpr ?
+          <Toggle 
+            options={[{ value: "asc", label: "Asc" }, { value: "desc", label: "Desc" }, { value: null, label: "No Initial Sort"}]}
+            allowReset={false}
+            value={props.value && props.value[colIndex] ? props.value[colIndex]!.initialOrderDir : null }
+            onChange={handleInitialOrderDirChange.bind(null, colIndex)}
+            size="sm"
+          />
+        : null }
+      </div>
+    ))}
+  </div>
+}
+
+/** Set the length of an array, adding/removing nulls as necessary */
+function setLength(arr: any[], length: number) {
+  // Shorten
+  if (arr.length > length) {
+    arr.splice(length, arr.length - length)
+  }
+  if (arr.length < length) {
+    for (let i = 0 ; i < length - arr.length ; i++) {
+      arr.push(null)
+    }
+  }
+}
