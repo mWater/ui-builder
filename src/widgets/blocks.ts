@@ -53,13 +53,13 @@ export interface ContextVar {
 
   type: "row" | "rowset" | LiteralType;
 
-  /** table of database (when type = "rowset" or "row") */
+  /** table of database (when type = "rowset" or "row" or "id" or "id[]") */
   table?: string
   
   // aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
   // selectable?: boolean;  // true if row can be selected (when type = "rowset")
 
-  /** Enum values when type is enum or enumset */
+  /** Enum values when type is "enum" or "enumset" */
   enumValues?: EnumValue[]
 }
 

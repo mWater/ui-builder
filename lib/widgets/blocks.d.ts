@@ -35,9 +35,9 @@ export interface ContextVar {
     /** Name of context variable */
     name: string;
     type: "row" | "rowset" | LiteralType;
-    /** table of database (when type = "rowset" or "row") */
+    /** table of database (when type = "rowset" or "row" or "id" or "id[]") */
     table?: string;
-    /** Enum values when type is enum or enumset */
+    /** Enum values when type is "enum" or "enumset" */
     enumValues?: EnumValue[];
 }
 /** A filter that applies to a particular rowset context variable */
