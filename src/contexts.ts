@@ -53,10 +53,12 @@ export interface InstanceCtx extends BaseCtx {
   /** Values of context variables. Note: filters are not incorporated automatically into rowset values! */
   contextVarValues: { [contextVarId: string]: any }
 
-  /** Get any filters set on a rowset context variable  */
+  /** Get any filters set on a rowset context variable. This includes ones set by other blocks */
   getFilters(contextVarId: string): Filter[]
 
-  /** Set a filter on a rowset context variable */
+  /** Set a filter on a rowset context variable. To remove a filter, set one with the same id
+   * but with a null expression.
+   */
   setFilter(contextVarId: string, filter: Filter): void
 
   /**
