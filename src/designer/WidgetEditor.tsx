@@ -12,6 +12,7 @@ import * as _ from "lodash";
 import { TextInput, Select } from "react-library/lib/bootstrap";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import { DesignCtx } from "../contexts";
+import { useState } from "react";
 
 interface WidgetEditorProps {
   designCtx: DesignCtx
@@ -49,15 +50,22 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
         </PropertyEditor>
       </LabeledProperty>
-      <LabeledProperty label="External Variables" hint="These are passed in to the widget from its parent">
+      <LabeledProperty label="External Variables" help="These are passed in to the widget from its parent. Values are for preview only">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
-          { (value, onChange) => <ContextVarsEditor contextVars={value} onChange={onChange} schema={this.props.designCtx.schema} /> }
+          { (value, onChange) => <ContextVarsEditor 
+            contextVars={value} 
+            onChange={onChange} 
+            contextVarValues={this.props.widgetDef.contextVarPreviewValues}
+            onContextVarValuesChange={this.handleContextVarPreviewValues}
+            schema={this.props.designCtx.schema} 
+            dataSource={this.props.designCtx.dataSource}
+            /> }
         </PropertyEditor>
       </LabeledProperty>
-      <LabeledProperty label="Preview External Variable Values" hint="For preview purposes only">
+      {/* <LabeledProperty label="Preview External Variable Values" hint="For preview purposes only">
         {allContextVars.map((contextVar) => {
           return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
-            <ContextVarsValuesEditor 
+            <ContextVarValueEditor 
               key={contextVar.id}
               contextVar={contextVar} 
               schema={this.props.designCtx.schema}
@@ -67,16 +75,24 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
               />
           </div>
         })}
-      </LabeledProperty>
-      <LabeledProperty label="Variables" hint="Define data sources here (rowsets or rows)">
+      </LabeledProperty> */}
+      <LabeledProperty label="Variables" help="Define data sources here (rowsets or rows)">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="privateContextVars"> 
-          { (value, onChange) => <ContextVarsEditor contextVars={value || []} onChange={onChange} schema={this.props.designCtx.schema} /> }
+          { (value, onChange) => <ContextVarsEditor 
+              contextVars={value || []} 
+              onChange={onChange} 
+              contextVarValues={this.props.widgetDef.privateContextVarValues || {}}
+              onContextVarValuesChange={this.handlePrivateContextVarValuesChange}
+              schema={this.props.designCtx.schema} 
+              dataSource={this.props.designCtx.dataSource}
+            /> 
+          }
         </PropertyEditor>
       </LabeledProperty>
-      <LabeledProperty label="Variable Values">
+      {/* <LabeledProperty label="Variable Values">
         {(this.props.widgetDef.privateContextVars || []).map((contextVar) => {
           return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
-            <ContextVarsValuesEditor 
+            <ContextVarValueEditor 
               key={contextVar.id}
               contextVar={contextVar} 
               schema={this.props.designCtx.schema}
@@ -86,49 +102,64 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
               />
           </div>
         })}
-      </LabeledProperty>
+      </LabeledProperty> */}
       <div style={{ color: "#EEE", fontSize: 9 }}>{this.props.widgetDef.id}</div>
 
     </div>)
   }
 }
 
-interface ContextVarsEditorProps {
+/** Edits a set of context variables and their values */
+const ContextVarsEditor = (props: {
   contextVars: ContextVar[]
   onChange: (contextVars: ContextVar[]) => void
+
+  /** Values of context variables */
+  contextVarValues: { [contextVarId: string]: any }
+  onContextVarValuesChange: (values: { [contextVarId: string]: any }) => void
+
   schema: Schema
+  dataSource: DataSource
+}) => {
+  const [modalElem, setModalElem] = useState<AddContextVarModal | null>(null)
+
+  const handleAddContextVar = (contextVar: ContextVar) => {
+    props.onChange(props.contextVars.concat(contextVar))
+  }
+
+  const handleOpenAdd = () => {
+    modalElem!.show()
+  }
+
+  const handleModalRef = (elem: AddContextVarModal | null) => {
+    setModalElem(elem)
+  }
+
+  return (
+    <div>
+      <ListEditor items={props.contextVars} onItemsChange={props.onChange}>
+        {(contextVar, onContextVarChange) => (
+          <div>
+            <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange} schema={props.schema}/>
+            <ContextVarValueEditor 
+              contextVar={contextVar}
+              contextVarValues={props.contextVarValues}
+              onContextVarValuesChange={props.onContextVarValuesChange}
+              schema={props.schema}
+              dataSource={props.dataSource}
+            />
+          </div>
+         )}
+      </ListEditor>
+      <AddContextVarModal schema={props.schema} locale="en" ref={handleModalRef} onAdd={handleAddContextVar} />
+      <button type="button" className="btn btn-link" onClick={handleOpenAdd}>
+        <i className="fa fa-plus"/> Add Variable
+      </button>
+    </div>
+  )
 }
 
-class ContextVarsEditor extends React.Component<ContextVarsEditorProps> {
-  modalElem: AddContextVarModal | null
-
-  handleAddContextVar = (contextVar: ContextVar) => {
-    this.props.onChange(this.props.contextVars.concat(contextVar))
-  }
-
-  handleOpenAdd = () => {
-    this.modalElem!.show()
-  }
-
-  handleModalRef = (elem: AddContextVarModal | null) => {
-    this.modalElem = elem
-  }
-
-  render() {
-    return (
-      <div>
-        <ListEditor items={this.props.contextVars} onItemsChange={this.props.onChange}>
-          { (contextVar, onContextVarChange) => <ContextVarEditor contextVar={contextVar} onChange={onContextVarChange} schema={this.props.schema}/> }
-        </ListEditor>
-        <AddContextVarModal schema={this.props.schema} locale="en" ref={this.handleModalRef} onAdd={this.handleAddContextVar} />
-        <button type="button" className="btn btn-link" onClick={this.handleOpenAdd}>
-          <i className="fa fa-plus"/> Add Variable
-        </button>
-      </div>
-    )
-  }
-}
-
+/** Individual item of a context variable list */
 class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChange: (contextVar: ContextVar) => void, schema: Schema}> { 
   handleNameChange = () => {
     const name = window.prompt("Enter name", this.props.contextVar.name)
@@ -147,7 +178,7 @@ class ContextVarEditor extends React.Component<{ contextVar: ContextVar, onChang
     return (
       <div>
         <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
-        &nbsp;({desc})
+        &nbsp; <span className="text-muted">- {desc}</span>
       </div>
     )
   }
@@ -247,7 +278,7 @@ class AddContextVarModal extends React.Component<AddContextVarModalProps, AddCon
 }
 
 /** Allows editing of the value for one context variable */
-class ContextVarsValuesEditor extends React.Component<{
+class ContextVarValueEditor extends React.Component<{
   contextVar: ContextVar
   contextVarValues?: { [contextVarId: string]: any }
   onContextVarValuesChange: (values: { [contextVarId: string]: any }) => void
@@ -306,11 +337,6 @@ class ContextVarsValuesEditor extends React.Component<{
   render() {
     const value = (this.props.contextVarValues || {})[this.props.contextVar.id]
 
-    return (
-      <div>
-        <div>{this.props.contextVar.name}:</div>
-        {this.renderValue(value)}
-      </div>
-    )
+    return this.renderValue(value)
   }
 }
