@@ -99,7 +99,10 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       return null
     }
 
-    const contextVars = (this.props.baseCtx.globalContextVars || []).concat(widgetDef.contextVars)
+    const contextVars = (this.props.baseCtx.globalContextVars || [])
+      .concat(widgetDef.contextVars)
+      .concat(widgetDef.privateContextVars || [])
+      
     for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars)) {
       const block = this.props.baseCtx.createBlock(childBlock.blockDef)
 

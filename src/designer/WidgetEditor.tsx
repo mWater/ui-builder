@@ -25,9 +25,18 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
     this.props.onWidgetDefChange({ ...this.props.widgetDef, contextVars })
   }
 
+  handleContextVarPreviewValues = (contextVarPreviewValues: { [contextVarId: string]: any }) => {
+    this.props.onWidgetDefChange({ ...this.props.widgetDef, contextVarPreviewValues })
+  }
+
+  handlePrivateContextVarValuesChange = (privateContextVarValues: { [contextVarId: string]: any }) => {
+    this.props.onWidgetDefChange({ ...this.props.widgetDef, privateContextVarValues })
+  }
+
   render() {
-    // Get list of all context variables, including global
-    const allContextVars = (this.props.designCtx.globalContextVars || []).concat(this.props.widgetDef.contextVars)
+    // Get list of all non-private context variables, including global
+    const allContextVars = (this.props.designCtx.globalContextVars || [])
+      .concat(this.props.widgetDef.contextVars)
 
     return (<div>
       <LabeledProperty label="Name">
@@ -40,21 +49,40 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
         </PropertyEditor>
       </LabeledProperty>
-      <LabeledProperty label="Variables">
+      <LabeledProperty label="External Variables" hint="These are passed in to the widget from its parent">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
           { (value, onChange) => <ContextVarsEditor contextVars={value} onChange={onChange} schema={this.props.designCtx.schema} /> }
         </PropertyEditor>
       </LabeledProperty>
-      <LabeledProperty label="Preview Variable Values">
+      <LabeledProperty label="Preview External Variable Values" hint="For preview purposes only">
         {allContextVars.map((contextVar) => {
           return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
-            <ContextVarPreviewValue 
+            <ContextVarsValuesEditor 
               key={contextVar.id}
               contextVar={contextVar} 
-              widgetDef={this.props.widgetDef} 
               schema={this.props.designCtx.schema}
               dataSource={this.props.designCtx.dataSource}
-              onWidgetDefChange={this.props.onWidgetDefChange}
+              contextVarValues={this.props.widgetDef.contextVarPreviewValues}
+              onContextVarValuesChange={this.handleContextVarPreviewValues}
+              />
+          </div>
+        })}
+      </LabeledProperty>
+      <LabeledProperty label="Variables" hint="Define data sources here (rowsets or rows)">
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="privateContextVars"> 
+          { (value, onChange) => <ContextVarsEditor contextVars={value || []} onChange={onChange} schema={this.props.designCtx.schema} /> }
+        </PropertyEditor>
+      </LabeledProperty>
+      <LabeledProperty label="Variable Values">
+        {(this.props.widgetDef.privateContextVars || []).map((contextVar) => {
+          return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
+            <ContextVarsValuesEditor 
+              key={contextVar.id}
+              contextVar={contextVar} 
+              schema={this.props.designCtx.schema}
+              dataSource={this.props.designCtx.dataSource}
+              contextVarValues={this.props.widgetDef.privateContextVarValues}
+              onContextVarValuesChange={this.handlePrivateContextVarValuesChange}
               />
           </div>
         })}
@@ -218,18 +246,18 @@ class AddContextVarModal extends React.Component<AddContextVarModalProps, AddCon
   }
 }
 
-/** Allows editing of the preview value for one context variable */
-class ContextVarPreviewValue extends React.Component<{
+/** Allows editing of the value for one context variable */
+class ContextVarsValuesEditor extends React.Component<{
   contextVar: ContextVar
-  widgetDef: WidgetDef
+  contextVarValues?: { [contextVarId: string]: any }
+  onContextVarValuesChange: (values: { [contextVarId: string]: any }) => void
   schema: Schema
   dataSource: DataSource
-  onWidgetDefChange(widgetDef: WidgetDef): void
 }> {
 
   handleChange = (value: any) => {
-    this.props.onWidgetDefChange(produce(this.props.widgetDef, (draft) => {
-      draft.contextVarPreviewValues[this.props.contextVar.id] = value
+    this.props.onContextVarValuesChange(produce(this.props.contextVarValues || {}, (draft) => {
+      draft[this.props.contextVar.id] = value
     })) 
   }
 
@@ -276,7 +304,7 @@ class ContextVarPreviewValue extends React.Component<{
     return <i>Not supported</i>
   }
   render() {
-    const value = this.props.widgetDef.contextVarPreviewValues[this.props.contextVar.id]
+    const value = (this.props.contextVarValues || {})[this.props.contextVar.id]
 
     return (
       <div>

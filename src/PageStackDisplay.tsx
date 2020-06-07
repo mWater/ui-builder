@@ -173,11 +173,16 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       registerForValidation: this.registerChildForValidation.bind(null, pageIndex)
     }
 
+    const injectedContextVars = (this.props.baseCtx.globalContextVars || [])
+      .concat(widgetDef.contextVars)
+      .concat(widgetDef.privateContextVars || [])
+    const injectedContextVarValues = page.contextVarValues
+
     // Wrap in context var injector
     return <ContextVarsInjector 
-      injectedContextVars={(this.props.baseCtx.globalContextVars || []).concat(widgetDef.contextVars)}
+      injectedContextVars={injectedContextVars}
       innerBlock={widgetDef.blockDef}
-      injectedContextVarValues={page.contextVarValues}
+      injectedContextVarValues={injectedContextVarValues}
       instanceCtx={{ ...outerInstanceCtx, database: page.database }}>
         {(innerInstanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
           if (loading) {

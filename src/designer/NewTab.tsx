@@ -52,7 +52,9 @@ export const NewTab = (props: {
       description: "",
       blockDef: null,
       contextVars: [],
-      contextVarPreviewValues: {}
+      contextVarPreviewValues: {},
+      privateContextVars: [],
+      privateContextVarValues: {}
     })
   }
 

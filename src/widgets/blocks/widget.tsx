@@ -136,11 +136,15 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = props.createBlock(widgetDef.blockDef)
 
+      const innerContextVars = (props.globalContextVars || [])
+        .concat(widgetDef.contextVars)
+        .concat(widgetDef.privateContextVars || [])
+
       // Create props for rendering inner block
       const innerProps : DesignCtx = {
         ...props,
         selectedId: null,
-        contextVars: widgetDef.contextVars,
+        contextVars: innerContextVars,
         store: new NullBlockStore(),
         blockPaletteEntries: [],
         renderChildBlock: (childProps, childBlockDef) => { 
@@ -190,13 +194,20 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = instanceCtx.createBlock(widgetDef.blockDef)
 
+      // Include outer context variables, even though widget does not technically need them
+      // They are included as the widget might receive expressions such as rowsets that reference
+      // variables that are only present in the outer scope.
+      const innerContextVars = (instanceCtx.globalContextVars || [])
+        .concat(instanceCtx.contextVars)
+        .concat(widgetDef.contextVars)
+        .concat(widgetDef.privateContextVars || [])
+
+      const innerContextVarValues = { ...instanceCtx.contextVarValues, ...mappedContextVarValues, ...widgetDef.privateContextVarValues || {} }
+
       const innerInstanceCtx : InstanceCtx = {
         ...instanceCtx,
-        // Include outer context variables, even though widget does not technically need them
-        // They are included as the widget might receive expressions such as rowsets that reference
-        // variables that are only present in the outer scope.
-        contextVars: widgetDef.contextVars.concat(instanceCtx.globalContextVars || []).concat(instanceCtx.contextVars),
-        contextVarValues: { ...instanceCtx.contextVarValues, ...mappedContextVarValues },
+        contextVars: innerContextVars,
+        contextVarValues: innerContextVarValues,
         getContextVarExprValue: (contextVarId: string, expr: Expr) => {
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
