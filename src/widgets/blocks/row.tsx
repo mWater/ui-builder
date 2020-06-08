@@ -15,13 +15,13 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface RowBlockDef extends BlockDef {
   type: "row"
 
-  /** Table that the row if from */
+  /** Table that the row is from */
   table?: string
   
   /** Name of the row context variable */
   name?: string | null
 
-  /** Filter which applies to rows in the row */
+  /** Filter which filters table down to one row */
   filter: Expr
 
   /** Block which is in the row */

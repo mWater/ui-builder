@@ -176,7 +176,9 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     const injectedContextVars = (this.props.baseCtx.globalContextVars || [])
       .concat(widgetDef.contextVars)
       .concat(widgetDef.privateContextVars || [])
-    const injectedContextVarValues = page.contextVarValues
+
+    // Page context var values contains global and context vars. Add private values
+    const injectedContextVarValues = { ...page.contextVarValues, ...widgetDef.privateContextVarValues || {} }
 
     // Wrap in context var injector
     return <ContextVarsInjector 

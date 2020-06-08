@@ -8,6 +8,7 @@ import { LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
 import produce from 'immer';
 import { InstanceCtx, DesignCtx } from '../../contexts';
+import ContextVarsInjector from '../ContextVarsInjector';
 
 /** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
@@ -200,7 +201,6 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       const innerContextVars = (instanceCtx.globalContextVars || [])
         .concat(instanceCtx.contextVars)
         .concat(widgetDef.contextVars)
-        .concat(widgetDef.privateContextVars || [])
 
       const innerContextVarValues = { ...instanceCtx.contextVarValues, ...mappedContextVarValues, ...widgetDef.privateContextVarValues || {} }
 
@@ -246,8 +246,25 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
           return []
         }
       }
-  
-      return innerBlock.renderInstance(innerInstanceCtx)
+
+      // Inject private context vars
+      return <ContextVarsInjector
+        instanceCtx={innerInstanceCtx}
+        innerBlock={widgetDef.blockDef}
+        injectedContextVars={widgetDef.privateContextVars || []}
+        injectedContextVarValues={widgetDef.privateContextVarValues || {}}
+        >
+          {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
+            if (loading) {
+              return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+            }
+            return (
+              <div style={{ opacity: refreshing ? 0.6 : undefined }}>
+                { innerBlock.renderInstance(instanceCtx) }
+              </div>
+            )            
+          }}
+        </ContextVarsInjector>
     } 
     else { // Handle case of widget with null block
       return <div/>

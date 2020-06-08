@@ -10,6 +10,7 @@ import BlockFactory from '../BlockFactory';
 import { ExpressionBlockDef } from './expression';
 import produce from 'immer';
 import { InstanceCtx } from '../../contexts';
+import { shallow } from 'enzyme';
 
 const innerBlockDef: ExpressionBlockDef = { 
   type: "expression", 
@@ -106,12 +107,15 @@ describe("renderInstance", () => {
   let innerInstanceCtx : InstanceCtx
  
   // Render instance
-  beforeEach(() => {
+  beforeEach((done) => {
     const createBlock = jest.fn()
     const widgetBlock = new WidgetBlock(blockDef)
 
     const innerBlock = {
-      renderInstance: jest.fn()
+      renderInstance: (instanceCtx: InstanceCtx) => {
+        innerInstanceCtx = instanceCtx
+        done()
+      }
     }
   
     // Return inner block
@@ -135,10 +139,7 @@ describe("renderInstance", () => {
       renderChildBlock: jest.fn(),
       registerForValidation: () => { return () => {} }      
     }
-    widgetBlock.renderInstance(instanceCtx)
-
-    // Get inner instanceCtx
-    innerInstanceCtx = innerBlock.renderInstance.mock.calls[0][0] as InstanceCtx
+    const x = shallow(widgetBlock.renderInstance(instanceCtx))
   })
 
   test("contextVars", () => {

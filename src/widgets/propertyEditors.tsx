@@ -19,7 +19,7 @@ import { DesignCtx } from "../contexts";
 export const LabeledProperty: React.FC<{ label: string, help?: string, hint?: string }> = (props) => {
   return (
     <div className="form-group">
-      <label>{props.label} { props.hint ? <span className="text-muted"> - {props.hint}</span> : null}</label>
+      <label>{props.label} { props.hint ? <span className="text-muted" style={{ fontWeight: "normal" }}> - {props.hint}</span> : null}</label>
       <div style={{ paddingLeft: 5 }}>
         {props.children}
       </div>

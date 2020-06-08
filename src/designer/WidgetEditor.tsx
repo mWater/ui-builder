@@ -50,33 +50,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
         </PropertyEditor>
       </LabeledProperty>
-      <LabeledProperty label="External Variables" help="These are passed in to the widget from its parent. Values are for preview only">
-        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
-          { (value, onChange) => <ContextVarsEditor 
-            contextVars={value} 
-            onChange={onChange} 
-            contextVarValues={this.props.widgetDef.contextVarPreviewValues}
-            onContextVarValuesChange={this.handleContextVarPreviewValues}
-            schema={this.props.designCtx.schema} 
-            dataSource={this.props.designCtx.dataSource}
-            /> }
-        </PropertyEditor>
-      </LabeledProperty>
-      {/* <LabeledProperty label="Preview External Variable Values" hint="For preview purposes only">
-        {allContextVars.map((contextVar) => {
-          return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
-            <ContextVarValueEditor 
-              key={contextVar.id}
-              contextVar={contextVar} 
-              schema={this.props.designCtx.schema}
-              dataSource={this.props.designCtx.dataSource}
-              contextVarValues={this.props.widgetDef.contextVarPreviewValues}
-              onContextVarValuesChange={this.handleContextVarPreviewValues}
-              />
-          </div>
-        })}
-      </LabeledProperty> */}
-      <LabeledProperty label="Variables" help="Define data sources here (rowsets or rows)">
+      <LabeledProperty label="Variables" hint="Define data sources (rowsets or rows)">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="privateContextVars"> 
           { (value, onChange) => <ContextVarsEditor 
               contextVars={value || []} 
@@ -89,20 +63,18 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           }
         </PropertyEditor>
       </LabeledProperty>
-      {/* <LabeledProperty label="Variable Values">
-        {(this.props.widgetDef.privateContextVars || []).map((contextVar) => {
-          return <div style={{ paddingBottom: 5 }} key={contextVar.id}>
-            <ContextVarValueEditor 
-              key={contextVar.id}
-              contextVar={contextVar} 
-              schema={this.props.designCtx.schema}
-              dataSource={this.props.designCtx.dataSource}
-              contextVarValues={this.props.widgetDef.privateContextVarValues}
-              onContextVarValuesChange={this.handlePrivateContextVarValuesChange}
-              />
-          </div>
-        })}
-      </LabeledProperty> */}
+      <LabeledProperty label="External Variables" hint="These are passed in to the widget from its parent. Values for preview only">
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="contextVars"> 
+          { (value, onChange) => <ContextVarsEditor 
+            contextVars={value} 
+            onChange={onChange} 
+            contextVarValues={this.props.widgetDef.contextVarPreviewValues}
+            onContextVarValuesChange={this.handleContextVarPreviewValues}
+            schema={this.props.designCtx.schema} 
+            dataSource={this.props.designCtx.dataSource}
+            /> }
+        </PropertyEditor>
+      </LabeledProperty>
       <div style={{ color: "#EEE", fontSize: 9 }}>{this.props.widgetDef.id}</div>
 
     </div>)
@@ -205,7 +177,7 @@ class AddContextVarModal extends React.Component<AddContextVarModalProps, AddCon
   show() {
     this.setState({
       visible: true,
-      contextVar: { id: uuid(), name: "Untitled", type: "row" }
+      contextVar: { id: uuid(), name: "Untitled", type: "rowset" }
     })
   }
 
@@ -239,8 +211,8 @@ class AddContextVarModal extends React.Component<AddContextVarModalProps, AddCon
     }
 
     const typeOptions = [
-      { value: "row", label: "Row of a table" },
       { value: "rowset", label: "Set of rows of a table" },
+      { value: "row", label: "Row of a table" },
       { value: "text", label: "Text" },
       { value: "number", label: "Number" },
       { value: "boolean", label: "Boolean" },
