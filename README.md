@@ -38,6 +38,12 @@ A block may use one or more context variables. Furthermore, for row and rowset v
 expressions based on the variable. For example, a text box may request the value of a text column of a row so that it doesn't have to query
 it itself.
 
+`rowset` can be filtered by widgets. Each widget can apply filters to the rowset dynamically as well as specifying initial filters to be applied.
+The filters are not present in the `contextVarValues` and must be applied manually if a widget wants to include filters.
+
+`row` is only different from `id` in that `row` can have expressions based on it. Also, `row` stores its table in `table` where 
+`id` uses `idTable`.
+
 ### Widgets
 
 A widget contains a single block and has a human readable name. It also defines 0 or more contexts variables that will be passed to the block.

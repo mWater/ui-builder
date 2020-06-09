@@ -10,7 +10,6 @@ import EnumInstance from './EnumInstance';
 import TextInstance from './TextInstance';
 import DateExprComponent, { toExpr, DateValue } from './DateExprComponent';
 import produce from 'immer';
-import { WidgetLibrary } from '../../../designer/widgetLibrary';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import EnumsetInstance from './EnumsetInstance';
 

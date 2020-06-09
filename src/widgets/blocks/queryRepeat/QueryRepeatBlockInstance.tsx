@@ -4,7 +4,7 @@ import { Row, Expr, IdExpr } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import _ from "lodash";
 import { localize } from "../../localization";
-import { InstanceCtx } from "../../../contexts";
+import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts";
 
 interface Props {
   block: QueryRepeatBlock
@@ -113,7 +113,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     // Mark as refreshing
     this.setState({ refreshing: true })
     
-    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, this.props.instanceCtx.contextVarValues).then(rows => {
+    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx)).then(rows => {
       // Check if still relevant
       if (_.isEqual(queryOptions, this.createQuery())) {
         this.setState({ rows, refreshing: false })

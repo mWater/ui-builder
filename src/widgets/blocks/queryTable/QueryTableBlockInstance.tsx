@@ -4,7 +4,7 @@ import { Row, Expr, IdExpr } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
 import { localize } from "../../localization";
-import { InstanceCtx } from "../../../contexts";
+import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts";
 import { BlockDef } from "../../blocks";
 
 interface Props {
@@ -145,7 +145,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     // Mark as refreshing
     this.setState({ refreshing: true })
 
-    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, this.props.instanceCtx.contextVarValues).then(rows => {
+    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx)).then(rows => {
       // Check if still relevant
       if (_.isEqual(queryOptions, this.createQuery())) {
         this.setState({ rows, refreshing: false })

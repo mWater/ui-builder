@@ -65,3 +65,7 @@ export interface InstanceCtx extends BaseCtx {
      */
     registerForValidation(validate: (isFirstError: boolean) => string | null): (() => void);
 }
+/** Gets context variables with filters baked into rowsets. Use for all queries, as that may depend on rowset filters */
+export declare function getFilteredContextVarValues(instanceCtx: InstanceCtx): {
+    [contextVarId: string]: any;
+};

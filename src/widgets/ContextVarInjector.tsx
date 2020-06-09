@@ -4,7 +4,7 @@ import { Expr, ExprUtils, Schema, Variable, PromiseExprEvaluator } from "mwater-
 import { QueryOptions, Database } from "../database/Database";
 import canonical from 'canonical-json'
 import _ from "lodash";
-import { InstanceCtx } from "../contexts";
+import { InstanceCtx, getFilteredContextVarValues } from "../contexts";
 
 interface Props {
   injectedContextVar: ContextVar
@@ -24,8 +24,8 @@ interface State {
   /** Value of expressions. Index by canonicalized JSON */
   exprValues: { [exprJson: string]: any }
 
-  /** Context var values at last refresh. Used to detect changes */
-  contextVarValues: { [contextVarId: string]: any }
+  /** Filtered context var values at last refresh. Used to detect changes */
+  filteredContextVarValues: { [contextVarId: string]: any }
 }
 
 /** Injects one context variable into the inner render instance props. 
@@ -44,7 +44,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       loading: true,
       refreshing: false,
       exprValues: {},
-      contextVarValues: props.instanceCtx.contextVarValues
+      filteredContextVarValues: getFilteredContextVarValues(props.instanceCtx)
     }
 
     this.unmounted = false
@@ -62,7 +62,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     // TODO context var value changes are only relevant if referenced as a variable. Could be optimized
     if (!_.isEqual(prevProps.value, this.props.value) 
       || !_.isEqual(prevState.filters, this.state.filters)
-      || !_.isEqual(this.props.instanceCtx.contextVarValues, this.state.contextVarValues)
+      || !_.isEqual(getFilteredContextVarValues(this.createInnerProps()), this.state.filteredContextVarValues)
       ) {
       this.performQueries()
     }
@@ -135,15 +135,15 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
     // Determine variables and values for expressions
     const variables = createExprVariables(innerProps.contextVars)
-    const variableValues = innerProps.contextVarValues
+    const variableValues = getFilteredContextVarValues(innerProps)
 
-    this.setState({ refreshing: true, contextVarValues: this.props.instanceCtx.contextVarValues })
+    this.setState({ refreshing: true, filteredContextVarValues: variableValues })
 
     // Query database if row 
     if (this.props.injectedContextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
       // Special case of null row value
       if (this.props.value == null) {
-        this.setState({ exprValues: {}, loading: false, refreshing: false, contextVarValues: this.props.instanceCtx.contextVarValues })
+        this.setState({ exprValues: {}, loading: false, refreshing: false, filteredContextVarValues: variableValues })
         return
       }
 
@@ -154,7 +154,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       const queryOptions = this.createRowQueryOptions(table)
 
       try {
-        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
+        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, variableValues)
 
         // Ignore if query options out of date
         if (!_.isEqual(queryOptions, this.createRowQueryOptions(table))) {
@@ -162,7 +162,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         }
 
         // Ignore if variable values out of date
-        if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
+        if (!_.isEqual(variableValues, getFilteredContextVarValues(this.createInnerProps()))) {
           return
         }
 
@@ -195,7 +195,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       // Perform query
       const queryOptions = this.createRowsetQueryOptions(table, variables)
       try {
-        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, innerProps.contextVarValues)
+        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, getFilteredContextVarValues(innerProps))
 
         // Ignore if query options out of date
         if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
@@ -203,7 +203,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         }
 
         // Ignore if variable values out of date
-        if (!_.isEqual(variableValues, this.createInnerProps().contextVarValues)) {
+        if (!_.isEqual(variableValues, getFilteredContextVarValues(this.createInnerProps()))) {
           return
         }
 

@@ -20,8 +20,8 @@ export class DataSourceDatabase implements Database {
     this.changeListeners = []
   }
   
-  query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
-    const queryCompiler = new QueryCompiler(this.schema, createExprVariables(contextVars), contextVarValues)
+  query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: { [contextVarId: string]: any }) {
+    const queryCompiler = new QueryCompiler(this.schema, createExprVariables(contextVars), filteredContextVarValues)
     const { jsonql, rowMapper } = queryCompiler.compileQuery(options)
     
     return new Promise<Row[]>((resolve, reject) => {
