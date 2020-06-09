@@ -20,8 +20,8 @@ interface State {
     exprValues: {
         [exprJson: string]: any;
     };
-    /** Context var values at last refresh. Used to detect changes */
-    contextVarValues: {
+    /** Filtered context var values at last refresh. Used to detect changes */
+    filteredContextVarValues: {
         [contextVarId: string]: any;
     };
 }

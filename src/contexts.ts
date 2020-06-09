@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { ActionLibrary } from "./widgets/ActionLibrary";
 import { WidgetLibrary } from "./designer/widgetLibrary";
 import { DataSource, Schema, Expr } from "mwater-expressions";
@@ -79,4 +80,35 @@ export interface InstanceCtx extends BaseCtx {
    * isFirstError is true if first block to potentially fail validation. This allows the block to scroll into view on error
    */
   registerForValidation(validate: (isFirstError: boolean) => string | null): (() => void)
+}
+
+/** Gets context variables with filters baked into rowsets. Use for all queries, as that may depend on rowset filters */
+export function getFilteredContextVarValues(instanceCtx: InstanceCtx): { [contextVarId: string]: any } {
+  const results: { [contextVarId: string]: any } = {}
+
+  for (const cv of instanceCtx.contextVars) {
+    if (cv.type == "rowset") {
+      // Create and expression
+      const expr: Expr = {
+        type: "op",
+        op: "and",
+        table: cv.table!,
+        exprs: _.compact([instanceCtx.contextVarValues[cv.id]].concat(_.map(instanceCtx.getFilters(cv.id), f => f.expr)))
+      }
+      if (expr.exprs.length == 1) {
+        results[cv.id] = expr.exprs[0]
+      }
+      else if (expr.exprs.length == 0) {
+        results[cv.id] = null
+      }
+      else {
+        results[cv.id] = expr
+      }
+    }
+    else {
+      results[cv.id] = instanceCtx.contextVarValues[cv.id]
+    }
+  }
+
+  return results
 }

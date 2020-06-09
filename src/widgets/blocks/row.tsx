@@ -9,7 +9,7 @@ import { FilterExprComponent } from 'mwater-expressions-ui';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
 import { localize } from '../localization';
 import { useEffect, useState } from 'react';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from '../../contexts';
 
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
@@ -162,7 +162,7 @@ const RowInstance = (props: {
       from: table,
       where: blockDef.filter,
       limit: 1
-    }, instanceProps.contextVars, instanceProps.contextVarValues)
+    }, instanceProps.contextVars, getFilteredContextVarValues(instanceProps))
       .then((rows) => {
         if (rows.length > 0) {
           setId(rows[0].id)

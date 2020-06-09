@@ -23,7 +23,8 @@ export declare type DatabaseChangeListener = () => void;
  * to the server (see VirtualDatabase)
  */
 export interface Database {
-    query(options: QueryOptions, contextVars: ContextVar[], contextVarValues: {
+    /** Perform a query. Note: contextVarValues should have filters baked into them. Use getFilteredContextVarValues(...) */
+    query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: {
         [contextVarId: string]: any;
     }): Promise<Row[]>;
     /** Adds a listener which is called with each change to the database */
