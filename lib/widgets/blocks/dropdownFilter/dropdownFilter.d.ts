@@ -15,6 +15,8 @@ export interface DropdownFilterBlockDef extends BlockDef {
     filterExpr: Expr;
     /** Default value of filter */
     defaultValue?: any;
+    /** Additional rowsets to be filtered by same value */
+    extraFilters?: ExtraFilter[];
     /** True to use "within" operator. Only for hierarchical tables  */
     idWithin?: boolean;
     /** Optional filter to limit the id choices */
@@ -32,13 +34,21 @@ export interface DropdownFilterBlockDef extends BlockDef {
     /** Advanced mode: sort order of results */
     idOrderBy?: OrderBy[] | null;
 }
+/** Additional rowset to be filtered */
+interface ExtraFilter {
+    /** Id of context variable of rowset to filter */
+    rowsetContextVarId: string | null;
+    /** Expression to filter on  */
+    filterExpr: Expr;
+}
 export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     validate(options: DesignCtx): string | null;
     /** Generate a single synthetic context variable to allow embedded expressions to work in label */
     generateEmbedContextVars(idTable: string): ContextVar[];
-    createFilter(schema: Schema, contextVars: ContextVar[], value: any): Filter;
+    createFilter(rowsetContextVarId: string, filterExpr: Expr, schema: Schema, contextVars: ContextVar[], value: any): Filter;
     renderDesign(props: DesignCtx): JSX.Element;
     getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];
     renderInstance(props: InstanceCtx): React.ReactElement<any>;
     renderEditor(ctx: DesignCtx): JSX.Element;
 }
+export {};

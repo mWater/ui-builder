@@ -33,8 +33,8 @@ export interface DropdownFilterBlockDef extends BlockDef {
   /** Default value of filter */
   defaultValue?: any
 
-  // /** Additional rowsets to be filtered by same value */
-  // extraFilters?: ExtraFilter[]
+  /** Additional rowsets to be filtered by same value */
+  extraFilters?: ExtraFilter[]
 
   /** True to use "within" operator. Only for hierarchical tables  */
   idWithin?: boolean
@@ -61,14 +61,14 @@ export interface DropdownFilterBlockDef extends BlockDef {
   idOrderBy?: OrderBy[] | null  
 }
 
-// /** Additional rowset to be filtered */
-// interface ExtraFilter {
-//   /** Id of context variable of rowset to filter */
-//   rowsetContextVarId: string | null
+/** Additional rowset to be filtered */
+interface ExtraFilter {
+  /** Id of context variable of rowset to filter */
+  rowsetContextVarId: string | null
 
-//   /** Expression to filter on  */
-//   filterExpr: Expr
-// }
+  /** Expression to filter on  */
+  filterExpr: Expr
+}
 
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   validate(options: DesignCtx) {
@@ -92,10 +92,36 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     }
 
     const exprUtils = new ExprUtils(options.schema, createExprVariables(options.contextVars))
-    const valueType = exprUtils.getExprType(this.blockDef.filterExpr)
+    const valueType = exprUtils.getExprType(this.blockDef.filterExpr)!
+    const valueIdTableId = exprUtils.getExprIdTable(this.blockDef.filterExpr)
+
+    // Validate extra filter exprs
+    if (this.blockDef.extraFilters) {
+      for (const extraFilter of this.blockDef.extraFilters) {
+        // Validate rowset
+        const extraRowsetCV = options.contextVars.find(cv => cv.id === extraFilter.rowsetContextVarId && cv.type === "rowset")
+        if (!extraRowsetCV) {
+          return "Rowset required"
+        }
+
+        if (!extraFilter.filterExpr) {
+          return "Filter expression required"
+        }
+
+        // Validate expr
+        let error
+        error = exprValidator.validateExpr(extraFilter.filterExpr, { 
+          table: extraRowsetCV.table, 
+          types: [valueType],
+          idTable: valueIdTableId || undefined
+        })
+        if (error) {
+          return error
+        }
+      }
+    }
 
     if (valueType === "id") {
-      const valueIdTableId = exprUtils.getExprIdTable(this.blockDef.filterExpr)
       if (!valueIdTableId) {
         return "Id table required"
       }
@@ -181,42 +207,42 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     ]
   }
   
-  createFilter(schema: Schema, contextVars: ContextVar[], value: any): Filter {
+  createFilter(rowsetContextVarId: string, filterExpr: Expr, schema: Schema, contextVars: ContextVar[], value: any): Filter {
     const exprUtils = new ExprUtils(schema, createExprVariables(contextVars))
-    const valueType = exprUtils.getExprType(this.blockDef.filterExpr)
-    const valueIdTable = exprUtils.getExprIdTable(this.blockDef.filterExpr)
-    const contextVar = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)!
+    const valueType = exprUtils.getExprType(filterExpr)
+    const valueIdTable = exprUtils.getExprIdTable(filterExpr)
+    const contextVar = contextVars.find(cv => cv.id === rowsetContextVarId)!
     const table = contextVar.table!
 
     switch (valueType) {
       case "enum":
         return {
           id: this.blockDef.id,
-          expr: value ? { type: "op", table: table, op: "=", exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "enum", value: value }]} : null,
+          expr: value ? { type: "op", table: table, op: "=", exprs: [filterExpr!, { type: "literal", valueType: "enum", value: value }]} : null,
           memo: value
         }
       case "enumset":
         return {
           id: this.blockDef.id,
-          expr: value ? { type: "op", table: table, op: "intersects", exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "enumset", value: value }]} : null,
+          expr: value ? { type: "op", table: table, op: "intersects", exprs: [filterExpr!, { type: "literal", valueType: "enumset", value: value }]} : null,
           memo: value
         }
       case "text":
         return {
           id: this.blockDef.id,
-          expr: value ? { type: "op", table: table, op: "=", exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "text", value: value }]} : null,
+          expr: value ? { type: "op", table: table, op: "=", exprs: [filterExpr!, { type: "literal", valueType: "text", value: value }]} : null,
           memo: value
         }
       case "date":
         return {
           id: this.blockDef.id,
-          expr: toExpr(table, this.blockDef.filterExpr!, false, value),
+          expr: toExpr(table, filterExpr!, false, value),
           memo: value
         }
       case "datetime":
         return {
           id: this.blockDef.id,
-          expr: toExpr(table, this.blockDef.filterExpr!, true, value),
+          expr: toExpr(table, filterExpr!, true, value),
           memo: value
         }
       case "id":
@@ -226,7 +252,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             type: "op", 
             table: table, 
             op: this.blockDef.idWithin ? "within" : "=", 
-            exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "id", idTable: valueIdTable!, value: value }]
+            exprs: [filterExpr!, { type: "literal", valueType: "id", idTable: valueIdTable!, value: value }]
           } : null,
           memo: value
         }
@@ -273,12 +299,23 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   }
 
   getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
+    const filters: Filter[] = []
     if (contextVarId == this.blockDef.rowsetContextVarId) {
       if (this.blockDef.defaultValue) {
-        return [this.createFilter(instanceCtx.schema, instanceCtx.contextVars, this.blockDef.defaultValue)]
+        filters.push(this.createFilter(this.blockDef.rowsetContextVarId, this.blockDef.filterExpr, instanceCtx.schema, instanceCtx.contextVars, this.blockDef.defaultValue))
       }
     }
-    return [] 
+
+    // Add extra filters
+    for (const extraFilter of this.blockDef.extraFilters || []) {
+      if (contextVarId == extraFilter.rowsetContextVarId) {
+        if (this.blockDef.defaultValue) {
+          filters.push(this.createFilter(extraFilter.rowsetContextVarId, extraFilter.filterExpr, instanceCtx.schema, instanceCtx.contextVars, this.blockDef.defaultValue))
+        }
+      }
+    }
+
+    return filters
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
@@ -288,8 +325,14 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
     const handleChange = (newValue: any) => {
       // Create filter
-      const newFilter = this.createFilter(props.schema, props.contextVars, newValue)
+      const newFilter = this.createFilter(this.blockDef.rowsetContextVarId!, this.blockDef.filterExpr, props.schema, props.contextVars, newValue)
       props.setFilter(contextVar.id, newFilter)
+
+      // Create extra filters
+      for (const extraFilter of this.blockDef.extraFilters || []) {
+        const newExtraFilter = this.createFilter(extraFilter.rowsetContextVarId!, extraFilter.filterExpr, props.schema, props.contextVars, newValue)
+        props.setFilter(extraFilter.rowsetContextVarId!, newExtraFilter)
+      }
     }
 
     const exprUtils = new ExprUtils(props.schema, createExprVariables(props.contextVars))
@@ -520,6 +563,51 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         : null }
+        { rowsetCV && this.blockDef.filterExpr ?
+          <LabeledProperty label="Additional filters on other rowsets">
+            <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="extraFilters">
+              {(value, onItemsChange) => {
+                const handleAddExtraFilter = () => {
+                  onItemsChange((value || []).concat({ rowsetContextVarId: null, filterExpr: null }))
+                }
+                return (
+                  <div>
+                    <ListEditor items={value || []} onItemsChange={onItemsChange}>
+                      { (extraFilter: ExtraFilter, onExtraFilterChange) => {
+                        const extraFilterCV = ctx.contextVars.find(cv => cv.id === extraFilter.rowsetContextVarId)
+                        return <div>
+                          <LabeledProperty label="Rowset">
+                            <PropertyEditor obj={extraFilter} onChange={onExtraFilterChange} property="rowsetContextVarId">
+                              {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={ctx.contextVars} types={["rowset"]} />}
+                            </PropertyEditor>
+                          </LabeledProperty>
+                  
+                          { extraFilterCV ?
+                            <LabeledProperty label="Filter expression">
+                              <PropertyEditor obj={extraFilter} onChange={onExtraFilterChange} property="filterExpr">
+                                {(value, onChange) => <ExprComponent 
+                                  value={value} 
+                                  schema={ctx.schema} 
+                                  dataSource={ctx.dataSource} 
+                                  onChange={onChange} 
+                                  table={extraFilterCV.table!} 
+                                  types={["enum", "enumset", "text", "date", "datetime", "id"]} /> 
+                                }
+                              </PropertyEditor>
+                            </LabeledProperty>
+                          : null}
+                        </div>                      
+                      }}
+                    </ListEditor>
+                    <button type="button" className="btn btn-link btn-sm" onClick={handleAddExtraFilter}>
+                      + Add Filter
+                    </button>
+                  </div>
+                )
+              }}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null }
       </div>
     )
   }
