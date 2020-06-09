@@ -37,7 +37,7 @@ interface SingleProps<T> {
   contextVarValues: { [contextVarId: string]: any }
 
   /** Styling for react-select */
-  styles: Partial<Styles>
+  styles?: Partial<Styles>
 }
 
 interface MultiProps<T> {
@@ -226,6 +226,7 @@ export function IdDropdownComponent<T>(props: Props<T>) {
       menuPortalTarget={document.body}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
+      classNamePrefix="react-select-short" 
       styles={props.styles} />
   </div>
 }

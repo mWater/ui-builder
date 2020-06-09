@@ -1,18 +1,10 @@
 import _ from 'lodash'
 import * as React from 'react';
-import { BlockDef, createExprVariables, ContextVar } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, EnumValue, Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
+import { Column } from 'mwater-expressions';
 import { localize } from '../../localization';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EnumArrayEditor, EmbeddedExprsEditor, OrderByArrayEditor } from '../../propertyEditors';
-import ReactSelect from "react-select"
-import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
-import { IdDropdownComponent } from './IdDropdownComponent';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
-import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../../embeddedExprs';
-import { OrderBy } from '../../../database/Database';
-import { Toggle } from 'react-library/lib/bootstrap';
-import ListEditor from '../../ListEditor';
+import { LabeledProperty, PropertyEditor, EnumArrayEditor } from '../../propertyEditors';
+import { DesignCtx } from '../../../contexts';
 
 export interface ToggleBlockDef extends ControlBlockDef {
   type: "toggle"

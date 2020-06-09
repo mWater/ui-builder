@@ -4,20 +4,10 @@ import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, Expr } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { Database, OrderBy } from "../../../database/Database";
-import { Styles } from 'react-select/lib/styles';
 import { IdDropdownComponent } from '../controls/IdDropdownComponent';
 import { formatEmbeddedExprString } from '../../../embeddedExprs';
 import { InstanceCtx } from '../../../contexts';
 import { localize } from '../../localization';
-
-/** Styles for react-select */
-const dropdownStyles: Partial<Styles> = { 
-  // Keep menu above other controls
-  menu: style => ({ ...style, zIndex: 2000 }),
-  menuPortal: style => ({ ...style, zIndex: 2000 }),
-  control: style => ({ ...style, minHeight: 34, height: 34 }),
-  valueContainer: style => ({ ...style, top: -2 })
-}
 
 /** Dropdown filter that is an id */
 export const IdInstance = (props: {
@@ -76,5 +66,5 @@ export const IdInstance = (props: {
     formatLabel={formatIdLabel}
     contextVars={props.ctx.contextVars}
     contextVarValues={props.ctx.contextVarValues}
-    styles={dropdownStyles} />
+  />
 }

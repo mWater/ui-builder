@@ -67,3 +67,17 @@
 
 /* Fix react datepicker behind button groups */
 .react-datepicker-popper { z-index: 2000 }
+
+/* Make react-select in front and shorter */
+.react-select-short__control {
+  height: 34px;
+  min-height: 34px !important;
+}
+
+.react-select-short__value-container {
+  top: -2px;
+}
+
+.react-select-short__menu {
+  z-index: 2000;
+}

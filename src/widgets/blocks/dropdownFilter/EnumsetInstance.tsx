@@ -4,16 +4,6 @@ import { Schema, ExprUtils, EnumValue } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
 import ReactSelect from "react-select"
-import { Styles } from "react-select/lib/styles";
-
-/** Styles for react-select */
-const dropdownStyles: Partial<Styles> = { 
-  // Keep menu above other controls
-  menu: style => ({ ...style, zIndex: 2000 }),
-  menuPortal: style => ({ ...style, zIndex: 2000 }),
-  control: style => ({ ...style, minHeight: 34, height: 34 }),
-  valueContainer: style => ({ ...style, top: -2 })
-}
 
 export default class EnumsetInstance extends React.Component<{
   blockDef: DropdownFilterBlockDef
@@ -38,8 +28,7 @@ export default class EnumsetInstance extends React.Component<{
     const minWidth = 400 //Math.min(300, Math.max(selectedValue ? getOptionLabel(selectedValue).length * 8 + 90 : 0, 150))
 
     const styles = {
-      ...dropdownStyles,
-      control: (style: CSSProperties) => ({ ...style, minHeight: 34, height: 34, minWidth: minWidth }),
+      control: (style: CSSProperties) => ({ ...style, minWidth: minWidth }),
     }
 
     return <ReactSelect
@@ -54,6 +43,7 @@ export default class EnumsetInstance extends React.Component<{
       styles={styles}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
-      />
+      classNamePrefix="react-select-short" 
+    />
   }
 }

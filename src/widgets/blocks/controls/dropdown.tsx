@@ -13,17 +13,7 @@ import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '.
 import { OrderBy } from '../../../database/Database';
 import { Toggle } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
-import { Styles } from 'react-select/lib/styles';
 import { ToggleBlockDef } from './toggle';
-
-/** Styles for react-select */
-const dropdownStyles: Partial<Styles> = { 
-  // Keep menu above other controls
-  menu: style => ({ ...style, zIndex: 2000 }),
-  menuPortal: style => ({ ...style, zIndex: 2000 }),
-  control: style => ({ ...style, minHeight: 34, height: 34 }),
-  valueContainer: style => ({ ...style, top: -2 })
-}
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -147,19 +137,19 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   renderControl(props: RenderControlProps) {
     // If can't be rendered due to missing context variable, just show placeholder
     if (!props.rowContextVar || !this.blockDef.column) {
-      return <ReactSelect
-        styles={{ 
-          // Keep menu above other controls
-          menu: (style) => ({ ...style, zIndex: 2000 }),
-          menuPortal: (style) => ({ ...style, zIndex: 2000 }),
-          control: style => ({ ...style, minHeight: 34, height: 34 })
-        }} />
+      return <ReactSelect 
+        menuPortalTarget={document.body}
+        classNamePrefix="react-select-short" 
+      />
     }
 
     // Get column
     const column = props.schema.getColumn(props.rowContextVar.table!, this.blockDef.column)!
     if (!column) {
-      return <ReactSelect/>
+      return <ReactSelect
+        menuPortalTarget={document.body}
+        classNamePrefix="react-select-short" 
+      />
     }
 
     if (column.type === "enum") {
@@ -209,8 +199,8 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       isClearable={true}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
-      styles={dropdownStyles}
-      />
+      classNamePrefix="react-select-short" 
+     />
   }
 
   renderEnumset(props: RenderControlProps, column: Column) {
@@ -248,8 +238,8 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       isMulti={true}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
-      styles={dropdownStyles}
-      />
+      classNamePrefix="react-select-short" 
+    />
   }
 
   formatIdLabel = (ctx: RenderControlProps, labelValues: any[]): string => {
@@ -301,7 +291,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       formatLabel={this.formatIdLabel.bind(null, props)}
       contextVars={props.contextVars}
       contextVarValues={props.contextVarValues}
-      styles={dropdownStyles} />
+    />
   }
 
   renderIds(props: RenderControlProps, column: Column) {

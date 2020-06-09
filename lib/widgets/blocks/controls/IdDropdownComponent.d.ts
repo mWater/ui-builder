@@ -26,7 +26,7 @@ interface SingleProps<T> {
         [contextVarId: string]: any;
     };
     /** Styling for react-select */
-    styles: Partial<Styles>;
+    styles?: Partial<Styles>;
 }
 interface MultiProps<T> {
     database: Database;

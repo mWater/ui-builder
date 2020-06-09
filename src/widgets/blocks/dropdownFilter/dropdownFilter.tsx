@@ -295,7 +295,14 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       )
     }
 
-    return <div style={{ padding: 5 }}><ReactSelect styles={styles} placeholder={placeholder}/></div>
+    return <div style={{ padding: 5 }}>
+      <ReactSelect 
+        classNamePrefix="react-select-short" 
+        styles={styles} 
+        placeholder={placeholder}
+        menuPortalTarget={document.body}
+        />
+    </div>
   }
 
   getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
