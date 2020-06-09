@@ -1,9 +1,19 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, EnumValue } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
 import ReactSelect from "react-select"
+import { Styles } from "react-select/lib/styles";
+
+/** Styles for react-select */
+const dropdownStyles: Partial<Styles> = { 
+  // Keep menu above other controls
+  menu: style => ({ ...style, zIndex: 2000 }),
+  menuPortal: style => ({ ...style, zIndex: 2000 }),
+  control: style => ({ ...style, minHeight: 34, height: 34 }),
+  valueContainer: style => ({ ...style, top: -2 })
+}
 
 export default class EnumInstance extends React.Component<{
   blockDef: DropdownFilterBlockDef
@@ -27,10 +37,8 @@ export default class EnumInstance extends React.Component<{
     const minWidth = Math.min(300, Math.max(enumValue ? getOptionLabel(enumValue).length * 8 + 90 : 0, 150))
 
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 40, minHeight: 40, minWidth: minWidth }),
-      // Keep menu above other controls
-      menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 }),
-      menuPortal: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
+      ...dropdownStyles,
+      control: (style: CSSProperties) => ({ ...style, minHeight: 34, height: 34, minWidth: minWidth }),
     }
 
     return <ReactSelect

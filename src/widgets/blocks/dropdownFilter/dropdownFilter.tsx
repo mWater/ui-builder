@@ -98,7 +98,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 40, minHeight: 40, minWidth: 150 }),
+      control: (base: React.CSSProperties) => ({ ...base, height: 34, minHeight: 34, minWidth: 150 }),
       // Keep menu above other controls
       menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 }),
       menuPortal: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })

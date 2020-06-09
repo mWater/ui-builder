@@ -1,11 +1,21 @@
 import _ from 'lodash'
-import React from "react";
+import React, { CSSProperties } from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
 import Async from 'react-select/lib/Async'
 import { QueryOptions, Database } from "../../../database/Database";
+import { Styles } from 'react-select/lib/styles';
+
+/** Styles for react-select */
+const dropdownStyles: Partial<Styles> = { 
+  // Keep menu above other controls
+  menu: style => ({ ...style, zIndex: 2000 }),
+  menuPortal: style => ({ ...style, zIndex: 2000 }),
+  control: style => ({ ...style, minHeight: 34, height: 34 }),
+  valueContainer: style => ({ ...style, top: -2 })
+}
 
 /** Dropdown filter that is a text string. Should search in database for matches */
 export default class TextInstance extends React.Component<{
@@ -66,9 +76,8 @@ export default class TextInstance extends React.Component<{
 
     const noOptionsMessage = () => "Type to search"
     const styles = {
-      control: (base: React.CSSProperties) => ({ ...base, height: 40, minHeight: 40, minWidth: minWidth }),
-      // Keep menu above other controls
-      menu: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })      
+      ...dropdownStyles,
+      control: (style: CSSProperties) => ({ ...style, minHeight: 34, height: 34, minWidth: minWidth }),
     }
 
     return <Async 
