@@ -2,8 +2,8 @@ import * as React from 'react';
 import LeafBlock from '../../LeafBlock'
 import { BlockDef, Filter, ContextVar, createExprVariables } from '../../blocks'
 import { Expr, ExprValidator, Schema, ExprUtils, LocalizedString } from 'mwater-expressions';
-import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import { ExprComponent } from 'mwater-expressions-ui';
+import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor, OrderByArrayEditor } from '../../propertyEditors';
+import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
 import { localize } from '../../localization';
 import ReactSelect from "react-select"
 import EnumInstance from './EnumInstance';
@@ -12,6 +12,11 @@ import DateExprComponent, { toExpr, DateValue } from './DateExprComponent';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import EnumsetInstance from './EnumsetInstance';
+import { EmbeddedExpr, validateEmbeddedExprs } from '../../../embeddedExprs';
+import { OrderBy } from '../../../database/Database';
+import { IdInstance } from './IdInstance';
+import { Toggle } from 'react-library/lib/bootstrap';
+import ListEditor from '../../ListEditor';
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -19,15 +24,51 @@ export interface DropdownFilterBlockDef extends BlockDef {
   /** Placeholder in box */
   placeholder: LocalizedString | null
 
-  /** Id of context variable of rowset for table to use */
+  /** Id of context variable of rowset to filter */
   rowsetContextVarId: string | null
 
-  /** Expression to filter on  */
+  /** Expression to filter on */
   filterExpr: Expr
 
   /** Default value of filter */
   defaultValue?: any
+
+  // /** Additional rowsets to be filtered by same value */
+  // extraFilters?: ExtraFilter[]
+
+  /** True to use "within" operator. Only for hierarchical tables  */
+  idWithin?: boolean
+
+  /** Optional filter to limit the id choices */
+  idFilterExpr?: Expr
+
+  /** There are two modes for id fields: simple (just a label expression) and advanced (custom format for label, separate search and order) */
+  idMode?: "simple" | "advanced"
+
+  /** Simple mode: Text expression to display for entries of type id */
+  idLabelExpr?: Expr
+
+  /** Advanced mode: Label for id selections with {0}, {1}, etc embedded in it */
+  idLabelText?: LocalizedString | null
+
+  /** Advanced mode: Expressions embedded in the id label text string. Referenced by {0}, {1}, etc. Context variable is ignored */
+  idLabelEmbeddedExprs?: EmbeddedExpr[] 
+
+  /** Advanced mode: Text/enum expressions to search on */
+  idSearchExprs?: Expr[]
+
+  /** Advanced mode: sort order of results */
+  idOrderBy?: OrderBy[] | null  
 }
+
+// /** Additional rowset to be filtered */
+// interface ExtraFilter {
+//   /** Id of context variable of rowset to filter */
+//   rowsetContextVarId: string | null
+
+//   /** Expression to filter on  */
+//   filterExpr: Expr
+// }
 
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   validate(options: DesignCtx) {
@@ -42,19 +83,108 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     }
 
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-
+    
     // Validate expr
     let error
-    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "enumset", "text", "date", "datetime"] })
+    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "enumset", "text", "date", "datetime", "id"] })
     if (error) {
       return error
+    }
+
+    const exprUtils = new ExprUtils(options.schema, createExprVariables(options.contextVars))
+    const valueType = exprUtils.getExprType(this.blockDef.filterExpr)
+
+    if (valueType === "id") {
+      const valueIdTableId = exprUtils.getExprIdTable(this.blockDef.filterExpr)
+      if (!valueIdTableId) {
+        return "Id table required"
+      }
+      const valueIdTable = options.schema.getTable(valueIdTableId)
+      if (!valueIdTable) {
+        return "Id table missing"
+      }
+
+      const idMode = this.blockDef.idMode || "simple"
+      const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
+
+      if (this.blockDef.idWithin && !valueIdTable.ancestry && !valueIdTable.ancestryTable) {
+        return "Within requires hierarchical table"
+      }
+
+      if (idMode == "simple") {
+        if (!this.blockDef.idLabelExpr)  {
+          return "Label Expression required"
+        }
+
+        // Validate expr
+        error = exprValidator.validateExpr(this.blockDef.idLabelExpr || null, { table: valueIdTableId, types: ["text"] })
+        if (error) {
+          return error
+        }
+      }
+      else {
+        // Complex mode
+        if (!this.blockDef.idLabelText) {
+          return "Label required"
+        }
+        if (!this.blockDef.idLabelEmbeddedExprs || this.blockDef.idLabelEmbeddedExprs.length == 0) {
+          return "Label embedded expressions required"
+        }
+        if (!this.blockDef.idOrderBy || this.blockDef.idOrderBy.length == 0) {
+          return "Label order by required"
+        }
+        if (!this.blockDef.idSearchExprs || this.blockDef.idSearchExprs.length == 0) {
+          return "Label search required"
+        }
+
+        // Validate embedded expressions
+        error = validateEmbeddedExprs({
+          embeddedExprs: this.blockDef.idLabelEmbeddedExprs,
+          schema: options.schema,
+          contextVars: this.generateEmbedContextVars(valueIdTableId)
+        })
+
+        if (error) {
+          return error
+        }
+
+        // Validate orderBy
+        for (const orderBy of this.blockDef.idOrderBy || []) {
+          error = exprValidator.validateExpr(orderBy.expr, { table: valueIdTableId })
+          if (error) {
+            return error
+          }
+        }
+
+        // Validate search
+        for (const searchExpr of this.blockDef.idSearchExprs) {
+          if (!searchExpr) {
+            return "Search expression required"
+          }
+    
+          // Validate expr
+          error = exprValidator.validateExpr(searchExpr, { table: valueIdTableId, types: ["text", "enum", "enumset"] })
+          if (error) {
+            return error
+          }
+        }
+      }
     }
 
     return null
   }
 
+  /** Generate a single synthetic context variable to allow embedded expressions to work in label */
+  generateEmbedContextVars(idTable: string): ContextVar[] {
+    return [
+      { id: "dropdown-embed", name: "Label", table: idTable, type: "row" }
+    ]
+  }
+  
   createFilter(schema: Schema, contextVars: ContextVar[], value: any): Filter {
-    const valueType = new ExprUtils(schema, createExprVariables(contextVars)).getExprType(this.blockDef.filterExpr)
+    const exprUtils = new ExprUtils(schema, createExprVariables(contextVars))
+    const valueType = exprUtils.getExprType(this.blockDef.filterExpr)
+    const valueIdTable = exprUtils.getExprIdTable(this.blockDef.filterExpr)
     const contextVar = contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)!
     const table = contextVar.table!
 
@@ -89,6 +219,17 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           expr: toExpr(table, this.blockDef.filterExpr!, true, value),
           memo: value
         }
+      case "id":
+        return {
+          id: this.blockDef.id,
+          expr: value ? { 
+            type: "op", 
+            table: table, 
+            op: this.blockDef.idWithin ? "within" : "=", 
+            exprs: [this.blockDef.filterExpr!, { type: "literal", valueType: "id", idTable: valueIdTable!, value: value }]
+          } : null,
+          memo: value
+        }
     }
 
     throw new Error("Unknown type")
@@ -104,6 +245,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       menuPortal: (style: React.CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
+    const placeholder = localize(this.blockDef.placeholder, props.locale)
     const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)
 
     if (valueType === "date" || valueType === "datetime") {
@@ -114,7 +256,6 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           return { ...bd, defaultValue: defaultValue }
         })
       }
-      const placeholder = localize(this.blockDef.placeholder, props.locale)
       return (
         <div style={{ padding: 5 }}>
           <DateExprComponent 
@@ -128,7 +269,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       )
     }
 
-    return <div style={{ padding: 5 }}><ReactSelect styles={styles}/></div>
+    return <div style={{ padding: 5 }}><ReactSelect styles={styles} placeholder={placeholder}/></div>
   }
 
   getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
@@ -151,7 +292,8 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       props.setFilter(contextVar.id, newFilter)
     }
 
-    const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)
+    const exprUtils = new ExprUtils(props.schema, createExprVariables(props.contextVars))
+    const valueType = exprUtils.getExprType(this.blockDef.filterExpr)
     const placeholder = localize(this.blockDef.placeholder, props.locale)
 
     let elem: React.ReactElement<any>
@@ -205,6 +347,14 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           locale={props.locale}
         />
         break
+      case "id":
+        elem = <IdInstance 
+          blockDef={this.blockDef}
+          ctx={props}
+          value={value}
+          onChange={handleChange}
+          locale={props.locale} />
+        break
       default:
         elem = <div/>
     }
@@ -212,12 +362,19 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     return <div style={{ padding: 5 }}>{elem}</div>
   }    
 
-  renderEditor(props: DesignCtx) {
+  renderEditor(ctx: DesignCtx) {
     // Get rowset context variable
-    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
+    const rowsetCV = ctx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
+
+    const isIdType = rowsetCV ? rowsetCV.type == "rowset" : false
+    const idMode = this.blockDef.idMode || "simple"
+    const exprUtils = new ExprUtils(ctx.schema, createExprVariables(ctx.contextVars))
+    const idTableId = exprUtils.getExprIdTable(this.blockDef.filterExpr)
+    const idTable = idTableId ? ctx.schema.getTable(idTableId) : null
+    const isIdTableHierarchical = idTable ? idTable.ancestryTable != null || idTable.ancestry != null : null
 
     const handleExprChange = (expr: Expr) => {
-      props.store.replaceBlock(produce(this.blockDef, (draft) => {
+      ctx.store.replaceBlock(produce(this.blockDef, (draft) => {
         // Clear default value if expression changes
         draft.filterExpr = expr
         delete draft.defaultValue
@@ -227,8 +384,8 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     return (
       <div>
         <LabeledProperty label="Rowset">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowsetContextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
+          <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="rowsetContextVarId">
+            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={ctx.contextVars} types={["rowset"]} />}
           </PropertyEditor>
         </LabeledProperty>
 
@@ -236,19 +393,133 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           <LabeledProperty label="Filter expression">
             <ExprComponent 
               value={this.blockDef.filterExpr} 
-              schema={props.schema} 
-              dataSource={props.dataSource} 
+              schema={ctx.schema} 
+              dataSource={ctx.dataSource} 
               onChange={handleExprChange} 
               table={rowsetCV.table!} 
-              types={["enum", "enumset", "text", "date", "datetime"]} />
+              types={["enum", "enumset", "text", "date", "datetime", "id"]} />
           </LabeledProperty>
         : null}
 
         <LabeledProperty label="Placeholder">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
-            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="placeholder">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={ctx.locale} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        { isIdType ?
+          <LabeledProperty label="Mode" key="mode">
+            <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idMode">
+              {(value, onChange) => 
+                <Toggle 
+                  value={value || "simple"} 
+                  onChange={onChange} 
+                  options={[
+                    { value: "simple", label: "Simple" },
+                    { value: "advanced", label: "Advanced" }
+                  ]} />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { isIdTableHierarchical ?
+          <LabeledProperty label="Match Mode" key="within">
+            <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idWithin">
+              {(value, onChange) => 
+                <Toggle 
+                  value={value || false} 
+                  onChange={onChange} 
+                  options={[
+                    { value: false, label: "Exact" },
+                    { value: true, label: "Is Within" }
+                  ]} />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { isIdType && idMode == "simple" ?
+          <LabeledProperty label="Label Expression" key="idLabelExpr">
+            <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idLabelExpr">
+              {(value, onChange) => <ExprComponent 
+                value={value || null} 
+                onChange={onChange} 
+                schema={ctx.schema}
+                dataSource={ctx.dataSource}
+                types={["text"]}
+                table={idTableId!}
+                />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
+        { isIdType && idMode == "advanced" ?
+          <div>
+            <LabeledProperty label="Label" key="idLabelText">
+              <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idLabelText">
+                {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={ctx.locale} />}
+              </PropertyEditor>
+            </LabeledProperty>
+            <LabeledProperty label="Embedded label expressions" help="Reference in text as {0}, {1}, etc." key="idLabelEmbeddedExprs">
+              <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idLabelEmbeddedExprs">
+                {(value: EmbeddedExpr[] | null | undefined, onChange) => (
+                  <EmbeddedExprsEditor 
+                    value={value} 
+                    onChange={onChange} 
+                    schema={ctx.schema} 
+                    dataSource={ctx.dataSource}
+                    contextVars={this.generateEmbedContextVars(idTableId!)} />
+                )}
+              </PropertyEditor>
+            </LabeledProperty>
+            <LabeledProperty label="Option ordering" key="idOrderBy">
+              <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idOrderBy">
+                {(value, onChange) => 
+                  <OrderByArrayEditor 
+                    value={value || []} 
+                    onChange={onChange} 
+                    schema={ctx.schema} 
+                    dataSource={ctx.dataSource} 
+                    contextVars={ctx.contextVars}
+                    table={idTableId!} /> }
+              </PropertyEditor>
+            </LabeledProperty>
+            <LabeledProperty label="Search expressions" key="idSearchExprs">
+              <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idSearchExprs">
+                {(value, onItemsChange) => {
+                  const handleAddSearchExpr = () => {
+                    onItemsChange((value || []).concat(null))
+                  }
+                  return (
+                    <div>
+                      <ListEditor items={value || []} onItemsChange={onItemsChange}>
+                        { (expr: Expr, onExprChange) => (
+                          <ExprComponent value={expr} schema={ctx.schema} dataSource={ctx.dataSource} onChange={onExprChange} table={idTableId!} types={["text", "enum", "enumset"]} />
+                        )}
+                      </ListEditor>
+                      <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>
+                        + Add Expression
+                      </button>
+                    </div>
+                  )
+                }}
+              </PropertyEditor>
+            </LabeledProperty>
+          </div>
+        : null }
+        { isIdType ?
+          <LabeledProperty label="Filter expression for id table" key="idFilterExpr">
+            <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idFilterExpr">
+              {(value, onChange) => <FilterExprComponent 
+                value={value} 
+                onChange={onChange} 
+                schema={ctx.schema}
+                dataSource={ctx.dataSource}
+                table={idTableId!}
+                />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null }
       </div>
     )
   }

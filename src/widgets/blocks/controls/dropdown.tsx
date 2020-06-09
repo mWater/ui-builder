@@ -46,7 +46,7 @@ export interface DropdownBlockDef extends ControlBlockDef {
   idLabelExpr?: Expr
 
   /** Advanced mode: Label for id selections with {0}, {1}, etc embedded in it */
-  idLabelText: LocalizedString | null
+  idLabelText?: LocalizedString | null
 
   /** Advanced mode: Expressions embedded in the id label text string. Referenced by {0}, {1}, etc. Context variable is ignored */
   idLabelEmbeddedExprs?: EmbeddedExpr[] 
@@ -147,7 +147,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   renderControl(props: RenderControlProps) {
     // If can't be rendered due to missing context variable, just show placeholder
     if (!props.rowContextVar || !this.blockDef.column) {
-      // TODO height
       return <ReactSelect
         styles={{ 
           // Keep menu above other controls

@@ -19,7 +19,7 @@ export interface DropdownBlockDef extends ControlBlockDef {
     /** Simple mode: Text expression to display for entries of type id */
     idLabelExpr?: Expr;
     /** Advanced mode: Label for id selections with {0}, {1}, etc embedded in it */
-    idLabelText: LocalizedString | null;
+    idLabelText?: LocalizedString | null;
     /** Advanced mode: Expressions embedded in the id label text string. Referenced by {0}, {1}, etc. Context variable is ignored */
     idLabelEmbeddedExprs?: EmbeddedExpr[];
     /** Advanced mode: Text/enum expressions to search on */
