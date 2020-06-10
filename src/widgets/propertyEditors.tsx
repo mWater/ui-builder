@@ -333,7 +333,11 @@ export class DateFormatEditor extends React.Component<{ value: string | null, on
         nullLabel="Short (Sep 4, 1986)"
         options={[
           { value: "LL", label: "Long (September 4, 1986)" },
+          { value: "ll", label: "Short (Sep 4, 1986)" },
           { value: "YYYY-MM-DD", label: "YYYY-MM-DD (1986-04-09)" },
+          { value: "YYYY-MM", label: "YYYY-MM (1986-04)" },
+          { value: "MMM YYYY", label: "Month Year (Apr 1986)" },
+          { value: "YYYY", label: "YYYY (1986)" },
         ]} />
     )
   }
