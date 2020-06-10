@@ -152,7 +152,7 @@ export const toExpr = (table: string, expr: Expr, datetime: boolean, value: Date
   }
 }
 
-/** Allows selection of a date expressions for quickfilters */
+/** Allows selection of a date range including presets */
 export default class DateExprComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)

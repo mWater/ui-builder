@@ -456,8 +456,8 @@ export const EmbeddedExprsEditor = (props: {
   return (
     <div>
       <ListEditor items={value || []} onItemsChange={onChange}>
-        {(item, onItemChange) => 
-          <EmbeddedExprEditor value={item} onChange={onItemChange} schema={schema} dataSource={dataSource} contextVars={contextVars} />
+        {(item, onItemChange, index) => 
+          <EmbeddedExprEditor value={item} onChange={onItemChange} schema={schema} dataSource={dataSource} contextVars={contextVars} index={index} />
         }
       </ListEditor>
       <button type="button" className="btn btn-link btn-sm" onClick={handleAddEmbeddedExpr}>
@@ -474,6 +474,7 @@ export const EmbeddedExprEditor = (props: {
   schema: Schema
   dataSource: DataSource
   contextVars: ContextVar[]
+  index: number
 }) => {
   const { schema, dataSource, contextVars } = props
 
@@ -493,7 +494,7 @@ export const EmbeddedExprEditor = (props: {
 
   return (
     <div>
-      <LabeledProperty label="Expression">
+      <LabeledProperty label={`Expression "{${props.index}}"`}>
         <ContextVarExprPropertyEditor 
           contextVarId={props.value.contextVarId}
           expr={props.value.expr} 

@@ -176,5 +176,6 @@ export declare const EmbeddedExprEditor: (props: {
     schema: Schema;
     dataSource: DataSource;
     contextVars: ContextVar[];
+    index: number;
 }) => JSX.Element;
 export {};

@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { ContextVar } from '../blocks'
+import { ContextVar, createExprVariables } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, EmbeddedExprsEditor } from '../propertyEditors'
 import { localize } from '../localization'
-import { Expr, LocalizedString } from 'mwater-expressions';
+import { Expr, LocalizedString, ExprUtils } from 'mwater-expressions';
 import * as _ from 'lodash';
 import { EmbeddedExpr, formatEmbeddedExprString, validateEmbeddedExprs } from '../../embeddedExprs';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -35,7 +35,18 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
   }
 
   renderDesign(props: DesignCtx) {
-    const text = localize(this.blockDef.text, props.locale)
+    let text = localize(this.blockDef.text, props.locale)
+
+    // Replace expressions with name
+    const exprUtils = new ExprUtils(props.schema, createExprVariables(props.contextVars))
+    if (this.blockDef.embeddedExprs) {
+      for (let i = 0 ; i < this.blockDef.embeddedExprs.length ; i++) {
+        if (this.blockDef.embeddedExprs[i].expr) {
+          text = text.replace(`{${i}}`, "{" + exprUtils.summarizeExpr(this.blockDef.embeddedExprs[i].expr, props.locale) + "}")
+        }
+      }
+    }
+
     return this.renderText(text ? this.processMarkdown(text) : <span className="text-muted">Text</span>)
   }
 

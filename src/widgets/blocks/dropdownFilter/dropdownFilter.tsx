@@ -36,6 +36,10 @@ export interface DropdownFilterBlockDef extends BlockDef {
   /** Additional rowsets to be filtered by same value */
   extraFilters?: ExtraFilter[]
 
+  // ----------- date type options
+  
+
+  // ----------- id type options
   /** True to use "within" operator. Only for hierarchical tables  */
   idWithin?: boolean
 
@@ -416,9 +420,9 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     // Get rowset context variable
     const rowsetCV = ctx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
 
-    const isIdType = rowsetCV ? rowsetCV.type == "rowset" : false
     const idMode = this.blockDef.idMode || "simple"
     const exprUtils = new ExprUtils(ctx.schema, createExprVariables(ctx.contextVars))
+    const isIdType = exprUtils.getExprType(this.blockDef.filterExpr) == "id"
     const idTableId = exprUtils.getExprIdTable(this.blockDef.filterExpr)
     const idTable = idTableId ? ctx.schema.getTable(idTableId) : null
     const isIdTableHierarchical = idTable ? idTable.ancestryTable != null || idTable.ancestry != null : null
