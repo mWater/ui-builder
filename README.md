@@ -20,6 +20,10 @@ Non-features:
 
 - Does not include a scripting language. Custom work should be done as custom components
 
+## Requirements
+
+Requires Bootstrap 3 to be present, as well as Font Awesome 4.7+.
+
 ## Concepts
 
 ### Blocks

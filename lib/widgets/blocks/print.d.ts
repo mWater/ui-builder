@@ -11,5 +11,5 @@ export declare class PrintBlock extends Block<PrintBlockDef> {
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: DesignCtx): JSX.Element;
-    renderInstance(props: InstanceCtx): JSX.Element;
+    renderInstance(ctx: InstanceCtx): JSX.Element;
 }
