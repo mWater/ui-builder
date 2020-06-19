@@ -90,13 +90,22 @@ const ExecutePrintInstance = (props: {
   /** Keep track of number of pending queries */
   const pendingQueriesRef = useRef(0)
 
+  /** Keep track of number of total queries */
+  const totalQueriesRef = useRef(0)
+
+  /** Query status string */
+  const [statusString, setStatusString] = useState("")
+
   /** Create tracking database and data source to make context that tracks query requests */
   const printCtx: InstanceCtx = useMemo(() => {
     const onStartQuery = () => { 
       pendingQueriesRef.current = pendingQueriesRef.current + 1 
+      totalQueriesRef.current = totalQueriesRef.current + 1 
+      setStatusString(`${totalQueriesRef.current - pendingQueriesRef.current} / ${totalQueriesRef.current}`)
     }
     const onEndQuery = () => { 
       pendingQueriesRef.current = pendingQueriesRef.current - 1 
+      setStatusString(`${totalQueriesRef.current - pendingQueriesRef.current} / ${totalQueriesRef.current}`)
     }
     
     return { ...props.ctx,
@@ -178,7 +187,7 @@ const ExecutePrintInstance = (props: {
         width: 100%;
         height: 100%;
         overflow: visible;    
-        background-color: rgba(255,255,255,0.7);
+        background-color: rgba(255,255,255,0.8);
       }
 
       @media print {
@@ -191,8 +200,12 @@ const ExecutePrintInstance = (props: {
     <div id="react_element_printer">{printElem}</div>
 
     <div id="react_element_printer_splash">
-      <div style={{ fontSize: 30 }}>
-        <i className="fa fa-spinner fa-spin"/> Printing...
+      <div style={{ fontSize: 30, width: "50%" }}>
+        <div className="progress">
+          <div className="progress-bar progress-bar-striped active" role="progressbar" style={{ width: "100%" }}>
+            <i className="fa fa-print"/>&nbsp;&nbsp;{statusString}
+          </div>
+        </div>    
       </div>
     </div>
   </React.Fragment>

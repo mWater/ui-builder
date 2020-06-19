@@ -182,7 +182,9 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     }
 
     if (!this.state.rows) {
-      return <i className="fa fa-spinner fa-spin"/>
+      return <div style={{ textAlign: "center", fontSize: 20 }}>
+        <i className="fa fa-spinner fa-spin"/>
+      </div>
     }
 
     if (this.state.rows.length === 0 && this.props.block.blockDef.noRowsMessage) {
