@@ -115,10 +115,10 @@ const FloatComponent = (props: {
   return (
     <table style={{width: "100%"}}>
       <tbody>
-        <tr>
-          { props.direction == "left" ? <td style={{ verticalAlign: props.verticalAlign }}>{props.float}</td> : null }
-          <td style={{ width: "100%", verticalAlign: props.verticalAlign }}>{props.main}</td>
-          { props.direction == "right" ? <td style={{ verticalAlign: props.verticalAlign }}>{props.float}</td> : null }
+        <tr key="float">
+          { props.direction == "left" ? <td key="left" style={{ verticalAlign: props.verticalAlign }}>{props.float}</td> : null }
+          <td key="main" style={{ width: "100%", verticalAlign: props.verticalAlign }}>{props.main}</td>
+          { props.direction == "right" ? <td key="right" style={{ verticalAlign: props.verticalAlign }}>{props.float}</td> : null }
         </tr>
       </tbody>      
     </table>

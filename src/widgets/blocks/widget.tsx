@@ -303,8 +303,8 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
               return (
                 <tr key={contextVar.id}>
-                  <td>{contextVar.name}</td>
-                  <td>
+                  <td key="name">{contextVar.name}</td>
+                  <td key="value">
                     <ContextVarPropertyEditor 
                       contextVars={props.contextVars}  
                       types={[contextVar.type]}

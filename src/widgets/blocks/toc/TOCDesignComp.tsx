@@ -202,8 +202,8 @@ export default function TOCDesignComp(props: {
 
               return (
                 <tr key={contextVar.id}>
-                  <td>{contextVar.name}</td>
-                  <td>
+                  <td key="name">{contextVar.name}</td>
+                  <td key="value">
                     <ContextVarPropertyEditor 
                       contextVars={renderProps.contextVars}  
                       types={[contextVar.type]}

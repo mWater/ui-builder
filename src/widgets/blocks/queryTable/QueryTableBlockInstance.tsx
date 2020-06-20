@@ -238,8 +238,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     if (this.state.error) {
       // TODO localize
       return (
-        <tr>
-          <td colSpan={this.props.block.blockDef.contents.length}>
+        <tr key="error">
+          <td key="error" colSpan={this.props.block.blockDef.contents.length}>
             <div className="alert alert-danger">Error loading data</div>
           </td>
         </tr>)
@@ -247,8 +247,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     if (!this.state.rows) {
       return (
-        <tr>
-          <td colSpan={this.props.block.blockDef.contents.length}>
+        <tr key="spin">
+          <td key="spin" colSpan={this.props.block.blockDef.contents.length}>
             <i className="fa fa-spinner fa-spin"/>
           </td>
         </tr>)
@@ -256,8 +256,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     if (this.state.rows.length === 0 && this.props.block.blockDef.noRowsMessage) {
       return (
-        <tr>
-          <td colSpan={this.props.block.blockDef.contents.length} style={{ fontStyle: "italic" }}>
+        <tr key="norows">
+          <td key="norows" colSpan={this.props.block.blockDef.contents.length} style={{ fontStyle: "italic" }}>
             {localize(this.props.block.blockDef.noRowsMessage, this.props.instanceCtx.locale)}
           </td>
         </tr>
@@ -345,7 +345,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       <table className={className} style={style}>
         { !blockDef.hideHeaders ? 
         <thead>
-          <tr>
+          <tr key="header">
             { blockDef.headers.map((b, index) => this.renderHeader(b, index)) }
           </tr>
         </thead>

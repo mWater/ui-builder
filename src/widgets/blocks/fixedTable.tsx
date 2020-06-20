@@ -107,7 +107,7 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
       <table className={className}>
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
-            <tr>
+            <tr key={rowIndex}>
               { row.cells.map((cell, columnIndex) => <td key={columnIndex}>{props.renderChildBlock(props, cell.content)}</td>) } 
             </tr>
           ))}

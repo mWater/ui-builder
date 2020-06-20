@@ -217,8 +217,8 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
               return (
                 <tr key={contextVar.id}>
-                  <td>{contextVar.name}</td>
-                  <td>
+                  <td key="name">{contextVar.name}</td>
+                  <td key="value">
                     <Select
                       options={options}                    
                       value={cvr}

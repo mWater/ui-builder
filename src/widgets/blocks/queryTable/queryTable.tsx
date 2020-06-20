@@ -247,7 +247,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       <table className={className}>
         { !this.blockDef.hideHeaders ? 
         <thead>
-          <tr>
+          <tr key="header">
             { this.blockDef.headers.map((b, index) => {
               return <th key={index}>{props.renderChildBlock(props, b, setHeader.bind(null, index))}</th>
             })}
@@ -255,7 +255,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
         </thead>
         : null }
         <tbody>
-          <tr>
+          <tr key="child">
             { this.blockDef.contents.map((b, index) => {
               return <td key={index}>{props.renderChildBlock(contentProps, b, setContent.bind(null, index))}</td>
             })}

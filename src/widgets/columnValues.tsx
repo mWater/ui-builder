@@ -66,8 +66,8 @@ export class ColumnValuesEditor extends React.Component<{
     const columnType = (column.type === "join") ? "id" : column.type
 
     return <tr key={columnId}>
-      <td>{localize(column.name, this.props.locale)}</td>
-      <td>
+      <td key="name">{localize(column.name, this.props.locale)}</td>
+      <td key="value">
         <LabeledProperty label="Expression">
           <ContextVarExprPropertyEditor 
             contextVarId={contextVarExpr.contextVarId} 
@@ -82,7 +82,7 @@ export class ColumnValuesEditor extends React.Component<{
           />
         </LabeledProperty>
       </td>
-      <td>
+      <td key="remove">
         <i className="fa fa-remove" onClick={this.handleRemove.bind(null, columnId)}/>
       </td>
     </tr>
