@@ -29,6 +29,7 @@ export default class EnumsetInstance extends React.Component<{
 
     const styles = {
       control: (style: CSSProperties) => ({ ...style, minWidth: minWidth }),
+      menuPortal: (style: CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
     return <ReactSelect

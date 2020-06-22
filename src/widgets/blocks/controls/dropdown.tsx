@@ -140,6 +140,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return <ReactSelect 
         menuPortalTarget={document.body}
         classNamePrefix="react-select-short" 
+        styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
       />
     }
 
@@ -149,6 +150,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return <ReactSelect
         menuPortalTarget={document.body}
         classNamePrefix="react-select-short" 
+        styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
       />
     }
 
@@ -200,7 +202,8 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
       classNamePrefix="react-select-short" 
-     />
+      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+      />
   }
 
   renderEnumset(props: RenderControlProps, column: Column) {
@@ -239,6 +242,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
       classNamePrefix="react-select-short" 
+      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
     />
   }
 
@@ -291,6 +295,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       formatLabel={this.formatIdLabel.bind(null, props)}
       contextVars={props.contextVars}
       contextVarValues={props.contextVarValues}
+      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
     />
   }
 
@@ -323,7 +328,9 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       filterExpr={this.blockDef.idFilterExpr || null}
       formatLabel={this.formatIdLabel.bind(null, props)}
       contextVars={props.contextVars}
-      contextVarValues={props.contextVarValues} />
+      contextVarValues={props.contextVarValues}
+      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+    />
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */

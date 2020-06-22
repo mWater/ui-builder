@@ -67,6 +67,7 @@ export default class TextInstance extends React.Component<{
     const noOptionsMessage = () => "Type to search"
     const styles = {
       control: (style: CSSProperties) => ({ ...style, minWidth: minWidth }),
+      menuPortal: (style: CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
     return <Async 
@@ -79,6 +80,8 @@ export default class TextInstance extends React.Component<{
       isClearable={true}
       noOptionsMessage={noOptionsMessage}
       styles={styles}
+      classNamePrefix="react-select-short" 
+      menuPortalTarget={document.body}
     />
   }
 }

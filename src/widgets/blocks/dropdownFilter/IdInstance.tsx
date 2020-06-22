@@ -66,5 +66,6 @@ export const IdInstance = (props: {
     formatLabel={formatIdLabel}
     contextVars={props.ctx.contextVars}
     contextVarValues={props.ctx.contextVarValues}
+    styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
   />
 }
