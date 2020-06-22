@@ -59,7 +59,7 @@ test("findBlockAncestry with queryTable", () => {
   const ancestry = blocks.findBlockAncestry(blockDef, createBlock, rootContextVars, "c1")
   expect(ancestry).toEqual([
     { blockDef: blockDef, contextVars: rootContextVars },
-    { blockDef: blockDef.contents[0], contextVars: rootContextVars.concat({ id: "qt1_row", name: "Table row", type: "row", table: "t1" }) },
+    { blockDef: blockDef.contents[0], contextVars: rootContextVars.concat({ id: "qt1_row", name: "Table row of CV1", type: "row", table: "t1" }) },
   ])
 })
 

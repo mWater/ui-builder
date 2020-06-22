@@ -73,7 +73,7 @@ export class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
 
   /** Create the context variable used */
   createRowContextVar(rowsetCV: ContextVar): ContextVar {
-    return { id: this.getRowContextVarId(), name: "Table row", type: "row", table: rowsetCV.table }
+    return { id: this.getRowContextVarId(), name: `Table row of ${rowsetCV.name}`, type: "row", table: rowsetCV.table }
   }
 
   getRowContextVarId() {

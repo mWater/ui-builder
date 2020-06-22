@@ -2,12 +2,10 @@ import { QueryRepeatBlockDef, QueryRepeatBlock } from "./queryRepeat";
 import { ContextVar } from "../../blocks";
 import simpleSchema from "../../../__fixtures__/schema";
 import BlockFactory from "../../BlockFactory";
-import { WidgetLibrary } from "../../../designer/widgetLibrary";
-import { ActionLibrary } from "../../ActionLibrary";
 import { InstanceCtx } from "../../../contexts";
 
 // Outer context vars
-const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
+const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "CV1", table: "t1" }
 const contextVars: ContextVar[] = [rowsetCV]
 
 const qrbd: QueryRepeatBlockDef = {
@@ -30,7 +28,7 @@ const schema = simpleSchema()
 test("gets row cv", () => {
   expect(qrb.createRowContextVar(rowsetCV)).toEqual({
     id: "123_row",
-    name: "Table row",
+    name: "Table row of CV1",
     type: "row",
     table: "t1"
   })

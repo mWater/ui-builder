@@ -7,7 +7,7 @@ import { InstanceCtx } from "../../../contexts";
 import { ActionLibrary } from "../../ActionLibrary";
 
 // Outer context vars
-const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
+const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "CV1", table: "t1" }
 const contextVars: ContextVar[] = [rowsetCV]
 
 const qtbdSingle: QueryTableBlockDef = {
@@ -47,7 +47,7 @@ const schema = simpleSchema()
 test("gets single row cv", () => {
   expect(qtbSingle.createRowContextVar(rowsetCV)).toEqual({
     id: "123_row",
-    name: "Table row",
+    name: "Table row of CV1",
     type: "row",
     table: "t1"
   })
@@ -56,7 +56,7 @@ test("gets single row cv", () => {
 test("gets multiple row cv", () => {
   expect(qtbMultiple.createRowContextVar(rowsetCV)).toEqual({
     id: "123_rowset",
-    name: "Table row rowset",
+    name: "Table row rowset of CV1",
     type: "rowset",
     table: "t1"
   })
