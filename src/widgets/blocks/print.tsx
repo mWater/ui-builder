@@ -7,11 +7,17 @@ import { Database, QueryOptions, DatabaseChangeListener, Transaction } from '../
 import { Row, DataSource } from 'mwater-expressions';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { LabeledProperty, PropertyEditor } from '../propertyEditors';
+import { Select } from 'react-library/lib/bootstrap';
 
 /** Block that can be printed by a print button at top right */
 export interface PrintBlockDef extends BlockDef {
   type: "print"
+
   content: BlockDef | null
+
+  /** Size of the paper. Default is letter-portrait */
+  paperSize?: "letter-portait" | "letter-landscape"
 }
 
 export class PrintBlock extends Block<PrintBlockDef> {
@@ -50,6 +56,24 @@ export class PrintBlock extends Block<PrintBlockDef> {
 
   renderInstance(ctx: InstanceCtx) {
     return <PrintInstance ctx={ctx} blockDef={this.blockDef} />
+  }
+
+  renderEditor(props: DesignCtx) {
+    return (
+      <div>
+        <LabeledProperty label="Paper Size">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="paperSize">
+            {(value, onChange) => 
+            <Select value={value || "letter-portrait"} onChange={onChange}
+              options={[
+                { value: "letter-portrait", label: "Letter (portrait)" },
+                { value: "letter-landscape", label: "Letter (landscape)" }
+              ]}
+            /> }
+          </PropertyEditor>
+        </LabeledProperty>
+      </div>
+    )
   }
 }
 
@@ -116,9 +140,16 @@ const ExecutePrintInstance = (props: {
 
   // Create printable element
   const printElem = useMemo(() => {
+    const paperSize = props.blockDef.paperSize || "letter-portait"
+
     // Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
+    let width = 1440
+    if (paperSize == "letter-landscape") {
+      width = 1920
+    }
+
     return <div style={{ transform: "scale(0.5)", transformOrigin: "top left" }}>
-      <div style={{ width: 1440 }}>
+      <div style={{ width: width }}>
         { printCtx.renderChildBlock(printCtx, props.blockDef.content) }
       </div>
     </div>
@@ -142,6 +173,9 @@ const ExecutePrintInstance = (props: {
 
     return () => { clearInterval(interval) }
   }, [])
+
+  // Create size css string
+  const sizeCss = (props.blockDef.paperSize || "letter-portait") == "letter-portait" ? "8.5in 11in" : "11in 8.5in landscape"
 
   // Fragment that contains CSS, splash screen and element to print
   const printFragment = <React.Fragment>
@@ -175,9 +209,8 @@ const ExecutePrintInstance = (props: {
         }*/
       }
 
-      /* Default to letter sized pages */
       @page  {
-        size: 8.5in 11in; 
+        size: ${sizeCss}; 
         margin: 0.5in 0.5in 0.5in 0.5in; 
       }
 
