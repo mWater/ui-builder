@@ -62,12 +62,12 @@ export default function TOCInstanceComp(props: {
       itemLabelStyle.backgroundColor = "#DDD"
     }
 
-    return <div>
-      <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
+    return <div key={item.id}>
+      <div key="label" onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
         {localize(item.label, instanceCtx.locale)}
       </div>
       { item.children.length > 0 ? 
-        <div style={{ marginLeft: 10 }}>
+        <div key="children" style={{ marginLeft: 10 }}>
           { item.children.map((child, index) => renderItem(item.children, index, depth + 1)) }
         </div>
       : null}

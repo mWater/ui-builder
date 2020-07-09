@@ -116,7 +116,12 @@ const ExecutePrintInstance = (props: {
 
   // Create printable element
   const printElem = useMemo(() => {
-    return printCtx.renderChildBlock(printCtx, props.blockDef.content)
+    // Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
+    return <div style={{ transform: "scale(0.5)", transformOrigin: "top left" }}>
+      <div style={{ width: 1440 }}>
+        { printCtx.renderChildBlock(printCtx, props.blockDef.content) }
+      </div>
+    </div>
   }, [printCtx])
   
   // Perform print after delay of waiting for no queries
