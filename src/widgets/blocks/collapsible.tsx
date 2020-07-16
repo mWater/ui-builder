@@ -108,27 +108,18 @@ class Collapsible extends React.Component<Props, { collapsed: boolean }> {
   }
 
   render() {
-    if (this.state.collapsed) {
-      return (
-        <div onClick={this.handleToggle}>
-          <div style={{float: "left", marginRight: 5, fontSize: 18, color: "#3bd" }}>
-            <i className="fa fa-caret-right"/>
-          </div>
-          {this.props.label}
-        </div>
-      )
-    }
-
-    return (
-      <div>
-        <div onClick={this.handleToggle}>
-          <div style={{float: "left", marginRight: 5, fontSize: 18, color: "#3bd" }}>
-            <i className="fa fa-caret-down"/>
-          </div>
-          {this.props.label}
-        </div>
-        {this.props.children}
-      </div>
-    )
+    return <div>
+      <table style={{width: "100%"}}>
+        <tbody>
+          <tr key="float" onClick={this.handleToggle} style={{ cursor: "pointer" }}>
+            <td key="left" style={{ verticalAlign: "middle", paddingRight: 5, fontSize: 18, color: "#3bd" }}>
+              { this.state.collapsed ? <i className="fa fa-caret-right"/> : <i className="fa fa-caret-down"/> }
+            </td>
+            <td key="main" style={{ width: "100%", verticalAlign: "middle" }}>{this.props.label}</td>
+          </tr>
+        </tbody>      
+      </table>
+      { !this.state.collapsed ? this.props.children : null}
+    </div>
   }
 }
