@@ -99,7 +99,13 @@ export class ColumnValuesEditor extends React.Component<{
         </tbody>
       </table>
 
-      <ReactSelect value={null} options={options} onChange={this.handleAdd} />
+      <ReactSelect 
+        value={null} 
+        options={options} 
+        onChange={this.handleAdd} 
+        menuPortalTarget={document.body}
+        styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+      />
     </div>
   }
 }

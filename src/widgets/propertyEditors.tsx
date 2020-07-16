@@ -407,6 +407,8 @@ export class TableSelect extends React.Component<{
       onChange={this.handleTableChange} 
       getOptionLabel={this.getOptionLabel}
       getOptionValue={this.getOptionValue}
+      menuPortalTarget={document.body}
+      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
     />
   }
 }
@@ -440,10 +442,8 @@ export const EnumArrayEditor = (props: {
     getOptionValue={getOptionValue}
     isClearable={true}
     isMulti={true}
-    styles={{ 
-      // Keep menu above other controls
-      menu: (style) => ({ ...style, zIndex: 2000 })
-    }}
+    menuPortalTarget={document.body}
+    styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
     />
 }
 
