@@ -258,11 +258,13 @@ export default class VirtualDatabase implements Database {
       followJoin: async (columnId: string) => {
         const column = this.schema.getColumn(from, columnId)!
 
+        const idTable = column.type == "id" ? column.idTable! : column.join!.toTable
+
         // Inverse 1-n uses the inverse column to get rows, as these are not included in the row values
         if (column.type == "join" && column.join!.type === "1-n" && column.join!.inverse) {
           const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: column.join!.toTable, exprs: [
-              { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
+            type: "op", op: "=", table: idTable, exprs: [
+              { type: "field", table: idTable, column: column.join!.inverse! },
               { type: "literal", valueType: "id", idTable: from, value: row.id }
             ]}, contextVars, contextVarValues)
           return joinRows
@@ -275,10 +277,10 @@ export default class VirtualDatabase implements Database {
             return null
           }
 
-          const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: column.idTable!, exprs: [
-              { type: "id", table: column.idTable! },
-              { type: "literal", valueType: "id", idTable: column.idTable!, value: row["c_" + columnId] }
+          const joinRows = await this.queryEvalRows(idTable, {
+            type: "op", op: "=", table: idTable, exprs: [
+              { type: "id", table: idTable },
+              { type: "literal", valueType: "id", idTable: idTable, value: row["c_" + columnId] }
           ]}, contextVars, contextVarValues)
           return joinRows[0] || null
         }
@@ -290,10 +292,10 @@ export default class VirtualDatabase implements Database {
             return []
           }
 
-          const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "= any", table: column.join!.toTable, exprs: [
-              { type: "id", table: column.join!.toTable },
-              { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
+          const joinRows = await this.queryEvalRows(idTable, {
+            type: "op", op: "= any", table: idTable, exprs: [
+              { type: "id", table: idTable },
+              { type: "literal", valueType: "id", idTable: idTable, value: row["c_" + columnId] }
           ]}, contextVars, contextVarValues)
           return joinRows
         }
