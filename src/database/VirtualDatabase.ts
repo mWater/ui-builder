@@ -174,17 +174,17 @@ export default class VirtualDatabase implements Database {
 
   /** Determine if a column should be included in the underlying query */
   shouldIncludeColumn(column: Column): boolean {
-    // Normal columns that don't have an expression should be included
-    if (column.type !== "join" && !column.expr) {
-      return true
+    // Compute expressions on the fly
+    if (column.expr) {
+      return false
     }
-    // n-1 joins should be included to get pk of joined row
-    // 1-n joins that don't have an inverse column need to be included as otherwise
-    // can't figure out which rows are at other end of the join
-    if (column.type === "join" && (!column.join!.inverse || column.join!.type !== "1-n")) {
-      return true
+
+    // Don't include 1-n joins with an inverse, as it's easy to use that to look them up
+    if (column.type === "join" && column.join!.type == "1-n" && column.join!.inverse) {
+      return false
     }
-    return false
+
+    return true
   }
 
   /** Create the rows as needed by PromiseExprEvaluator for a query */
@@ -241,28 +241,50 @@ export default class VirtualDatabase implements Database {
       getField: async (columnId: string) => {
         const column = this.schema.getColumn(from, columnId)!
 
-        // For non-joins, return simple value
-        if (column.type !== "join") {
-          return row["c_" + columnId]
+        // Special case is 1-n join with inverse, as they are not included in the query
+        if (column.type === "join" && column.join!.type == "1-n" && column.join!.inverse) {
+          // Get the rows and then extract the primary keys
+          const joinRows = await this.queryEvalRows(column.join!.toTable, {
+            type: "op", op: "=", table: column.join!.toTable, exprs: [
+              { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
+              { type: "literal", valueType: "id", idTable: from, value: row.id }
+            ]}, contextVars, contextVarValues)
+          return Promise.all(joinRows.map(r => r.getPrimaryKey()))
         }
 
-        // For n-1 and 1-1 joins, create row
-        if (column.join!.type === "n-1" || column.join!.type === "1-1") {
+        // Return simple value
+        return row["c_" + columnId]
+      },
+      followJoin: async (columnId: string) => {
+        const column = this.schema.getColumn(from, columnId)!
+
+        // Inverse 1-n uses the inverse column to get rows, as these are not included in the row values
+        if (column.type == "join" && column.join!.type === "1-n" && column.join!.inverse) {
+          const joinRows = await this.queryEvalRows(column.join!.toTable, {
+            type: "op", op: "=", table: column.join!.toTable, exprs: [
+              { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
+              { type: "literal", valueType: "id", idTable: from, value: row.id }
+            ]}, contextVars, contextVarValues)
+          return joinRows
+        }
+
+        // For ones with single row
+        if (column.type == "id" || (column.type == "join" && (column.join!.type == "1-1" || column.join!.type == "n-1"))) {
           // Short-circuit if null/undefined
           if (row["c_" + columnId] == null) {
             return null
           }
 
           const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: column.join!.toTable, exprs: [
-              { type: "id", table: column.join!.toTable },
-              { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
+            type: "op", op: "=", table: column.idTable!, exprs: [
+              { type: "id", table: column.idTable! },
+              { type: "literal", valueType: "id", idTable: column.idTable!, value: row["c_" + columnId] }
           ]}, contextVars, contextVarValues)
           return joinRows[0] || null
         }
 
-        // For non-inverse 1-n and n-n, create rows based on key
-        if (column.join!.type == "n-n" || !column.join!.inverse) {
+        // For ones with multiple rows
+        if (column.type == "id[]" || (column.type == "join" && (column.join!.type == "1-n" || column.join!.type == "n-n"))) {
           // Short-circuit if null/undefined
           if (row["c_" + columnId] == null || row["c_" + columnId].length == 0) {
             return []
@@ -273,16 +295,6 @@ export default class VirtualDatabase implements Database {
               { type: "id", table: column.join!.toTable },
               { type: "literal", valueType: "id", idTable: column.join!.toTable, value: row["c_" + columnId] }
           ]}, contextVars, contextVarValues)
-          return joinRows
-        }
-
-        // Inverse 1-n
-        if (column.join!.type === "1-n" && column.join!.inverse) {
-          const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: column.join!.toTable, exprs: [
-              { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
-              { type: "literal", valueType: "id", idTable: from, value: row.id }
-            ]}, contextVars, contextVarValues)
           return joinRows
         }
 

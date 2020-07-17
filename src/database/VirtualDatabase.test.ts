@@ -92,6 +92,7 @@ describe("select, order, limit", () => {
           const evalRow: PromiseExprEvaluatorRow = {
             getPrimaryKey: () => Promise.resolve(row.id),
             getField: (columnId) => Promise.resolve(row[columnId]),
+            followJoin: (columnId) => Promise.reject(new Error("Not implemented"))
           }
           if (await exprEval.evaluate(qo.where, { row: evalRow })) {
             filteredRows.push(row)
