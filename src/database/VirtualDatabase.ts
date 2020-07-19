@@ -184,6 +184,11 @@ export default class VirtualDatabase implements Database {
       return false
     }
 
+    // TODO: remove this condition. primary keys should always exist
+    if (column.type == "join" && !this.schema.getTable(column.join!.toTable)?.primaryKey) {
+      return false
+    }
+
     return true
   }
 
