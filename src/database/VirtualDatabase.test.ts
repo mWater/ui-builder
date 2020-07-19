@@ -36,7 +36,7 @@ test("shouldIncludeColumn includes regular columns and joins without inverse", (
   expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" }})).toBe(true)
   expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" }, expr: { type: "literal", valueType: "text", value: "xyz"}})).toBe(false)
   expect(vdb.shouldIncludeColumn(schema.getColumn("t1", "1-2")!)).toBe(false)
-  expect(vdb.shouldIncludeColumn(schema.getColumn("t2", "2-1")!)).toBe(true)
+  expect(vdb.shouldIncludeColumn(schema.getColumn("t2", "id1")!)).toBe(true)
 })
 
 test("trigger change if underlying database changed", () => {
@@ -68,7 +68,7 @@ test("queries with where clause and included columns", async () => {
       id: { type: "id", table: "t2" },
       c_text: { type: "field", table: "t2", column: "text" },
       c_number: { type: "field", table: "t2", column: "number" },
-      "c_2-1": { type: "field", table: "t2", column: "2-1" }
+      c_id1: { type: "field", table: "t2", column: "id1" }
     },
     from: "t2",
     where: t2Where
@@ -222,18 +222,18 @@ describe("select, order, limit", () => {
     ])
   })
 
-  test("n-1 join", async () => {
+  test("id join", async () => {
     preventPassthrough()    // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "field", table: "t2", column: "2-1" }},
+      select: { x: { type: "field", table: "t2", column: "id1" }},
       from: "t2"
     }
 
     const rows = await performQuery({ t1: [
       { id: "a", text: "a", number: 1 }
     ], t2: [
-      { id: 1, text: "a", number: 1, "2-1": "a" }
+      { id: 1, text: "a", number: 1, "id1": "a" }
     ] }, qopts)
 
     expect(rows).toEqual([
@@ -245,14 +245,14 @@ describe("select, order, limit", () => {
     preventPassthrough()    // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "scalar", joins: ["2-1"], table: "t2", expr: { type: "field", table: "t1", column: "text" } } },
+      select: { x: { type: "scalar", joins: ["id1"], table: "t2", expr: { type: "field", table: "t1", column: "text" } } },
       from: "t2"
     }
 
     const rows = await performQuery({ t1: [
       { id: 1, text: "abc" }
     ], t2: [
-      { id: 101, "2-1": 1 }
+      { id: 101, "id1": 1 }
     ] }, qopts)
     expect(rows).toEqual([
       { x: "abc" }
@@ -272,9 +272,9 @@ describe("select, order, limit", () => {
       { id: 1 },
       { id: 2 }
     ], t2: [
-      { id: 101, "2-1": 1, number: 1 },
-      { id: 102, "2-1": 1, number: 2 },
-      { id: 103, "2-1": 2, number: 4 }
+      { id: 101, "id1": 1, number: 1 },
+      { id: 102, "id1": 1, number: 2 },
+      { id: 103, "id1": 2, number: 4 }
     ]}, qopts)
     expect(rows).toEqual([
       { x: 3 },

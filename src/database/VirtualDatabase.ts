@@ -179,15 +179,20 @@ export default class VirtualDatabase implements Database {
       return false
     }
 
-    // Don't include 1-n joins with an inverse, as it's easy to use that to look them up
-    if (column.type === "join" && column.join!.type == "1-n" && column.join!.inverse) {
+    // Don't include joins at all, as they can't be mutated
+    if (column.type == "join") {
       return false
     }
 
-    // TODO: remove this condition. primary keys should always exist
-    if (column.type == "join" && !this.schema.getTable(column.join!.toTable)?.primaryKey) {
-      return false
-    }
+    // // Don't include 1-n joins with an inverse, as it's easy to use that to look them up
+    // if (column.type === "join" && column.join!.type == "1-n" && column.join!.inverse) {
+    //   return false
+    // }
+
+    // // TODO: remove this condition. primary keys should always exist
+    // if (column.type == "join" && !this.schema.getTable(column.join!.toTable)?.primaryKey) {
+    //   return false
+    // }
 
     return true
   }
@@ -257,6 +262,12 @@ export default class VirtualDatabase implements Database {
           return Promise.all(joinRows.map(r => r.getPrimaryKey()))
         }
 
+        // Other joins are not available
+        if (column.type == "join") {
+          console.warn(`Attempt to get join field ${columnId}`)
+          return null
+        }
+
         // Return simple value
         return row["c_" + columnId]
       },
@@ -275,8 +286,14 @@ export default class VirtualDatabase implements Database {
           return joinRows
         }
 
+        // Other joins are not available
+        if (column.type == "join") {
+          console.warn(`Attempt to get join field ${columnId}`)
+          return null
+        }
+        
         // For ones with single row
-        if (column.type == "id" || (column.type == "join" && (column.join!.type == "1-1" || column.join!.type == "n-1"))) {
+        if (column.type == "id") {
           // Short-circuit if null/undefined
           if (row["c_" + columnId] == null) {
             return null
@@ -291,7 +308,7 @@ export default class VirtualDatabase implements Database {
         }
 
         // For ones with multiple rows
-        if (column.type == "id[]" || (column.type == "join" && (column.join!.type == "1-n" || column.join!.type == "n-n"))) {
+        if (column.type == "id[]") {
           // Short-circuit if null/undefined
           if (row["c_" + columnId] == null || row["c_" + columnId].length == 0) {
             return []
