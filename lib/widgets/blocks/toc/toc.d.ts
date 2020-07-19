@@ -35,7 +35,7 @@ export interface TOCItem {
 /** Create a flat list of all items */
 export declare const iterateItems: (items: TOCItem[]) => TOCItem[];
 /** Alter each item, allowing item to be mutated, replaced (return item or array of items) or deleted (return null) */
-export declare const alterItems: (items: TOCItem[], action: (item: TOCItem) => TOCItem | TOCItem[] | null | undefined) => TOCItem[];
+export declare const alterItems: (items: TOCItem[], action: (item: TOCItem) => undefined | null | TOCItem | TOCItem[]) => TOCItem[];
 export declare class TOCBlock extends Block<TOCBlockDef> {
     /** Get child blocks */
     getChildren(contextVars: ContextVar[]): ChildBlock[];

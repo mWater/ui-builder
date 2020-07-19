@@ -166,6 +166,10 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     if (column.type === "id[]") {
       return this.renderIds(props, column)
     }
+    // TODO: remove this by Sept 2020. Legacy support.
+    if (column.type === "join" && column.join!.type === "n-1") {
+      return this.renderId(props, column)
+    }
     throw new Error("Unsupported type")
   }
 

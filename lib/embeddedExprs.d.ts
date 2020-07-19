@@ -1,6 +1,7 @@
 import { Expr, Schema } from "mwater-expressions";
 import { ContextVar } from "./widgets/blocks";
 import * as d3Format from 'd3-format';
+import { FormatLocaleObject } from "d3-format";
 /** Expression which is embedded in the text string */
 export interface EmbeddedExpr {
     /** Context variable (row or rowset) to use for expression */
