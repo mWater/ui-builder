@@ -281,9 +281,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       orderBy = [{ expr: this.blockDef.idLabelExpr!, dir: "asc" }]
     }
 
+    // TODO: Remove this and just use idTable
+    const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
+
     return <IdDropdownComponent
       database={props.database}
-      table={column.idTable!}
+      table={idTable}
       value={props.value}
       onChange={props.onChange}
       multi={false}
