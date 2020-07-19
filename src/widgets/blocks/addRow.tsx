@@ -88,9 +88,6 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     const exprUtils = new ExprUtils(options.schema, createExprVariables(options.contextVars))
 
-    // Get type of column
-    const columnType = (column.type === "join") ? "id" : column.type
-
     // Check context var
     const contextVarExpr: ContextVarExpr = this.blockDef.columnValues[columnId]
     let contextVar: ContextVar | undefined
@@ -112,7 +109,7 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
 
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [columnType] })
+    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [column.type] })
     if (error) {
       return error
     }

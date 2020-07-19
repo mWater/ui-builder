@@ -56,9 +56,6 @@ export class AddRowAction extends Action<AddRowActionDef> {
     const exprValidator = new ExprValidator(designCtx.schema, createExprVariables(designCtx.contextVars))
     const exprUtils = new ExprUtils(designCtx.schema, createExprVariables(designCtx.contextVars))
 
-    // Get type of column
-    const columnType = (column.type === "join") ? "id" : column.type
-
     // Check context var
     const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
     let contextVar: ContextVar | undefined
@@ -80,7 +77,7 @@ export class AddRowAction extends Action<AddRowActionDef> {
 
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [columnType] })
+    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [column.type] })
     if (error) {
       return error
     }

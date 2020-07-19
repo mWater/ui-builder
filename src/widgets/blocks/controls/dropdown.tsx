@@ -59,10 +59,10 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)!
     const column = options.schema.getColumn(contextVar.table!, this.blockDef.column!)!
 
-    if (column.type === "join") {
+    if (column.type === "id" || column.type == "id[]") {
       const idMode = this.blockDef.idMode || "simple"
       const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-      const idTable = column.join!.toTable
+      const idTable = column.idTable!
 
       if (idMode == "simple") {
         if (!this.blockDef.idLabelExpr)  {
@@ -166,9 +166,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     if (column.type === "id[]") {
       return this.renderIds(props, column)
     }
-    if (column.type === "join" && column.join!.type === "n-1") {
-      return this.renderId(props, column)
-    }
     throw new Error("Unsupported type")
   }
 
@@ -264,8 +261,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   }
 
   renderId(props: RenderControlProps, column: Column) {
-    const idTable = column.join ? column.join.toTable : column.idTable
-
     let labelEmbeddedExprs: Expr[]
     let searchExprs: Expr[]
     let orderBy: OrderBy[]
@@ -284,7 +279,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
 
     return <IdDropdownComponent
       database={props.database}
-      table={idTable!}
+      table={column.idTable!}
       value={props.value}
       onChange={props.onChange}
       multi={false}
@@ -342,9 +337,9 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       column = props.schema.getColumn(contextVar.table, this.blockDef.column)
     }
 
-    const isIdType = column && (column.type === "join" || column.type == "id" || column.type == "id[]")
+    const isIdType = column && (column.type == "id" || column.type == "id[]")
     const idMode = this.blockDef.idMode || "simple"
-    const idTable = column && column.join ? column.join.toTable : (column ? column.idTable : null)
+    const idTable = column ? column.idTable : null
 
     const handleConvertToToggle = () => {
       props.store.replaceBlock({
@@ -506,7 +501,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     return column.type === "enum" 
       || column.type === "enumset" 
       || column.type === "id" 
-      || column.type === "id[]" 
-      || (column.type === "join" && column.join!.type === "n-1")
+      || column.type === "id[]"
   }
 }

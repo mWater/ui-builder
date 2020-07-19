@@ -62,9 +62,6 @@ export class ColumnValuesEditor extends React.Component<{
 
     const contextVar = this.props.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
 
-    // Get type of column
-    const columnType = (column.type === "join") ? "id" : column.type
-
     return <tr key={columnId}>
       <td key="name">{localize(column.name, this.props.locale)}</td>
       <td key="value">
@@ -76,9 +73,9 @@ export class ColumnValuesEditor extends React.Component<{
             contextVars={this.props.contextVars} 
             schema={this.props.schema} 
             dataSource={this.props.dataSource}
-            idTable={column.idTable || (column.type === "join" ? column.join!.toTable : undefined)}
+            idTable={column.idTable}
             enumValues={column.enumValues}
-            types={[columnType as LiteralType]}
+            types={[column.type as LiteralType]}
           />
         </LabeledProperty>
       </td>
