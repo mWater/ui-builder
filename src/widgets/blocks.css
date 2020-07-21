@@ -81,3 +81,7 @@
 .react-select-short__menu {
   z-index: 2000;
 }
+
+.react-select-short__clear-indicator {
+  padding-top: 4px;
+}
