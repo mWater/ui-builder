@@ -5,7 +5,7 @@ import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedE
 import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
-import { LocalizedString, Expr } from 'mwater-expressions';
+import { LocalizedString, Expr, ExprUtils } from 'mwater-expressions';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
 import { ContextVar } from '../blocks';
 import { localize } from '../localization';
@@ -122,6 +122,11 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
             table: outerCV.table!,
             exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), f => f.expr)))
           }
+        }
+
+        // Inline variables used in rowsets as they may depend on context variables that aren't present in new page
+        if (outerCV.type == "rowset") {
+          outerCVValue = new ExprUtils(instanceCtx.schema).inlineVariableValues(outerCVValue, instanceCtx.contextVarValues)
         }
 
         contextVarValues[cvid] = outerCVValue
