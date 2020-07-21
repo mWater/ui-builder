@@ -4,9 +4,7 @@ import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateC
 import * as _ from 'lodash';
 import { ExprValidator, Expr } from 'mwater-expressions';
 import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
-import { ExprComponent } from 'mwater-expressions-ui';
 import { DesignCtx, InstanceCtx } from '../../contexts';
-import { validateEmbeddedExprs } from '../../embeddedExprs';
 
 /** Block which only displays content if an expression is true */
 export interface ConditionalBlockDef extends BlockDef {

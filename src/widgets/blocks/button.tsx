@@ -1,16 +1,21 @@
+import _ from 'lodash'
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, ContextVar } from '../blocks'
-import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor } from '../propertyEditors';
+import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { ActionDef } from '../actions';
 import { Select, Checkbox } from 'react-library/lib/bootstrap';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
 
 export interface ButtonBlockDef extends BlockDef {
   type: "button"
   label: LocalizedString | null
+
+  /** Expressions embedded in the label string. Referenced by {0}, {1}, etc. */
+  labelEmbeddedExprs?: EmbeddedExpr[] 
 
   /** Action to perform when button is clicked */
   actionDef?: ActionDef | null
@@ -30,6 +35,16 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
   validate(designCtx: DesignCtx) { 
     let error: string | null
 
+    // Validate expressions
+    error = validateEmbeddedExprs({
+      embeddedExprs: this.blockDef.labelEmbeddedExprs || [],
+      schema: designCtx.schema,
+      contextVars: designCtx.contextVars})
+
+    if (error) {
+      return error
+    }
+    
     // Validate action
     if (this.blockDef.actionDef) {
       const action = designCtx.actionLibrary.createAction(this.blockDef.actionDef)
@@ -43,17 +58,22 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
   }
 
   getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
+    let exprs: Expr[] = []
+
+    if (this.blockDef.labelEmbeddedExprs) {
+      exprs = exprs.concat(_.compact(_.map(this.blockDef.labelEmbeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null)))
+    }
+
     // Include action expressions
     if (this.blockDef.actionDef) {
       const action = ctx.actionLibrary.createAction(this.blockDef.actionDef)
-      return action.getContextVarExprs(contextVar)
+      exprs = exprs.concat(action.getContextVarExprs(contextVar))
     }
 
-    return [] 
+    return exprs
   }
  
-  renderButton(locale: string, onClick: () => void) {
-    const label = localize(this.blockDef.label, locale)
+  renderButton(label: string, onClick: () => void) {
     let className = "btn btn-" + this.blockDef.style
 
     switch (this.blockDef.size) {
@@ -90,7 +110,8 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
   }
 
   renderDesign(props: DesignCtx) {
-    return this.renderButton(props.locale, (() => null))
+    const label = localize(this.blockDef.label, props.locale)
+    return this.renderButton(label, (() => null))
   }
 
   renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
@@ -110,15 +131,46 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
       }
     }
 
-    return this.renderButton(instanceCtx.locale, handleClick)
+    // Get label
+    let label = localize(this.blockDef.label, instanceCtx.locale)
+
+    if (label) {
+      // Get any embedded expression values
+      const exprValues = _.map(this.blockDef.labelEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
+
+      // Format and replace
+      label = formatEmbeddedExprString({
+        text: label, 
+        embeddedExprs: this.blockDef.labelEmbeddedExprs || [],
+        exprValues: exprValues,
+        schema: instanceCtx.schema,
+        contextVars: instanceCtx.contextVars,
+        locale: instanceCtx.locale, 
+        formatLocale: instanceCtx.formatLocale
+      })
+    }
+
+    return this.renderButton(label, handleClick)
   }
 
   renderEditor(props: DesignCtx) {
     return (
       <div>
-        <LabeledProperty label="Text">
+        <LabeledProperty label="Label">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="label">
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
+        <LabeledProperty label="Label embedded expressions" help="Reference in text as {0}, {1}, etc.">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="labelEmbeddedExprs">
+            {(value: EmbeddedExpr[] | null | undefined, onChange) => (
+              <EmbeddedExprsEditor 
+                value={value} 
+                onChange={onChange} 
+                schema={props.schema} 
+                dataSource={props.dataSource}
+                contextVars={props.contextVars} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Style">
