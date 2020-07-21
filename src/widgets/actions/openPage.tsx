@@ -7,7 +7,7 @@ import { WidgetDef } from '../widgets';
 import produce from 'immer';
 import { LocalizedString, Expr, ExprUtils } from 'mwater-expressions';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
-import { ContextVar } from '../blocks';
+import { ContextVar, createExprVariables } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
@@ -126,7 +126,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
         // Inline variables used in rowsets as they may depend on context variables that aren't present in new page
         if (outerCV.type == "rowset") {
-          outerCVValue = new ExprUtils(instanceCtx.schema).inlineVariableValues(outerCVValue, instanceCtx.contextVarValues)
+          outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, instanceCtx.contextVarValues)
         }
 
         contextVarValues[cvid] = outerCVValue
