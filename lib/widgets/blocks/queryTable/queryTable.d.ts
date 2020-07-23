@@ -37,6 +37,10 @@ interface QueryTableColumnInfo {
      * is used as the initial ordering.
      */
     initialOrderDir: "asc" | "desc" | null;
+    /** Column width in CSS format (e.g. "auto", "50%", "30px")
+     * If not present, defaults to auto
+     */
+    columnWidth?: string;
 }
 export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];

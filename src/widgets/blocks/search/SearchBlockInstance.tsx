@@ -149,7 +149,7 @@ export class SearchControl extends React.Component<SearchControlProps> {
           type="text" 
           ref={this.inputRef}
           className="form-control" 
-          style={{maxWidth: "20em"}} 
+          style={{maxWidth: "20em", minWidth: "10em"}} 
           value={this.props.value} 
           onChange={this.handleChange}
           placeholder={this.props.placeholder} />

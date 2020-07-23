@@ -8,6 +8,10 @@ export interface HorizontalBlockDef extends BlockDef {
     align?: "justify" | "right" | "left" | "center";
     /** How to vertically align child blocks. Default is top */
     verticalAlign?: "top" | "middle" | "bottom";
+    /** Column widths in CSS grid format (e.g. "min-content", "50%", "30px")
+     * If not present, defaults to 1fr for justify, min-content otherwise.
+     */
+    columnWidths?: string[];
 }
 export declare class HorizontalBlock extends Block<HorizontalBlockDef> {
     get id(): string;

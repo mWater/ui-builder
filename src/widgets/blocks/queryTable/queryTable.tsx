@@ -5,7 +5,7 @@ import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '..
 import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row, DataSource, Column } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor, TableColumnWidthEditor } from '../../propertyEditors';
 import { NumberInput, Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
@@ -57,6 +57,11 @@ interface QueryTableColumnInfo {
    * is used as the initial ordering.
    */
   initialOrderDir: "asc" | "desc" | null
+
+  /** Column width in CSS format (e.g. "auto", "50%", "30px") 
+   * If not present, defaults to auto
+   */
+  columnWidth?: string
 }
 
 export class QueryTableBlock extends Block<QueryTableBlockDef> {
@@ -177,7 +182,6 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
     return [] 
   }
 
-
   /** 
    * Get the value of the row context variable for a specific row. 
    * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
@@ -245,6 +249,12 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
     return (
       <table className={className}>
+        {this.blockDef.contents.map((b, colIndex) => {
+          // Determine width
+          const columnInfos = this.blockDef.columnInfos
+          const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
+          return <col key={colIndex} style={{ width: width }}/>
+        })}
         { !this.blockDef.hideHeaders ? 
         <thead>
           <tr key="header">
@@ -384,9 +394,9 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
         </LabeledProperty>
 
         { rowCV ? 
-          <LabeledProperty label="Column Sort Icons" hint="Allow dynamic sorting if present">
+          <LabeledProperty label="Columns">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="columnInfos">
-              {(value, onChange) => <ColumnOrderExprsEditor
+              {(value, onChange) => <ColumnInfosEditor
                 value={value}
                 onChange={onChange}
                 schema={props.schema}
@@ -408,8 +418,8 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
   }
 }
 
-/** Edits a list of column order expressions */
-const ColumnOrderExprsEditor = (props: { 
+/** Edits column info */
+const ColumnInfosEditor = (props: { 
   value?: Array<QueryTableColumnInfo | null>
   onChange: (value: Array<QueryTableColumnInfo | null>) => void 
   numColumns: number
@@ -433,32 +443,47 @@ const ColumnOrderExprsEditor = (props: {
     }))
   }
 
-  return <div>
-    { _.map(_.range(props.numColumns), colIndex => (
-      <div key={colIndex}>
-        {`#${colIndex + 1}:`}
-        <div style={{ display: "inline-block", paddingLeft: 5, paddingRight: 10 }}>
-          <ExprComponent 
-            schema={props.schema}
-            dataSource={props.dataSource}
-            onChange={handleOrderExprChange.bind(null, colIndex)}
-            table={props.table}
-            value={props.value && props.value[colIndex] ? props.value[colIndex]!.orderExpr : null}
-            types={["text", "number", "date", "datetime"]}
+  const handleColumnWidthChange = (colIndex: number, columnWidth: string) => {
+    props.onChange(produce(props.value || [], draft => {
+      // Make sure exists
+      draft[colIndex] = draft[colIndex] || { orderExpr: null, initialOrderDir: null }
+      draft[colIndex]!.columnWidth = columnWidth
+    }))
+  }
+
+  return <ul className="list-group">
+    { _.map(_.range(props.numColumns), colIndex => {
+      return <li className="list-group-item" key={colIndex}>
+        <LabeledProperty label="Sort Icons" hint="Allow dynamic sorting if present" key="sort">
+          <div style={{ display: "inline-block", paddingLeft: 5, paddingRight: 10 }}>
+            <ExprComponent 
+              schema={props.schema}
+              dataSource={props.dataSource}
+              onChange={handleOrderExprChange.bind(null, colIndex)}
+              table={props.table}
+              value={props.value && props.value[colIndex] ? props.value[colIndex]!.orderExpr : null}
+              types={["text", "number", "date", "datetime"]}
+              />
+          </div>
+          { props.value && props.value[colIndex] && props.value[colIndex]!.orderExpr ?
+            <Toggle 
+              options={[{ value: "asc", label: "Asc" }, { value: "desc", label: "Desc" }, { value: null, label: "No Initial Sort"}]}
+              allowReset={false}
+              value={props.value && props.value[colIndex] ? props.value[colIndex]!.initialOrderDir : null }
+              onChange={handleInitialOrderDirChange.bind(null, colIndex)}
+              size="sm"
             />
-        </div>
-        { props.value && props.value[colIndex] && props.value[colIndex]!.orderExpr ?
-          <Toggle 
-            options={[{ value: "asc", label: "Asc" }, { value: "desc", label: "Desc" }, { value: null, label: "No Initial Sort"}]}
-            allowReset={false}
-            value={props.value && props.value[colIndex] ? props.value[colIndex]!.initialOrderDir : null }
-            onChange={handleInitialOrderDirChange.bind(null, colIndex)}
-            size="sm"
-          />
-        : null }
-      </div>
-    ))}
-  </div>
+          : null }
+      </LabeledProperty>
+      <LabeledProperty label="Width" key="width">
+        <TableColumnWidthEditor
+          columnWidth={props.value && props.value[colIndex] ? props.value[colIndex]!.columnWidth || "auto" : "auto" }
+          onChange={handleColumnWidthChange.bind(null, colIndex)}
+        />
+      </LabeledProperty>
+    </li>
+    })}
+  </ul>
 }
 
 /** Set the length of an array, adding/removing nulls as necessary */

@@ -554,3 +554,34 @@ export const EmbeddedExprEditor = (props: {
     </div>
   )
 }
+
+/** Edits the width of a table column */
+export const TableColumnWidthEditor = (props: {
+  columnWidth: string
+  onChange: (columnWidth: string) => void
+}) => {
+  return <Select
+    value={props.columnWidth}
+    onChange={props.onChange}
+    options={
+      [
+        { value: "auto", label: "Auto" },
+        { value: "1px", label: "Fit" },
+        { value: "16%", label: "1/6" },
+        { value: "25%", label: "1/4" },
+        { value: "33%", label: "1/3" },
+        { value: "50%", label: "1/2" },
+        { value: "67%", label: "2/3" },
+        { value: "75%", label: "3/4" },
+        { value: "83%", label: "5/6" },
+        { value: "100%", label: "100%" },
+        { value: "100px", label: "100px" },
+        { value: "200px", label: "200px" },
+        { value: "300px", label: "300px" },
+        { value: "400px", label: "400px" },
+        { value: "500px", label: "500px" }
+      ]
+    }
+  />
+}
+

@@ -14,6 +14,8 @@ export interface FixedTableBlockDef extends BlockDef {
     numColumns: number;
     /** Rows of the table */
     rows: FixedTableRowDef[];
+    /** Columns of the table (not the blocks, just information) */
+    columns?: FixedTableColumnDef[];
 }
 /** Single row of a table */
 interface FixedTableRowDef {
@@ -22,6 +24,10 @@ interface FixedTableRowDef {
 }
 interface FixedTableCellDef {
     content: BlockDef | null;
+}
+/** Single column of a table */
+interface FixedTableColumnDef {
+    columnWidth: string;
 }
 export declare class FixedTableBlock extends Block<FixedTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];

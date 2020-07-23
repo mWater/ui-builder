@@ -178,4 +178,9 @@ export declare const EmbeddedExprEditor: (props: {
     contextVars: ContextVar[];
     index: number;
 }) => JSX.Element;
+/** Edits the width of a table column */
+export declare const TableColumnWidthEditor: (props: {
+    columnWidth: string;
+    onChange: (columnWidth: string) => void;
+}) => JSX.Element;
 export {};

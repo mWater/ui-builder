@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
-import { LabeledProperty, PropertyEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor, TableColumnWidthEditor } from '../propertyEditors';
 import { NumberInput, Select } from 'react-library/lib/bootstrap';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
@@ -24,6 +24,9 @@ export interface FixedTableBlockDef extends BlockDef {
 
   /** Rows of the table */
   rows: FixedTableRowDef[]
+
+  /** Columns of the table (not the blocks, just information) */
+  columns?: FixedTableColumnDef[]
 }
 
 /** Single row of a table */
@@ -34,6 +37,12 @@ interface FixedTableRowDef {
 
 interface FixedTableCellDef {
   content: BlockDef | null
+}
+
+/** Single column of a table */
+interface FixedTableColumnDef {
+  // Default to auto
+  columnWidth: string
 }
 
 export class FixedTableBlock extends Block<FixedTableBlockDef> {
@@ -78,6 +87,12 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
 
     return (
       <table className={className}>
+        { _.range(this.blockDef.numColumns).map((colIndex) => {
+          // Determine width
+          const columns = this.blockDef.columns
+          const width = columns && columns[colIndex] ? columns[colIndex]!.columnWidth : "auto"
+          return <col key={colIndex} style={{ width: width }}/>
+        })}
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
@@ -105,6 +120,12 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
 
     return (
       <table className={className}>
+        { _.range(this.blockDef.numColumns).map((colIndex) => {
+          // Determine width
+          const columns = this.blockDef.columns
+          const width = columns && columns[colIndex] ? columns[colIndex]!.columnWidth : "auto"
+          return <col key={colIndex} style={{ width: width }}/>
+        })}
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
@@ -152,6 +173,16 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
             {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        <LabeledProperty label="Columns">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="columns">
+            {(value, onChange) => <ColumnsEditor
+              value={value}
+              onChange={onChange}
+              numColumns={this.blockDef.numColumns}
+              /> }
+          </PropertyEditor>
+        </LabeledProperty>
      </div>
     )
   }
@@ -179,12 +210,23 @@ export function setNumRows(blockDef: FixedTableBlockDef, numRows: number): Fixed
 /** Function to set the number of columns, adding/removing as necessary */
 export function setNumColumns(blockDef: FixedTableBlockDef, numColumns: number): FixedTableBlockDef {
   return produce(blockDef, (d: FixedTableBlockDef) => {
+    // Create columns if they don't exist
+    if (!d.columns) {
+      d.columns = _.range(blockDef.numColumns).map(c => ({ columnWidth: "auto" }))
+    }
+
     // Add columns
     if (numColumns > blockDef.numColumns) {
+      // Add to each row
       for (const row of d.rows) {
         for (let i = 0; i < numColumns - blockDef.numColumns ; i++) {
           row.cells.push({ content: null })
         }
+      }
+
+      // Add to columns
+      for (let i = 0; i < numColumns - blockDef.numColumns ; i++) {
+        d.columns.push({ columnWidth: "auto" })
       }
     }
 
@@ -193,8 +235,37 @@ export function setNumColumns(blockDef: FixedTableBlockDef, numColumns: number):
       for (const row of d.rows) {
         row.cells.splice(numColumns, blockDef.numColumns - numColumns)
       }
+      d.columns.splice(numColumns, blockDef.numColumns - numColumns)
     }
 
     d.numColumns = numColumns
   })
+}
+
+/** Edits column info */
+const ColumnsEditor = (props: { 
+  value?: Array<FixedTableColumnDef>
+  onChange: (value: Array<FixedTableColumnDef>) => void 
+  numColumns: number
+}) => {
+  const handleColumnWidthChange = (colIndex: number, columnWidth: string) => {
+    props.onChange(produce(props.value || [], draft => {
+      // Make sure exists
+      draft[colIndex] = draft[colIndex] || { columnWidth: "auto" }
+      draft[colIndex]!.columnWidth = columnWidth
+    }))
+  }
+
+  return <ul className="list-group">
+    { _.map(_.range(props.numColumns), colIndex => {
+      return <li className="list-group-item" key={colIndex}>
+        <LabeledProperty label="Width" key="width">
+          <TableColumnWidthEditor
+            columnWidth={props.value && props.value[colIndex] ? props.value[colIndex]!.columnWidth : "auto" }
+            onChange={handleColumnWidthChange.bind(null, colIndex)}
+          />
+        </LabeledProperty>
+      </li>
+    })}
+  </ul>
 }
