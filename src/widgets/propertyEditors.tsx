@@ -566,7 +566,7 @@ export const TableColumnWidthEditor = (props: {
     options={
       [
         { value: "auto", label: "Auto" },
-        { value: "1px", label: "Fit" },
+        { value: "1px", label: "Small as possible" },
         { value: "16%", label: "1/6" },
         { value: "25%", label: "1/4" },
         { value: "33%", label: "1/3" },
