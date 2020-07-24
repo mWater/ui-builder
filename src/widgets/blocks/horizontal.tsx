@@ -19,7 +19,7 @@ export interface HorizontalBlockDef extends BlockDef {
   verticalAlign?: "top" | "middle" | "bottom"
 
   /** Column widths in CSS grid format (e.g. "min-content", "50%", "30px") 
-   * If not present, defaults to 1fr for justify, min-content otherwise.
+   * If not present, defaults to 1fr for justify, auto otherwise.
    */
   columnWidths?: string[]
 }
@@ -71,7 +71,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
       if (align == "justify") {
         return columnWidths[index] || "1fr"
       }
-      return columnWidths[index] || "min-content"
+      return columnWidths[index] || "auto"
     })
 
     // Create CSS grid with style
@@ -153,7 +153,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
             {(value, onChange) => 
               <ColumnWidthsEditor 
                 numColumns={this.blockDef.items.length}
-                defaultWidth={align == "justify" ? "1fr" : "min-content"}
+                defaultWidth={align == "justify" ? "1fr" : "auto"}
                 columnWidths={value || []} 
                 onChange={onChange} />
             }
@@ -198,7 +198,8 @@ const ColumnWidthEditor = (props: {
     onChange={props.onChange}
     options={
       [
-        { value: "min-content", label: "Fit" },
+        { value: "auto", label: "Auto" },
+        { value: "min-content", label: "Small as possible" },
         { value: "1fr", label: "1 fraction" },
         { value: "2fr", label: "2 fraction" },
         { value: "3fr", label: "3 fraction" },
