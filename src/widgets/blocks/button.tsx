@@ -5,7 +5,7 @@ import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { ActionDef } from '../actions';
-import { Select, Checkbox } from 'react-library/lib/bootstrap';
+import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
@@ -100,8 +100,14 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
       style.margin = 5
     }
 
+    const handleClick = (ev: React.MouseEvent) => {
+      // Ensure button doesn't trigger other actions
+      ev.stopPropagation()
+      onClick()
+    }
+
     return (
-      <button type="button" className={className} onClick={onClick} style={style}>
+      <button type="button" className={className} onClick={handleClick} style={style}>
         { icon }
         { icon && label ? "\u00A0" : null }
         { label }
@@ -176,7 +182,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
         <LabeledProperty label="Style">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="style">
             {(value, onChange) => 
-            <Select value={value} onChange={onChange}
+            <Toggle value={value} onChange={onChange}
               options={[
                 { value: "default", label: "Default"},
                 { value: "primary", label: "Primary"},
@@ -188,7 +194,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
         <LabeledProperty label="Size">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="size">
             {(value, onChange) => 
-            <Select value={value} onChange={onChange}
+            <Toggle value={value} onChange={onChange}
               options={[
                 { value: "normal", label: "Default"},
                 { value: "small", label: "Small"},

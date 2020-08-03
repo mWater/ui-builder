@@ -64,6 +64,7 @@ export const IdInstance = (props: {
     orderBy={orderBy}
     filterExpr={props.blockDef.idFilterExpr || null}
     formatLabel={formatIdLabel}
+    placeholder={localize(props.blockDef.placeholder, props.locale)}
     contextVars={props.ctx.contextVars}
     contextVarValues={props.ctx.contextVarValues}
     styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}

@@ -1,9 +1,10 @@
+import _ from 'lodash'
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
 import ModalWindowComponent from 'react-library/lib/ModalWindowComponent'
 import { BlockPaletteEntry } from '../../designer/blockPaletteEntries';
-import { Schema, DataSource } from 'mwater-expressions';
+import { Schema, DataSource, LocalizedString } from 'mwater-expressions';
 import BlockPlaceholder from '../BlockPlaceholder';
 import { useState, useRef, useEffect } from 'react';
 import { SearchControl } from './search/SearchBlockInstance';
@@ -18,6 +19,9 @@ import { NumberboxBlockDef } from './controls/numberbox';
 import { DatefieldBlockDef } from './controls/datefield';
 import { DropdownBlockDef } from './controls/dropdown';
 import { WidgetBlockDef } from './widget';
+import { Toggle } from 'react-library/lib/bootstrap';
+import { HorizontalBlockDef } from './horizontal';
+import { TextBlockDef } from './text';
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -67,6 +71,9 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
 // Persist default tab
 var defaultCurrentTabId = "palette"
 
+/** Mode of expression adding */
+type ExpressionMode = "plain" | "labelAbove" | "labelBefore"
+
 /** Pane with search and allowing clicking on a widget to add */
 const AddWizardPane = (props: {
   designCtx: DesignCtx
@@ -76,6 +83,8 @@ const AddWizardPane = (props: {
   const { designCtx } = props
   const [search, setSearch] = useState("")
   const [currentTabId, setCurrentTabId] = useState(defaultCurrentTabId)
+
+  const [expressionMode, setExpressionMode] = useState<ExpressionMode>("plain")
 
   // Focus on load
   const searchControl = useRef<SearchControl>(null)
@@ -155,6 +164,33 @@ const AddWizardPane = (props: {
   const getExpressionEntries = () => {
     const allEntries: BlockPaletteEntry[] = []
 
+    const wrapBlockDef = (label: LocalizedString, blockDef: ExpressionBlockDef): BlockDef => {
+      if (expressionMode == "plain") {
+        return blockDef
+      }
+      else if (expressionMode == "labelAbove") {
+        return {
+          id: uuid(),
+          type: "labeled",
+          label: label,
+          child: blockDef
+        } as LabeledBlockDef
+      }
+      else if (expressionMode == "labelBefore") {
+        return {
+          id: uuid(),
+          type: "horizontal",
+          align: "left",
+          verticalAlign: "middle",
+          items: [
+            { id: uuid(), type: "text", text: appendStr(label, ":"), bold: true } as TextBlockDef,
+            blockDef
+          ]
+        } as HorizontalBlockDef
+      }
+      throw new Error("Not implemented")
+    }
+
     // Find context var of type row
     for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {  
       // Get columns
@@ -163,13 +199,13 @@ const AddWizardPane = (props: {
       for (const column of columns) {
         allEntries.push({ 
           title: localize(column.name) || "", 
-          blockDef: { 
+          blockDef: wrapBlockDef(column.name, { 
             id: uuid(),
             type: "expression", 
             contextVarId: contextVar.id,
             expr: { type: "field", table: contextVar.table!, column: column.id },
             format: column.type == "number" ? "," : null
-          } as ExpressionBlockDef
+          } as ExpressionBlockDef)
         })
       }
     }
@@ -218,9 +254,24 @@ const AddWizardPane = (props: {
     </div>
   }
 
+  const renderExpressionOptions = () => {
+    return <div style={{ float: "right", paddingRight: 10 }}>
+      <Toggle 
+        value={expressionMode}
+        onChange={setExpressionMode}
+        size="sm"
+        options={[
+          { value: "plain", label: "Plain" },
+          { value: "labelAbove", label: "Label Above" },
+          { value: "labelBefore", label: "Label Before" }
+        ]} />
+    </div>
+  }
+
   return <div>
     <div>
       <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
+      { currentTabId == "expressions" ? renderExpressionOptions() : null }
     </div>
     <TabbedComponent 
       tabId={currentTabId}
@@ -284,4 +335,9 @@ class PaletteItem extends React.Component<{
       </div>
     )
   }
+}
+
+/** Appends to a localized string */
+function appendStr(str: LocalizedString, append: string) {
+  return _.mapValues(str, (v, k) => k == "_base" ? v : v + append)
 }
