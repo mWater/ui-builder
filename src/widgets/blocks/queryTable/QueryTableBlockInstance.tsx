@@ -343,12 +343,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     return (
       <table className={className} style={style}>
-        {blockDef.contents.map((b, colIndex) => {
-          // Determine width
-          const columnInfos = blockDef.columnInfos
-          const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
-          return <col key={colIndex} style={{ width: width }}/>
-        })}
+        <colgroup>
+          {blockDef.contents.map((b, colIndex) => {
+            // Determine width
+            const columnInfos = blockDef.columnInfos
+            const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
+            return <col key={colIndex} style={{ width: width }}/>
+          })}
+        </colgroup>
         { !blockDef.hideHeaders ? 
         <thead>
           <tr key="header">

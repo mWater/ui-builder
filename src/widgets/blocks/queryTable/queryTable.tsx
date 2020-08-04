@@ -249,12 +249,14 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
     return (
       <table className={className}>
-        {this.blockDef.contents.map((b, colIndex) => {
-          // Determine width
-          const columnInfos = this.blockDef.columnInfos
-          const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
-          return <col key={colIndex} style={{ width: width }}/>
-        })}
+        <colgroup>
+          {this.blockDef.contents.map((b, colIndex) => {
+            // Determine width
+            const columnInfos = this.blockDef.columnInfos
+            const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
+            return <col key={colIndex} style={{ width: width }}/>
+          })}
+        </colgroup>
         { !this.blockDef.hideHeaders ? 
         <thead>
           <tr key="header">

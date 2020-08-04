@@ -458,7 +458,9 @@ export const EmbeddedExprsEditor = (props: {
   const { value, onChange, schema, dataSource, contextVars } = props
 
   const handleAddEmbeddedExpr = () => {
-    onChange((value || []).concat([{ contextVarId: contextVars.length > 0 ? contextVars[contextVars.length - 1].id : null, expr: null, format: null }]))
+    const defaultContextVar = props.contextVars.find(cv => cv.type === "rowset" || cv.type === "row")
+
+    onChange((value || []).concat([{ contextVarId: defaultContextVar ? defaultContextVar.id : null, expr: null, format: null }]))
   }
 
   return (

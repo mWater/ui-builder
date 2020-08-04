@@ -87,12 +87,14 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
 
     return (
       <table className={className}>
-        { _.range(this.blockDef.numColumns).map((colIndex) => {
-          // Determine width
-          const columns = this.blockDef.columns
-          const width = columns && columns[colIndex] ? columns[colIndex]!.columnWidth : "auto"
-          return <col key={colIndex} style={{ width: width }}/>
-        })}
+        <colgroup>
+          { _.range(this.blockDef.numColumns).map((colIndex) => {
+            // Determine width
+            const columns = this.blockDef.columns
+            const width = columns && columns[colIndex] ? columns[colIndex]!.columnWidth : "auto"
+            return <col key={colIndex} style={{ width: width }}/>
+          })}
+        </colgroup>
         <tbody>
           { this.blockDef.rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
