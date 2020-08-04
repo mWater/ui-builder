@@ -143,13 +143,13 @@ export class SearchControl extends React.Component<SearchControlProps> {
 
   render() {
     return (
-      <div style={{ position: "relative", display: "inline-block", margin: 5 }}>
+      <div style={{ position: "relative", display: "inline-block", margin: 5, width: "15em" }}>
         <i className="fa fa-search" style={{ position: "absolute", right: 8, top: 10, color: "#AAA", pointerEvents: "none" }} />
         <input 
           type="text" 
           ref={this.inputRef}
           className="form-control" 
-          style={{maxWidth: "20em", minWidth: "10em"}} 
+          style={{ width: "100%" }}
           value={this.props.value} 
           onChange={this.handleChange}
           placeholder={this.props.placeholder} />

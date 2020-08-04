@@ -8,7 +8,7 @@ import { localize } from "../widgets/localization";
 import { produce } from "immer";
 import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import ListEditor from "../widgets/ListEditor";
-import * as _ from "lodash";
+import _ from "lodash";
 import { TextInput, Select } from "react-library/lib/bootstrap";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import { DesignCtx } from "../contexts";

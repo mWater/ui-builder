@@ -11,6 +11,10 @@ interface WidgetDesignerProps {
     widgetDef: WidgetDef;
     onWidgetDefChange(widgetDef: WidgetDef): void;
     blockPaletteEntries: BlockPaletteEntry[];
+    /** Global context variable values to use for preview mode */
+    globalContextVarValues?: {
+        [contextVarId: string]: any;
+    };
 }
 declare enum Mode {
     Design = 0,
