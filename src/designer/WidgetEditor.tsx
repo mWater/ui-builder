@@ -288,6 +288,17 @@ class ContextVarValueEditor extends React.Component<{
         />
     }
 
+    if (this.props.contextVar.type === "id[]" && this.props.schema.getTable(this.props.contextVar.table!)) {
+      return <IdLiteralComponent 
+        schema={this.props.schema} 
+        dataSource={this.props.dataSource}
+        idTable={this.props.contextVar.table!}
+        value={value}
+        onChange={this.handleChange}
+        multi={true}
+        />
+    }
+
     if (this.props.contextVar.type === "rowset") {
       return <ExprComponent 
         schema={this.props.schema} 
