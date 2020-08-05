@@ -24,9 +24,6 @@ interface WidgetDesignerProps {
   widgetDef: WidgetDef
   onWidgetDefChange(widgetDef: WidgetDef): void
   blockPaletteEntries: BlockPaletteEntry[]
-
-  /** Global context variable values to use for preview mode */
-  globalContextVarValues?: { [contextVarId: string]: any }
 }
 
 enum Mode { Design, Preview }
@@ -288,11 +285,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     }
 
     // Include global context values if present
-    const contextVarValues = { 
-      ...this.props.widgetDef.contextVarPreviewValues, 
-      ...(this.props.globalContextVarValues || {}) 
-    }
-
+    const contextVarValues = this.props.widgetDef.contextVarPreviewValues
+    
     // Create normal page to display
     const page: Page = {
       type: "normal",

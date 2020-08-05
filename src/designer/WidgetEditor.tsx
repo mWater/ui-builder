@@ -75,8 +75,21 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             /> }
         </PropertyEditor>
       </LabeledProperty>
+      <LabeledProperty label="Global Variables" hint="Values for preview only">
+        { (this.props.designCtx.globalContextVars || []).map((contextVar) => {
+          return <div key={contextVar.id} style={{ paddingBottom: 10 }}>
+            <div>{contextVar.name}:</div>
+            <ContextVarValueEditor 
+              contextVar={contextVar}
+              contextVarValues={this.props.widgetDef.contextVarPreviewValues}
+              onContextVarValuesChange={this.handleContextVarPreviewValues}
+              schema={this.props.designCtx.schema} 
+              dataSource={this.props.designCtx.dataSource}
+              />
+          </div>
+        })}
+      </LabeledProperty>
       <div style={{ color: "#EEE", fontSize: 9 }}>{this.props.widgetDef.id}</div>
-
     </div>)
   }
 }
