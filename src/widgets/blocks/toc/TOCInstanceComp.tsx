@@ -1,5 +1,6 @@
+import _ from 'lodash'
 import { TOCBlockDef, iterateItems, TOCItem } from "./toc"
-import { CreateBlock } from '../../blocks'
+import { CreateBlock, createExprVariables } from '../../blocks'
 import { useState, useRef } from "react"
 import { localize } from '../../localization'
 import SplitPane from "./SplitPane"
@@ -7,6 +8,7 @@ import React from "react"
 import { Page } from "../../../PageStack"
 import { PageStackDisplay } from "../../../PageStackDisplay"
 import { InstanceCtx } from "../../../contexts"
+import { ExprUtils } from 'mwater-expressions'
 
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: { 
@@ -96,8 +98,33 @@ export default function TOCInstanceComp(props: {
 
     for (const innerContextVarId of Object.keys(selectedItem.contextVarMap || {})) {
       const outerContextVarId = (selectedItem.contextVarMap || {})[innerContextVarId]
+
       if (outerContextVarId) {
-        mappedContextVarValues[innerContextVarId] = instanceCtx.contextVarValues[outerContextVarId]
+        // Look up outer context variable
+        const outerCV = instanceCtx.contextVars.find(cv => cv.id == outerContextVarId)
+        if (!outerCV) {
+          throw new Error("Outer context variable not found")
+        }
+
+        // Get value 
+        let outerCVValue = instanceCtx.contextVarValues[outerCV.id]
+
+        // Add filters if rowset
+        if (outerCV.type == "rowset") {
+          outerCVValue = {
+            type: "op",
+            op: "and",
+            table: outerCV.table!,
+            exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), f => f.expr)))
+          }
+        }
+
+        // Inline variables used in rowsets as they may depend on context variables that aren't present in new page
+        if (outerCV.type == "rowset") {
+          outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, instanceCtx.contextVarValues)
+        }
+
+        mappedContextVarValues[innerContextVarId] = outerCVValue
       }
       else {
         mappedContextVarValues[innerContextVarId] = null
