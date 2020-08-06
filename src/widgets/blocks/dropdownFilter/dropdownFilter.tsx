@@ -277,14 +277,15 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     const placeholder = localize(this.blockDef.placeholder, props.locale)
     const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)
 
+    const handleSetDefault = (defaultValue: any) => {
+      props.store.alterBlock(this.blockDef.id, (bd) => {
+        return { ...bd, defaultValue }
+      })
+    }
+
     if (valueType === "date" || valueType === "datetime") {
       // Fake table
       const table = contextVar ? contextVar.table || "" : ""
-      const handleSetDefault = (defaultValue: DateValue) => {
-        props.store.alterBlock(this.blockDef.id, (bd) => {
-          return { ...bd, defaultValue: defaultValue }
-        })
-      }
       return (
         <div style={{ padding: 5 }}>
           <DateExprComponent 
@@ -296,6 +297,26 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             locale={props.locale}/>
         </div>
       )
+    }
+
+    // Allow setting default for enum and enumset
+    switch (valueType) {
+      case "enum":
+        return <EnumInstance 
+          blockDef={this.blockDef}
+          schema={props.schema}
+          contextVars={props.contextVars}
+          value={this.blockDef.defaultValue}
+          onChange={handleSetDefault}
+          locale={props.locale} />
+      case "enumset":
+        return <EnumsetInstance 
+          blockDef={this.blockDef}
+          schema={props.schema}
+          contextVars={props.contextVars}
+          value={this.blockDef.defaultValue}
+          onChange={handleSetDefault}
+          locale={props.locale} />
     }
 
     return <div style={{ padding: 5 }}>

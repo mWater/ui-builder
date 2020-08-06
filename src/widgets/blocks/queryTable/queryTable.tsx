@@ -318,7 +318,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
         <LabeledProperty label="Mode">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="mode">
-            {(value, onChange) => <Select value={value} onChange={onChange} options={[{ value: "singleRow", label: "One item per row" }, { value: "multiRow", label: "Multiple item per row" }]} />}
+            {(value, onChange) => <Toggle value={value} onChange={onChange} options={[{ value: "singleRow", label: "One item per row" }, { value: "multiRow", label: "Multiple item per row" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
@@ -385,13 +385,13 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
         <LabeledProperty label="Borders">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="borders">
-            {(value, onChange) => <Select value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
+            {(value, onChange) => <Toggle value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Padding">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="padding">
-            {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
+            {(value, onChange) => <Toggle value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
