@@ -222,7 +222,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       case "modal":
         return (
           <div style={{ display: invisible ? "none" : "block" }} key={index}>
-            <ModalPage onClose={this.handleClose} key={index} title={page.title}>
+            <ModalPage onClose={this.handleClose} key={index} title={page.title} size={page.modalSize || "normal"}>
               {contents}
             </ModalPage>
           </div>
@@ -267,10 +267,10 @@ class NormalPage extends React.Component<{
   }
 }
 
-class ModalPage extends React.Component<{ title?: string, onClose: () => void }> {
+class ModalPage extends React.Component<{ title?: string, onClose: () => void, size: "small" | "normal" | "large" | "full" }> {
   render() {
     return (
-      <ModalPopupComponent onClose={this.props.onClose} size="large" header={this.props.title}>
+      <ModalPopupComponent onClose={this.props.onClose} size={this.props.size} header={this.props.title}>
         {this.props.children}
       </ModalPopupComponent>
     )

@@ -18,6 +18,8 @@ interface ContextVarNull {
 export interface OpenPageActionDef extends ActionDef {
     type: "openPage";
     pageType: "normal" | "modal";
+    /** Size of the modal to open. Default is normal */
+    modalSize?: "small" | "normal" | "large" | "full";
     /** Title of page to open */
     title?: LocalizedString | null;
     /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */

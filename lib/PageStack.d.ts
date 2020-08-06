@@ -5,6 +5,8 @@ export interface Page {
      * will be modals
      */
     type: "modal" | "normal" | "inline";
+    /** Modal size. Default is "normal" */
+    modalSize?: "small" | "normal" | "large" | "full";
     /** Widget to display in page */
     widgetId: string;
     database: Database;

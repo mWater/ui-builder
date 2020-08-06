@@ -26,6 +26,10 @@ export interface DropdownBlockDef extends ControlBlockDef {
     idSearchExprs?: Expr[];
     /** Advanced mode: sort order of results */
     idOrderBy?: OrderBy[] | null;
+    /** Label for true value if boolean. Default is "Yes" */
+    trueLabel?: LocalizedString | null;
+    /** Label for false value if boolean. Default is "No" */
+    falseLabel?: LocalizedString | null;
 }
 export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     validate(options: DesignCtx): string | null;
@@ -37,6 +41,7 @@ export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     formatIdLabel: (ctx: RenderControlProps, labelValues: any[]) => string;
     renderId(props: RenderControlProps, column: Column): JSX.Element;
     renderIds(props: RenderControlProps, column: Column): JSX.Element;
+    renderBoolean(props: RenderControlProps, column: Column): JSX.Element;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
     renderControlEditor(props: DesignCtx): JSX.Element;
     /** Filter the columns that this control is for. Can't be expression */

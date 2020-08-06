@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import * as React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
-import { Select, Checkbox } from 'react-library/lib/bootstrap';
+import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
 import { LocalizedString, Expr, ExprUtils } from 'mwater-expressions';
@@ -31,6 +31,9 @@ export interface OpenPageActionDef extends ActionDef {
   type: "openPage"
 
   pageType: "normal" | "modal"
+
+  /** Size of the modal to open. Default is normal */
+  modalSize?: "small" | "normal" | "large" | "full"
 
   /** Title of page to open */
   title?: LocalizedString | null
@@ -162,6 +165,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     const page: Page = {
       type: this.actionDef.pageType,
+      modalSize: this.actionDef.modalSize,
       database: instanceCtx.database,
       widgetId: this.actionDef.widgetId!,
       contextVarValues: contextVarValues,
@@ -244,9 +248,28 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       <div>
         <LabeledProperty label="Page Type">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="pageType">
-            {(value, onChange) => <Select value={value} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "modal", label: "Modal" }]} />}
+            {(value, onChange) => <Toggle value={value} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "modal", label: "Modal" }]} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        { this.actionDef.pageType == "modal" ?
+          <LabeledProperty label="Modal Size">
+            <PropertyEditor obj={this.actionDef} onChange={onChange} property="modalSize">
+              {(value, onChange) => 
+                <Toggle 
+                  value={value || "normal"} 
+                  onChange={onChange} 
+                  options={[
+                    { value: "small", label: "Small" },
+                    { value: "normal", label: "Normal" }, 
+                    { value: "large", label: "Large" }, 
+                    { value: "full", label: "Full-screen" }
+                  ]} 
+                />
+               }
+            </PropertyEditor>
+          </LabeledProperty>
+      : null}
 
         <LabeledProperty label="Page Widget">
           <Select value={actionDef.widgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
