@@ -257,7 +257,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
             <PropertyEditor obj={this.actionDef} onChange={onChange} property="modalSize">
               {(value, onChange) => 
                 <Toggle 
-                  value={value || "normal"} 
+                  value={value || "large"} 
                   onChange={onChange} 
                   options={[
                     { value: "small", label: "Small" },
