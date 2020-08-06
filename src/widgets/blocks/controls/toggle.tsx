@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import * as React from 'react';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column } from 'mwater-expressions';
+import { Column, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
-import { LabeledProperty, PropertyEditor, EnumArrayEditor } from '../../propertyEditors';
+import { LabeledProperty, PropertyEditor, EnumArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
 import { DesignCtx } from '../../../contexts';
 
 export interface ToggleBlockDef extends ControlBlockDef {
@@ -14,8 +14,15 @@ export interface ToggleBlockDef extends ControlBlockDef {
 
   /** Values to exclude (if present, exclude them) */
   excludeValues?: any[] | null
+
+  /** Label for true value if boolean. Default is "Yes" */
+  trueLabel?: LocalizedString | null
+
+  /** Label for false value if boolean. Default is "No" */
+  falseLabel?: LocalizedString | null
 }
 
+/** Block which shows a toggle to control an enum or boolean or enumset */
 export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
   renderControl(props: RenderControlProps) {
     // If can't be displayed properly
@@ -40,6 +47,9 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
     }
     if (column.type === "enumset") {
       return this.renderEnumset(props, column)
+    }
+    if (column.type === "boolean") {
+      return this.renderBoolean(props, column)
     }
     throw new Error("Unsupported type")
   }
@@ -101,6 +111,26 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
     </div>
   }
 
+  renderBoolean(props: RenderControlProps, column: Column) {
+    return <div className="btn-group">
+      <button 
+        key="true"
+        type="button" 
+        disabled={props.disabled}
+        className={ props.value == true ? "btn btn-primary active" : "btn btn-default" }
+        onClick={() => props.onChange(props.value === true ? null : true)}>
+          {localize(this.blockDef.trueLabel, props.locale) || "Yes"}
+      </button>
+      <button 
+        key="false"
+        type="button" 
+        disabled={props.disabled}
+        className={ props.value == false ? "btn btn-primary active" : "btn btn-default" }
+        onClick={() => props.onChange(props.value === false ? null : false)}>
+          {localize(this.blockDef.falseLabel, props.locale) || "No"}
+      </button>
+    </div>
+  }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   renderControlEditor(props: DesignCtx) {
@@ -114,7 +144,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
     return (
       <div>
         { column && (column.type === "enum" || column.type === "enumset") ?
-          <LabeledProperty label="Include Values">
+          <LabeledProperty label="Include Values" key="includeValues">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="includeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
@@ -126,7 +156,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
           </LabeledProperty>
         : null }
         { column && (column.type === "enum" || column.type === "enumset") ?
-          <LabeledProperty label="Exclude Values">
+          <LabeledProperty label="Exclude Values" key="excludeValues">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="excludeValues">
               {(value, onChange) => <EnumArrayEditor 
                 value={value} 
@@ -137,6 +167,20 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         : null }
+        { column && column.type === "boolean" ?
+          <LabeledProperty label="Label for true" key="trueLabel" hint="Must be set to allow localization">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="trueLabel">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="Yes" />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null}
+        { column && column.type === "boolean" ?
+          <LabeledProperty label="Label for false" key="falseLabel" hint="Must be set to allow localization">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="falseLabel">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="No" />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null}
       </div>
     )
   }
@@ -149,5 +193,6 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
 
     return column.type === "enum" 
       || column.type === "enumset" 
+      || column.type === "boolean"
   }
 }

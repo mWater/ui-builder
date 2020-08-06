@@ -11,7 +11,7 @@ import { IdDropdownComponent } from './IdDropdownComponent';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../../embeddedExprs';
 import { OrderBy } from '../../../database/Database';
-import { Toggle } from 'react-library/lib/bootstrap';
+import { Toggle, Select } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { ToggleBlockDef } from './toggle';
 
@@ -46,6 +46,12 @@ export interface DropdownBlockDef extends ControlBlockDef {
 
   /** Advanced mode: sort order of results */
   idOrderBy?: OrderBy[] | null
+
+  /** Label for true value if boolean. Default is "Yes" */
+  trueLabel?: LocalizedString | null
+
+  /** Label for false value if boolean. Default is "No" */
+  falseLabel?: LocalizedString | null
 }
 
 export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
@@ -165,6 +171,9 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     }
     if (column.type === "id[]") {
       return this.renderIds(props, column)
+    }
+    if (column.type === "boolean") {
+      return this.renderBoolean(props, column)
     }
     // TODO: remove this by Sept 2020. Legacy support.
     if (column.type === "join" && column.join!.type === "n-1") {
@@ -335,6 +344,19 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     />
   }
 
+  renderBoolean(props: RenderControlProps, column: Column) {
+    console.log(props.value)
+    return <Select
+      options={[
+        { value: true, label: localize(this.blockDef.trueLabel) || "Yes" },
+        { value: false, label: localize(this.blockDef.falseLabel) || "No" }
+      ]}
+      value={props.value}
+      onChange={props.onChange}
+      nullLabel={""}
+    />
+  }
+
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   renderControlEditor(props: DesignCtx) {
     const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
@@ -347,6 +369,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     const isIdType = column && (column.type == "id" || column.type == "id[]")
     const idMode = this.blockDef.idMode || "simple"
     const idTable = column ? column.idTable : null
+    const isBooleanType = column && column.type == "boolean"
 
     const handleConvertToToggle = () => {
       props.store.replaceBlock({
@@ -495,6 +518,20 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
             <button className="btn btn-link btn-sm" onClick={handleConvertToToggle}>Convert to Toggle</button>
           </div>
         : null }
+        { isBooleanType ?
+          <LabeledProperty label="Label for true" key="trueLabel" hint="Must be set to allow localization">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="trueLabel">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="Yes" />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null}
+        { isBooleanType ?
+          <LabeledProperty label="Label for false" key="falseLabel" hint="Must be set to allow localization">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="falseLabel">
+              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="No" />}
+            </PropertyEditor>
+          </LabeledProperty>
+        : null}
       </div>
     )
   }
@@ -509,5 +546,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       || column.type === "enumset" 
       || column.type === "id" 
       || column.type === "id[]"
+      || column.type == "boolean"
   }
 }

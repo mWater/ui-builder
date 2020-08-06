@@ -147,7 +147,8 @@ const AddWizardPane = (props: {
         if (column.type === "enum" 
           || column.type === "enumset" 
           || column.type === "id" 
-          || column.type === "id[]") {
+          || column.type === "id[]"
+          || column.type === "boolean") {
           createLabeledBlock({
             id: uuid(),
             type: "dropdown",
