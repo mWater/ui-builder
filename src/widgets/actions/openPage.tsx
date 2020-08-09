@@ -32,7 +32,7 @@ export interface OpenPageActionDef extends ActionDef {
 
   pageType: "normal" | "modal"
 
-  /** Size of the modal to open. Default is normal */
+  /** Size of the modal to open. Default is "large" */
   modalSize?: "small" | "normal" | "large" | "full"
 
   /** Title of page to open */
@@ -165,7 +165,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     const page: Page = {
       type: this.actionDef.pageType,
-      modalSize: this.actionDef.modalSize,
+      modalSize: this.actionDef.modalSize || "large",
       database: instanceCtx.database,
       widgetId: this.actionDef.widgetId!,
       contextVarValues: contextVarValues,
