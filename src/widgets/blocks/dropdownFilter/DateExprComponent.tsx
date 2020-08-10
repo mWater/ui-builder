@@ -129,7 +129,7 @@ const toLiteral = (datetime: boolean, value: string | null): Expr => {
 }
 
 /** Convert a filter value to an expression */
-export const toExpr = (table: string, expr: Expr, datetime: boolean, value: DateValue): Expr => {
+export const createDateFilterExpr = (table: string, expr: Expr, datetime: boolean, value: DateValue): Expr => {
   if (!value) {
     return null
   }

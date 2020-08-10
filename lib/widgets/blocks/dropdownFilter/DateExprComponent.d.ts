@@ -24,7 +24,7 @@ interface Preset {
     name: LocalizedString;
 }
 /** Convert a filter value to an expression */
-export declare const toExpr: (table: string, expr: Expr, datetime: boolean, value: DateValue) => Expr;
+export declare const createDateFilterExpr: (table: string, expr: Expr, datetime: boolean, value: DateValue) => Expr;
 /** Allows selection of a date range including presets */
 export default class DateExprComponent extends React.Component<Props, State> {
     constructor(props: Props);

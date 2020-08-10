@@ -8,7 +8,7 @@ import { localize } from '../../localization';
 import ReactSelect from "react-select"
 import EnumInstance from './EnumInstance';
 import TextInstance from './TextInstance';
-import DateExprComponent, { toExpr, DateValue } from './DateExprComponent';
+import DateExprComponent, { createDateFilterExpr, DateValue } from './DateExprComponent';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import EnumsetInstance from './EnumsetInstance';
@@ -17,6 +17,7 @@ import { OrderBy } from '../../../database/Database';
 import { IdInstance } from './IdInstance';
 import { Toggle } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
+import { DateFilterInstance } from './DateFilterInstance';
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -37,8 +38,9 @@ export interface DropdownFilterBlockDef extends BlockDef {
   extraFilters?: ExtraFilter[]
 
   // ----------- date type options
+  /** Mode for selecting date. Default is "full" */
+  dateMode?: "full" | "year" | "yearmonth" | "month"
   
-
   // ----------- id type options
   /** True to use "within" operator. Only for hierarchical tables  */
   idWithin?: boolean
@@ -74,6 +76,9 @@ interface ExtraFilter {
   filterExpr: Expr
 }
 
+/** Dropdown that filters one or more rowsets. The value of the filter is stored in the memo of the rowset filter
+ * and depends on which type of filter it is.
+ */
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   validate(options: DesignCtx) {
     // Validate rowset
@@ -238,16 +243,45 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           memo: value
         }
       case "date":
-        return {
-          id: this.blockDef.id,
-          expr: toExpr(table, filterExpr!, false, value),
-          memo: value
-        }
       case "datetime":
-        return {
-          id: this.blockDef.id,
-          expr: toExpr(table, filterExpr!, true, value),
-          memo: value
+        const dateMode = this.blockDef.dateMode || "full"
+
+        if (dateMode == "full") {
+          return {
+            id: this.blockDef.id,
+            expr: createDateFilterExpr(table, filterExpr!, valueType == "datetime", value),
+            memo: value
+          }
+        }
+        else if (dateMode == "year") {
+          return {
+            id: this.blockDef.id,
+            expr: value ? { type: "op", table: table, op: "=", exprs: [
+              { type: "op", table: table, op: "year", exprs: [filterExpr!] }, 
+              { type: "literal", valueType: "date", value: value }]
+            } : null,
+            memo: value
+          }
+        }
+        else if (dateMode == "yearmonth") {
+          return {
+            id: this.blockDef.id,
+            expr: value ? { type: "op", table: table, op: "=", exprs: [
+              { type: "op", table: table, op: "yearmonth", exprs: [filterExpr!] }, 
+              { type: "literal", valueType: "date", value: value }]
+            } : null,
+            memo: value
+          }
+        }
+        else if (dateMode == "month") {
+          return {
+            id: this.blockDef.id,
+            expr: value ? { type: "op", table: table, op: "=", exprs: [
+              { type: "op", table: table, op: "month", exprs: [filterExpr!] }, 
+              { type: "literal", valueType: "enum", value: value }]
+            } : null,
+            memo: value
+          }
         }
       case "id":
         return {
@@ -284,19 +318,36 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     }
 
     if (valueType === "date" || valueType === "datetime") {
-      // Fake table
-      const table = contextVar ? contextVar.table || "" : ""
-      return (
-        <div style={{ padding: 5 }}>
-          <DateExprComponent 
-            table={table} 
-            datetime={valueType === "datetime"} 
-            value={this.blockDef.defaultValue} 
-            onChange={handleSetDefault} 
-            placeholder={placeholder}
-            locale={props.locale}/>
-        </div>
-      )
+      const dateMode = this.blockDef.dateMode || "full"
+
+      if (dateMode == "full") {
+        // Fake table
+        const table = contextVar ? contextVar.table || "" : ""
+        return (
+          <div style={{ padding: 5 }}>
+            <DateExprComponent 
+              table={table} 
+              datetime={valueType === "datetime"} 
+              value={this.blockDef.defaultValue} 
+              onChange={handleSetDefault} 
+              placeholder={placeholder}
+              locale={props.locale}/>
+          </div>
+        )
+      }
+      else {
+        return (
+          <div style={{ padding: 5 }}>
+            <DateFilterInstance
+              mode={dateMode}
+              value={this.blockDef.defaultValue}
+              onChange={handleSetDefault} 
+              placeholder={placeholder}
+              locale={props.locale}
+            />
+          </div>
+        )
+      }
     }
 
     // Allow setting default for enum and enumset
@@ -402,24 +453,27 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           locale={props.locale} />
         break
       case "date":
-        elem = <DateExprComponent 
-          datetime={false} 
-          table={contextVar.table!} 
-          value={value} 
-          onChange={handleChange} 
-          placeholder={placeholder}
-          locale={props.locale}
-         />
-        break
       case "datetime":
-        elem = <DateExprComponent 
-          datetime={true} 
-          table={contextVar.table!} 
-          value={value} 
-          onChange={handleChange} 
-          placeholder={placeholder}
-          locale={props.locale}
-        />
+        const dateMode = this.blockDef.dateMode || "full"
+        if (dateMode == "full") {
+          elem = <DateExprComponent 
+            datetime={valueType == "datetime"} 
+            table={contextVar.table!} 
+            value={value} 
+            onChange={handleChange} 
+            placeholder={placeholder}
+            locale={props.locale}
+          />
+        }
+        else {
+          elem = <DateFilterInstance
+            mode={dateMode}
+            value={value}
+            onChange={handleChange} 
+            placeholder={placeholder}
+            locale={props.locale}
+          />
+        }
         break
       case "id":
         elem = <IdInstance 
@@ -442,15 +496,26 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
     const idMode = this.blockDef.idMode || "simple"
     const exprUtils = new ExprUtils(ctx.schema, createExprVariables(ctx.contextVars))
-    const isIdType = exprUtils.getExprType(this.blockDef.filterExpr) == "id"
+    const exprType = exprUtils.getExprType(this.blockDef.filterExpr)
+    const isIdType = exprType == "id"
     const idTableId = exprUtils.getExprIdTable(this.blockDef.filterExpr)
     const idTable = idTableId ? ctx.schema.getTable(idTableId) : null
     const isIdTableHierarchical = idTable ? idTable.ancestryTable != null || idTable.ancestry != null : null
+
+    const isDateType = exprType == "date" || exprType == "datetime"
 
     const handleExprChange = (expr: Expr) => {
       ctx.store.replaceBlock(produce(this.blockDef, (draft) => {
         // Clear default value if expression changes
         draft.filterExpr = expr
+        delete draft.defaultValue
+      }))
+    }
+
+    const handleDateModeChange = (dateMode: "full" | "year" | "yearmonth" | "month") => {
+      ctx.store.replaceBlock(produce(this.blockDef, (draft) => {
+        // Clear default value if expression changes
+        draft.dateMode = dateMode
         delete draft.defaultValue
       }))
     }
@@ -480,6 +545,20 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={ctx.locale} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        { isDateType ?
+          <LabeledProperty label="Mode" key="dateMode">
+            <Toggle 
+              value={this.blockDef.dateMode || "full"} 
+              onChange={handleDateModeChange} 
+              options={[
+                { value: "full", label: "Full" },
+                { value: "year", label: "Year" },
+                { value: "yearmonth", label: "Year + Month" },
+                { value: "month", label: "Month" }
+              ]} />
+          </LabeledProperty>
+        : null }
 
         { isIdType ?
           <LabeledProperty label="Mode" key="mode">

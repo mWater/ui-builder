@@ -17,6 +17,8 @@ export interface DropdownFilterBlockDef extends BlockDef {
     defaultValue?: any;
     /** Additional rowsets to be filtered by same value */
     extraFilters?: ExtraFilter[];
+    /** Mode for selecting date. Default is "full" */
+    dateMode?: "full" | "year" | "yearmonth" | "month";
     /** True to use "within" operator. Only for hierarchical tables  */
     idWithin?: boolean;
     /** Optional filter to limit the id choices */
@@ -41,6 +43,9 @@ interface ExtraFilter {
     /** Expression to filter on  */
     filterExpr: Expr;
 }
+/** Dropdown that filters one or more rowsets. The value of the filter is stored in the memo of the rowset filter
+ * and depends on which type of filter it is.
+ */
 export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     validate(options: DesignCtx): string | null;
     /** Generate a single synthetic context variable to allow embedded expressions to work in label */
