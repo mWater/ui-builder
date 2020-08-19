@@ -2,7 +2,7 @@ import * as React from "react";
 import {v4 as uuid} from 'uuid'
 import { LabeledProperty, PropertyEditor, TableSelect } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
-import { ContextVar } from "../widgets/blocks";
+import { ContextVar, createExprVariables } from "../widgets/blocks";
 import { Schema, DataSource } from "mwater-expressions";
 import { localize } from "../widgets/localization";
 import { produce } from "immer";
@@ -59,6 +59,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
               onContextVarValuesChange={this.handlePrivateContextVarValuesChange}
               schema={this.props.designCtx.schema} 
               dataSource={this.props.designCtx.dataSource}
+              availContextVars={allContextVars}
             /> 
           }
         </PropertyEditor>
@@ -72,6 +73,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             onContextVarValuesChange={this.handleContextVarPreviewValues}
             schema={this.props.designCtx.schema} 
             dataSource={this.props.designCtx.dataSource}
+            availContextVars={allContextVars}
             /> }
         </PropertyEditor>
       </LabeledProperty>
@@ -85,6 +87,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
               onContextVarValuesChange={this.handleContextVarPreviewValues}
               schema={this.props.designCtx.schema} 
               dataSource={this.props.designCtx.dataSource}
+              availContextVars={allContextVars}
               />
           </div>
         })}
@@ -98,6 +101,9 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
 const ContextVarsEditor = (props: {
   contextVars: ContextVar[]
   onChange: (contextVars: ContextVar[]) => void
+
+  /** Avaiable context variables (for expression builder) */
+  availContextVars: ContextVar[]
 
   /** Values of context variables */
   contextVarValues: { [contextVarId: string]: any }
@@ -132,6 +138,7 @@ const ContextVarsEditor = (props: {
               onContextVarValuesChange={props.onContextVarValuesChange}
               schema={props.schema}
               dataSource={props.dataSource}
+              availContextVars={props.availContextVars}
             />
           </div>
          )}
@@ -269,6 +276,8 @@ class ContextVarValueEditor extends React.Component<{
   onContextVarValuesChange: (values: { [contextVarId: string]: any }) => void
   schema: Schema
   dataSource: DataSource
+  /** Available context vars for expression builder */
+  availContextVars: ContextVar[]
 }> {
 
   handleChange = (value: any) => {
@@ -307,6 +316,7 @@ class ContextVarValueEditor extends React.Component<{
         types={["boolean"]}
         value={value}
         onChange={this.handleChange}
+        variables={createExprVariables(this.props.availContextVars)}
         />
     }
 
