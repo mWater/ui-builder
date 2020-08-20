@@ -25,6 +25,7 @@ export interface BaseCtx {
 /** Context that all design-mode operations need */
 export interface DesignCtx extends BaseCtx {
     dataSource: DataSource;
+    /** All context variables present, including global ones */
     contextVars: ContextVar[];
     /** Store to edit blocks */
     store: BlockStore;
@@ -37,7 +38,7 @@ export interface DesignCtx extends BaseCtx {
 /** Context that all operations on an instance of a block need */
 export interface InstanceCtx extends BaseCtx {
     pageStack: PageStack;
-    /** Context variables that are present */
+    /** Context variables that are present, including global ones */
     contextVars: ContextVar[];
     /** Values of context variables. Note: filters are not incorporated automatically into rowset values! */
     contextVarValues: {

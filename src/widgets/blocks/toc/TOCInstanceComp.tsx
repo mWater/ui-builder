@@ -16,7 +16,7 @@ export default function TOCInstanceComp(props: {
   instanceCtx: InstanceCtx 
   createBlock: CreateBlock
 }) {
-  const { blockDef, instanceCtx: instanceCtx } = props
+  const { blockDef, instanceCtx } = props
 
   // Ref to page stack to ensure closed properly
   const pageStackRef = useRef<PageStackDisplay>(null)
@@ -93,11 +93,15 @@ export default function TOCInstanceComp(props: {
       return null
     }
 
+    // Get widget
+    const widget = instanceCtx.widgetLibrary.widgets[selectedWidgetId]
+
     // Map context var values
     const mappedContextVarValues = {} as object
 
-    for (const innerContextVarId of Object.keys(selectedItem.contextVarMap || {})) {
-      const outerContextVarId = (selectedItem.contextVarMap || {})[innerContextVarId]
+    // For each context variable that the widget needs
+    for (const innerContextVar of widget.contextVars) {
+      const outerContextVarId = (selectedItem.contextVarMap || {})[innerContextVar.id]
 
       if (outerContextVarId) {
         // Look up outer context variable
@@ -124,10 +128,10 @@ export default function TOCInstanceComp(props: {
           outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, instanceCtx.contextVarValues)
         }
 
-        mappedContextVarValues[innerContextVarId] = outerCVValue
+        mappedContextVarValues[innerContextVar.id] = outerCVValue
       }
       else {
-        mappedContextVarValues[innerContextVarId] = null
+        mappedContextVarValues[innerContextVar.id] = null
       }
     }
 

@@ -196,8 +196,13 @@ export default function TOCDesignComp(props: {
           <tbody>
             { widgetDef.contextVars.map(contextVar => {
               const cv = contextVarMap[contextVar.id]
-              const handleCVChange = (contextVarId: string) => {
-                handleContextVarMapChange({ ...selectedItem!.contextVarMap, [contextVar.id]: contextVarId })
+              const handleCVChange = (contextVarId: string | null) => {
+                if (contextVarId) {
+                  handleContextVarMapChange({ ...contextVarMap, [contextVar.id]: contextVarId })
+                }
+                else {
+                  handleContextVarMapChange(produce(contextVarMap, draft => { delete draft[contextVar.id] }))
+                }
               }
 
               return (

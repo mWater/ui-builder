@@ -76,7 +76,41 @@ export class TOCBlock extends Block<TOCBlockDef> {
       .map(bd => ({ blockDef: bd!, contextVars: contextVars }))
   }
 
-  validate() { return null }
+  validate(designCtx: DesignCtx) { 
+    const validateItem = (tocItem: TOCItem) => {
+      if (!tocItem.widgetId) {
+        return null
+      }
+
+      // Check that widget exists
+      const widget = designCtx.widgetLibrary.widgets[tocItem.widgetId]
+      if (!widget) {
+        return "Widget does not exist"
+      }
+
+      // For each inner context variable
+      for (const innerContextVar of widget.contextVars) {
+        // If mapped, check that outer context var exists
+        if (tocItem.contextVarMap && tocItem.contextVarMap[innerContextVar.id]) {
+          const outerContextVarId = tocItem.contextVarMap[innerContextVar.id]
+          if (!designCtx.contextVars.find(cv => cv.id == outerContextVarId)) {
+            return "Context variable not found. Please check mapping"
+          }
+        }
+      }
+
+      return null
+    }
+
+    // Validate all items
+    for (const tocItem of iterateItems(this.blockDef.items)) {
+      const error = validateItem(tocItem)
+      if (error) {
+        return error
+      }
+    }
+    return null 
+  }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     // For header and footer

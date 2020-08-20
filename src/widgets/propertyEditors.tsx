@@ -127,7 +127,7 @@ export class DropdownPropertyEditor extends React.Component<{
 /** Allows selecting a context variable */
 export class ContextVarPropertyEditor extends React.Component<{ 
   value?: string | null, 
-  onChange: (value: string) => void,
+  onChange: (value: string | null) => void,
   contextVars: ContextVar[],
   types?: string[],
   table?: string, 

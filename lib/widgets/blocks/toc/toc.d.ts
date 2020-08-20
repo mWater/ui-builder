@@ -39,7 +39,7 @@ export declare const alterItems: (items: TOCItem[], action: (item: TOCItem) => u
 export declare class TOCBlock extends Block<TOCBlockDef> {
     /** Get child blocks */
     getChildren(contextVars: ContextVar[]): ChildBlock[];
-    validate(): null;
+    validate(designCtx: DesignCtx): "Widget does not exist" | "Context variable not found. Please check mapping" | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(props: InstanceCtx): React.ReactElement<any>;
