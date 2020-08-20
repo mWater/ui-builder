@@ -1,11 +1,12 @@
 import _ from 'lodash'
 import React, { CSSProperties } from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
-import { Schema, ExprUtils } from "mwater-expressions";
+import { Schema, ExprUtils, Expr } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
 import Async from 'react-select/lib/Async'
 import { QueryOptions, Database } from "../../../database/Database";
+import { InstanceCtx, getFilteredContextVarValues } from '../../../contexts';
 
 /** Dropdown filter that is a text string. Should search in database for matches */
 export default class TextInstance extends React.Component<{
@@ -16,12 +17,34 @@ export default class TextInstance extends React.Component<{
   database: Database
   onChange: (value: any) => void
   locale: string
+  instanceCtx: InstanceCtx
 }> {
 
   getOptions = async (input: string) => {
     const contextVar = this.props.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!
     const table = contextVar.table!
     const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
+    const whereExprs: Expr[] = []
+
+    // Add context var value to only show possible text values. Do not filter on other
+    // filters, as this causes problems due to https://github.com/JedWatson/react-select/issues/4012
+    // as well as needing to exclude self-filters
+    const cvValue = this.props.instanceCtx.contextVarValues[contextVar.id]
+    if (cvValue) {
+      whereExprs.push(cvValue)
+    }
+
+    // Filter by input string
+    whereExprs.push({
+      type: "op",
+      op: "~*",
+      table: table,
+      exprs: [
+        this.props.blockDef.filterExpr,
+        { type: "literal", valueType: "text", value: "^" + escapeRegex(input) }
+      ]
+    })
     
     const queryOptions: QueryOptions = {
       select: { value: this.props.blockDef.filterExpr },
@@ -29,12 +52,9 @@ export default class TextInstance extends React.Component<{
       from: table,
       where: {
         type: "op",
-        op: "~*",
+        op: "and",
         table: table,
-        exprs: [
-          this.props.blockDef.filterExpr,
-          { type: "literal", valueType: "text", value: "^" + escapeRegex(input) }
-        ]
+        exprs: whereExprs
       },
       orderBy: [{ expr: this.props.blockDef.filterExpr, dir: "asc" }],
       limit: 250
@@ -74,7 +94,7 @@ export default class TextInstance extends React.Component<{
       placeholder={localize(this.props.blockDef.placeholder, this.props.locale)}
       value={currentValue}
       defaultOptions={true}
-      cacheOptions={null}
+      cacheOptions={window["xyzzy"]}
       loadOptions={this.getOptions}
       onChange={this.handleChange}
       isClearable={true}

@@ -400,26 +400,26 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     return filters
   }
 
-  renderInstance(props: InstanceCtx): React.ReactElement<any> {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)!
-    const filter = props.getFilters(this.blockDef.rowsetContextVarId!).find(f => f.id === this.blockDef.id)
+  renderInstance(ctx: InstanceCtx): React.ReactElement<any> {
+    const contextVar = ctx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)!
+    const filter = ctx.getFilters(this.blockDef.rowsetContextVarId!).find(f => f.id === this.blockDef.id)
     const value = filter ? filter.memo : null
 
     const handleChange = (newValue: any) => {
       // Create filter
-      const newFilter = this.createFilter(this.blockDef.rowsetContextVarId!, this.blockDef.filterExpr, props.schema, props.contextVars, newValue)
-      props.setFilter(contextVar.id, newFilter)
+      const newFilter = this.createFilter(this.blockDef.rowsetContextVarId!, this.blockDef.filterExpr, ctx.schema, ctx.contextVars, newValue)
+      ctx.setFilter(contextVar.id, newFilter)
 
       // Create extra filters
       for (const extraFilter of this.blockDef.extraFilters || []) {
-        const newExtraFilter = this.createFilter(extraFilter.rowsetContextVarId!, extraFilter.filterExpr, props.schema, props.contextVars, newValue)
-        props.setFilter(extraFilter.rowsetContextVarId!, newExtraFilter)
+        const newExtraFilter = this.createFilter(extraFilter.rowsetContextVarId!, extraFilter.filterExpr, ctx.schema, ctx.contextVars, newValue)
+        ctx.setFilter(extraFilter.rowsetContextVarId!, newExtraFilter)
       }
     }
 
-    const exprUtils = new ExprUtils(props.schema, createExprVariables(props.contextVars))
+    const exprUtils = new ExprUtils(ctx.schema, createExprVariables(ctx.contextVars))
     const valueType = exprUtils.getExprType(this.blockDef.filterExpr)
-    const placeholder = localize(this.blockDef.placeholder, props.locale)
+    const placeholder = localize(this.blockDef.placeholder, ctx.locale)
 
     let elem: React.ReactElement<any>
 
@@ -427,30 +427,31 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       case "enum":
         elem = <EnumInstance 
           blockDef={this.blockDef}
-          schema={props.schema}
-          contextVars={props.contextVars}
+          schema={ctx.schema}
+          contextVars={ctx.contextVars}
           value={value}
           onChange={handleChange}
-          locale={props.locale} />
+          locale={ctx.locale} />
         break
       case "enumset":
         elem = <EnumsetInstance 
           blockDef={this.blockDef}
-          schema={props.schema}
-          contextVars={props.contextVars}
+          schema={ctx.schema}
+          contextVars={ctx.contextVars}
           value={value}
           onChange={handleChange}
-          locale={props.locale} />
+          locale={ctx.locale} />
         break
       case "text":
         elem = <TextInstance 
+          instanceCtx={ctx}
           blockDef={this.blockDef}
-          schema={props.schema}
-          contextVars={props.contextVars}
+          schema={ctx.schema}
+          contextVars={ctx.contextVars}
           value={value}
-          database={props.database}
+          database={ctx.database}
           onChange={handleChange}
-          locale={props.locale} />
+          locale={ctx.locale} />
         break
       case "date":
       case "datetime":
@@ -462,7 +463,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             value={value} 
             onChange={handleChange} 
             placeholder={placeholder}
-            locale={props.locale}
+            locale={ctx.locale}
           />
         }
         else {
@@ -471,17 +472,17 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             value={value}
             onChange={handleChange} 
             placeholder={placeholder}
-            locale={props.locale}
+            locale={ctx.locale}
           />
         }
         break
       case "id":
         elem = <IdInstance 
           blockDef={this.blockDef}
-          ctx={props}
+          ctx={ctx}
           value={value}
           onChange={handleChange}
-          locale={props.locale} />
+          locale={ctx.locale} />
         break
       default:
         elem = <div/>

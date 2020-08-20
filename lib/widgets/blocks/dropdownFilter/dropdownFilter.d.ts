@@ -53,7 +53,7 @@ export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDe
     createFilter(rowsetContextVarId: string, filterExpr: Expr, schema: Schema, contextVars: ContextVar[], value: any): Filter;
     renderDesign(props: DesignCtx): JSX.Element;
     getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];
-    renderInstance(props: InstanceCtx): React.ReactElement<any>;
+    renderInstance(ctx: InstanceCtx): React.ReactElement<any>;
     renderEditor(ctx: DesignCtx): JSX.Element;
 }
 export {};
