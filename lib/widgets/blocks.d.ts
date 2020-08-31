@@ -54,7 +54,7 @@ export interface ChildBlock {
 export declare abstract class Block<T extends BlockDef> {
     blockDef: T;
     constructor(blockDef: T);
-    get id(): string;
+    readonly id: string;
     /** Render the block as it looks in design mode. This may use bootstrap */
     abstract renderDesign(props: DesignCtx): React.ReactElement<any>;
     /** Render a live instance of the block. This may use bootstrap for now */

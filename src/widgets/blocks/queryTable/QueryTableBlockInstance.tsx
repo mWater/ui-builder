@@ -328,6 +328,9 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       case "all":
         className += " table-bordered"
         break
+      case "none":
+        className += " table-borderless"
+        break
     }
 
     switch (blockDef.padding || "normal") {

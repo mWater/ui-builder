@@ -26,7 +26,7 @@ export interface QueryTableBlockDef extends BlockDef {
     /** True to hide headers */
     hideHeaders?: boolean;
     /** Borders (default is "horizontal") */
-    borders?: "horizontal" | "all";
+    borders?: "horizontal" | "all" | "none";
     /** Table padding (default is "normal") */
     padding?: "normal" | "compact";
 }

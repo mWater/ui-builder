@@ -43,7 +43,7 @@ export interface QueryTableBlockDef extends BlockDef {
   hideHeaders?: boolean
 
   /** Borders (default is "horizontal") */
-  borders?: "horizontal" | "all"
+  borders?: "horizontal" | "all" | "none"
 
   /** Table padding (default is "normal") */
   padding?: "normal" | "compact"
@@ -239,7 +239,10 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       case "all":
         className += " table-bordered"
         break
-    }
+      case "none":
+        className += " table-borderless"
+        break
+     }
 
     switch (this.blockDef.padding || "normal") {
       case "compact":
@@ -385,7 +388,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
         <LabeledProperty label="Borders">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="borders">
-            {(value, onChange) => <Toggle value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
+            {(value, onChange) => <Toggle value={value || "horizontal"} onChange={onChange} options={[{ value: "none", label: "None" }, { value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 

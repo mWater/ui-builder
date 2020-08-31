@@ -6,7 +6,7 @@ export interface VerticalBlockDef extends BlockDef {
     items: BlockDef[];
 }
 export declare class VerticalBlock extends Block<VerticalBlockDef> {
-    get id(): string;
+    readonly id: string;
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;

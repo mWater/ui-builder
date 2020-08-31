@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { LabeledProperty, PropertyEditor, TableColumnWidthEditor } from '../propertyEditors';
-import { NumberInput, Select } from 'react-library/lib/bootstrap';
+import { NumberInput, Select, Toggle } from 'react-library/lib/bootstrap';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -11,7 +11,7 @@ export interface FixedTableBlockDef extends BlockDef {
   type: "fixedTable"
 
   /** Borders (default is "horizontal") */
-  borders?: "horizontal" | "all"
+  borders?: "horizontal" | "all" | "none"
 
   /** Table padding (default is "normal") */
   padding?: "normal" | "compact"
@@ -77,6 +77,9 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
       case "all":
         className += " table-bordered"
         break
+      case "none":
+        className += " table-borderless"
+        break
     }
 
     switch (this.blockDef.padding || "normal") {
@@ -111,6 +114,9 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
     switch (this.blockDef.borders || "horizontal") {
       case "all":
         className += " table-bordered"
+        break
+      case "none":
+        className += " table-borderless"
         break
     }
 
@@ -166,13 +172,16 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
 
         <LabeledProperty label="Borders">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="borders">
-            {(value, onChange) => <Select value={value || "horizontal"} onChange={onChange} options={[{ value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
+            {(value, onChange) => <Toggle 
+              value={value || "horizontal"} 
+              onChange={onChange} 
+              options={[{ value: "none", label: "None" }, { value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Padding">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="padding">
-            {(value, onChange) => <Select value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
+            {(value, onChange) => <Toggle value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>
 

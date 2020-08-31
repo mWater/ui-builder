@@ -6,7 +6,7 @@ import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
 import { ActionLibrary } from './widgets/ActionLibrary';
 import * as _ from 'lodash';
 
-import 'bootstrap/dist/css/bootstrap.css'
+// import 'bootstrap/dist/css/bootstrap.css'
 import 'font-awesome/css/font-awesome.css'
 import './Demo.css'
 import * as ReactDOM from 'react-dom';

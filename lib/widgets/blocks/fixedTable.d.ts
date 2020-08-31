@@ -5,7 +5,7 @@ import { DesignCtx, InstanceCtx } from '../../contexts';
 export interface FixedTableBlockDef extends BlockDef {
     type: "fixedTable";
     /** Borders (default is "horizontal") */
-    borders?: "horizontal" | "all";
+    borders?: "horizontal" | "all" | "none";
     /** Table padding (default is "normal") */
     padding?: "normal" | "compact";
     /** Number of rows in the table */
