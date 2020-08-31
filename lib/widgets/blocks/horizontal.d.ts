@@ -14,7 +14,7 @@ export interface HorizontalBlockDef extends BlockDef {
     columnWidths?: string[];
 }
 export declare class HorizontalBlock extends Block<HorizontalBlockDef> {
-    readonly id: string;
+    get id(): string;
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     validate(): null;
     canonicalize(): BlockDef | null;

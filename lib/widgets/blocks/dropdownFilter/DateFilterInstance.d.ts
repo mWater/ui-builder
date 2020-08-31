@@ -1,7 +1,7 @@
 /// <reference types="react" />
 /** Simple date filter that is year, month or year-month */
 export declare const DateFilterInstance: (props: {
-    mode: "year" | "month" | "yearmonth";
+    mode: "year" | "yearmonth" | "month";
     value: any;
     onChange: (value: any) => void;
     placeholder: string;
