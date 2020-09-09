@@ -1,0 +1,9 @@
+/* Only show border when focused */
+.form-control.edit-on-focus:not(:focus) {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.form-control.edit-on-focus:hover:not(:focus) {
+  border-color: #ddd;
+}

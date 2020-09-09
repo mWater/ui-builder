@@ -3,8 +3,9 @@ import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBloc
 import { Column, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import { NumberInput } from 'react-library/lib/bootstrap';
+import { NumberInput, Checkbox } from 'react-library/lib/bootstrap';
 import { DesignCtx } from '../../../contexts';
+import './textbox.css'
 
 export interface TextboxBlockDef extends ControlBlockDef {
   type: "textbox"
@@ -13,6 +14,9 @@ export interface TextboxBlockDef extends ControlBlockDef {
 
   /** Number of lines in the text box. Default is 1. */
   numLines?: number | null
+
+  /** True to only show edit when focused */
+  editOnFocus?: boolean
 }
 
 /** Block that is a text input control linked to a specific field */
@@ -24,6 +28,7 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       disabled={props.disabled}
       numLines={this.blockDef.numLines || undefined}
+      editOnFocus={this.blockDef.editOnFocus || false}
       />
   }
 
@@ -41,6 +46,9 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
             {(value, onChange) => <NumberInput value={value || 1} onChange={onChange} decimal={false} />}
           </PropertyEditor>
         </LabeledProperty>
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="editOnFocus">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Edit On Focus</Checkbox>}
+        </PropertyEditor>
       </div>
     )
   }
@@ -57,14 +65,15 @@ interface TextboxProps {
   placeholder?: string
   numLines?: number
   disabled: boolean
+  editOnFocus: boolean
 }
 
 /** Text box that updates only on blur */
-class Textbox extends React.Component<TextboxProps, { text: string | null }> {
+class Textbox extends React.Component<TextboxProps, { text: string | null, focused: boolean }> {
   constructor(props: TextboxProps) {
     super(props)
 
-    this.state = { text: null }
+    this.state = { text: null, focused: false }
   }
 
   componentDidUpdate(prevProps: TextboxProps) {
@@ -76,12 +85,12 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
 
   handleFocus = () => {
     // Start tracking state internally
-    this.setState({ text: this.props.value });
+    this.setState({ text: this.props.value, focused: true })
   }
 
   handleBlur = (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     // Stop tracking state internally
-    this.setState({ text: null })
+    this.setState({ text: null, focused: false })
     
     // Only change if different
     const value = ev.target.value || null
@@ -98,7 +107,7 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
     if (this.props.numLines && this.props.numLines > 1) {
       return (
         <textarea
-          className="form-control"
+          className={ this.props.editOnFocus ? "form-control edit-on-focus" : "form-control" }
           placeholder={this.props.placeholder}
           disabled={this.props.disabled}
           value={ this.state.text != null ? this.state.text : this.props.value || "" }
@@ -111,7 +120,7 @@ class Textbox extends React.Component<TextboxProps, { text: string | null }> {
     }
     return (
       <input 
-        className="form-control"
+        className={ this.props.editOnFocus ? "form-control edit-on-focus" : "form-control" }
         type="text"
         placeholder={this.props.placeholder}
         disabled={this.props.disabled}
