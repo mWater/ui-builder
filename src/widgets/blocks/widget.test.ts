@@ -137,7 +137,8 @@ describe("renderInstance", () => {
       setFilter: jest.fn(),
       getFilters: jest.fn(),
       renderChildBlock: jest.fn(),
-      registerForValidation: () => { return () => {} }      
+      registerForValidation: () => { return () => {} },
+      T: (str) => str
     }
     const x = shallow(widgetBlock.renderInstance(instanceCtx))
   })

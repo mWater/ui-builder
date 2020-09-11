@@ -53,7 +53,8 @@ beforeEach(() => {
       return <div/>
     },
     widgetLibrary: { widgets: {} },
-    registerForValidation: () => { return () => {} }
+    registerForValidation: () => { return () => {} },
+    T: (str) => str
  }
 
  alertMessages = []

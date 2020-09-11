@@ -7,16 +7,25 @@ import { Database } from "./database/Database";
 import { PageStack } from "./PageStack";
 import { BlockPaletteEntry } from "./designer/blockPaletteEntries";
 import { FormatLocaleObject } from "d3-format";
+import { LocalizeString } from 'ez-localize';
 /** Base context that all UI Builder needs */
 export interface BaseCtx {
     /** locale to use (e.g. "en") */
     locale: string;
+    /** Schema that system uses */
     schema: Schema;
+    /** Data source. Present in design always, optional in instance */
     dataSource?: DataSource;
+    /** All widgets of system */
     widgetLibrary: WidgetLibrary;
+    /** All actions of system */
     actionLibrary: ActionLibrary;
+    /** Function to create a block */
     createBlock: CreateBlock;
+    /** Database to use */
     database: Database;
+    /** Localizer to use */
+    T: LocalizeString;
     /** Locale object to use for formatting */
     formatLocale?: FormatLocaleObject;
     /** Global context variables that are passed to all blocks */

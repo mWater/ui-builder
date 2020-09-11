@@ -21,6 +21,7 @@ export default () => {
     dataSource: {} as DataSource,
     renderChildBlock: jest.fn(),
     widgetLibrary: { widgets: {} },
-    registerForValidation: () => () => {}
+    registerForValidation: () => () => {},
+    T: (str) => str
   } as InstanceCtx
 }

@@ -36,7 +36,8 @@ beforeEach(() => {
     getFilters: jest.fn(),
     renderChildBlock: jest.fn(),
     createBlock: jest.fn(),
-    registerForValidation: () => () => {}
+    registerForValidation: () => () => {},
+    T: (str) => str
   }  
 })
 

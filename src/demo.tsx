@@ -4,7 +4,8 @@ import { Schema } from 'mwater-expressions';
 import { WidgetLibraryDesigner, WidgetLibrary } from './designer/widgetLibrary';
 import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
 import { ActionLibrary } from './widgets/ActionLibrary';
-import * as _ from 'lodash';
+import _ from 'lodash'
+import { defaultT } from 'ez-localize'
 
 // import 'bootstrap/dist/css/bootstrap.css'
 import 'font-awesome/css/font-awesome.css'
@@ -81,7 +82,8 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
           { id: "a", name: { _base: "en", en: "A" }},
           { id: "b", name: { _base: "en", en: "B" }},
         ] }
-      ]
+      ],
+      T: defaultT
     }
 
     return (
