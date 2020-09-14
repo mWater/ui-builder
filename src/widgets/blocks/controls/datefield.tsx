@@ -6,6 +6,7 @@ import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, DateForma
 import DatePicker from 'react-datepicker'
 import moment, { Moment } from 'moment'
 import { DesignCtx } from '../../../contexts';
+import ReactDOM from 'react-dom';
 
 export interface DatefieldBlockDef extends ControlBlockDef {
   type: "datefield"
@@ -130,7 +131,13 @@ class Datefield extends React.Component<DatefieldProps> {
         timeFormat="HH:mm"
         dateFormat={this.props.format}
         className="form-control"
+        popperContainer={createPopperContainer}
       />
     )
   }
+}
+
+// https://github.com/Hacker0x01/react-datepicker/issues/1366
+function createPopperContainer(props: { children: React.ReactNode[] }): React.ReactNode {
+  return ReactDOM.createPortal(<div style={{ zIndex: 10000 }}>{props.children}</div>, document.body)
 }
