@@ -85,7 +85,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
     let error: string | null
     
     // Validate where
-    error = exprValidator.validateExpr(this.blockDef.where, { table: rowsetCV.table })
+    error = exprValidator.validateExpr(this.blockDef.where, { table: rowsetCV.table, types: ["boolean"] })
     if (error) {
       return error
     }

@@ -27,7 +27,9 @@ const defaultWidgetLibrary : WidgetLibrary = {
 
 const initialWidgetLibrary: WidgetLibrary = JSON.parse(window.localStorage.getItem("widgetLibrary") || "null") || defaultWidgetLibrary
 
-const client = window.location.search ? window.location.search.substr(1) : null
+const urlParams = new URLSearchParams(window.location.search);
+const client = urlParams.get('client')
+const extraTables = _.compact((urlParams.get('extraTables') || "").split(","))
 
 const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", client, { localCaching: false, serverCaching: false })
 
@@ -45,7 +47,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
   }
 
   componentDidMount() {
-    fetch("https://api.mwater.co/v3/schema?client=" + (client || "")).then(req => req.json()).then(json => {
+    fetch("https://api.mwater.co/v3/schema?client=" + (client || "") + "&extraTables=" + extraTables.join(",")).then(req => req.json()).then(json => {
       const schema = new Schema(json)
       const database = new DataSourceDatabase(schema, dataSource)
       this.setState({ schema, database })

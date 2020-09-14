@@ -51,9 +51,9 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <Collapsible label={labelNode} forceOpen>
+        <CollapsibleComponent label={labelNode} forceOpen>
           {contentNode}
-        </Collapsible>
+        </CollapsibleComponent>
       </div>
     )
   }
@@ -67,9 +67,9 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <Collapsible label={labelNode} initialCollapsed={this.blockDef.initialCollapsed}>
+        <CollapsibleComponent label={labelNode} initialCollapsed={this.blockDef.initialCollapsed}>
           {contentNode}
-        </Collapsible>
+        </CollapsibleComponent>
       </div>
     )
   }
@@ -91,7 +91,8 @@ interface Props {
   initialCollapsed?: boolean
 }
 
-class Collapsible extends React.Component<Props, { collapsed: boolean }> {
+/** Collapsible UI control */
+export class CollapsibleComponent extends React.Component<Props, { collapsed: boolean }> {
   constructor(props: Props) {
     super(props)
 

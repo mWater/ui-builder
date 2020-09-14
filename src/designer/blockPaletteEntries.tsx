@@ -33,6 +33,7 @@ import { QueryRepeatBlockDef } from "../widgets/blocks/queryRepeat/queryRepeat";
 import { LabeledBlockDef } from "../widgets/blocks/labeled";
 import { DateInjectBlockDef } from "../widgets/blocks/dateInject";
 import { ToggleBlockDef } from "../widgets/blocks/controls/toggle";
+import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart";
 
 export interface BlockPaletteEntry {
   title: string
@@ -218,5 +219,22 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     title: "Date Inject",
     blockDef: { id: "", type: "dateInject", content: null } as DateInjectBlockDef,
     subtitle: "Allows selecting a date and injects that date as a variable to the inner block"
+  },
+  {
+    title: "GANTT Chart",
+    blockDef: { 
+      id: "", 
+      type: "ganttChart",
+      rowsetContextVarId: null,
+      rowLabelExpr: null,
+      rowStartDateExpr: null,
+      rowEndDateExpr: null,
+      filter: null,
+      rowOrderColumn: null,
+      rowParentColumn: null,
+      startDate: null,
+      endDate: null,
+      barColor: null
+     } as GanttChartBlockDef,
   }
 ]

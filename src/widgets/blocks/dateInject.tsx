@@ -1,7 +1,7 @@
 import produce from 'immer'
 import * as React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
-import * as _ from 'lodash';
+import _ from 'lodash';
 import DatePicker from 'react-datepicker'
 import moment from 'moment'
 import { DesignCtx, InstanceCtx } from '../../contexts';

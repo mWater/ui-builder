@@ -12,6 +12,7 @@ import ReactSelect from "react-select"
 import { localize } from "./localization";
 import { EmbeddedExpr } from "../embeddedExprs";
 import { DesignCtx } from "../contexts";
+import { CollapsibleComponent } from './blocks/collapsible';
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -223,9 +224,13 @@ export class ActionDefEditor extends React.Component<{
           value={this.props.value ? this.props.value.type : null}
           options={this.props.designCtx.actionLibrary.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
         />
-        { action 
-          ? action.renderEditor({ ...this.props.designCtx, onChange: this.props.onChange })
-          : null }
+        { action ? 
+          <CollapsibleComponent label="Details">
+            <div style={{ paddingLeft: 10 }}>
+              {action.renderEditor({ ...this.props.designCtx, onChange: this.props.onChange })}
+            </div>
+          </CollapsibleComponent> 
+        : null }
       </div>
     )
     
