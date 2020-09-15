@@ -92,7 +92,9 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
         { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
         <div className="save-cancel-footer">
           { this.blockDef.deleteContextVarId ?
-            <button type="button" className="btn btn-danger" style={{float: "left"}}>{deleteLabelText}</button>
+            <button type="button" className="btn btn-link" style={{float: "left"}}>
+              <span className="text-danger"><i className="fa fa-remove"/> {deleteLabelText}</span>
+            </button>
           : null}
           <button type="button" className="btn btn-primary">{saveLabelText}</button>
           &nbsp;
@@ -326,7 +328,9 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
 
         <div className="save-cancel-footer">
           { this.props.blockDef.deleteContextVarId && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] ?
-            <button type="button" className="btn btn-danger" onClick={this.handleDelete} style={{float: "left"}}>{deleteLabelText}</button>
+            <button type="button" className="btn btn-link" onClick={this.handleDelete} style={{float: "left"}}>
+              <span className="text-danger"><i className="fa fa-remove"/> {deleteLabelText}</span>
+            </button>
           : null}
           <button type="button" className="btn btn-primary" onClick={this.handleSave} disabled={this.state.saving}>
             { this.state.saving ? <i className="fa fa-fw fa-spinner fa-spin"/> : null }

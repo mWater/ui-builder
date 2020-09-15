@@ -75,8 +75,8 @@ export function GanttChartInstance(props: {
     return <div><i className="fa fa-spinner fa-spin"/></div>
   }
 
-  // Create chart
-  const chartRows = rows.map(row => ({
+  // Create chart rows
+  const chartRows = rows.slice().sort((a, b) => a.order > b.order ? 1 : -1).map(row => ({
     id: row.id,
     color: blockDef.barColor || "#68cdee", 
     level: 0, 
@@ -145,14 +145,39 @@ export function GanttChartInstance(props: {
     handleAddRow(null, order)
   }
 
-  // Determine start and end dates
-  let startDate = blockDef.startDate || rows.reduce((acc, row) => !acc || (row.startDate && row.startDate < acc!) ? row.startDate : acc, null)
-  let endDate = blockDef.endDate || rows.reduce((acc, row) => !acc || (row.endDate && row.endDate > acc!) ? row.endDate : acc, null)
-  if (!startDate) {
-    startDate = moment().startOf("year").format("YYYY-MM-DD")
+  let startDate: string
+  let endDate: string
+  
+  // Use override if present
+  if (blockDef.startDate) {
+    startDate = blockDef.startDate
   }
-  if (!endDate) {
-    endDate = moment().endOf("year").format("YYYY-MM-DD")
+  else {
+    // Go earliest with a buffer
+    const minStartDate = rows.reduce((acc, row) => !acc || (row.startDate && row.startDate < acc!) ? row.startDate : acc, null)
+    if (minStartDate) {
+      startDate = moment(minStartDate, "YYYY-MM-DD").subtract(1, "month").format("YYYY-MM-DD")
+    }
+    else {
+      // Start of year
+      startDate = moment().startOf("year").format("YYYY-MM-DD")
+    }
+  }
+
+  // Use override if present
+  if (blockDef.endDate) {
+    endDate = blockDef.endDate
+  }
+  else {
+    // Go earliest with a buffer
+    const maxEndDate = rows.reduce((acc, row) => !acc || (row.endDate && row.endDate > acc!) ? row.endDate : acc, null)
+    if (maxEndDate) {
+      endDate = moment(maxEndDate, "YYYY-MM-DD").add(1, "month").format("YYYY-MM-DD")
+    }
+    else {
+      // End of year
+      endDate = moment().endOf("year").format("YYYY-MM-DD")
+    }
   }
 
   return <GanttChart
