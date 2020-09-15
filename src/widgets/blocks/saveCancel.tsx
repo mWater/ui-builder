@@ -92,7 +92,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
         { props.renderChildBlock(props, this.blockDef.child, handleAdd) }
         <div className="save-cancel-footer">
           { this.blockDef.deleteContextVarId ?
-            <button type="button" className="btn btn-link" style={{float: "left"}}>
+            <button type="button" className="btn btn-default" style={{float: "left"}}>
               <span className="text-danger"><i className="fa fa-remove"/> {deleteLabelText}</span>
             </button>
           : null}
@@ -328,7 +328,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
 
         <div className="save-cancel-footer">
           { this.props.blockDef.deleteContextVarId && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] ?
-            <button type="button" className="btn btn-link" onClick={this.handleDelete} style={{float: "left"}}>
+            <button type="button" className="btn btn-default" onClick={this.handleDelete} style={{float: "left"}}>
               <span className="text-danger"><i className="fa fa-remove"/> {deleteLabelText}</span>
             </button>
           : null}
