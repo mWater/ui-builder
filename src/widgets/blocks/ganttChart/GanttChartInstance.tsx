@@ -136,7 +136,7 @@ export function GanttChartInstance(props: {
     const chartRow = chartRows[index]
 
     // Find previous sibling
-    for (let i = index - 1 ; i > 0 ; i--) {
+    for (let i = index - 1 ; i >= 0 ; i--) {
       // If up a level, ignore
       if (chartRows[i].level < chartRow.level) {
         return
