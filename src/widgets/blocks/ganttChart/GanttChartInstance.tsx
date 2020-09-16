@@ -108,6 +108,116 @@ export function GanttChartInstance(props: {
     }
   }
 
+  /** Move a row logically down  */
+  const handleMoveRowDown = (index: number) => {
+    const chartRow = chartRows[index]
+
+    // Find next sibling
+    for (let i = index + 1 ; i < chartRows.length ; i++) {
+      // If up a level, ignore
+      if (chartRows[i].level < chartRow.level) {
+        return
+      }
+      // If same level, use this one
+      if (chartRows[i].level == chartRow.level) {
+        // Swap orders
+        const myRow = rows.find(r => r.id == chartRow.id)!
+        const otherRow = rows.find(r => r.id == chartRows[i].id)!
+        const txn = ctx.database.transaction()
+        txn.updateRow(table, myRow.id, { order: otherRow.order })
+        txn.updateRow(table, otherRow.id, { order: myRow.order })
+        txn.commit()
+        return
+      }
+    }
+  }
+
+  const handleMoveRowUp = (index: number) => {
+    const chartRow = chartRows[index]
+
+    // Find previous sibling
+    for (let i = index - 1 ; i > 0 ; i--) {
+      // If up a level, ignore
+      if (chartRows[i].level < chartRow.level) {
+        return
+      }
+      // If same level, use this one
+      if (chartRows[i].level == chartRow.level) {
+        // Swap orders
+        const myRow = rows.find(r => r.id == chartRow.id)!
+        const otherRow = rows.find(r => r.id == chartRows[i].id)!
+        const txn = ctx.database.transaction()
+        txn.updateRow(table, myRow.id, { order: otherRow.order })
+        txn.updateRow(table, otherRow.id, { order: myRow.order })
+        txn.commit()
+        return
+      }
+    }
+  }
+
+  const handleMoveRowLeft = (index: number) => {
+    const chartRow = chartRows[index]
+    const myRow = rows.find(r => r.id == chartRow.id)!
+
+    // Find parent
+    const parentRow = rows.find(r => r.id == myRow.parent)!
+
+    const txn = ctx.database.transaction()
+
+    // Set own parent to parent's parent and and set order to parent + 1
+    txn.updateRow(table, myRow.id, { parent: parentRow.parent, order: parentRow.order + 1 })
+
+    // Decrement order of all siblings after self
+    for (const r of rows) {
+      if (r.parent == myRow.parent && r.order > myRow.order) {
+        txn.updateRow(table, r.id, { order: r.order - 1 })
+      }
+    }
+
+    // Increment order of all siblings after parent
+    for (const r of rows) {
+      if (r.parent == parentRow.parent && r.order > parentRow.order) {
+        txn.updateRow(table, r.id, { order: r.order + 1 })
+      }
+    }
+    txn.commit()
+  }
+
+  const handleMoveRowRight = (index: number) => {
+    const chartRow = chartRows[index]
+    const myRow = rows.find(r => r.id == chartRow.id)!
+
+    // Find new parent (previous row)
+    const parentRow = rows.find(r => r.id == chartRows[index - 1].id)!
+
+    const txn = ctx.database.transaction()
+
+    // Set own parent to previous row's parent and set order to 0
+    txn.updateRow(table, myRow.id, { parent: parentRow.id, order: 0 })
+
+    // Decrement order of all siblings after parent
+    for (const r of rows) {
+      if (r.parent == parentRow.parent && r.order > parentRow.order) {
+        txn.updateRow(table, r.id, { order: r.order - 1 })
+      }
+    }
+    txn.commit()
+  }
+
+  const handleInsertChildRow = (index: number) => {
+    const chartRow = chartRows[index]
+    const myRow = rows.find(r => r.id == chartRow.id)!
+
+    // Determine max order of child rows
+    let order = 0
+    for (const r of rows) {
+      if (r.parent == myRow.parent && r.order >= order) {
+        order = r.order + 1
+      }
+    }
+    handleAddRow(myRow.id, order)
+  }
+
   const handleRowClick = (chartRowIndex: number) => {
     // Lookup row
     const row = rows.find(r => r.id == chartRows[chartRowIndex].id)!
@@ -181,10 +291,18 @@ export function GanttChartInstance(props: {
     }
   }
 
+  const isOrdered = blockDef.rowOrderColumn != null
+  const isHierarchical = blockDef.rowParentColumn != null
+
   return <GanttChart
     rows={chartRows}
     startDate={startDate}
     endDate={endDate}
+    onMoveRowDown={isOrdered ? handleMoveRowDown : undefined}
+    onMoveRowUp={isOrdered ? handleMoveRowUp : undefined}
+    onMoveRowLeft={isOrdered && isHierarchical ? handleMoveRowLeft : undefined}
+    onMoveRowRight={isOrdered && isHierarchical ? handleMoveRowRight : undefined}
+    onInsertChildRow={isOrdered && isHierarchical ? handleInsertChildRow : undefined }
     onRowClick={blockDef.rowClickAction ? handleRowClick : undefined}
     onAddRow={blockDef.addRowAction ? handleAppendRow : undefined}
     addRowLabel={blockDef.addRowLabel ? [<i className="fa fa-plus"/>, " ", localize(blockDef.addRowLabel, ctx.locale)] : undefined }

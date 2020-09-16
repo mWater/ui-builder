@@ -2,7 +2,7 @@
 import { BlockDef, ContextVar } from '../../blocks';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import LeafBlock from '../../LeafBlock';
-import { Expr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 import { ActionDef } from '../../actions';
 /** Gantt chart */
 export interface GanttChartBlockDef extends BlockDef {
@@ -31,6 +31,12 @@ export interface GanttChartBlockDef extends BlockDef {
     addRowAction?: ActionDef | null;
     /** Color of bars. Defaults to #68cdee */
     barColor: string | null;
+    /** Color of milestones. Defaults to #68cdee */
+    milestoneColor: string | null;
+    /** Add row label */
+    addRowLabel: LocalizedString | null;
+    /** Auto-number rows */
+    autoNumberRows?: boolean;
 }
 export declare class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
     validate(designCtx: DesignCtx): string | null;

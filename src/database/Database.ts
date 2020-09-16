@@ -44,11 +44,14 @@ export interface Transaction {
   /** Adds a row, returning the primary key as a promise */
   addRow(table: string, values: { [column: string]: any }): Promise<any>;
 
+  /** Updates a row */
   updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
   
+  /** Removes a row */
   removeRow(table: string, primaryKey: any): Promise<void>;
 
-  commit(): Promise<any>;
+  /** Commits the transaction */
+  commit(): Promise<void>;
 }
 
 /** Database which performs no actions and always returns blank query results */

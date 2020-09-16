@@ -15,7 +15,7 @@ import { defaultBlockPaletteEntries } from './designer/blockPaletteEntries';
 
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from 'react-dnd-html5-backend'
-import { Database } from './database/Database';
+import { Database, Transaction } from './database/Database';
 import { DataSourceDatabase } from './database/DataSourceDatabase';
 import { BaseCtx } from './contexts';
 
@@ -35,6 +35,23 @@ const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", client, { l
 
 const actionLibrary = new ActionLibrary()
 
+class MockTransaction implements Transaction {
+  async addRow(table: string, values: { [column: string]: any; }): Promise<any> {
+    console.log(`add(${table}, ${JSON.stringify(values)})`)
+    return "1"
+  }
+  async updateRow(table: string, primaryKey: any, updates: { [column: string]: any; }): Promise<void> {
+    console.log(`update(${table}, ${primaryKey}, ${JSON.stringify(updates)})`)
+  }
+  async removeRow(table: string, primaryKey: any): Promise<void> {
+    console.log(`remove(${table}, ${primaryKey})`)
+  }
+  async commit(): Promise<void> {
+    console.log("commit()")
+    alert("Note: updated ignored")
+  }
+}
+
 @DragDropContext(HTML5Backend)
 class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[], database?: Database }> {
   constructor(props: object) {
@@ -49,7 +66,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
   componentDidMount() {
     fetch("https://api.mwater.co/v3/schema?client=" + (client || "") + "&extraTables=" + extraTables.join(",")).then(req => req.json()).then(json => {
       const schema = new Schema(json)
-      const database = new DataSourceDatabase(schema, dataSource)
+      const database = new DataSourceDatabase(schema, dataSource, () => new MockTransaction())
       this.setState({ schema, database })
     })
   }

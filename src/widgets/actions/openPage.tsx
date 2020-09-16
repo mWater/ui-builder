@@ -75,7 +75,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       const contextVarValue = this.actionDef.contextVarValues[widgetCV.id]
       if (contextVarValue.type == "ref") {
         const srcCV = designCtx.contextVars.find(cv => cv.id === contextVarValue.contextVarId)
-        if (!srcCV || srcCV.table !== widgetCV.table || srcCV.type !== widgetCV.type) {
+        if (!srcCV || !areContextVarCompatible(srcCV, widgetCV)) {
           return "Invalid context variable"
         }
       }
@@ -217,9 +217,9 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
               const options: { value: ContextVarNull | ContextVarRef, label: string }[] = [
                 { value: { type: "null" }, label: "No Value" }
               ]
-              
-              for (const cv of props.contextVars){
-                if (cv.type == contextVar.type && cv.table == contextVar.table) {
+
+              for (const cv of props.contextVars) {
+                if (areContextVarCompatible(cv, contextVar)) {
                   options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
                 }
               }
@@ -306,4 +306,19 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       </div>
     )
   }
+}
+
+/** Determine if context variables are compatible to be passed in. 
+ * Only exception is that id and row type are compatible
+ */
+function areContextVarCompatible(cv1: ContextVar, cv2: ContextVar) {
+  if (cv1.type == cv2.type && cv1.table == cv2.table) {
+    return true
+  }
+
+  if (["id", "row"].includes(cv1.type) && ["id", "row"].includes(cv2.type) && cv1.table == cv2.table) {
+    return true
+  }
+
+  return false
 }
