@@ -134,7 +134,6 @@ class Datefield extends React.Component<DatefieldProps> {
         popperContainer={createPopperContainer}
         showMonthDropdown
         showYearDropdown
-        dropdownMode="select"        
       />
     )
   }
