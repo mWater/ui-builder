@@ -132,6 +132,9 @@ class Datefield extends React.Component<DatefieldProps> {
         dateFormat={this.props.format}
         className="form-control"
         popperContainer={createPopperContainer}
+        showMonthDropdown
+        showYearDropdown
+        dropdownMode="select"        
       />
     )
   }
