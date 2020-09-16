@@ -211,7 +211,7 @@ export function GanttChartInstance(props: {
     // Determine max order of child rows
     let order = 0
     for (const r of rows) {
-      if (r.parent == myRow.parent && r.order >= order) {
+      if (r.parent == myRow.id && r.order >= order) {
         order = r.order + 1
       }
     }
