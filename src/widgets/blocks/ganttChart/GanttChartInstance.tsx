@@ -5,9 +5,10 @@ import { QueryOptions, useDatabaseChangeListener } from "../../../database/Datab
 import { GanttChartBlock, GanttChartBlockDef } from "./GanttChart"
 import canonical from 'canonical-json'
 import React from "react"
-import { GanttChart } from "react-library/lib/GanttChart"
+import { GanttChart, GanttChartRow } from "react-library/lib/GanttChart"
 import moment from 'moment'
 import { produce } from 'immer'
+import { localize } from '../../localization'
 
 export function GanttChartInstance(props: {
   block: GanttChartBlock
@@ -75,15 +76,15 @@ export function GanttChartInstance(props: {
     return <div><i className="fa fa-spinner fa-spin"/></div>
   }
 
+  // Gets the color of a row
+  function getRowColor(row: GanttQueryRow) {
+    return row.startDate == row.endDate || !row.startDate || !row.endDate 
+      ? blockDef.milestoneColor || "#68cdee"
+      : blockDef.barColor || "#68cdee"
+  }
+
   // Create chart rows
-  const chartRows = rows.slice().sort((a, b) => a.order > b.order ? 1 : -1).map(row => ({
-    id: row.id,
-    color: blockDef.barColor || "#68cdee", 
-    level: 0, 
-    startDate: row.startDate, 
-    endDate: row.endDate, 
-    label: row.label || ""
-  }))
+  const chartRows = createChartRows({ queryRows: rows, getColor: getRowColor, prefixNumber: blockDef.autoNumberRows || false })
 
   /** Create instance ctx for a clicked row */
   function createRowInstanceCtx(row: GanttQueryRow): InstanceCtx {
@@ -186,11 +187,12 @@ export function GanttChartInstance(props: {
     endDate={endDate}
     onRowClick={blockDef.rowClickAction ? handleRowClick : undefined}
     onAddRow={blockDef.addRowAction ? handleAppendRow : undefined}
+    addRowLabel={blockDef.addRowLabel ? [<i className="fa fa-plus"/>, " ", localize(blockDef.addRowLabel, ctx.locale)] : undefined }
     T={ctx.T} />
 }
 
 /** Results of the query. Note: This is *not* a chart row, which is a different structure and order! */
-interface GanttQueryRow {
+export interface GanttQueryRow {
   id: string | number
   label: string | null
   startDate: string | null
@@ -199,3 +201,46 @@ interface GanttQueryRow {
   order: any
 }
 
+/** Chart rows with extra fields */
+export interface EnhancedChartRow extends GanttChartRow {
+  id: string | number
+}
+
+/** Performs operation to convert from query rows to chart rows
+ * which involves making the results into a sorted tree and then 
+ * returning the rows in depth-first order, adding any labels as
+ * required.
+ * prefixNumber adds 1.1, 1.2.3, etc before label
+ */
+export function createChartRows(options: {
+  queryRows: GanttQueryRow[]
+  getColor: (queryRow: GanttQueryRow) => string
+  prefixNumber: boolean
+}): EnhancedChartRow[] {
+  const chartRows: EnhancedChartRow[] = []
+
+  /** Add all rows, sorted, that have this as a parent */
+  function addRows(parent: number | string | null, level: number, prefix: string) {
+    const childRows = options.queryRows.filter(r => r.parent == parent)
+
+    // Sort by order
+    childRows.sort((a, b) => a.order > b.order ? 1 : -1)
+
+    // Add each row, then add its children
+    childRows.forEach((row, index) => {
+      chartRows.push({
+        id: row.id,
+        color: options.getColor(row), 
+        level: level, 
+        startDate: row.startDate, 
+        endDate: row.endDate, 
+        label: options.prefixNumber ? `${prefix}${index + 1}. ${row.label}` || "" : row.label || ""
+      })
+
+      addRows(row.id, level + 1, `${prefix}${index + 1}.`)
+    })
+  }
+  addRows(null, 0, "")
+
+  return chartRows
+}

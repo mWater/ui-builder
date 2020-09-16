@@ -8,7 +8,7 @@ import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions'
 import { ActionDefEditor, ContextVarPropertyEditor, EmbeddedExprsEditor, LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../../propertyEditors'
 import { ExprComponent } from 'mwater-expressions-ui'
 import { localize } from '../../localization'
-import { Select, TextInput } from 'react-library/lib/bootstrap'
+import { Checkbox, Select, TextInput } from 'react-library/lib/bootstrap'
 import DatePicker from 'react-datepicker'
 import moment from 'moment'
 import { GanttChartInstance } from './GanttChartInstance'
@@ -53,6 +53,15 @@ export interface GanttChartBlockDef extends BlockDef {
 
   /** Color of bars. Defaults to #68cdee */
   barColor: string | null
+
+  /** Color of milestones. Defaults to #68cdee */
+  milestoneColor: string | null
+
+  /** Add row label */
+  addRowLabel: LocalizedString | null
+
+  /** Auto-number rows */
+  autoNumberRows?: boolean
 }
 
 export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
@@ -172,12 +181,13 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
   
   renderDesign(ctx: DesignCtx) {
     const barColor = this.blockDef.barColor || "#68cdee" 
+    const milestoneColor = this.blockDef.milestoneColor || "#68cdee" 
     
     return <GanttChart
       rows={[
         { color: barColor, level: 0, startDate: "2020-01-14", endDate: "2020-05-23", label: "Activity 1" },
         { color: barColor, level: 1, startDate: "2020-02-14", endDate: "2020-06-23", label: "Activity 2" },
-        { color: barColor, level: 2, startDate: "2020-04-12", endDate: null, label: "Activity 3" }
+        { color: milestoneColor, level: 2, startDate: "2020-04-12", endDate: null, label: "Activity 3" }
       ]}
       startDate="2020-01-01"
       endDate="2020-07-01"
@@ -337,6 +347,28 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
         </PropertyEditor>
       </LabeledProperty>
 
+      <LabeledProperty label="Milestone color" hint="CSS format">
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="milestoneColor">
+          {(value: string | null, onChange) => (
+            <TextInput
+              value={value}
+              onChange={onChange}
+              emptyNull={true}
+              placeholder="#68cdee"
+            />
+          )}
+        </PropertyEditor>
+      </LabeledProperty>
+
+      <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="autoNumberRows">
+        {(value: boolean | undefined, onChange) => (
+          <Checkbox
+            value={value}
+            onChange={onChange}
+          >Autonumber Rows</Checkbox>
+        )}
+      </PropertyEditor>
+
       { rowCV ? 
         <LabeledProperty label="When row clicked">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowClickAction">
@@ -363,6 +395,13 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
         </LabeledProperty>
       : null } 
 
+      { this.blockDef.addRowAction ?
+        <LabeledProperty label="Add row link text">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="addRowLabel">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
+      : null }
     </div>)
   }
 }

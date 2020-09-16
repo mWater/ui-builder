@@ -234,7 +234,8 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       rowParentColumn: null,
       startDate: null,
       endDate: null,
-      barColor: null
+      barColor: null,
+      milestoneColor: null
      } as GanttChartBlockDef,
   }
 ]
