@@ -37,6 +37,10 @@ export interface GanttChartBlockDef extends BlockDef {
     addRowLabel: LocalizedString | null;
     /** Auto-number rows */
     autoNumberRows?: boolean;
+    /** Allow removing rows */
+    allowRemove?: boolean;
+    /** If present, message to display when confirming remove */
+    removeConfirmMessage?: LocalizedString | null;
 }
 export declare class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
     validate(designCtx: DesignCtx): string | null;

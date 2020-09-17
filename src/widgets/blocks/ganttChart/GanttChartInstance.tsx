@@ -218,6 +218,44 @@ export function GanttChartInstance(props: {
     handleAddRow(myRow.id, order)
   }
 
+  const handleInsertRowAbove = (index: number) => {
+    const chartRow = chartRows[index]
+    const myRow = rows.find(r => r.id == chartRow.id)!
+
+    // Make room for new row
+    const txn = ctx.database.transaction()
+
+    // Increment order of all siblings including and after self
+    for (const r of rows) {
+      if (r.parent == myRow.parent && r.order >= myRow.order) {
+        txn.updateRow(table, r.id, { order: r.order + 1 })
+      }
+    }
+   
+    txn.commit()
+
+    handleAddRow(myRow.parent, myRow.order)
+  }
+
+  const handleInsertRowBelow = (index: number) => {
+    const chartRow = chartRows[index]
+    const myRow = rows.find(r => r.id == chartRow.id)!
+
+    // Make room for new row
+    const txn = ctx.database.transaction()
+
+    // Increment order of all siblings after self
+    for (const r of rows) {
+      if (r.parent == myRow.parent && r.order > myRow.order) {
+        txn.updateRow(table, r.id, { order: r.order + 1 })
+      }
+    }
+   
+    txn.commit()
+
+    handleAddRow(myRow.parent, myRow.order)
+  }
+
   const handleRowClick = (chartRowIndex: number) => {
     // Lookup row
     const row = rows.find(r => r.id == chartRows[chartRowIndex].id)!
@@ -238,6 +276,34 @@ export function GanttChartInstance(props: {
     })
 
     ctx.actionLibrary.createAction(blockDef.addRowAction!).performAction(innerCtx)
+  }
+
+  const handleRemoveRow = (chartRowIndex: number) => {
+    // Confirm if confirm message
+    if (blockDef.removeConfirmMessage) {
+      if (!confirm(localize(blockDef.removeConfirmMessage, ctx.locale))) {
+        return
+      }
+    }
+
+    // Delete recursively
+    const txn = ctx.database.transaction()
+
+    function deleteDescendants(rowId: any) {
+      // Lookup row
+      const row = rows!.find(r => r.id == rowId)!
+
+      // Delete any children
+      for (const child of rows!) {
+        if (child.parent == row.id) {
+          deleteDescendants(child.id)
+        }
+        txn.removeRow(table, row.id)
+      }
+    }
+    deleteDescendants(chartRows[chartRowIndex].id)
+   
+    txn.commit()
   }
 
   /** Append row to bottom of chart */
@@ -303,9 +369,12 @@ export function GanttChartInstance(props: {
     onMoveRowLeft={isOrdered && isHierarchical ? handleMoveRowLeft : undefined}
     onMoveRowRight={isOrdered && isHierarchical ? handleMoveRowRight : undefined}
     onInsertChildRow={isOrdered && isHierarchical ? handleInsertChildRow : undefined }
+    onInsertRowAbove={isOrdered && isHierarchical ? handleInsertRowAbove : undefined }
+    onInsertRowBelow={isOrdered && isHierarchical ? handleInsertRowBelow : undefined }
     onRowClick={blockDef.rowClickAction ? handleRowClick : undefined}
     onAddRow={blockDef.addRowAction ? handleAppendRow : undefined}
     addRowLabel={blockDef.addRowLabel ? [<i className="fa fa-plus"/>, " ", localize(blockDef.addRowLabel, ctx.locale)] : undefined }
+    onRemoveRow={blockDef.allowRemove ? handleRemoveRow : undefined}
     T={ctx.T} />
 }
 

@@ -62,6 +62,12 @@ export interface GanttChartBlockDef extends BlockDef {
 
   /** Auto-number rows */
   autoNumberRows?: boolean
+
+  /** Allow removing rows */
+  allowRemove?: boolean
+
+  /** If present, message to display when confirming remove */
+  removeConfirmMessage?: LocalizedString | null
 }
 
 export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
@@ -402,6 +408,24 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
       : null }
+
+      <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="allowRemove">
+        {(value: boolean | undefined, onChange) => (
+          <Checkbox
+            value={value}
+            onChange={onChange}
+          >Allow removing rows</Checkbox>
+        )}
+      </PropertyEditor>
+
+      { this.blockDef.allowRemove ?
+        <LabeledProperty label="Remove confirm message">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removeConfirmMessage">
+            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+          </PropertyEditor>
+        </LabeledProperty>
+      : null}
+
     </div>)
   }
 }
