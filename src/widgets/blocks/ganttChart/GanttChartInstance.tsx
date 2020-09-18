@@ -253,7 +253,7 @@ export function GanttChartInstance(props: {
    
     txn.commit()
 
-    handleAddRow(myRow.parent, myRow.order)
+    handleAddRow(myRow.parent, myRow.order + 1)
   }
 
   const handleRowClick = (chartRowIndex: number) => {
