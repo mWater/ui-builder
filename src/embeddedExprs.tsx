@@ -12,7 +12,7 @@ export interface EmbeddedExpr {
   /** Expression to be displayed */
   expr: Expr
 
-  /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
+  /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll). Note: % is not multiplied by 100!  */
   format: string | null
 }
 
@@ -47,7 +47,13 @@ export const formatEmbeddedExprString = (options: {
     }
     else {
       if (exprType === "number" && value != null) {
-        str = formatLocale.format(format || "")(value)
+        // d3 multiplies by 100 when appending a percentage. Remove this behaviour for consistency
+        if ((format || "").includes("%")) {
+          str = formatLocale.format(format || "")(value / 100.0)
+        }
+        else {
+          str = formatLocale.format(format || "")(value)
+        }
       }
       else if (exprType === "date" && value != null) {
         str = moment(value, moment.ISO_8601).format(format || "ll")
@@ -82,11 +88,6 @@ export const validateEmbeddedExprs = (options: {
 
     if (error) {
       return error
-    }
-
-    // TODO REMOVE
-    if ((embeddedExpr.format || "").includes("%")) {
-      return "PERCENT!!!"
     }
   }
 

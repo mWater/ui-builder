@@ -19,7 +19,7 @@ export interface ExpressionBlockDef extends TextualBlockDef {
   /** Expression to be displayed */
   expr: Expr
 
-  /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
+  /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll). Note: % is not multiplied by 100!  */
   format: string | null
 }
 
@@ -29,11 +29,6 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   validate(ctx: DesignCtx) {
-    // TODO REMOVE
-    if ((this.blockDef.format || "").includes("%")) {
-      return "PERCENT!!!"
-    }
-
     return validateContextVarExpr({
       schema: ctx.schema,
       contextVars: ctx.contextVars,
@@ -70,7 +65,13 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     }
     else {
       if (exprType === "number") {
-        str = formatLocale.format(this.blockDef.format || "")(value)
+        // d3 multiplies by 100 when appending a percentage. Remove this behaviour for consistency
+        if ((this.blockDef.format || "").includes("%")) {
+          str = formatLocale.format(this.blockDef.format || "")(value / 100.0)
+        }
+        else {
+          str = formatLocale.format(this.blockDef.format || "")(value)
+        }
       }
       else if (exprType === "date" && value != null) {
         str = moment(value, moment.ISO_8601).format(this.blockDef.format || "ll")

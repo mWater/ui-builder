@@ -9,7 +9,7 @@ export interface ExpressionBlockDef extends TextualBlockDef {
     contextVarId: string | null;
     /** Expression to be displayed */
     expr: Expr;
-    /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
+    /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll). Note: % is not multiplied by 100!  */
     format: string | null;
 }
 export declare class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {

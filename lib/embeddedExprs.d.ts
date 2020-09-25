@@ -8,7 +8,7 @@ export interface EmbeddedExpr {
     contextVarId: string | null;
     /** Expression to be displayed */
     expr: Expr;
-    /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll)  */
+    /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll). Note: % is not multiplied by 100!  */
     format: string | null;
 }
 /** Format an embedded string which is a string with {0}, {1}, etc. to be replaced by expressions */
