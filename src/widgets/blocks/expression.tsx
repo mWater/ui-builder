@@ -29,6 +29,11 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   validate(ctx: DesignCtx) {
+    // TODO REMOVE
+    if ((this.blockDef.format || "").includes("%")) {
+      return "PERCENT!!!"
+    }
+
     return validateContextVarExpr({
       schema: ctx.schema,
       contextVars: ctx.contextVars,

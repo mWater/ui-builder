@@ -83,6 +83,11 @@ export const validateEmbeddedExprs = (options: {
     if (error) {
       return error
     }
+
+    // TODO REMOVE
+    if ((embeddedExpr.format || "").includes("%")) {
+      return "PERCENT!!!"
+    }
   }
 
   return null
