@@ -22,6 +22,12 @@ interface State {
 
   /** Ordering of column. Default to asc */
   columnOrderDir: "asc" | "desc"
+
+  /** Limit. Use this rather than limit of block def as Show more... may extend it */
+  limit: number | null
+
+  /** True if more rows are available (for soft limits) */
+  moreRowsAvail: boolean
 }
 
 /** Instance of a query table */
@@ -47,7 +53,9 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     this.state = { 
       refreshing: false,
       columnOrderIndex,
-      columnOrderDir
+      columnOrderDir,
+      limit: props.block.blockDef.limit,
+      moreRowsAvail: false
     }
   }
 
@@ -71,6 +79,10 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   /** Change listener to refresh database */
   handleChange = () => {
     this.performQuery()
+  }
+
+  handleShowMore = () => {
+    this.setState({ limit: this.state.limit! + this.props.block.blockDef.limit! })
   }
 
   createQuery(): QueryOptions {
@@ -100,7 +112,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       from: rowsetCV.table!,
       where: where.exprs.length > 0 ? where : null,
       orderBy: [],
-      limit: block.blockDef.limit
+      // Add extra row to see if more available
+      limit: this.state.limit != null ? this.state.limit + 1 : null
     }
 
     // Add column ordering if present
@@ -148,7 +161,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx)).then(rows => {
       // Check if still relevant
       if (_.isEqual(queryOptions, this.createQuery())) {
-        this.setState({ rows, refreshing: false })
+        // Take limit of rows
+        const limitedRows = this.state.limit != null ? _.take(rows, this.state.limit) : rows
+        this.setState({ 
+          rows: limitedRows, 
+          refreshing: false, 
+          // If soft limit and more available, show that
+          moreRowsAvail: (this.props.block.blockDef.limitType || "soft") == "soft" && rows.length > limitedRows.length 
+        })
       }
     }).catch(error => {
       this.setState({ error: error })
@@ -310,6 +330,19 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     </th>
   }
 
+  /** Render the show more rows at bottom */
+  renderShowMore() {
+    if (!this.state.moreRowsAvail) {
+      return null
+    }
+
+    return <tr key="showMore">
+      <td colSpan={this.props.block.blockDef.contents.length}>
+        <a style={{ cursor: "pointer" }} onClick={this.handleShowMore}>{this.props.instanceCtx.T("Show more...")}</a>
+      </td>
+    </tr>
+  }
+
   render() {
     const riProps = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
@@ -363,6 +396,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         : null }
         <tbody>
           {this.renderRows()}
+          {this.renderShowMore()}
         </tbody>
       </table>
     )  

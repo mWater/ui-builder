@@ -29,7 +29,12 @@ export interface QueryTableBlockDef extends BlockDef {
   /** Id of context variable of rowset for table to use */
   rowsetContextVarId: string | null
 
+  /** Limit of rows displayed. Can be soft limit (prompts for more) or hard limit */
   limit: number | null
+
+  /** Limit type. "soft" means to enable "Show more..." prompt, "hard" means that only the limit of rows will be shown. Default is "soft" */
+  limitType?: "soft" | "hard"
+
   where: Expr
   orderBy: OrderBy[] | null
 
@@ -358,9 +363,22 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
         : null }
 
         <LabeledProperty label="Maximum rows">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="limit">
-            {(value, onChange) => <NumberInput value={value} onChange={onChange} decimal={false} />}
-          </PropertyEditor>
+          <div>
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="limit">
+              {(value, onChange) =>
+                <NumberInput value={value} onChange={onChange} decimal={false} style={{ display: "inline-block" }}/>
+              }
+            </PropertyEditor>
+            { this.blockDef.limit != null ? 
+              <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="limitType">
+                {(value, onChange) =>
+                  <div style={{ paddingLeft: 10, display: "inline-block" }}>
+                    <Toggle value={value || "soft"} onChange={onChange} options={[{ label: "Soft Limit", value: "soft" }, { label: "Hard Limit", value: "hard" }]}/>
+                  </div>
+                }
+              </PropertyEditor>
+            :null}
+          </div>
         </LabeledProperty>
         
         { rowCV ? 

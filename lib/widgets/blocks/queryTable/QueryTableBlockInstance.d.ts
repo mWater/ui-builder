@@ -16,6 +16,10 @@ interface State {
     columnOrderIndex: number | null;
     /** Ordering of column. Default to asc */
     columnOrderDir: "asc" | "desc";
+    /** Limit. Use this rather than limit of block def as Show more... may extend it */
+    limit: number | null;
+    /** True if more rows are available (for soft limits) */
+    moreRowsAvail: boolean;
 }
 /** Instance of a query table */
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
@@ -27,6 +31,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     componentWillUnmount(): void;
     /** Change listener to refresh database */
     handleChange: () => void;
+    handleShowMore: () => void;
     createQuery(): QueryOptions;
     performQuery(): void;
     createRowInstanceCtx(rowIndex: number): InstanceCtx;
@@ -34,6 +39,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     renderRows(): JSX.Element | JSX.Element[];
     /** Render one header of the table */
     renderHeader(header: BlockDef | null, index: number): JSX.Element;
+    /** Render the show more rows at bottom */
+    renderShowMore(): JSX.Element | null;
     render(): JSX.Element;
 }
 export {};

@@ -16,7 +16,10 @@ export interface QueryTableBlockDef extends BlockDef {
     columnInfos?: Array<QueryTableColumnInfo | null>;
     /** Id of context variable of rowset for table to use */
     rowsetContextVarId: string | null;
+    /** Limit of rows displayed. Can be soft limit (prompts for more) or hard limit */
     limit: number | null;
+    /** Limit type. "soft" means to enable "Show more..." prompt, "hard" means that only the limit of rows will be shown. Default is "soft" */
+    limitType?: "soft" | "hard";
     where: Expr;
     orderBy: OrderBy[] | null;
     /** Action to be executed when row is clicked */
