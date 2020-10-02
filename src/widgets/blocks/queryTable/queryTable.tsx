@@ -373,7 +373,11 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="limitType">
                 {(value, onChange) =>
                   <div style={{ paddingLeft: 10, display: "inline-block" }}>
-                    <Toggle value={value || "soft"} onChange={onChange} options={[{ label: "Soft Limit", value: "soft" }, { label: "Hard Limit", value: "hard" }]}/>
+                    <Checkbox 
+                      value={value != "hard"} 
+                      onChange={v => onChange(v !== false ? "soft" : "hard")}>
+                      Enable 'Show More...'
+                    </Checkbox>
                   </div>
                 }
               </PropertyEditor>

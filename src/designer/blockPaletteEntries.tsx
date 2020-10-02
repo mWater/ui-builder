@@ -138,7 +138,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
         rowClickAction: null,
         orderBy: null,
         rowsetContextVarId: rowsetCV ? rowsetCV.id : null,
-        limit: 100
+        limit: 1000
       } as QueryTableBlockDef
     }
   },
