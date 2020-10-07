@@ -53,16 +53,6 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
     return null 
   }
 
-  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
-    // Include action expressions
-    if (this.blockDef.clickActionDef) {
-      const action = ctx.actionLibrary.createAction(this.blockDef.clickActionDef)
-      return action.getContextVarExprs(contextVar)
-    }
-
-    return [] 
-  }
-   
   renderImage(locale: string, handleClick?: () => void) {
     if (!this.blockDef.url) {
       return <i className="fa fa-picture-o"/>

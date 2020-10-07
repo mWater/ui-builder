@@ -30,5 +30,5 @@ export abstract class Action<T extends ActionDef> {
   abstract performAction(instanceCtx: InstanceCtx): Promise<void>
   
   /** Render an optional property editor for the action. This may use bootstrap */
-  renderEditor(designCtx: DesignCtx): React.ReactElement<any> | null { return null }
+  renderEditor(props: RenderActionEditorProps): React.ReactElement<any> | null { return null }
 }

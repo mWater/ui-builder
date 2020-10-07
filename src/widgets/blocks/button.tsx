@@ -64,12 +64,6 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
       exprs = exprs.concat(_.compact(_.map(this.blockDef.labelEmbeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null)))
     }
 
-    // Include action expressions
-    if (this.blockDef.actionDef) {
-      const action = ctx.actionLibrary.createAction(this.blockDef.actionDef)
-      exprs = exprs.concat(action.getContextVarExprs(contextVar))
-    }
-
     return exprs
   }
  
