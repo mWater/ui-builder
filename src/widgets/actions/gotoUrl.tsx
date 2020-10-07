@@ -7,6 +7,7 @@ import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '.
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { ContextVar } from '../blocks';
 import { Expr } from 'mwater-expressions';
+import { evalContextVarExpr } from '../evalContextVarExpr';
 
 export interface GotoUrlActionDef extends ActionDef {
   type: "gotoUrl"
@@ -37,14 +38,6 @@ export class GotoUrlAction extends Action<GotoUrlActionDef> {
     }
 
     return null
-  }
-
-  /** Get any context variables expressions that this action needs */
-  getContextVarExprs(contextVar: ContextVar): Expr[] {
-    if (this.actionDef.urlEmbeddedExprs) {
-      return _.compact(_.map(this.actionDef.urlEmbeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null))
-    }
-    return []
   }
 
   renderEditor(props: RenderActionEditorProps) {
@@ -83,7 +76,15 @@ export class GotoUrlAction extends Action<GotoUrlActionDef> {
     let url = this.actionDef.url!
 
     // Get any embedded expression values
-    const exprValues = _.map(this.actionDef.urlEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
+    const exprValues: any[] = []
+    for (const ee of this.actionDef.urlEmbeddedExprs || []) {
+      const contextVar = ee.contextVarId ? instanceCtx.contextVars.find(cv => cv.id == ee.contextVarId)! : null
+      exprValues.push(await evalContextVarExpr({ 
+        contextVar,
+        contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
+        ctx: instanceCtx,
+        expr: ee.expr }))
+    }
 
     // Format and replace
     url = formatEmbeddedExprString({

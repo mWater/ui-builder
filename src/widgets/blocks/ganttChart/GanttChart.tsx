@@ -153,23 +153,6 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
     return null
   }
 
-  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
-    let exprs: Expr[] = []
-
-    // Include action expressions
-    if (this.blockDef.rowClickAction) {
-      const action = ctx.actionLibrary.createAction(this.blockDef.rowClickAction)
-      exprs = exprs.concat(action.getContextVarExprs(contextVar))
-    }
-
-    if (this.blockDef.addRowAction) {
-      const action = ctx.actionLibrary.createAction(this.blockDef.addRowAction)
-      exprs = exprs.concat(action.getContextVarExprs(contextVar))
-    }
-
-    return [] 
-  }
-
   /** Create the context variable used */
   createRowContextVar(rowsetCV: ContextVar): ContextVar {
     return { id: this.blockDef.id + "_row", name: `GANTT Row of ${rowsetCV.name}`, type: "row", table: rowsetCV.table }

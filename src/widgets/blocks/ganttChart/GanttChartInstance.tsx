@@ -24,10 +24,6 @@ export function GanttChartInstance(props: {
   /** Incremented when database changed */
   const dbChanged = useDatabaseChangeListener(ctx.database)
 
-  // Get row expressions that depend on rowCV
-  const rowClickAction = blockDef.rowClickAction ? ctx.actionLibrary.createAction(blockDef.rowClickAction) : undefined
-  const rowExprs = rowClickAction ? rowClickAction.getContextVarExprs(rowCV) : []
-
   const table = rowsetCV.table!
 
   // Determine type of order column
@@ -48,11 +44,6 @@ export function GanttChartInstance(props: {
       from: table,
       where: blockDef.filter
     }
-
-    // Add expressions for rowClickAction as e0, e1, etc.
-    rowExprs.forEach((expr, index) => {
-      query.select[`e${index}`] = expr
-    })
 
     return query
   }
@@ -96,15 +87,7 @@ export function GanttChartInstance(props: {
     return {
       ...ctx, 
       contextVars: innerContextVars,
-      contextVarValues: { ...ctx.contextVarValues, [rowCV.id]: cvvalue },
-      getContextVarExprValue: (cvid, expr) => {
-        if (cvid !== rowCV.id) {
-          return ctx.getContextVarExprValue(cvid, expr)
-        }
-        // Look up expression
-        const exprIndex = rowExprs.findIndex(rowExpr => _.isEqual(expr, rowExpr))
-        return row[`e${exprIndex}`]
-      }
+      contextVarValues: { ...ctx.contextVarValues, [rowCV.id]: cvvalue }
     }
   }
 
@@ -261,7 +244,8 @@ export function GanttChartInstance(props: {
     const row = rows.find(r => r.id == chartRows[chartRowIndex].id)!
 
     // Create context with variables 
-    rowClickAction!.performAction(createRowInstanceCtx(row))
+    const rowClickAction = ctx.actionLibrary.createAction(blockDef.rowClickAction!)
+    rowClickAction.performAction(createRowInstanceCtx(row))
   }
   
   const handleAddRow = (parent: any, order: number) => {

@@ -6,6 +6,7 @@ import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
 import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
 import { InstanceCtx, DesignCtx } from '../../contexts';
+import { evalContextVarExpr } from '../evalContextVarExpr';
 
 export interface AddRowActionDef extends ActionDef {
   type: "addRow"
@@ -22,7 +23,13 @@ export class AddRowAction extends Action<AddRowActionDef> {
 
     for (const columnId of Object.keys(this.actionDef.columnValues)) {
       const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
-      row[columnId] = instanceCtx.getContextVarExprValue(contextVarExpr.contextVarId!, contextVarExpr.expr) 
+      const contextVar = contextVarExpr.contextVarId ? instanceCtx.contextVars.find(cv => cv.id == contextVarExpr.contextVarId)! : null
+      row[columnId] = await evalContextVarExpr({ 
+        contextVar, 
+        contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
+        ctx: instanceCtx,
+        expr: contextVarExpr.expr
+      })
     }
 
     const txn = instanceCtx.database.transaction()
@@ -85,12 +92,6 @@ export class AddRowAction extends Action<AddRowActionDef> {
     return null
   }
 
-  /** Get any context variables expressions that this action needs */
-  getContextVarExprs(contextVar: ContextVar): Expr[] {
-    // Get ones for the specified context var
-    return Object.values(this.actionDef.columnValues).filter(cve => cve.contextVarId === contextVar.id).map(cve => cve.expr)
-  }
-  
   renderEditor(props: RenderActionEditorProps) {
     const onChange = props.onChange as (actionDef: AddRowActionDef) => void
 

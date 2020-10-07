@@ -11,6 +11,7 @@ import { ContextVar, createExprVariables } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
+import { evalContextVarExpr } from '../evalContextVarExpr';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -93,15 +94,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     return null
   }
 
-  /** Get any context variables expressions that this action needs */
-  getContextVarExprs(contextVar: ContextVar): Expr[] {
-    if (this.actionDef.titleEmbeddedExprs) {
-      return _.compact(_.map(this.actionDef.titleEmbeddedExprs, ee => ee.contextVarId === contextVar.id ? ee.expr : null))
-    }
-    return []
-  }
-
-  performAction(instanceCtx: InstanceCtx): Promise<void> {
+  async performAction(instanceCtx: InstanceCtx): Promise<void> {
     const contextVarValues = {}
 
     // Perform mappings 
@@ -149,7 +142,15 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     if (title) {
       // Get any embedded expression values
-      const exprValues = _.map(this.actionDef.titleEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
+      const exprValues: any[] = []
+      for (const ee of this.actionDef.titleEmbeddedExprs || []) {
+        const contextVar = ee.contextVarId ? instanceCtx.contextVars.find(cv => cv.id == ee.contextVarId)! : null
+        exprValues.push(await evalContextVarExpr({ 
+          contextVar,
+          contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
+          ctx: instanceCtx,
+          expr: ee.expr }))
+      }
 
       // Format and replace
       title = formatEmbeddedExprString({
@@ -178,8 +179,6 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     else {
       instanceCtx.pageStack.openPage(page)
     }
-
-    return Promise.resolve()
   }
   
   /** Render an optional property editor for the action. This may use bootstrap */

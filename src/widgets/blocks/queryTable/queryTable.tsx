@@ -169,22 +169,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       }
     }
 
-    // Get action expressions too
-    if (this.blockDef.rowClickAction) {
-      const action = ctx.actionLibrary.createAction(this.blockDef.rowClickAction)
-      exprs = exprs.concat(action.getContextVarExprs(rowCV))
-    }
     return exprs
-  }
-
-  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
-    // Include action expressions
-    if (this.blockDef.rowClickAction) {
-      const action = ctx.actionLibrary.createAction(this.blockDef.rowClickAction)
-      return action.getContextVarExprs(contextVar)
-    }
-
-    return [] 
   }
 
   /** 

@@ -136,7 +136,7 @@ test("exprs are null for null row variables", (done) => {
   
   setImmediate(() => {
     // Query should not have been made
-    const queryOptions = expect((database.query as jest.Mock).mock.calls.length).toBe(0)
+    expect((database.query as jest.Mock).mock.calls.length).toBe(0)
   
     // Should get the value as undefined
     expect(innerRenderProps!.getContextVarExprValue(contextVar.id, contextVarExprs[0])).toBeUndefined()

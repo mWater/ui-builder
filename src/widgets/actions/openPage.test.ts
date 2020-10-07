@@ -32,7 +32,7 @@ test("performs action", async () => {
     pageStack: pageStack,
     contextVars: [{ id: "outercv1", table: "t2", name: "Cv1", type: "rowset" } as ContextVar],
     contextVarValues: { outercv1: { type: "literal", valueType: "boolean", value: true }},
-    getContextVarExprValue: () => null,
+    getContextVarExprValue: () => { throw new Error("Not implemented") },
     getFilters: (cvid: string) => {
       return cvid == "outercv1" ? [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: false }} as Filter] : []
     }

@@ -54,7 +54,6 @@ export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     getRowContextVarId(): string;
     /** Get list of expressions used in a row by content blocks */
     getRowExprs(contextVars: ContextVar[], ctx: DesignCtx | InstanceCtx): Expr[];
-    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /**
      * Get the value of the row context variable for a specific row.
      * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field

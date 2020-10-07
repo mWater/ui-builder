@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LocalizedString, Expr } from 'mwater-expressions';
+import { LocalizedString } from 'mwater-expressions';
 import { EmbeddedExpr } from '../../embeddedExprs';
-import { ContextVar } from '../blocks';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -35,8 +34,6 @@ export interface OpenPageActionDef extends ActionDef {
 }
 export declare class OpenPageAction extends Action<OpenPageActionDef> {
     validate(designCtx: DesignCtx): string | null;
-    /** Get any context variables expressions that this action needs */
-    getContextVarExprs(contextVar: ContextVar): Expr[];
     performAction(instanceCtx: InstanceCtx): Promise<void>;
     /** Render an optional property editor for the action. This may use bootstrap */
     renderEditor(props: RenderActionEditorProps): React.ReactElement<any> | null;

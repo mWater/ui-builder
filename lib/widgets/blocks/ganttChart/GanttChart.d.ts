@@ -44,7 +44,6 @@ export interface GanttChartBlockDef extends BlockDef {
 }
 export declare class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
     validate(designCtx: DesignCtx): string | null;
-    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /** Create the context variable used */
     createRowContextVar(rowsetCV: ContextVar): ContextVar;
     /** Create context variables that add row action receives */

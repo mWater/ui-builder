@@ -1,30 +1,9 @@
 import { AddRowAction, AddRowActionDef } from "./addRow";
 import { ContextVar } from "../blocks";
 import VirtualDatabase, { AddMutation } from "../../database/VirtualDatabase";
-import { NullDatabase } from "../../database/Database";
+import { Database, NullDatabase } from "../../database/Database";
 import simpleSchema from "../../__fixtures__/schema";
 import mockInstanceCtx from "../../__fixtures__/mockInstanceCtx";
-
-
-test("gets context var exprs", () => {
-  const ad : AddRowActionDef = {
-    type: "addRow",
-    table: "abc",
-    columnValues: {
-      "a": { 
-        contextVarId: "cv1",
-        expr: { type: "literal", valueType: "number", value: 123 }
-      },
-      "b": { 
-        contextVarId: "cv2",
-        expr: { type: "literal", valueType: "number", value: 456 }
-      }
-    }
-  }
-
-  const varExprs = new AddRowAction(ad).getContextVarExprs({ id: "cv2" } as ContextVar)
-  expect(varExprs).toEqual([{ type: "literal", valueType: "number", value: 456 }])
-})
 
 
 test("performs non-literal action", async () => {
@@ -33,7 +12,7 @@ test("performs non-literal action", async () => {
     table: "t1",
     columnValues: {
       "number": { 
-        contextVarId: "cv1",
+        contextVarId: null,
         expr: { type: "literal", valueType: "number", value: 123 }
       }
     }
@@ -47,7 +26,7 @@ test("performs non-literal action", async () => {
     database: database,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" } as ContextVar],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: () => 123
+    getContextVarExprValue: () => { throw new Error("Not implemented") },
   }
 
   await action.performAction(instanceCtx)
@@ -77,7 +56,7 @@ test("performs literal action", async () => {
     database: database,
     contextVars: [{ id: "cv1", table: "t2", name: "Cv1", type: "row" } as ContextVar],
     contextVarValues: { cv1: "123" },
-    getContextVarExprValue: () => 123,
+    getContextVarExprValue: () => { throw new Error("Not implemented") },
     getFilters: () => []
   }
 
