@@ -4,18 +4,9 @@ import React from "react";
 import { ContextVar } from "./blocks";
 import produce from "immer";
 import { localize } from "./localization";
-import { LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from "./propertyEditors";
-import { ExprComponent } from "mwater-expressions-ui";
+import { LabeledProperty, ContextVarExprPropertyEditor } from "./propertyEditors";
 import ReactSelect from 'react-select'
-
-/** Expression based on a context variable */
-export interface ContextVarExpr {
-  /** Context variable which expression is based on. Null for literal-only */
-  contextVarId: string | null,
-  
-  /** Expression to generate column values */
-  expr: Expr
-}
+import { ContextVarExpr } from '../ContextVarExpr';
 
 export interface ColumnValues { 
   [columnId: string]: ContextVarExpr 

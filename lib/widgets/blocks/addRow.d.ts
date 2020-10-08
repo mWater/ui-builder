@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import { BlockDef, ContextVar, ChildBlock, Block } from '../blocks';
 import { Expr } from 'mwater-expressions';
-import { ContextVarExpr } from '../columnValues';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { ContextVarExpr } from '../../ContextVarExpr';
 /** Block which creates a new row and adds it as a context variable to its content */
 export interface AddRowBlockDef extends BlockDef {
     type: "addRow";

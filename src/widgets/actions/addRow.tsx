@@ -4,9 +4,10 @@ import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { ExprValidator, LiteralExpr, Expr, ExprUtils } from 'mwater-expressions';
 import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
-import { ContextVarExpr, ColumnValuesEditor } from '../columnValues';
+import { ColumnValuesEditor } from '../columnValues';
 import { InstanceCtx, DesignCtx } from '../../contexts';
 import { evalContextVarExpr } from '../evalContextVarExpr';
+import { ContextVarExpr } from '../../ContextVarExpr';
 
 export interface AddRowActionDef extends ActionDef {
   type: "addRow"

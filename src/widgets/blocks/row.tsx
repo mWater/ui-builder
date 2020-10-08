@@ -1,15 +1,16 @@
 import produce from 'immer'
 import * as React from 'react';
-import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock, createExprVariables } from '../blocks'
+import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../blocks'
 import * as _ from 'lodash';
 import { Expr, ExprValidator, Table } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
-import { TextInput } from 'react-library/lib/bootstrap';
+import { TextInput, Toggle } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
-import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, TableSelect, ContextVarExprPropertyEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { useEffect, useState } from 'react';
 import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from '../../contexts';
+import { ContextVarExpr } from '../../ContextVarExpr';
 
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
@@ -21,8 +22,14 @@ export interface RowBlockDef extends BlockDef {
   /** Name of the row context variable */
   name?: string | null
 
-  /** Filter which filters table down to one row */
-  filter: Expr
+  /** Mode to use to get the one row. Either by specifying a filter or by specifying an id. Default "filter" */
+  mode?: "filter" | "id"
+
+  /** For mode = "filter": Filter which filters table down to one row. Boolean expression */
+  filter?: Expr
+
+  /** For mode = "id": context var expression to get the id to use */
+  idContextVarExpr?: ContextVarExpr
 
   /** Block which is in the row */
   content: BlockDef | null
@@ -44,6 +51,13 @@ export class RowBlock extends Block<RowBlockDef> {
     return null
   }
 
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
+    if (this.blockDef.idContextVarExpr && contextVar.id == this.blockDef.idContextVarExpr.contextVarId) {
+      return [this.blockDef.idContextVarExpr.expr]
+    }
+    return []
+  }
+
   validate(options: DesignCtx) { 
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     let error: string | null
@@ -52,10 +66,33 @@ export class RowBlock extends Block<RowBlockDef> {
       return "Missing table"
     }
 
-    // Validate where
-    error = exprValidator.validateExpr(this.blockDef.filter, { table: this.blockDef.table, types: ["boolean"] })
-    if (error) {
-      return error
+    const mode = this.blockDef.mode || "filter"
+    
+    // Validate filter
+    if (mode == "filter") {
+      error = exprValidator.validateExpr(this.blockDef.filter || null, { table: this.blockDef.table, types: ["boolean"] })
+      if (error) {
+        return error
+      }
+    }
+
+    // Validate idContextVarExpr
+    if (mode == "id") {
+      if (!this.blockDef.idContextVarExpr) {
+        return "Id expression required"
+      }
+
+      error = validateContextVarExpr({
+        contextVars: options.contextVars,
+        schema: options.schema,
+        contextVarId: this.blockDef.idContextVarExpr.contextVarId,
+        expr: this.blockDef.idContextVarExpr.expr,
+        idTable: this.blockDef.table,
+        types: ["id"],
+      })
+      if (error) {
+        return error
+      }
     }
 
     return null
@@ -111,6 +148,8 @@ export class RowBlock extends Block<RowBlockDef> {
       }))
     }
 
+    const mode = this.blockDef.mode || "filter"
+
     return (
       <div>
         <h3>Row</h3>
@@ -122,7 +161,20 @@ export class RowBlock extends Block<RowBlockDef> {
             {(value, onChange) => <TextInput value={value || null} onChange={onChange} placeholder="Unnamed" />}
           </PropertyEditor>
         </LabeledProperty>
-        { this.blockDef.table ? 
+        <LabeledProperty label="Mode" key="mode">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="mode">
+            {(value, onChange) =>
+              <Toggle 
+                value={value || "filter"} 
+                onChange={onChange} 
+                options={[
+                  { value: "filter", label: "By Filter" },
+                  { value: "id", label: "By ID" }
+                ]} />
+              }
+          </PropertyEditor>
+        </LabeledProperty>
+        { this.blockDef.table && mode == "filter" ? 
         <LabeledProperty label="Filter" help="Should only match one row">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
             {(value, onChange) => 
@@ -134,6 +186,25 @@ export class RowBlock extends Block<RowBlockDef> {
                 table={this.blockDef.table!}
                 variables={createExprVariables(props.contextVars)}
                 />}
+          </PropertyEditor>
+        </LabeledProperty>
+        : null }
+        { this.blockDef.table && mode == "id" ? 
+        <LabeledProperty label="ID of row">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idContextVarExpr">
+            {(value, onChange) => 
+              <ContextVarExprPropertyEditor
+                contextVars={props.contextVars}
+                contextVarId={value ? value.contextVarId : null}
+                expr={value ? value.expr : null}
+                onChange={(contextVarId, expr) => {
+                  onChange({ contextVarId, expr })
+                }}
+                schema={props.schema} 
+                dataSource={props.dataSource}
+                idTable={this.blockDef.table}
+                types={["id"]}
+              />}
           </PropertyEditor>
         </LabeledProperty>
         : null }
@@ -155,27 +226,37 @@ const RowInstance = (props: {
   const [loading, setLoading] = useState(true)
   const [id, setId] = useState<string | null>()
 
+  const mode = blockDef.mode || "filter"
+
   useEffect(() => {
-    // Query to get match
-    db.query({
-      select: { id: { type: "id", table: table }},
-      from: table,
-      where: blockDef.filter,
-      limit: 1
-    }, instanceProps.contextVars, getFilteredContextVarValues(instanceProps))
-      .then((rows) => {
-        if (rows.length > 0) {
-          setId(rows[0].id)
-        }
-        else {
-          setId(null)
-        }
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err)
-        setLoading(false)
-      })
+    if (mode == "filter") {
+      // Query to get match
+      db.query({
+        select: { id: { type: "id", table: table }},
+        from: table,
+        where: blockDef.filter,
+        limit: 1
+      }, instanceProps.contextVars, getFilteredContextVarValues(instanceProps))
+        .then((rows) => {
+          if (rows.length > 0) {
+            setId(rows[0].id)
+          }
+          else {
+            setId(null)
+          }
+          setLoading(false)
+        })
+        .catch(err => {
+          setError(err)
+          setLoading(false)
+        })
+    }
+    else {
+      // Just set id from context var
+      const exprValue = instanceProps.getContextVarExprValue(blockDef.idContextVarExpr!.contextVarId, blockDef.idContextVarExpr!.expr)
+      setId(exprValue)
+      setLoading(false)
+    }
   }, [])
 
   if (loading) {

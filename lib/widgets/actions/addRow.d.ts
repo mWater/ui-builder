@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { ContextVarExpr } from '../columnValues';
 import { InstanceCtx, DesignCtx } from '../../contexts';
+import { ContextVarExpr } from '../../ContextVarExpr';
 export interface AddRowActionDef extends ActionDef {
     type: "addRow";
     table: string | null;

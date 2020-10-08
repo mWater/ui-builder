@@ -4,10 +4,11 @@ import { BlockDef, ContextVar, ChildBlock, createExprVariables, CreateBlock, Blo
 import * as _ from 'lodash';
 import { ExprValidator, Schema, LiteralExpr, Expr, ExprCompiler, ExprUtils } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
-import { TextInput, Select, Radio } from 'react-library/lib/bootstrap';
+import { TextInput,  Radio } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
-import { ColumnValuesEditor, ContextVarExpr } from '../columnValues';
+import { ColumnValuesEditor } from '../columnValues';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import { ContextVarExpr } from '../../ContextVarExpr';
 
 /** Block which creates a new row and adds it as a context variable to its content */
 export interface AddRowBlockDef extends BlockDef {
