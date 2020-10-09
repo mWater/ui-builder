@@ -18,3 +18,4 @@ export { ControlBlock, ControlBlockDef, RenderControlProps } from './widgets/blo
 export * from './embeddedExprs';
 export * from './database/VirtualDatabase';
 export { localize } from './widgets/localization';
+export { ContextVarExpr } from './ContextVarExpr';
