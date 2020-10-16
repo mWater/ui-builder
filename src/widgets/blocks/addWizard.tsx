@@ -121,7 +121,8 @@ const AddWizardPane = (props: {
             id: uuid(),
             type: "textbox",
             rowContextVarId: contextVar.id,
-            column: column.id
+            column: column.id,
+            required: column.required
           } as TextboxBlockDef)
         }
 
@@ -131,7 +132,8 @@ const AddWizardPane = (props: {
             type: "numberbox",
             decimal: true,
             rowContextVarId: contextVar.id,
-            column: column.id
+            column: column.id,
+            required: column.required
           } as NumberboxBlockDef)
         }
 
@@ -140,7 +142,8 @@ const AddWizardPane = (props: {
             id: uuid(),
             type: "datefield",
             rowContextVarId: contextVar.id,
-            column: column.id
+            column: column.id,
+            required: column.required
           } as DatefieldBlockDef)
         }
 
@@ -153,7 +156,8 @@ const AddWizardPane = (props: {
             id: uuid(),
             type: "dropdown",
             rowContextVarId: contextVar.id,
-            column: column.id
+            column: column.id,
+            required: column.required
           } as DropdownBlockDef)
         }
       }
