@@ -35,7 +35,7 @@ interface State {
   redoStack: WidgetDef[]
 }
 
-/** Design mode for a single widget */
+/** Design mode for a single widget. Ensures that blockdefs are always canonical */
 export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
   constructor(props: WidgetDesignerProps) {
     super(props)
@@ -75,15 +75,23 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     this.props.onWidgetDefChange(redoValue)
   }
 
-
-  // Set the widget block
-  handleBlockDefChange = (blockDef: BlockDef | null) => {
+  /** Canonicalize the widget's block and all children, returning the canonical version */
+  canonicalize(blockDef: BlockDef | null) {
     // Canonicalize
     if (blockDef) {
-      blockDef = this.props.baseCtx.createBlock(blockDef).process(this.props.baseCtx.createBlock, (b: BlockDef) => {
+      // Processes entire tree, canonicalizing it
+      return this.props.baseCtx.createBlock(blockDef).process(this.props.baseCtx.createBlock, (b: BlockDef) => {
         return this.props.baseCtx.createBlock(b).canonicalize()
       })
     }
+    return blockDef
+  }
+
+  // Set the widget block
+  handleBlockDefChange = (blockDef: BlockDef | null) => {
+    // Canonicalize so that saved version is always canonical
+    blockDef = this.canonicalize(blockDef)
+
     this.handleWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 
@@ -309,6 +317,17 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   }
 
   render() {
+    // Check if canonical
+    const canonilizedBlockDef = this.canonicalize(this.props.widgetDef.blockDef)
+    if (!_.isEqual(canonilizedBlockDef, this.props.widgetDef.blockDef)) {
+      // Is not canonical. Defer update (since we can't call directly in render)
+      // and return null
+      setTimeout(() => {
+        this.handleBlockDefChange(canonilizedBlockDef)
+      })
+      return null
+    }
+
     return (
       <div className="widget-designer">
         <div className="widget-designer-header">

@@ -38,6 +38,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
     if (this.blockDef.items.length === 0) {
       return null
     }
+    
     // Collapse if one item
     if (this.blockDef.items.length === 1) {
       return this.blockDef.items[0]

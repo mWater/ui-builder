@@ -76,6 +76,11 @@ export interface ChildBlock {
   contextVars: ContextVar[]
 }
 
+/** Block class. Ephemeral class that is created for a block def and 
+ * contains the logic and display for a block type.
+ * Note: Designer (renderDesign and renderEditor) can assume that the block def is canonical.
+ * Instance, however, cannot assume that.
+ */
 export abstract class Block<T extends BlockDef> {
   blockDef: T
 
@@ -154,8 +159,9 @@ export abstract class Block<T extends BlockDef> {
     return ownFilters
   }
   
-  
-  /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children */
+  /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children.
+   * Can also be used to upgrade blocks
+   */
   canonicalize(): BlockDef | null {
     return this.blockDef
   }
