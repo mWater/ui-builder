@@ -42,11 +42,25 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
     if (this.blockDef.items.length === 1) {
       return this.blockDef.items[0]
     }
+
     // Flatten out nested horizontal blocks
-    return produce(this.blockDef, (draft) => {
-      const items = draft.items.map(item => item.type === "horizontal" ? (item as HorizontalBlockDef).items : item)
-      draft.items = items.reduce((a: BlockDef[], b) => a.concat(b), []) as BlockDef[]
-    })
+    if (this.blockDef.items.some(bd => bd.type == "horizontal")) {
+      // Create list of items
+      let newItems: BlockDef[] = []
+      for (const item of this.blockDef.items) {
+        if (item.type == "horizontal") {
+          newItems = newItems.concat((item as HorizontalBlockDef).items)
+        }
+        else {
+          newItems.push(item)
+        }
+      }
+      return produce(this.blockDef, (draft) => {
+        draft.items = newItems
+      })
+    }
+
+    return this.blockDef
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {

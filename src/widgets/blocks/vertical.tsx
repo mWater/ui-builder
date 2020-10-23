@@ -41,11 +41,26 @@ export class VerticalBlock extends Block<VerticalBlockDef> {
     }
 
     // Flatten out nested vertical blocks
-    return produce(this.blockDef, (draft) => {
-      const items = draft.items.map(item => item.type === "vertical" ? (item as VerticalBlockDef).items : item)
-      draft.items = items.reduce((a: BlockDef[], b) => a.concat(b), []) as BlockDef[]
-    })
+    if (this.blockDef.items.some(bd => bd.type == "vertical")) {
+      // Create list of items
+      let newItems: BlockDef[] = []
+      for (const item of this.blockDef.items) {
+        if (item.type == "vertical") {
+          newItems = newItems.concat((item as VerticalBlockDef).items)
+        }
+        else {
+          newItems.push(item)
+        }
+      }
+      return produce(this.blockDef, (draft) => {
+        draft.items = newItems
+      })
+    }
+
+    return this.blockDef
   }
+
+
 
   renderDesign(props: DesignCtx) {
     // Add keys
