@@ -1,18 +1,13 @@
 import React, { ReactNode } from "react"
-import _ from 'lodash'
 import { TOCBlockDef, TOCItem, alterItems, iterateItems } from "./toc"
 import { BlockDef } from ".."
 import { useState } from "react"
 import produce from "immer"
 import uuid from "uuid"
-import { localize } from "../../localization"
 import SplitPane from "./SplitPane"
-import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors"
-import { Select } from "react-library/lib/bootstrap"
-import { LocalizedString } from "mwater-expressions"
 import { DesignCtx } from "../../../contexts"
 import { TextBlockDef } from "../text"
-import { ContextVarExpr } from "../../../ContextVarExpr"
+import { TOCDesignRightPane } from "./TOCDesignRightPane"
 
 /** Designer component for TOC */
 export default function TOCDesignComp(props: { 
@@ -34,9 +29,15 @@ export default function TOCDesignComp(props: {
     }))
   }
 
-  const handleAddItem = () => {
+  function handleSetItems(items: TOCItem[]) {
     renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
-      bd.items.push({
+      bd.items = items
+    }))
+  }
+
+  const handleAddItem = () => {
+    handleSetItems(produce(blockDef.items, draft => {
+      draft.push({
         id: uuid(), 
         labelBlock: { type: "text", id: uuid.v4(), text: { _base: renderProps.locale, [renderProps.locale]: "New Item" }} as TextBlockDef, 
         children: [],
@@ -66,6 +67,15 @@ export default function TOCDesignComp(props: {
     })
   }
 
+  function handleSetChildren(item: TOCItem, children: TOCItem[]) {
+    alterBlockItems((draft: TOCItem) => {
+      if (draft.id === item.id) {
+        draft.children = children
+      }
+      return draft
+    })
+  }
+
   const addChildItem = (itemId: string) => {
     alterBlockItems((item: TOCItem) => {
       if (item.id === itemId) {
@@ -83,7 +93,6 @@ export default function TOCDesignComp(props: {
     alterBlockItems((item: TOCItem) => item.id === itemId ? null : item)
   }
 
-
   // Render the dropdown gear menu to edit an entry
   const renderCaretMenu = (item: TOCItem) => {
     return <CaretMenu items={
@@ -97,7 +106,7 @@ export default function TOCDesignComp(props: {
   const renderLeft = () => {
     return <div style={{ padding: 10 }}>
       { renderProps.renderChildBlock(renderProps, blockDef.header, handleHeaderSet) }
-      { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
+      { renderItems(blockDef.items, 0, handleSetItems) }
       <button type="button" className="btn btn-link btn-xs" onClick={handleAddItem}>
         <i className="fa fa-plus"/> Add Item
       </button>
@@ -105,8 +114,12 @@ export default function TOCDesignComp(props: {
     </div>
   }
 
+  function renderItems(items: TOCItem[], depth: number, onItemsChange: (items: TOCItem[]) => void) {
+    return items.map((item, index) => renderItem(blockDef.items, index, depth))
+  }
+
   /** Render an item at a specified depth which starts at 0 */
-  const renderItem = (items: TOCItem[], index: number, depth: number) => {
+  function renderItem(items: TOCItem[], index: number, depth: number) {
     const item = items[index]
 
     // Determine style of item label
@@ -120,154 +133,43 @@ export default function TOCDesignComp(props: {
     return <div>
       <div key="main" style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", alignItems: "center", backgroundColor: item.id == selectedId ? "#DDD" : undefined }}>
         <div onClick={handleItemClick.bind(null, item)} style={{ cursor: "pointer", paddingTop: 2, paddingLeft: 5 }}>
-          { item.id == selectedId ?
-            <i className="fa fa-arrow-circle-right text-primary"/>
-           : <i className="fa fa-circle-thin text-muted"/> }
+          {item.id == selectedId ?
+            <i className="fa fa-arrow-circle-right text-primary" />
+            : <i className="fa fa-circle-thin" style={{ color: "#EEE" }} />}
         </div>
         <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
-          {renderProps.renderChildBlock(renderProps, item.labelBlock || null, setItemLabelBlock.bind(null, item)) }
+          {renderProps.renderChildBlock(renderProps, item.labelBlock || null, setItemLabelBlock.bind(null, item))}
         </div>
-        { renderCaretMenu(item) }
+        {renderCaretMenu(item)}
       </div>
-      { item.children.length > 0 ? 
+      {item.children.length > 0 ?
         <div style={{ marginLeft: 10 }} key="children">
-          { item.children.map((child, index) => renderItem(item.children, index, depth + 1)) }
+          { renderItems(item.children, depth + 1, handleSetChildren.bind(null, item)) }
         </div>
-      : null}
+        : null}
     </div>
   }
   
   // Get selected item
   const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
-  const selectedWidgetId = selectedItem ? selectedItem.widgetId : null
-
-  const handleLabelBlockChange = (labelBlock: BlockDef | null) => {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === selectedItem!.id) {
-        draft.labelBlock = labelBlock
-      }
-      return draft
-    })
-  }
-
-  const handleWidgetIdChange = (widgetId: string | null) => {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === selectedItem!.id) {
-        draft.widgetId = widgetId
-      }
-      return draft
-    })
-  }
-
-  const handleTitleChange = (title: LocalizedString | null) => {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === selectedItem!.id) {
-        draft.title = title
-      }
-      return draft
-    })
-  }
-
-  const handleContextVarMapChange = (contextVarMap: { [internalContextVarId: string]: string }) => {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === selectedItem!.id) {
-        draft.contextVarMap = contextVarMap
-      }
-      return draft
-    })
-  }
-
-  const handleConditionChange = (condition: ContextVarExpr) => {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === selectedItem!.id) {
-        draft.condition = condition
-      }
-      return draft
-    })
-  }
 
   const renderRight = () => {
     if (!selectedItem) {
       return null
     }
-    
-    // Create widget options 
-    const widgetOptions = _.sortBy(Object.values(props.renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
 
-    const renderContextVarValues = () => {
-      if (!selectedItem!.widgetId) {
-        return null
-      }
-
-      // Find the widget
-      const widgetDef = renderProps.widgetLibrary.widgets[selectedItem!.widgetId]
-      if (!widgetDef) {
-        return null
-      }
-
-      const contextVarMap = selectedItem!.contextVarMap || {}
-
-      return (
-        <table className="table table-bordered table-condensed">
-          <tbody>
-            { widgetDef.contextVars.map(contextVar => {
-              const cv = contextVarMap[contextVar.id]
-              const handleCVChange = (contextVarId: string | null) => {
-                if (contextVarId) {
-                  handleContextVarMapChange({ ...contextVarMap, [contextVar.id]: contextVarId })
-                }
-                else {
-                  handleContextVarMapChange(produce(contextVarMap, draft => { delete draft[contextVar.id] }))
-                }
-              }
-
-              return (
-                <tr key={contextVar.id}>
-                  <td key="name">{contextVar.name}</td>
-                  <td key="value">
-                    <ContextVarPropertyEditor 
-                      contextVars={renderProps.contextVars}  
-                      types={[contextVar.type]}
-                      table={contextVar.table}
-                      value={cv}
-                      onChange={handleCVChange}
-                    />
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      )
-    }
-
-    return (
-      <div style={{ padding: 10 }}>
-        <LabeledProperty label="Label">
-          { renderProps.renderChildBlock(renderProps, selectedItem.labelBlock || null, handleLabelBlockChange)}
-        </LabeledProperty>
-        <LabeledProperty label="Widget">
-          <Select value={selectedWidgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
-        </LabeledProperty>
-        <LabeledProperty label="Page title (optional)">
-          <LocalizedTextPropertyEditor value={selectedItem.title || null} onChange={handleTitleChange} locale={props.renderProps.locale} />
-        </LabeledProperty>
-        <LabeledProperty label="Variable Mappings">
-          {renderContextVarValues()}
-        </LabeledProperty>
-        <LabeledProperty label="Conditional display (optional)">
-          <ContextVarExprPropertyEditor
-            schema={renderProps.schema}          
-            dataSource={renderProps.dataSource}
-            contextVars={renderProps.contextVars}
-            contextVarId={selectedItem.condition ? selectedItem.condition.contextVarId : null}
-            expr={selectedItem.condition ? selectedItem.condition.expr : null}
-            onChange={(contextVarId, expr) => { handleConditionChange({ contextVarId, expr })}}
-            types={["boolean"]}
-          />
-        </LabeledProperty>
-      </div>
-    )
+    return <TOCDesignRightPane
+      selectedItem={selectedItem}
+      renderProps={renderProps}
+      onItemChange={ item => {
+        alterBlockItems(draft => {
+          if (draft.id == selectedItem.id) {
+            return item
+          }
+          return draft
+        })
+      }}
+    />
   }
 
   // Render overall structure
@@ -291,3 +193,4 @@ const CaretMenu = (props: { items: Array<{ label: ReactNode, onClick: () => void
     </ul>
   </div>    
 }
+
