@@ -8,6 +8,7 @@ import SplitPane from "./SplitPane"
 import { DesignCtx } from "../../../contexts"
 import { TextBlockDef } from "../text"
 import { TOCDesignRightPane } from "./TOCDesignRightPane"
+import { DraggableProvidedDragHandleProps, ReorderableList } from "./ReorderableList"
 
 /** Designer component for TOC */
 export default function TOCDesignComp(props: { 
@@ -23,21 +24,21 @@ export default function TOCDesignComp(props: {
   const handleItemClick = (item: TOCItem) => { setSelectedId(item.id) }
 
   /** Alter items using an action */
-  const alterBlockItems = (action: (draft: TOCItem) => TOCItem | TOCItem[] | undefined | null) => {
-    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
-      bd.items = alterItems(bd.items, action)
+  const alterBlockItems = (action: (item: TOCItem) => TOCItem | TOCItem[] | undefined | null) => {
+    renderProps.store.replaceBlock(produce(blockDef, draft => {
+      draft.items = alterItems(draft.items, action)
     }))
   }
 
   function handleSetItems(items: TOCItem[]) {
-    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
-      bd.items = items
+    renderProps.store.replaceBlock(produce(blockDef, draft => {
+      draft.items = items
     }))
   }
 
   const handleAddItem = () => {
-    handleSetItems(produce(blockDef.items, draft => {
-      draft.push({
+    renderProps.store.replaceBlock(produce(blockDef, draft => {
+      draft.items.push({
         id: uuid(), 
         labelBlock: { type: "text", id: uuid.v4(), text: { _base: renderProps.locale, [renderProps.locale]: "New Item" }} as TextBlockDef, 
         children: [],
@@ -47,42 +48,44 @@ export default function TOCDesignComp(props: {
   }
 
   const handleHeaderSet = (header: BlockDef | null) => {
-    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
-      bd.header = header
+    renderProps.store.replaceBlock(produce(blockDef, draft => {
+      draft.header = header
     }))
   }
 
   const handleFooterSet = (footer: BlockDef | null) => {
-    renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
-      bd.footer = footer
+    renderProps.store.replaceBlock(produce(blockDef, draft => {
+      draft.footer = footer
     }))
   }
 
-  const setItemLabelBlock = (item: TOCItem, labelBlock: BlockDef | null) => {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === item.id) {
-        draft.labelBlock = labelBlock
+  const setItemLabelBlock = (itemId: string, labelBlock: BlockDef | null) => {
+    alterBlockItems((item: TOCItem) => {
+      if (item.id === itemId) {
+        return { ...item, labelBlock }
       }
-      return draft
+      return item
     })
   }
 
-  function handleSetChildren(item: TOCItem, children: TOCItem[]) {
-    alterBlockItems((draft: TOCItem) => {
-      if (draft.id === item.id) {
-        draft.children = children
+  function handleSetChildren(itemId: string, children: TOCItem[]) {
+    alterBlockItems((item: TOCItem) => {
+      if (item.id === itemId) {
+        return { ...item, children }
       }
-      return draft
+      return item
     })
   }
 
   const addChildItem = (itemId: string) => {
     alterBlockItems((item: TOCItem) => {
       if (item.id === itemId) {
-        item.children.push({ 
-          id: uuid(), 
-          labelBlock: { type: "text", id: uuid.v4(), text: { _base: renderProps.locale, [renderProps.locale]: "New Item" }} as TextBlockDef, 
-          children: []
+        return produce(item, draft => {
+          draft.children.push({ 
+            id: uuid(), 
+            labelBlock: { type: "text", id: uuid.v4(), text: { _base: renderProps.locale, [renderProps.locale]: "New Item" }} as TextBlockDef, 
+            children: []
+          })
         })
       }
       return item
@@ -115,13 +118,20 @@ export default function TOCDesignComp(props: {
   }
 
   function renderItems(items: TOCItem[], depth: number, onItemsChange: (items: TOCItem[]) => void) {
-    return items.map((item, index) => renderItem(blockDef.items, index, depth))
+    return <ReorderableList
+      items={items}
+      onItemsChange={onItemsChange}
+      getItemId={item => item.id}
+      renderItem={(item, index, innerRef, draggableProps, dragHandleProps) => (
+        <div {...draggableProps} ref={innerRef}>
+          { renderItem(item, index, depth, dragHandleProps) }
+        </div>
+      )}
+    />
   }
 
   /** Render an item at a specified depth which starts at 0 */
-  function renderItem(items: TOCItem[], index: number, depth: number) {
-    const item = items[index]
-
+  function renderItem(item: TOCItem, index: number, depth: number, dragHandleProps?: DraggableProvidedDragHandleProps) {
     // Determine style of item label
     const itemLabelStyle: React.CSSProperties = {
       padding: 5,
@@ -131,20 +141,20 @@ export default function TOCDesignComp(props: {
     }
 
     return <div>
-      <div key="main" style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", alignItems: "center", backgroundColor: item.id == selectedId ? "#DDD" : undefined }}>
-        <div onClick={handleItemClick.bind(null, item)} style={{ cursor: "pointer", paddingTop: 2, paddingLeft: 5 }}>
-          {item.id == selectedId ?
-            <i className="fa fa-arrow-circle-right text-primary" />
-            : <i className="fa fa-circle-thin" style={{ color: "#EEE" }} />}
+      <div key="main" 
+        style={{ display: "grid", gridTemplateColumns: "auto auto 1fr auto", alignItems: "center", backgroundColor: item.id == selectedId ? "#DDD" : undefined }}
+        onClick={handleItemClick.bind(null, item)}>
+        <div style={{ cursor: "pointer", paddingTop: 2, paddingLeft: 5 }} {...dragHandleProps}>
+          <i className="fa fa-bars text-muted" />
         </div>
-        <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
-          {renderProps.renderChildBlock(renderProps, item.labelBlock || null, setItemLabelBlock.bind(null, item))}
+        <div style={itemLabelStyle}>
+          {renderProps.renderChildBlock(renderProps, item.labelBlock || null, setItemLabelBlock.bind(null, item.id))}
         </div>
         {renderCaretMenu(item)}
       </div>
       {item.children.length > 0 ?
         <div style={{ marginLeft: 10 }} key="children">
-          { renderItems(item.children, depth + 1, handleSetChildren.bind(null, item)) }
+          { renderItems(item.children, depth + 1, handleSetChildren.bind(null, item.id)) }
         </div>
         : null}
     </div>

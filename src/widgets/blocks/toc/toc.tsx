@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as _ from 'lodash'
 import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
-import produce from 'immer'
+import { produce, original } from 'immer'
 import { Expr, LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
@@ -70,11 +70,12 @@ export const iterateItems = (items: TOCItem[]): TOCItem[] => {
 /** Alter each item, allowing item to be mutated, replaced (return item or array of items) or deleted (return null) */
 export const alterItems = (items: TOCItem[], action: (item: TOCItem) => undefined | null | TOCItem | TOCItem[]): TOCItem[] => {
   const newItems = _.flatten(_.compact(items.map(item => action(item)))) as TOCItem[]
-
-  for (const ni of newItems) {
-    ni.children = alterItems(ni.children, action)
-  }
-  return newItems
+  
+  return produce(newItems, draft => {
+    for (const ni of draft) {
+      ni.children = alterItems(original(ni.children) as TOCItem[], action)
+    }
+  })
 }
 
 export class TOCBlock extends Block<TOCBlockDef> {
