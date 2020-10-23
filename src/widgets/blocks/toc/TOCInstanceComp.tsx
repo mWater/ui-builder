@@ -51,6 +51,14 @@ export default function TOCInstanceComp(props: {
   const renderItem = (items: TOCItem[], index: number, depth: number) => {
     const item = items[index]
 
+    // Determine if visible
+    if (item.condition && item.condition.expr) {
+      const conditionValue = instanceCtx.getContextVarExprValue(item.condition.contextVarId, item.condition.expr)
+      if (conditionValue === false) {
+        return null
+      }
+    }
+
     // Determine style of item label
     const itemLabelStyle: React.CSSProperties = {
       padding: 5,
@@ -66,7 +74,11 @@ export default function TOCInstanceComp(props: {
 
     return <div key={item.id}>
       <div key="label" onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
-        {localize(item.label, instanceCtx.locale)}
+        { item.label != null ? 
+          localize(item.label, instanceCtx.locale) // Legacy support of label
+          : 
+          instanceCtx.renderChildBlock(instanceCtx, item.labelBlock || null)
+        }
       </div>
       { item.children.length > 0 ? 
         <div key="children" style={{ marginLeft: 10 }}>

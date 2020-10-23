@@ -2,13 +2,16 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
 import produce from 'immer'
-import { LocalizedString } from 'mwater-expressions'
+import { Expr, LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
 import './toc.css'
 import { PropertyEditor } from '../../propertyEditors'
 import { Checkbox } from 'react-library/lib/bootstrap'
 import { DesignCtx, InstanceCtx } from '../../../contexts'
+import { TextBlockDef } from '../text'
+import uuid from 'uuid'
+import { ContextVarExpr } from '../../../ContextVarExpr'
 
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
@@ -32,8 +35,11 @@ export interface TOCItem {
   /** uuid id */
   id: string
 
-  /** Localized label */
-  label: LocalizedString
+  /** Label to be displayed for entry */
+  labelBlock?: BlockDef | null
+
+  /** DEPRECATED: Localized label. Use labelBlock @deprecated */
+  label?: LocalizedString
 
   /** Localized title of page */
   title?: LocalizedString | null
@@ -46,6 +52,9 @@ export interface TOCItem {
 
   /** Any children items */
   children: TOCItem[]
+
+  /** Optional condition for display */
+  condition?: ContextVarExpr
 }
 
 /** Create a flat list of all items */
@@ -72,8 +81,14 @@ export class TOCBlock extends Block<TOCBlockDef> {
   /** Get child blocks */
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Iterate all 
-    return _.compact([this.blockDef.header, this.blockDef.footer])
+    return _.compact([this.blockDef.header, this.blockDef.footer].concat(iterateItems(this.blockDef.items).map(item => item.labelBlock || null)))
       .map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+  }
+
+  /** Get any context variables expressions that this block needs (not including child blocks) */
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
+    return _.compact(iterateItems(this.blockDef.items).map(
+      item => item.condition && item.condition.contextVarId == contextVar.id ? item.condition.expr : null))
   }
 
   validate(designCtx: DesignCtx) { 
@@ -113,10 +128,30 @@ export class TOCBlock extends Block<TOCBlockDef> {
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
-    // For header and footer
     return produce(this.blockDef, (draft: TOCBlockDef) => {
+      // For header and footer
       draft.header = action(this.blockDef.header)
       draft.footer = action(this.blockDef.footer)
+
+      // For all other blocks
+      for (const item of iterateItems(draft.items)) {
+        item.labelBlock = action(item.labelBlock || null)
+      }
+    })
+  }
+
+  /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children.
+   * Can also be used to upgrade blocks
+   */
+  canonicalize(): BlockDef | null {
+    // Upgrade any labels to labelBlocks
+    return produce(this.blockDef, draft => {
+      for (const item of iterateItems(draft.items)) {
+        if (item.label && !item.labelBlock) {
+          item.labelBlock = { type: "text", text: item.label, id: uuid.v4() } as TextBlockDef
+          delete item.label
+        }
+      }
     })
   }
 

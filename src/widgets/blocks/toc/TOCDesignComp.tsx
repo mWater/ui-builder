@@ -7,10 +7,12 @@ import produce from "immer"
 import uuid from "uuid"
 import { localize } from "../../localization"
 import SplitPane from "./SplitPane"
-import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors"
+import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors"
 import { Select } from "react-library/lib/bootstrap"
 import { LocalizedString } from "mwater-expressions"
 import { DesignCtx } from "../../../contexts"
+import { TextBlockDef } from "../text"
+import { ContextVarExpr } from "../../../ContextVarExpr"
 
 /** Designer component for TOC */
 export default function TOCDesignComp(props: { 
@@ -36,7 +38,7 @@ export default function TOCDesignComp(props: {
     renderProps.store.alterBlock(blockDef.id, produce((bd: TOCBlockDef) => {
       bd.items.push({
         id: uuid(), 
-        label: { _base: renderProps.locale, [renderProps.locale]: "New Item" }, 
+        labelBlock: { type: "text", id: uuid.v4(), text: { _base: renderProps.locale, [renderProps.locale]: "New Item" }} as TextBlockDef, 
         children: [],
         contextVarMap: {}
       })
@@ -55,16 +57,10 @@ export default function TOCDesignComp(props: {
     }))
   }
 
-  const editItemLabel = (item: TOCItem) => {
-    const newlabel = prompt("Enter new label", localize(item.label, renderProps.locale))
-    if (!newlabel) {
-      return
-    }
-
+  const setItemLabelBlock = (item: TOCItem, labelBlock: BlockDef | null) => {
     alterBlockItems((draft: TOCItem) => {
       if (draft.id === item.id) {
-        draft.label._base = renderProps.locale
-        draft.label[renderProps.locale] = newlabel
+        draft.labelBlock = labelBlock
       }
       return draft
     })
@@ -75,7 +71,7 @@ export default function TOCDesignComp(props: {
       if (item.id === itemId) {
         item.children.push({ 
           id: uuid(), 
-          label: { _base: renderProps.locale, [renderProps.locale]: "New Item" }, 
+          labelBlock: { type: "text", id: uuid.v4(), text: { _base: renderProps.locale, [renderProps.locale]: "New Item" }} as TextBlockDef, 
           children: []
         })
       }
@@ -92,7 +88,6 @@ export default function TOCDesignComp(props: {
   const renderCaretMenu = (item: TOCItem) => {
     return <CaretMenu items={
       [
-        { label: "Edit Label", onClick: () => editItemLabel(item)},
         { label: "Add Subitem", onClick: () => addChildItem(item.id)},
         { label: "Delete", onClick: () => deleteItem(item.id)}
       ]
@@ -117,22 +112,25 @@ export default function TOCDesignComp(props: {
     // Determine style of item label
     const itemLabelStyle: React.CSSProperties = {
       padding: 5,
-      cursor: "pointer"
     }
     if (depth === 0) {
       itemLabelStyle.fontWeight = "bold"
     }
-    if (item.id === selectedId) {
-      itemLabelStyle.backgroundColor = "#DDD"
-    }
 
     return <div>
-      <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
-        {localize(item.label, renderProps.locale)}
+      <div key="main" style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", alignItems: "center", backgroundColor: item.id == selectedId ? "#DDD" : undefined }}>
+        <div onClick={handleItemClick.bind(null, item)} style={{ cursor: "pointer", paddingTop: 2, paddingLeft: 5 }}>
+          { item.id == selectedId ?
+            <i className="fa fa-arrow-circle-right text-primary"/>
+           : <i className="fa fa-circle-thin text-muted"/> }
+        </div>
+        <div onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
+          {renderProps.renderChildBlock(renderProps, item.labelBlock || null, setItemLabelBlock.bind(null, item)) }
+        </div>
         { renderCaretMenu(item) }
       </div>
       { item.children.length > 0 ? 
-        <div style={{ marginLeft: 10 }}>
+        <div style={{ marginLeft: 10 }} key="children">
           { item.children.map((child, index) => renderItem(item.children, index, depth + 1)) }
         </div>
       : null}
@@ -142,6 +140,15 @@ export default function TOCDesignComp(props: {
   // Get selected item
   const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
   const selectedWidgetId = selectedItem ? selectedItem.widgetId : null
+
+  const handleLabelBlockChange = (labelBlock: BlockDef | null) => {
+    alterBlockItems((draft: TOCItem) => {
+      if (draft.id === selectedItem!.id) {
+        draft.labelBlock = labelBlock
+      }
+      return draft
+    })
+  }
 
   const handleWidgetIdChange = (widgetId: string | null) => {
     alterBlockItems((draft: TOCItem) => {
@@ -165,6 +172,15 @@ export default function TOCDesignComp(props: {
     alterBlockItems((draft: TOCItem) => {
       if (draft.id === selectedItem!.id) {
         draft.contextVarMap = contextVarMap
+      }
+      return draft
+    })
+  }
+
+  const handleConditionChange = (condition: ContextVarExpr) => {
+    alterBlockItems((draft: TOCItem) => {
+      if (draft.id === selectedItem!.id) {
+        draft.condition = condition
       }
       return draft
     })
@@ -227,6 +243,9 @@ export default function TOCDesignComp(props: {
 
     return (
       <div style={{ padding: 10 }}>
+        <LabeledProperty label="Label">
+          { renderProps.renderChildBlock(renderProps, selectedItem.labelBlock || null, handleLabelBlockChange)}
+        </LabeledProperty>
         <LabeledProperty label="Widget">
           <Select value={selectedWidgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
         </LabeledProperty>
@@ -235,6 +254,17 @@ export default function TOCDesignComp(props: {
         </LabeledProperty>
         <LabeledProperty label="Variable Mappings">
           {renderContextVarValues()}
+        </LabeledProperty>
+        <LabeledProperty label="Conditional display (optional)">
+          <ContextVarExprPropertyEditor
+            schema={renderProps.schema}          
+            dataSource={renderProps.dataSource}
+            contextVars={renderProps.contextVars}
+            contextVarId={selectedItem.condition ? selectedItem.condition.contextVarId : null}
+            expr={selectedItem.condition ? selectedItem.condition.expr : null}
+            onChange={(contextVarId, expr) => { handleConditionChange({ contextVarId, expr })}}
+            types={["boolean"]}
+          />
         </LabeledProperty>
       </div>
     )

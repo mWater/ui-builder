@@ -116,7 +116,7 @@ export abstract class Block<T extends BlockDef> {
   }
 
   /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
-  abstract getChildren(contextVars: ContextVar[]): ChildBlock[] // TODO
+  abstract getChildren(contextVars: ContextVar[]): ChildBlock[] 
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
   abstract validate(designCtx: DesignCtx): string | null
