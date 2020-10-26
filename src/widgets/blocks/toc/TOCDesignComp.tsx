@@ -132,28 +132,29 @@ export default function TOCDesignComp(props: {
 
   /** Render an item at a specified depth which starts at 0 */
   function renderItem(item: TOCItem, index: number, depth: number, dragHandleProps?: DraggableProvidedDragHandleProps) {
-    // Determine style of item label
-    const itemLabelStyle: React.CSSProperties = {
-      padding: 5,
+    const labelClasses = ["toc-item-label", `toc-item-label-level${depth}`]
+    if (item.id === selectedId) {
+      labelClasses.push(`toc-item-label-selected bg-primary`)
     }
-    if (depth === 0) {
-      itemLabelStyle.fontWeight = "bold"
+    if (item.widgetId) {
+      labelClasses.push("toc-item-label-selectable")
     }
 
-    return <div>
+    return <div className={`toc-item toc-item-level${depth}`}>
       <div key="main" 
-        style={{ display: "grid", gridTemplateColumns: "auto auto 1fr auto", alignItems: "center", backgroundColor: item.id == selectedId ? "#DDD" : undefined }}
+        className={labelClasses.join(" ")}
+        style={{ display: "grid", gridTemplateColumns: "auto auto 1fr auto", alignItems: "center" }}
         onClick={handleItemClick.bind(null, item)}>
         <div style={{ cursor: "pointer", paddingTop: 2, paddingLeft: 5 }} {...dragHandleProps}>
           <i className="fa fa-bars text-muted" />
         </div>
-        <div style={itemLabelStyle}>
+        <div>
           {renderProps.renderChildBlock(renderProps, item.labelBlock || null, setItemLabelBlock.bind(null, item.id))}
         </div>
         {renderCaretMenu(item)}
       </div>
       {item.children.length > 0 ?
-        <div style={{ marginLeft: 10 }} key="children">
+        <div key="children">
           { renderItems(item.children, depth + 1, handleSetChildren.bind(null, item.id)) }
         </div>
         : null}
@@ -169,7 +170,7 @@ export default function TOCDesignComp(props: {
     }
 
     return <TOCDesignRightPane
-      selectedItem={selectedItem}
+      item={selectedItem}
       renderProps={renderProps}
       onItemChange={ item => {
         alterBlockItems(draft => {

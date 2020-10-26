@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { TOCBlockDef, iterateItems, TOCItem } from "./toc"
+import { TOCBlockDef, iterateItems, TOCItem, TOCBlock } from "./toc"
 import { CreateBlock, createExprVariables } from '../../blocks'
 import { useState, useRef } from "react"
 import { localize } from '../../localization'
@@ -25,8 +25,23 @@ export default function TOCInstanceComp(props: {
   const firstItem = iterateItems(blockDef.items).find(item => item.widgetId)
   const [selectedId, setSelectedId] = useState(firstItem ? firstItem.id : null)
 
+  // Store collapsed state for items. If not listed, is expanded
+  const [collapsedItems, setCollapsedItems] = useState(() => {
+    return iterateItems(blockDef.items).filter(item => item.collapse == "startCollapsed").map(item => item.id)
+  })
+
   // Select item
   const handleItemClick = (item: TOCItem) => { 
+    // Toggle collapse
+    if (item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")) {
+      if (collapsedItems.includes(item.id)) {
+        setCollapsedItems(_.without(collapsedItems, item.id))
+      }
+      else {
+        setCollapsedItems(_.union(collapsedItems, [item.id]))
+      }
+    }
+
     // Only allow selecting with content
     if (!item.widgetId) {
       return
@@ -59,29 +74,34 @@ export default function TOCInstanceComp(props: {
       }
     }
 
-    // Determine style of item label
-    const itemLabelStyle: React.CSSProperties = {
-      padding: 5,
-      cursor: item.widgetId ? "pointer" : "default",
-      color: item.widgetId ? undefined : "#737373"
-    }
-    if (depth === 0) {
-      itemLabelStyle.fontWeight = "bold"
-    }
+    const collapsible = item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")
+
+    const labelClasses = ["toc-item-label", `toc-item-label-level${depth}`]
     if (item.id === selectedId) {
-      itemLabelStyle.backgroundColor = "#DDD"
+      labelClasses.push(`toc-item-label-selected bg-primary`)
+    }
+    if (item.widgetId || collapsible) {
+      labelClasses.push("toc-item-label-selectable")
     }
 
-    return <div key={item.id}>
-      <div key="label" onClick={handleItemClick.bind(null, item)} style={itemLabelStyle}>
+    // Determine if collapsed
+    const collapsed = collapsedItems.includes(item.id)
+
+    return <div key={item.id} className={`toc-item toc-item-level${depth}`}>
+      <div key="label" className={labelClasses.join(" ")} onClick={handleItemClick.bind(null, item)}>
+        { collapsible ?
+          <div key="expand" className="chevron">
+            { collapsed ? <i className="fas fa-fw fa-chevron-right"/> : <i className="fas fa-fw fa-chevron-down"/> }
+          </div>
+        : null }
         { item.label != null ? 
           localize(item.label, instanceCtx.locale) // Legacy support of label
           : 
           instanceCtx.renderChildBlock(instanceCtx, item.labelBlock || null)
         }
       </div>
-      { item.children.length > 0 ? 
-        <div key="children" style={{ marginLeft: 10 }}>
+      { item.children.length > 0 && !collapsed ? 
+        <div key="children" className="toc-item-children">
           { item.children.map((child, index) => renderItem(item.children, index, depth + 1)) }
         </div>
       : null}
@@ -89,10 +109,10 @@ export default function TOCInstanceComp(props: {
   }
 
   const renderLeft = () => {
-    return <div style={{ padding: 10 }}>
-      <div key="header">{ instanceCtx.renderChildBlock(instanceCtx, blockDef.header) }</div>
+    return <div>
+      <div key="header" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.header) }</div>
       { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
-      <div key="footer">{ instanceCtx.renderChildBlock(instanceCtx, blockDef.footer) }</div>
+      <div key="footer" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.footer) }</div>
     </div>
   }
 

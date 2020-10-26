@@ -55,6 +55,9 @@ export interface TOCItem {
 
   /** Optional condition for display */
   condition?: ContextVarExpr
+
+  /** Collapse behaviour. Default is expanded */
+  collapse?: "expanded" | "startCollapsed" | "startExpanded"
 }
 
 /** Create a flat list of all items */

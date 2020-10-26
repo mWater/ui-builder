@@ -8,7 +8,7 @@ import _ from 'lodash'
 import { defaultT } from 'ez-localize'
 
 // import 'bootstrap/dist/css/bootstrap.css'
-import 'font-awesome/css/font-awesome.css'
+// import 'font-awesome/css/font-awesome.css'
 import './Demo.css'
 import * as ReactDOM from 'react-dom';
 import { defaultBlockPaletteEntries } from './designer/blockPaletteEntries';

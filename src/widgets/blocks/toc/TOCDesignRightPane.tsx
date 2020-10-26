@@ -3,47 +3,47 @@ import _ from 'lodash';
 import { TOCItem } from "./toc";
 import { BlockDef } from "..";
 import produce from "immer";
-import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors";
-import { Select } from "react-library/lib/bootstrap";
+import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor, PropertyEditor } from "../../propertyEditors";
+import { Select, Toggle } from "react-library/lib/bootstrap";
 import { LocalizedString } from "mwater-expressions";
 import { DesignCtx } from "../../../contexts";
 import { ContextVarExpr } from "../../../ContextVarExpr";
 
 export function TOCDesignRightPane(props: {
-  selectedItem: TOCItem;
+  item: TOCItem;
   renderProps: DesignCtx;
   onItemChange: (item: TOCItem) => void;
 }) {
-  const { selectedItem, onItemChange, renderProps } = props;
+  const { item, onItemChange, renderProps } = props;
 
-  const selectedWidgetId = selectedItem.widgetId;
+  const selectedWidgetId = item.widgetId;
 
   const handleLabelBlockChange = (labelBlock: BlockDef | null) => {
-    onItemChange(produce(selectedItem, draft => {
+    onItemChange(produce(item, draft => {
       draft.labelBlock = labelBlock;
     }));
   };
 
   const handleWidgetIdChange = (widgetId: string | null) => {
-    onItemChange(produce(selectedItem, draft => {
+    onItemChange(produce(item, draft => {
       draft.widgetId = widgetId;
     }));
   };
 
   const handleTitleChange = (title: LocalizedString | null) => {
-    onItemChange(produce(selectedItem, draft => {
+    onItemChange(produce(item, draft => {
       draft.title = title;
     }));
   };
 
   const handleContextVarMapChange = (contextVarMap: { [internalContextVarId: string]: string; }) => {
-    onItemChange(produce(selectedItem, draft => {
+    onItemChange(produce(item, draft => {
       draft.contextVarMap = contextVarMap;
     }));
   };
 
   const handleConditionChange = (condition: ContextVarExpr) => {
-    onItemChange(produce(selectedItem, draft => {
+    onItemChange(produce(item, draft => {
       draft.condition = condition;
     }));
   };
@@ -52,17 +52,17 @@ export function TOCDesignRightPane(props: {
   const widgetOptions = _.sortBy(Object.values(renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label");
 
   const renderContextVarValues = () => {
-    if (!selectedItem!.widgetId) {
+    if (!item!.widgetId) {
       return null;
     }
 
     // Find the widget
-    const widgetDef = renderProps.widgetLibrary.widgets[selectedItem!.widgetId];
+    const widgetDef = renderProps.widgetLibrary.widgets[item!.widgetId];
     if (!widgetDef) {
       return null;
     }
 
-    const contextVarMap = selectedItem!.contextVarMap || {};
+    const contextVarMap = item!.contextVarMap || {};
 
     return (
       <table className="table table-bordered table-condensed">
@@ -100,24 +100,40 @@ export function TOCDesignRightPane(props: {
   return (
     <div style={{ padding: 10 }}>
       <LabeledProperty label="Label">
-        {renderProps.renderChildBlock(renderProps, selectedItem.labelBlock || null, handleLabelBlockChange)}
+        {renderProps.renderChildBlock(renderProps, item.labelBlock || null, handleLabelBlockChange)}
       </LabeledProperty>
       <LabeledProperty label="Widget">
         <Select value={selectedWidgetId} onChange={handleWidgetIdChange} options={widgetOptions} nullLabel="Select Widget" />
       </LabeledProperty>
       <LabeledProperty label="Page title (optional)">
-        <LocalizedTextPropertyEditor value={selectedItem.title || null} onChange={handleTitleChange} locale={props.renderProps.locale} />
+        <LocalizedTextPropertyEditor value={item.title || null} onChange={handleTitleChange} locale={props.renderProps.locale} />
       </LabeledProperty>
       <LabeledProperty label="Variable Mappings">
         {renderContextVarValues()}
       </LabeledProperty>
+      { item.children.length > 0 ?
+        <LabeledProperty label="Collapse/Expand">
+          <PropertyEditor obj={item} onChange={onItemChange} property="collapse">
+            {(value, onChange) => {
+              return <Toggle 
+                value={value || "expanded"} 
+                onChange={onChange} 
+                options={[
+                  { value: "expanded", label: "Always Expanded" },
+                  { value: "startExpanded", label: "Start Expanded" },
+                  { value: "startCollapsed", label: "Start Collapsed" }
+                ]} />
+            }}
+          </PropertyEditor>
+        </LabeledProperty>
+      : null }
       <LabeledProperty label="Conditional display (optional)">
         <ContextVarExprPropertyEditor
           schema={renderProps.schema}
           dataSource={renderProps.dataSource}
           contextVars={renderProps.contextVars}
-          contextVarId={selectedItem.condition ? selectedItem.condition.contextVarId : null}
-          expr={selectedItem.condition ? selectedItem.condition.expr : null}
+          contextVarId={item.condition ? item.condition.contextVarId : null}
+          expr={item.condition ? item.condition.expr : null}
           onChange={(contextVarId, expr) => { handleConditionChange({ contextVarId, expr }); }}
           types={["boolean"]} />
       </LabeledProperty>
