@@ -139,7 +139,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
 
       // For all other blocks
       for (const item of iterateItems(draft.items)) {
-        item.labelBlock = action(item.labelBlock || null)
+        item.labelBlock = action(original(item.labelBlock) || null)
       }
     })
   }

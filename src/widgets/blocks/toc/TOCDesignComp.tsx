@@ -26,7 +26,7 @@ export default function TOCDesignComp(props: {
   /** Alter items using an action */
   const alterBlockItems = (action: (item: TOCItem) => TOCItem | TOCItem[] | undefined | null) => {
     renderProps.store.replaceBlock(produce(blockDef, draft => {
-      draft.items = alterItems(draft.items, action)
+      draft.items = alterItems(blockDef.items, action)
     }))
   }
 
