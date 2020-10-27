@@ -188,6 +188,7 @@ export default function TOCDesignComp(props: {
     left={renderLeft()}
     right={renderRight()}
     removePadding={false}
+    theme={blockDef.theme || "light"}
   />
 }
 

@@ -15,6 +15,8 @@ export interface TOCBlockDef extends BlockDef {
     footer: BlockDef | null;
     /** Remove padding (for top-level TOC that should fit page completely) */
     removePadding?: boolean;
+    /** Theme (default is light) */
+    theme?: "light" | "dark";
 }
 /** An item within the table of contents */
 export interface TOCItem {

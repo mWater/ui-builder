@@ -7,8 +7,29 @@
   height: 100%;
   width: 25%;
   float: left;
+}
+
+.toc-split.dark .toc-split-left {
   background-color: #444;
   color: white;
+}
+
+.toc-split.dark .toc-item-label:not(.toc-item-label-selected) {
+  color: #DDD;
+}
+
+.toc-split.light .toc-item-label:not(.toc-item-label-selected) {
+  color: #444;
+}
+
+.toc-split.dark .toc-item-label-selectable:hover:not(.toc-item-label-selected) {
+  background-color: #555;
+  color: white;
+}
+
+.toc-split.light .toc-item-label-selectable:hover:not(.toc-item-label-selected) {
+  background-color: #DDD;
+  color: black;
 }
 
 .toc-split-right { 
@@ -35,45 +56,28 @@
 
 .toc-item-label {
   padding: 5px;
-  color: #DDD;
-  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
 }
-
-.toc-item-label .chevron {
-  position: absolute;
-}
-
-.toc-item-label-level0 .chevron { left: 2px; }
-.toc-item-label-level1 .chevron { left: 12px; }
-.toc-item-label-level2 .chevron { left: 22px; }
 
 .toc-item-label-level0 {
-  padding-left: 20px;
+  padding-left: 10px;
   /* font-weight: bold; */
 }
 
 .toc-item-label-level1 {
-  padding-left: 30px;
+  padding-left: 20px;
 }
 
 .toc-item-label-level2 {
-  padding-left: 40px;
+  padding-left: 30px;
 }
 
 .toc-item-label-level3 {
-  padding-left: 50px;
+  padding-left: 40px;
 }
 
 .toc-item-label-selectable {
   cursor: pointer;
-}
-
-/* Handled by bg-primary .toc-item-label-selected {
-  color: white;
-  background-color: #777;
-} */
-
-.toc-item-label-selectable:hover:not(.toc-item-label-selected) {
-  background-color: #555;
-  color: white;
 }

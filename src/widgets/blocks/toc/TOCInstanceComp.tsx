@@ -89,11 +89,11 @@ export default function TOCInstanceComp(props: {
 
     return <div key={item.id} className={`toc-item toc-item-level${depth}`}>
       <div key="label" className={labelClasses.join(" ")} onClick={handleItemClick.bind(null, item)}>
-        { collapsible ?
-          <div key="expand" className="chevron">
-            { collapsed ? <i className="fas fa-fw fa-chevron-right"/> : <i className="fas fa-fw fa-chevron-down"/> }
-          </div>
-        : null }
+        <div key="expand" className="chevron">
+          { collapsible ?
+            ( collapsed ? <i className="fas fa-fw fa-caret-right"/> : <i className="fas fa-fw fa-caret-down"/>)
+          : <i className="fas fa-fw fa-caret-right" style={{ visibility: "hidden" }}/> }
+        </div>
         { item.label != null ? 
           localize(item.label, instanceCtx.locale) // Legacy support of label
           : 
@@ -194,5 +194,6 @@ export default function TOCInstanceComp(props: {
     left={renderLeft()}
     right={renderRight()}
     removePadding={blockDef.removePadding || false}
+    theme={blockDef.theme || "light"}
   />
 }

@@ -6,8 +6,8 @@ import { Expr, LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
 import './toc.css'
-import { PropertyEditor } from '../../propertyEditors'
-import { Checkbox } from 'react-library/lib/bootstrap'
+import { LabeledProperty, PropertyEditor } from '../../propertyEditors'
+import { Checkbox, Toggle } from 'react-library/lib/bootstrap'
 import { DesignCtx, InstanceCtx } from '../../../contexts'
 import { TextBlockDef } from '../text'
 import uuid from 'uuid'
@@ -28,6 +28,9 @@ export interface TOCBlockDef extends BlockDef {
 
   /** Remove padding (for top-level TOC that should fit page completely) */
   removePadding?: boolean
+
+  /** Theme (default is light) */
+  theme?: "light" | "dark"
 }
 
 /** An item within the table of contents */
@@ -173,6 +176,20 @@ export class TOCBlock extends Block<TOCBlockDef> {
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removePadding">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Remove Padding (for top-level TOCs)</Checkbox>}
         </PropertyEditor>
+        <LabeledProperty label="Theme">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="theme">
+            {(value, onChange) => (
+              <Toggle 
+                value={value || "light"} 
+                onChange={onChange}
+                options={[
+                  { value: "light", label: "Light" },
+                  { value: "dark", label: "Dark" }
+                ]}
+              />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }
