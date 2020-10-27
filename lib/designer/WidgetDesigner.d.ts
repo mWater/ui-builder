@@ -22,7 +22,7 @@ interface State {
     undoStack: WidgetDef[];
     redoStack: WidgetDef[];
 }
-/** Design mode for a single widget */
+/** Design mode for a single widget. Ensures that blockdefs are always canonical */
 export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
     constructor(props: WidgetDesignerProps);
     handleSelect: (blockId: string) => void;
@@ -30,6 +30,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     handleWidgetDefChange: (widgetDef: WidgetDef) => void;
     handleUndo: () => void;
     handleRedo: () => void;
+    /** Canonicalize the widget's block and all children, returning the canonical version */
+    canonicalize(blockDef: BlockDef | null): BlockDef | null;
     handleBlockDefChange: (blockDef: BlockDef | null) => void;
     handleUnselect: () => void;
     handleRemoveBlock: (blockId: string) => void;
@@ -44,6 +46,6 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     renderDesign(): JSX.Element[];
     /** Render a preview of the widget in a page */
     renderPreview(): JSX.Element[] | null;
-    render(): JSX.Element;
+    render(): JSX.Element | null;
 }
 export {};

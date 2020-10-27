@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
-import { LocalizedString } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 import './toc.css';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
+import { ContextVarExpr } from '../../../ContextVarExpr';
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
     type: "toc";
@@ -19,8 +20,10 @@ export interface TOCBlockDef extends BlockDef {
 export interface TOCItem {
     /** uuid id */
     id: string;
-    /** Localized label */
-    label: LocalizedString;
+    /** Label to be displayed for entry */
+    labelBlock?: BlockDef | null;
+    /** DEPRECATED: Localized label. Use labelBlock @deprecated */
+    label?: LocalizedString;
     /** Localized title of page */
     title?: LocalizedString | null;
     /** Widget to be displayed when the item is selected */
@@ -31,6 +34,10 @@ export interface TOCItem {
     };
     /** Any children items */
     children: TOCItem[];
+    /** Optional condition for display */
+    condition?: ContextVarExpr;
+    /** Collapse behaviour. Default is expanded */
+    collapse?: "expanded" | "startCollapsed" | "startExpanded";
 }
 /** Create a flat list of all items */
 export declare const iterateItems: (items: TOCItem[]) => TOCItem[];
@@ -39,8 +46,14 @@ export declare const alterItems: (items: TOCItem[], action: (item: TOCItem) => u
 export declare class TOCBlock extends Block<TOCBlockDef> {
     /** Get child blocks */
     getChildren(contextVars: ContextVar[]): ChildBlock[];
+    /** Get any context variables expressions that this block needs (not including child blocks) */
+    getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     validate(designCtx: DesignCtx): "Widget does not exist" | "Context variable not found. Please check mapping" | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
+    /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children.
+     * Can also be used to upgrade blocks
+     */
+    canonicalize(): BlockDef | null;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(props: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
