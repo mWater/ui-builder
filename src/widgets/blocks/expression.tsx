@@ -83,8 +83,19 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
         str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
       }
     }
-    
-    return this.renderText(this.processMarkdown(str))
+
+    let node
+    if (this.blockDef.html) {
+      node = this.processHTML(str)
+    }
+    else if (this.blockDef.markdown) {
+      node = this.processMarkdown(str)
+    }
+    else {
+      node = str
+    }
+
+    return this.renderText(node)
   }
 
   renderEditor(props: DesignCtx) {

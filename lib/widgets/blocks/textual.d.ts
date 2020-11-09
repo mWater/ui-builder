@@ -13,10 +13,12 @@ export interface TextualBlockDef extends BlockDef {
     color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger";
     /** How to align text. Default is left */
     align?: "left" | "center" | "right" | "justify";
-    /** True to make multiple lines break. No effect if markdown is true */
+    /** True to make multiple lines break. No effect if markdown or html is true */
     multiline?: boolean;
     /** True to interpret as markdown */
     markdown?: boolean;
+    /** True to interpret as html. Overrides markdown */
+    html?: boolean;
 }
 export declare abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<T> {
     getClassName(): string;
@@ -27,7 +29,10 @@ export declare abstract class TextualBlock<T extends TextualBlockDef> extends Le
         style: React.CSSProperties;
         className: string;
     }, HTMLElement>;
-    /** Processes markdown if markdown is turned on, otherwise passthrough */
-    processMarkdown(text: string): string | JSX.Element;
+    /** Processes markdown*/
+    processMarkdown(text: string): JSX.Element;
+    /** Processes HTML */
+    processHTML(text: string): JSX.Element;
+    canonicalize(): T;
     renderTextualEditor(props: DesignCtx): JSX.Element;
 }

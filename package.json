@@ -4,10 +4,12 @@
   "private": true,
   "main": "lib/index.js",
   "dependencies": {
+    "@types/dompurify": "^2.0.4",
     "@types/react-datepicker": "^1.8.0",
     "bootstrap": "^3.4.1",
     "canonical-json": "0.0.4",
     "d3-format": "^1.4.4",
+    "dompurify": "^2.2.2",
     "ez-localize": "^2.1.1",
     "font-awesome": "^4.7.0",
     "immer": "^4.0.2",

@@ -47,7 +47,18 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
       }
     }
 
-    return this.renderText(text ? this.processMarkdown(text) : <span className="text-muted">Text</span>)
+    let node
+    if (this.blockDef.html) {
+      node = this.processHTML(text)
+    }
+    else if (this.blockDef.markdown) {
+      node = this.processMarkdown(text)
+    }
+    else {
+      node = text
+    }
+
+    return this.renderText(text ? node : <span className="text-muted">Text</span>)
   }
 
   renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
@@ -66,8 +77,19 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
       locale: instanceCtx.locale,
       formatLocale: instanceCtx.formatLocale
     })
-    
-    return this.renderText(this.processMarkdown(text))
+
+    let node
+    if (this.blockDef.html) {
+      node = this.processHTML(text)
+    }
+    else if (this.blockDef.markdown) {
+      node = this.processMarkdown(text)
+    }
+    else {
+      node = text
+    }
+
+    return this.renderText(node)
   }
 
   renderEditor(props: DesignCtx) {
@@ -80,8 +102,8 @@ export class TextBlock extends TextualBlock<TextBlockDef> {
                 value={value} 
                 onChange={onChange} 
                 locale={props.locale} 
-                multiline={this.blockDef.multiline || this.blockDef.markdown} 
-                allowCR={this.blockDef.multiline} />
+                multiline={this.blockDef.multiline || this.blockDef.markdown || this.blockDef.html} 
+                allowCR={this.blockDef.multiline || this.blockDef.markdown || this.blockDef.html} />
             }
           </PropertyEditor>
         </LabeledProperty>

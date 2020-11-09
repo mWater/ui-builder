@@ -6,6 +6,7 @@ import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from "..
 import { Select } from "react-library/lib/bootstrap";
 import { Checkbox, Toggle } from "react-library/lib/bootstrap";
 import Markdown from 'markdown-it'
+import { sanitize } from 'dompurify'
 
 /** Common base class for text and expression */
 export interface TextualBlockDef extends BlockDef {
@@ -22,11 +23,14 @@ export interface TextualBlockDef extends BlockDef {
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
 
-  /** True to make multiple lines break. No effect if markdown is true */
+  /** True to make multiple lines break. No effect if markdown or html is true */
   multiline?: boolean
 
   /** True to interpret as markdown */
   markdown?: boolean
+
+  /** True to interpret as html. Overrides markdown */
+  html?: boolean
 }
 
 export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<T> {
@@ -66,13 +70,21 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
     return React.createElement(this.blockDef.style || "div", { style: style, className: this.getClassName() }, content)
   }
 
-  /** Processes markdown if markdown is turned on, otherwise passthrough */
+  /** Processes markdown*/
   processMarkdown(text: string) {
-    if (!this.blockDef.markdown) {
-      return text
-    }
-
     return <div dangerouslySetInnerHTML={{ __html: new Markdown().render(text) }} />
+  }
+
+  /** Processes HTML */
+  processHTML(text: string) {
+    return <div dangerouslySetInnerHTML={{ __html: sanitize(text) }} />
+  }
+  
+  canonicalize() {
+    if (this.blockDef.html && this.blockDef.markdown) {
+      return { ...this.blockDef, markdown: false }
+    }
+    return this.blockDef
   }
 
   renderTextualEditor(props: DesignCtx) {
@@ -124,16 +136,26 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
           </PropertyEditor>
         </LabeledProperty>
 
-        { !this.blockDef.markdown ? 
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
-            {(value, onChange) => <Checkbox value={value} onChange={onChange}>Multi-line</Checkbox>}
+        <div>
+          { !this.blockDef.html ?
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="markdown">
+            {(value, onChange) => <Checkbox inline value={value} onChange={onChange}>Markdown</Checkbox>}
           </PropertyEditor>
-        : null }
+          : null }
 
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="markdown">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Markdown</Checkbox>}
-        </PropertyEditor>
+          { !this.blockDef.markdown ?
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="html">
+            {(value, onChange) => <Checkbox inline value={value} onChange={onChange}>HTML</Checkbox>}
+          </PropertyEditor>
+          : null }
 
+          { !this.blockDef.markdown && !this.blockDef.html ? 
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
+              {(value, onChange) => <Checkbox inline value={value} onChange={onChange}>Multi-line</Checkbox>}
+            </PropertyEditor>
+          : null }
+        </div>
+        <br/>
         <LabeledProperty label="Color">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="color">
             {(value, onChange) => 
