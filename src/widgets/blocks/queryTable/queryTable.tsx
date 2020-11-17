@@ -10,6 +10,8 @@ import { NumberInput, Select, Checkbox, Toggle } from 'react-library/lib/bootstr
 import { ExprComponent } from 'mwater-expressions-ui';
 import { ActionDef } from '../../actions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
+import uuid from 'uuid';
+import { TextBlockDef } from '../text';
 
 export interface QueryTableBlockDef extends BlockDef {
   type: "queryTable"
@@ -284,6 +286,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       props.store.replaceBlock(produce(this.blockDef, b => {
         setLength(b.contents, this.blockDef.contents.length + 1)
         setLength(b.headers, this.blockDef.contents.length + 1)
+        b.headers[b.headers.length - 1] = { id: uuid.v4(), type: "text", text: { _base: "en", en: "Header" }, style: "div" } as TextBlockDef
         b.columnInfos = b.columnInfos || []
         setLength(b.columnInfos, this.blockDef.contents.length + 1)
       }))

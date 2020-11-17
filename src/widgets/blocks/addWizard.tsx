@@ -202,6 +202,11 @@ const AddWizardPane = (props: {
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
+        // Skip id columns
+        if (column.type == "id") {
+          continue
+        }
+
         allEntries.push({ 
           title: localize(column.name) || "", 
           blockDef: wrapBlockDef(column.name, { 
