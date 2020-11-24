@@ -9,6 +9,10 @@ export interface LabeledBlockDef extends BlockDef {
     help?: LocalizedString | null;
     /** Optional hint text shown after label in faded */
     hint?: LocalizedString | null;
+    /** True to display required red star */
+    requiredStar?: boolean;
+    /** Layout of control. Default is stacked */
+    layout?: "stacked" | "horizontal";
     child: BlockDef | null;
 }
 export declare class LabeledBlock extends Block<LabeledBlockDef> {

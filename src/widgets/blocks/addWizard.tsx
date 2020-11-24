@@ -68,11 +68,17 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
   }
 }
 
+/** Layout of adding */
+type LayoutMode = "plain" | "labelAbove" | "labelBefore"
+
 // Persist default tab
 var defaultCurrentTabId = "palette"
 
-/** Mode of expression adding */
-type ExpressionMode = "plain" | "labelAbove" | "labelBefore"
+// Persist expression mode
+var defaultExpressionMode: LayoutMode = "plain"
+
+// Persist control mode
+var defaultControlMode: LayoutMode = "labelAbove"
 
 /** Pane with search and allowing clicking on a widget to add */
 const AddWizardPane = (props: {
@@ -84,7 +90,8 @@ const AddWizardPane = (props: {
   const [search, setSearch] = useState("")
   const [currentTabId, setCurrentTabId] = useState(defaultCurrentTabId)
 
-  const [expressionMode, setExpressionMode] = useState<ExpressionMode>("plain")
+  const [expressionMode, setExpressionMode] = useState<LayoutMode>(defaultExpressionMode)
+  const [controlMode, setControlMode] = useState<LayoutMode>(defaultControlMode)
 
   // Focus on load
   const searchControl = useRef<SearchControl>(null)
@@ -98,26 +105,45 @@ const AddWizardPane = (props: {
   const getControlEntries = () => {
     const allEntries: BlockPaletteEntry[] = []
 
+    const wrapBlockDef = (label: LocalizedString, blockDef: BlockDef): BlockDef => {
+      if (controlMode == "plain") {
+        return blockDef
+      }
+      else if (controlMode == "labelAbove") {
+        return {
+          id: uuid(),
+          type: "labeled",
+          label: label,
+          child: blockDef
+        } as LabeledBlockDef
+      }
+      else if (controlMode == "labelBefore") {
+        return {
+          id: uuid(),
+          type: "labeled",
+          label: appendStr(label, ":"),
+          child: blockDef,
+          layout: "horizontal"
+        } as LabeledBlockDef
+      }
+      throw new Error("Not implemented")
+    }
+
     // Find context var of type row
     for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {
       // Get columns
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
-        const createLabeledBlock = (child: BlockDef) => {
+        const addBlock = (child: BlockDef) => {
           allEntries.push({ 
             title: localize(column.name) || "", 
-            blockDef: { 
-              id: uuid(),
-              type: "labeled", 
-              label: column.name,
-              child: child
-            } as LabeledBlockDef
+            blockDef: wrapBlockDef(column.name, child)
           })
         }
     
         if (column.type == "text") {
-          createLabeledBlock({
+          addBlock({
             id: uuid(),
             type: "textbox",
             rowContextVarId: contextVar.id,
@@ -127,7 +153,7 @@ const AddWizardPane = (props: {
         }
 
         if (column.type == "number") {
-          createLabeledBlock({
+          addBlock({
             id: uuid(),
             type: "numberbox",
             decimal: true,
@@ -138,7 +164,7 @@ const AddWizardPane = (props: {
         }
 
         if (column.type == "date" || column.type == "datetime") {
-          createLabeledBlock({
+          addBlock({
             id: uuid(),
             type: "datefield",
             rowContextVarId: contextVar.id,
@@ -152,7 +178,7 @@ const AddWizardPane = (props: {
           || column.type === "id" 
           || column.type === "id[]"
           || column.type === "boolean") {
-          createLabeledBlock({
+          addBlock({
             id: uuid(),
             type: "dropdown",
             rowContextVarId: contextVar.id,
@@ -184,14 +210,11 @@ const AddWizardPane = (props: {
       else if (expressionMode == "labelBefore") {
         return {
           id: uuid(),
-          type: "horizontal",
-          align: "left",
-          verticalAlign: "middle",
-          items: [
-            { id: uuid(), type: "text", text: appendStr(label, ":"), bold: true } as TextBlockDef,
-            blockDef
-          ]
-        } as HorizontalBlockDef
+          type: "labeled",
+          label: appendStr(label, ":"),
+          child: blockDef,
+          layout: "horizontal"
+        } as LabeledBlockDef
       }
       throw new Error("Not implemented")
     }
@@ -268,7 +291,27 @@ const AddWizardPane = (props: {
     return <div style={{ float: "right", paddingRight: 10 }}>
       <Toggle 
         value={expressionMode}
-        onChange={setExpressionMode}
+        onChange={(em: LayoutMode) => { 
+          setExpressionMode(em)
+          defaultExpressionMode = em
+        }}
+        size="sm"
+        options={[
+          { value: "plain", label: "Plain" },
+          { value: "labelAbove", label: "Label Above" },
+          { value: "labelBefore", label: "Label Before" }
+        ]} />
+    </div>
+  }
+
+  const renderControlOptions = () => {
+    return <div style={{ float: "right", paddingRight: 10 }}>
+      <Toggle 
+        value={controlMode}
+        onChange={(em: LayoutMode) => { 
+          setControlMode(em)
+          defaultControlMode = em
+        }}
         size="sm"
         options={[
           { value: "plain", label: "Plain" },
@@ -282,6 +325,7 @@ const AddWizardPane = (props: {
     <div>
       <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
       { currentTabId == "expressions" ? renderExpressionOptions() : null }
+      { currentTabId == "controls" ? renderControlOptions() : null }
     </div>
     <TabbedComponent 
       tabId={currentTabId}
@@ -348,6 +392,6 @@ class PaletteItem extends React.Component<{
 }
 
 /** Appends to a localized string */
-function appendStr(str: LocalizedString, append: string) {
-  return _.mapValues(str, (v, k) => k == "_base" ? v : v + append)
+function appendStr(str: LocalizedString, append: string): LocalizedString {
+  return _.mapValues(str, (v, k) => k == "_base" ? v : v + append) as LocalizedString
 }
