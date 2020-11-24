@@ -35,6 +35,7 @@ import { AlertBlock, AlertBlockDef } from './blocks/alert';
 import { DateInjectBlock, DateInjectBlockDef } from './blocks/dateInject';
 import { ToggleBlockDef, ToggleBlock } from './blocks/controls/toggle';
 import { GanttChartBlock, GanttChartBlockDef } from './blocks/ganttChart/GanttChart';
+import { ToggleFilterBlock, ToggleFilterBlockDef } from './blocks/toggleFilter';
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -121,6 +122,8 @@ export default class BlockFactory {
         return new DateInjectBlock(blockDef as DateInjectBlockDef)
       case "ganttChart":
         return new GanttChartBlock(blockDef as GanttChartBlockDef)
+      case "toggleFilter":
+        return new ToggleFilterBlock(blockDef as ToggleFilterBlockDef)
       }
 
     // Use custom blocks

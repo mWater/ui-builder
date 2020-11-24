@@ -34,6 +34,7 @@ import { LabeledBlockDef } from "../widgets/blocks/labeled";
 import { DateInjectBlockDef } from "../widgets/blocks/dateInject";
 import { ToggleBlockDef } from "../widgets/blocks/controls/toggle";
 import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart";
+import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter";
 
 export interface BlockPaletteEntry {
   title: string
@@ -162,6 +163,13 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Dropdown Filter",
     blockDef: { id: "", type: "dropdownFilter", filterExpr: null, placeholder: null } as DropdownFilterBlockDef,
+  },
+  {
+    title: "Toggle Filter",
+    blockDef: { id: "", type: "toggleFilter", initialOption: 0, forceSelection: false, options: [
+      { label: { _base: "en", en: "Option A" }, filters: [] },
+      { label: { _base: "en", en: "Option B" }, filters: [] },
+    ]} as ToggleFilterBlockDef
   },
   {
     title: "Button",
