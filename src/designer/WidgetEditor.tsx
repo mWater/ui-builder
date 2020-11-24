@@ -9,7 +9,7 @@ import { produce } from "immer";
 import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import ListEditor from "../widgets/ListEditor";
 import _ from "lodash";
-import { TextInput, Select } from "react-library/lib/bootstrap";
+import { TextInput, Select, Checkbox } from "react-library/lib/bootstrap";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import { DesignCtx } from "../contexts";
 import { useState } from "react";
@@ -92,7 +92,10 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           </div>
         })}
       </LabeledProperty>
-      <div style={{ color: "#EEE", fontSize: 9 }}>{this.props.widgetDef.id}</div>
+      <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="virtualizeDatabaseInPreview">
+        {(value, onChange) => <Checkbox value={value} onChange={onChange}>Prevent changes to database in Preview</Checkbox>}
+      </PropertyEditor>
+      <div style={{ color: "#D8D8D8", fontSize: 9 }}>{this.props.widgetDef.id}</div>
     </div>)
   }
 }

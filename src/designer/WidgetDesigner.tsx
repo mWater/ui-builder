@@ -285,9 +285,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     let database: Database = this.props.baseCtx.database
 
-    const virtualizeDatabase = false
-
-    if (virtualizeDatabase) {
+    if (this.props.widgetDef.virtualizeDatabaseInPreview) {
       // Make non-live TODO needed? Could make big queries for counts/sums if mutated
       database = new VirtualDatabase(database, this.props.baseCtx.schema, this.props.baseCtx.locale)
     }
