@@ -130,7 +130,7 @@ const AddWizardPane = (props: {
     }
 
     // Find context var of type row
-    for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {
+    for (const contextVar of props.contextVars.filter(cv => cv.type == "row").reverse()) {
       // Get columns
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
@@ -220,13 +220,13 @@ const AddWizardPane = (props: {
     }
 
     // Find context var of type row
-    for (const contextVar of props.contextVars.filter(cv => cv.type == "row")) {  
+    for (const contextVar of props.contextVars.filter(cv => cv.type == "row").reverse()) {  
       // Get columns
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
         // Skip id columns
-        if (column.type == "id") {
+        if (column.type == "id" || column.type == "id[]") {
           continue
         }
 
