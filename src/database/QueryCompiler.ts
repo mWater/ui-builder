@@ -53,7 +53,9 @@ export class QueryCompiler {
         // Convert to 4326 (lat/long). Force ::geometry for null
         compiledExpr = {
           type: "op", op: "::json", exprs: [
-            { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
+            { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 
+              { type: "op", op: "::integer", exprs: [4326] }
+            ] }] }
           ]
         }
       }
