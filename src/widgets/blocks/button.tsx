@@ -20,7 +20,8 @@ export interface ButtonBlockDef extends BlockDef {
   /** Action to perform when button is clicked */
   actionDef?: ActionDef | null
 
-  style: "default" | "primary" | "link"
+  /** plainlink is a plain link without padding */
+  style: "default" | "primary" | "link" | "plainlink"
   size: "normal" | "small" | "large" | "extrasmall"
   icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download"
 
@@ -68,6 +69,22 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
   }
  
   renderButton(label: string, onClick: () => void) {
+    const icon = this.blockDef.icon ? <i className={`fa fa-${this.blockDef.icon}`}/> : null
+
+    const handleClick = (ev: React.MouseEvent) => {
+      // Ensure button doesn't trigger other actions
+      ev.stopPropagation()
+      onClick()
+    }
+
+    // Special case of plain link
+    if (this.blockDef.style == "plainlink") {
+      return <a onClick={handleClick} style={{ cursor: "pointer" }}>
+        { icon }
+        { icon && label ? "\u00A0" : null }
+        { label }
+      </a>
+    }
     let className = "btn btn-" + this.blockDef.style
 
     switch (this.blockDef.size) {
@@ -88,16 +105,9 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
       className += " btn-block"
     }
 
-    const icon = this.blockDef.icon ? <i className={`fa fa-${this.blockDef.icon}`}/> : null
     const style: React.CSSProperties = {}
     if (!this.blockDef.block) {
       style.margin = 5
-    }
-
-    const handleClick = (ev: React.MouseEvent) => {
-      // Ensure button doesn't trigger other actions
-      ev.stopPropagation()
-      onClick()
     }
 
     return (
@@ -181,10 +191,12 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
                 { value: "default", label: "Default"},
                 { value: "primary", label: "Primary"},
                 { value: "link", label: "Link"},
+                { value: "plainlink", label: "Plain Link"},
               ]}
             /> }
           </PropertyEditor>
         </LabeledProperty>
+        { this.blockDef.style != "plainlink" ?
         <LabeledProperty label="Size">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="size">
             {(value, onChange) => 
@@ -197,6 +209,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>
+        : null }
         <LabeledProperty label="Icon">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="icon">
             {(value, onChange) => 
@@ -212,9 +225,11 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>
+        { this.blockDef.style != "plainlink" ?
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="block">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Block-style</Checkbox>}
         </PropertyEditor>
+        : null }
         <LabeledProperty label="When button clicked">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="actionDef">
             {(value, onChange) => (

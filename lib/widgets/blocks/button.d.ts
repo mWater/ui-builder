@@ -12,7 +12,8 @@ export interface ButtonBlockDef extends BlockDef {
     labelEmbeddedExprs?: EmbeddedExpr[];
     /** Action to perform when button is clicked */
     actionDef?: ActionDef | null;
-    style: "default" | "primary" | "link";
+    /** plainlink is a plain link without padding */
+    style: "default" | "primary" | "link" | "plainlink";
     size: "normal" | "small" | "large" | "extrasmall";
     icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download";
     /** True to make block-style button */
