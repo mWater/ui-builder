@@ -1,14 +1,15 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
 import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
-import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
-import { Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
+import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarExprPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
+import { Expr, ExprUtils, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import * as d3Format from 'd3-format';
 import moment from 'moment'
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { TextualBlockDef, TextualBlock } from './textual';
+import { localize } from '../localization';
 
 export interface ExpressionBlockDef extends TextualBlockDef {
   type: "expression"
@@ -21,6 +22,12 @@ export interface ExpressionBlockDef extends TextualBlockDef {
 
   /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll). Note: % is not multiplied by 100!  */
   format: string | null
+
+  /** Alternative label for true value */
+  trueLabel?: LocalizedString | null
+
+  /** Alternative label for true value */
+  falseLabel?: LocalizedString | null
 }
 
 export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
@@ -78,6 +85,17 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
       }
       else if (exprType === "datetime" && value != null) {
         str = moment(value, moment.ISO_8601).format(this.blockDef.format || "lll")
+      }
+      else if (exprType == "boolean") {
+        if (value == true) {
+          str = this.blockDef.trueLabel ? localize(this.blockDef.trueLabel, props.locale) : "True"
+        }
+        else if (value == false) {
+          str = this.blockDef.falseLabel ? localize(this.blockDef.falseLabel, props.locale) : "False"
+        }
+        else {
+          str = ""
+        }
       }
       else {
         str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
@@ -164,6 +182,28 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
                 <DatetimeFormatEditor
                   value={value} 
                   onChange={onChange} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "boolean" ?
+          <LabeledProperty label="Display True As">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="trueLabel">
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="True" />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+          : null
+        }
+
+        { exprType === "boolean" ?
+          <LabeledProperty label="Display False As">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="falseLabel">
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="False" />
               )}
             </PropertyEditor>
           </LabeledProperty>

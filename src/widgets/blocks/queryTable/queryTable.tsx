@@ -54,6 +54,9 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Table padding (default is "normal") */
   padding?: "normal" | "compact"
+
+  /** Striping of table */
+  striped?: boolean
 }
 
 interface QueryTableColumnInfo {
@@ -242,6 +245,10 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
         break
     }
 
+    if (this.blockDef.striped) {
+      className += " table-striped"
+    }
+
     return (
       <table className={className}>
         <colgroup>
@@ -407,6 +414,10 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
             {(value, onChange) => <Toggle value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
           </PropertyEditor>
         </LabeledProperty>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="striped">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Striped</Checkbox>}
+        </PropertyEditor>
 
         { rowCV ? 
           <LabeledProperty label="Columns">

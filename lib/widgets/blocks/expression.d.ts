@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ContextVar } from '../blocks';
-import { Expr } from 'mwater-expressions';
+import { Expr, LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { TextualBlockDef, TextualBlock } from './textual';
 export interface ExpressionBlockDef extends TextualBlockDef {
@@ -11,6 +11,10 @@ export interface ExpressionBlockDef extends TextualBlockDef {
     expr: Expr;
     /** d3 format of expression for numbers, moment.js format for date (default ll) and datetime (default lll). Note: % is not multiplied by 100!  */
     format: string | null;
+    /** Alternative label for true value */
+    trueLabel?: LocalizedString | null;
+    /** Alternative label for true value */
+    falseLabel?: LocalizedString | null;
 }
 export declare class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     getContextVarExprs(contextVar: ContextVar): Expr[];

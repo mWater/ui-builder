@@ -32,6 +32,8 @@ export interface QueryTableBlockDef extends BlockDef {
     borders?: "horizontal" | "all" | "none";
     /** Table padding (default is "normal") */
     padding?: "normal" | "compact";
+    /** Striping of table */
+    striped?: boolean;
 }
 interface QueryTableColumnInfo {
     /** Column order expressions. When present for a column, makes it orderable via icon at top */

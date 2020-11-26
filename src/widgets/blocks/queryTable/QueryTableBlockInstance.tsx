@@ -377,6 +377,10 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       className += " table-hover"
     }
 
+    if (blockDef.striped) {
+      className += " table-striped"
+    }
+
     return (
       <table className={className} style={style}>
         <colgroup>
