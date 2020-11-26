@@ -344,7 +344,6 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   }
 
   render() {
-    const riProps = this.props.instanceCtx
     const blockDef = this.props.block.blockDef
 
     const style: React.CSSProperties = {
@@ -402,6 +401,13 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
           {this.renderRows()}
           {this.renderShowMore()}
         </tbody>
+        { blockDef.footers ?
+        <tfoot>
+          <tr>
+            { blockDef.footers.map((b, index) => <td key={index}>{this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, b)}</td>)}
+          </tr>
+        </tfoot>
+        : null}
       </table>
     )  
   }

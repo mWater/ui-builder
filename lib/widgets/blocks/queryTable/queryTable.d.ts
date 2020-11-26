@@ -14,6 +14,8 @@ export interface QueryTableBlockDef extends BlockDef {
     headers: Array<BlockDef | null>;
     /** Column information. May not be present in legacy block defs. Can be null if no info */
     columnInfos?: Array<QueryTableColumnInfo | null>;
+    /** Footer blocks. Always same length as contents (if exist). */
+    footers?: Array<BlockDef | null>;
     /** Id of context variable of rowset for table to use */
     rowsetContextVarId: string | null;
     /** Limit of rows displayed. Can be soft limit (prompts for more) or hard limit */

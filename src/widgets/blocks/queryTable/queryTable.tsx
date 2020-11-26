@@ -28,6 +28,9 @@ export interface QueryTableBlockDef extends BlockDef {
   /** Column information. May not be present in legacy block defs. Can be null if no info */
   columnInfos?: Array<QueryTableColumnInfo | null>
 
+  /** Footer blocks. Always same length as contents (if exist). */
+  footers?: Array<BlockDef | null>
+
   /** Id of context variable of rowset for table to use */
   rowsetContextVarId: string | null
 
@@ -81,7 +84,8 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
     const headerChildren: ChildBlock[] = _.compact(this.blockDef.headers).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
     const contentChildren: ChildBlock[] = _.compact(this.blockDef.contents).map(bd => ({ blockDef: bd!, contextVars: rowsetCV ? contextVars.concat(this.createRowContextVar(rowsetCV)) : contextVars }))
-    return headerChildren.concat(contentChildren)
+    const footerChildren: ChildBlock[] = _.compact(this.blockDef.footers || []).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+    return headerChildren.concat(contentChildren).concat(footerChildren)
   }
 
   validate(designCtx: DesignCtx) { 
@@ -126,10 +130,12 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     const headers = this.blockDef.headers.map(b => action(b))
     const contents = this.blockDef.contents.map(b => action(b))
+    const footers = this.blockDef.footers ? this.blockDef.footers.map(b => action(b)) : undefined
 
     return produce(this.blockDef, draft => {
       draft.headers = headers
       draft.contents = contents
+      draft.footers = footers
     })
   }
 
@@ -221,6 +227,12 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       }), blockDef.id)
     }
 
+    const setFooter = (index: number, blockDef: BlockDef) => {
+      props.store.alterBlock(this.id, produce(b => {
+        b!.footers[index] = blockDef
+      }), blockDef.id)
+    }
+
     const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
     let contentProps = props
     
@@ -275,6 +287,15 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
             })}
           </tr>
         </tbody>
+        { this.blockDef.footers ?
+        <tfoot>
+          <tr key="footer">
+            { this.blockDef.footers.map((b, index) => {
+              return <td key={index}>{props.renderChildBlock(props, b, setFooter.bind(null, index))}</td>
+            })}
+          </tr>
+        </tfoot>
+        : null }
       </table>
     )
   }
@@ -293,6 +314,9 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       props.store.replaceBlock(produce(this.blockDef, b => {
         setLength(b.contents, this.blockDef.contents.length + 1)
         setLength(b.headers, this.blockDef.contents.length + 1)
+        if (b.footers) {
+          setLength(b.footers, this.blockDef.contents.length + 1)
+        }
         b.headers[b.headers.length - 1] = { id: uuid.v4(), type: "text", text: { _base: "en", en: "Header" }, style: "div" } as TextBlockDef
         b.columnInfos = b.columnInfos || []
         setLength(b.columnInfos, this.blockDef.contents.length + 1)
@@ -305,9 +329,25 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
         if (b.contents.length > 1) {
           setLength(b.contents, this.blockDef.contents.length - 1)
           setLength(b.headers, this.blockDef.contents.length - 1)
+          if (b.footers) {
+            setLength(b.footers, this.blockDef.contents.length - 1)
+          }
           b.columnInfos = b.columnInfos || []
-          setLength(b.columnInfos, this.blockDef.headers.length - 1)
+          setLength(b.columnInfos, this.blockDef.contents.length - 1)
         }
+      }))
+    }
+
+    const handleAddFooters = () => {
+      props.store.replaceBlock(produce(this.blockDef, b => {
+        b.footers = [] as BlockDef[]
+        setLength(b.footers, this.blockDef.contents.length)
+      }))
+    }
+
+    const handleRemoveFooters = () => {
+      props.store.replaceBlock(produce(this.blockDef, b => {
+        delete b.footers
       }))
     }
 
@@ -433,12 +473,23 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         : null }
-        <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
-          <i className="fa fa-plus"/> Add Column
-        </button>
-        <button type="button" className="btn btn-link btn-sm" onClick={handleRemoveColumn}>
-          <i className="fa fa-minus"/> Remove Column
-        </button>
+        <div>
+          <button type="button" className="btn btn-link btn-sm" onClick={handleAddColumn}>
+            <i className="fa fa-plus"/> Add Column
+          </button>
+          <button type="button" className="btn btn-link btn-sm" onClick={handleRemoveColumn}>
+            <i className="fa fa-minus"/> Remove Column
+          </button>
+        </div>
+        { this.blockDef.footers != null ?
+          <button type="button" className="btn btn-link btn-sm" onClick={handleRemoveFooters}>
+            Remove Footer
+          </button>
+          :
+          <button type="button" className="btn btn-link btn-sm" onClick={handleAddFooters}>
+            Add Footer
+          </button>
+        }
       </div>
     )
   }
@@ -519,7 +570,8 @@ function setLength(arr: any[], length: number) {
     arr.splice(length, arr.length - length)
   }
   if (arr.length < length) {
-    for (let i = 0 ; i < length - arr.length ; i++) {
+    const toAdd = length - arr.length
+    for (let i = 0 ; i < toAdd ; i++) {
       arr.push(null)
     }
   }
