@@ -13,6 +13,7 @@
     "ez-localize": "^2.1.1",
     "font-awesome": "^4.7.0",
     "immer": "^4.0.2",
+    "jsonql": "github:mWater/jsonql",
     "lodash": "^3.10.1",
     "lru-cache": "^4.1.5",
     "markdown-it": "^10.0.0",

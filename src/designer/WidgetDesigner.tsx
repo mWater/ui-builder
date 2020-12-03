@@ -17,6 +17,7 @@ import AddWizardPalette from "./AddWizardPalette"
 import ClipboardPalette from "./ClipboardPalette"
 import { BaseCtx, DesignCtx } from "../contexts"
 import { DataSource } from "mwater-expressions"
+import canonical from 'canonical-json'
 
 interface WidgetDesignerProps {
   baseCtx: BaseCtx
@@ -285,7 +286,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     let database: Database = this.props.baseCtx.database
 
-    if (this.props.widgetDef.virtualizeDatabaseInPreview) {
+    if (this.props.widgetDef.virtualizeDatabaseInPreview || this.props.widgetDef.virtualizeDatabaseInPreview == null) {
       // Make non-live TODO needed? Could make big queries for counts/sums if mutated
       database = new VirtualDatabase(database, this.props.baseCtx.schema, this.props.baseCtx.locale)
     }
@@ -317,7 +318,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   render() {
     // Check if canonical
     const canonilizedBlockDef = this.canonicalize(this.props.widgetDef.blockDef)
-    if (!_.isEqual(canonilizedBlockDef, this.props.widgetDef.blockDef)) {
+    if (canonical(canonilizedBlockDef) != canonical(this.props.widgetDef.blockDef)) {
       // Is not canonical. Defer update (since we can't call directly in render)
       // and return null
       setTimeout(() => {

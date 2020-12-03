@@ -21,7 +21,7 @@ export interface WidgetDef {
     privateContextVarValues?: {
         [contextVarId: string]: any;
     };
-    /** True to virtualize database in preview */
+    /** True to virtualize database in preview. Default true */
     virtualizeDatabaseInPreview?: boolean;
 }
 export declare type LookupWidget = (id: string) => WidgetDef | null;

@@ -26,7 +26,7 @@ export interface WidgetDef {
   /** Values of private context variables */
   privateContextVarValues?: { [contextVarId: string]: any }
 
-  /** True to virtualize database in preview */
+  /** True to virtualize database in preview. Default true */
   virtualizeDatabaseInPreview?: boolean
 }
 

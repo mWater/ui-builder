@@ -179,10 +179,14 @@ function HorizLabeledControl(props: {
     <div key="content">
       { props.children }
     </div>
-    <div key="blank"/>
-    <div key="help" style={{ marginLeft: 5 }}>
-      <span key="hint" className="text-muted" style={{ marginLeft: 5 }}>{props.hintText}</span>
-      <span key="help" style={{ marginLeft: 5 }}>{props.helpText}</span>
-    </div>
+    { props.helpText || props.hintText ?
+      <div key="blank"/>
+    : null }
+    { props.helpText || props.hintText ?
+      <div key="help" style={{ marginLeft: 5 }}>
+        <span key="hint" className="text-muted" style={{ marginLeft: 5 }}>{props.hintText}</span>
+        <span key="help" style={{ marginLeft: 5 }}>{props.helpText}</span>
+      </div>
+    : null }
   </div>
 }

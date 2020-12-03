@@ -93,7 +93,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
         })}
       </LabeledProperty>
       <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="virtualizeDatabaseInPreview">
-        {(value, onChange) => <Checkbox value={value} onChange={onChange}>Prevent changes to database in Preview</Checkbox>}
+        {(value, onChange) => <Checkbox value={value != null ? value : true} onChange={onChange}>Prevent changes to database in Preview</Checkbox>}
       </PropertyEditor>
       <div style={{ color: "#D8D8D8", fontSize: 9 }}>{this.props.widgetDef.id}</div>
     </div>)
