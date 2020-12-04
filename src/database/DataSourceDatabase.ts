@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
 import { DataSource, Schema, Row } from "mwater-expressions";
 import { QueryCompiler } from "./QueryCompiler";
-import { createExprVariables, ContextVar } from "../widgets/blocks";
+import { createExprVariables, ContextVar, createExprVariableValues } from "../widgets/blocks";
 
 type TransactionHandler = () => Transaction
 
@@ -20,8 +20,8 @@ export class DataSourceDatabase implements Database {
     this.changeListeners = []
   }
   
-  query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: { [contextVarId: string]: any }) {
-    const queryCompiler = new QueryCompiler(this.schema, createExprVariables(contextVars), filteredContextVarValues)
+  query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: { [variableId: string]: any }) {
+    const queryCompiler = new QueryCompiler(this.schema, createExprVariables(contextVars), createExprVariableValues(contextVars, filteredContextVarValues))
     const { jsonql, rowMapper } = queryCompiler.compileQuery(options)
     
     return new Promise<Row[]>((resolve, reject) => {

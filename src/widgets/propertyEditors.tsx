@@ -383,7 +383,8 @@ export class TableSelect extends React.Component<{
   schema: Schema
   locale: string
   value?: string | null
-  onChange: (tableId: string) => void
+  onChange: (tableId: string | null) => void
+  allowNull?: boolean
 }> {
   static contextTypes = {
     tableSelectElementFactory: PropTypes.func  // Can be overridden by setting tableSelectElementFactory in context that takes ({ schema, value, onChange, filter, onFilterChange })
@@ -412,6 +413,7 @@ export class TableSelect extends React.Component<{
       onChange={this.handleTableChange} 
       getOptionLabel={this.getOptionLabel}
       getOptionValue={this.getOptionValue}
+      isClearable={this.props.allowNull}
       menuPortalTarget={document.body}
       styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
     />

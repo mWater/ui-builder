@@ -12,6 +12,7 @@ import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
 import { evalContextVarExpr } from '../evalContextVarExpr';
+import { ExprComponent } from 'mwater-expressions-ui';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -26,6 +27,13 @@ interface ContextVarNull {
   type: "null"
 }
 
+/** Literal value for context value */
+interface ContextVarLiteral {
+  type: "literal"
+
+  /** Value of the variable. Is an expression for non-rowset/non-row types */
+  value: any
+}
 
 /** Action which opens a page */
 export interface OpenPageActionDef extends ActionDef {
@@ -46,7 +54,7 @@ export interface OpenPageActionDef extends ActionDef {
   widgetId: string | null
 
   /** Values of context variables that widget inside page needs */
-  contextVarValues: { [contextVarId: string]: ContextVarRef | ContextVarNull }
+  contextVarValues: { [contextVarId: string]: ContextVarRef | ContextVarNull | ContextVarLiteral }
 
   /** True to replace current page */
   replacePage?: boolean
@@ -130,6 +138,9 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       else if (contextVarValue.type == "null") {
         contextVarValues[cvid] = null
       }
+      else if (contextVarValue.type == "literal") {
+        contextVarValues[cvid] = contextVarValue.value
+      }
     }
 
     // Include global context variables
@@ -196,6 +207,51 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     
     const widgetDef: WidgetDef | null = actionDef.widgetId ? props.widgetLibrary.widgets[actionDef.widgetId] : null
 
+    const renderContextVarValue = (contextVar: ContextVar) => {
+      const cvr = actionDef.contextVarValues[contextVar.id]
+      const handleCVRChange = (cvr: ContextVarNull | ContextVarRef | ContextVarLiteral) => {
+        props.onChange(produce(actionDef, (draft) => {
+          draft.contextVarValues[contextVar.id] = cvr
+        }))
+      }
+
+      // Create options list
+      const options: { value: ContextVarNull | ContextVarRef | ContextVarLiteral, label: string }[] = [
+        { value: { type: "null" }, label: "No Value" },
+        { value: { type: "literal", value: null }, label: "Literal Value" }
+      ]
+
+      for (const cv of props.contextVars) {
+        if (areContextVarCompatible(cv, contextVar)) {
+          options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
+        }
+      }
+
+      return (
+        <tr key={contextVar.id}>
+          <td key="name">{contextVar.name}</td>
+          <td key="value">
+            <Select
+              options={options}                    
+              value={cvr && cvr.type == "literal" ? { type: "literal", value: null } : cvr}
+              onChange={handleCVRChange}
+              nullLabel="Select..."
+            />
+            { !cvr ? <span className="text-warning">Value not set</span> : null}
+            { cvr && cvr.type == "literal" ?
+              <ExprComponent
+                schema={props.schema}
+                dataSource={props.dataSource}
+                table={contextVar.table || null}
+                value={cvr.value}
+                onChange={expr => { handleCVRChange({ ...cvr, value: expr })}}
+              />
+            : null }
+          </td>
+        </tr>
+      )
+}
+
     const renderContextVarValues = () => {
       if (!widgetDef) {
         return null
@@ -204,40 +260,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       return (
         <table className="table table-bordered table-condensed">
           <tbody>
-            { widgetDef.contextVars.map(contextVar => {
-              const cvr = actionDef.contextVarValues[contextVar.id]
-              const handleCVRChange = (cvr: ContextVarNull | ContextVarRef) => {
-                props.onChange(produce(actionDef, (draft) => {
-                  draft.contextVarValues[contextVar.id] = cvr
-                }))
-              }
-
-              // Create options list
-              const options: { value: ContextVarNull | ContextVarRef, label: string }[] = [
-                { value: { type: "null" }, label: "No Value" }
-              ]
-
-              for (const cv of props.contextVars) {
-                if (areContextVarCompatible(cv, contextVar)) {
-                  options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
-                }
-              }
-
-              return (
-                <tr key={contextVar.id}>
-                  <td key="name">{contextVar.name}</td>
-                  <td key="value">
-                    <Select
-                      options={options}                    
-                      value={cvr}
-                      onChange={handleCVRChange}
-                      nullLabel="Select..."
-                    />
-                    { !cvr ? <span className="text-warning">Value not set</span> : null}          
-                  </td>
-                </tr>
-              )
-            })}
+            { widgetDef.contextVars.map(renderContextVarValue) }
           </tbody>
         </table>
       )
@@ -307,17 +330,29 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
   }
 }
 
-/** Determine if context variables are compatible to be passed in. 
- * Only exception is that id and row type are compatible
+/** 
+ * Determine if context variables are compatible to be passed in. 
  */
 function areContextVarCompatible(cv1: ContextVar, cv2: ContextVar) {
-  if (cv1.type == cv2.type && cv1.table == cv2.table) {
-    return true
+  if (cv1.type != cv2.type) {
+    return false
+  } 
+  if (cv1.table != cv2.table) {
+    return false
   }
-
-  if (["id", "row"].includes(cv1.type) && ["id", "row"].includes(cv2.type) && cv1.table == cv2.table) {
-    return true
+  if (cv1.idTable != cv2.idTable) {
+    return false
   }
-
-  return false
+  if (cv1.enumValues && !cv2.enumValues) {
+    return false
+  }
+  if (!cv1.enumValues && cv2.enumValues) {
+    return false
+  }
+  if (cv1.enumValues && cv2.enumValues) {
+    if (!_.isEqual(cv1.enumValues.map(ev => ev.id), cv2.enumValues.map(ev => ev.id))) {
+      return false
+    }
+  }
+  return true
 }

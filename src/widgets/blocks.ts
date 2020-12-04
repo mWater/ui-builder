@@ -43,7 +43,12 @@ export interface BlockDef {
 
 export type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>
 
-/** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset */
+/** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset 
+ * Values: 
+ * - In the case of "row", the value of the variable is the primary key
+ * - In the case of "rowset", the value of the variable is a boolean expression for the table
+ * - Otherwise, the value is an expression
+ */
 export interface ContextVar {
   /** Id of context variable */
   id: string   
@@ -53,14 +58,17 @@ export interface ContextVar {
 
   type: "row" | "rowset" | LiteralType;
 
-  /** table of database (when type = "rowset" or "row" or "id" or "id[]") */
+  /** table of database.
+   * When type is "rowset" or "row", it is the table which the row or rowset is for.
+   * For other variable types, the table is present if the variable is an expression based on a table.
+   */
   table?: string
-  
-  // aggrOnly?: boolean; // true if only aggregate expressions are allowed (when type = "rowset")
-  // selectable?: boolean;  // true if row can be selected (when type = "rowset")
 
   /** Enum values when type is "enum" or "enumset" */
   enumValues?: EnumValue[]
+
+  /** Table referenced by an "id" or "id[]" type variable */
+  idTable?: string
 }
 
 /** A filter that applies to a particular rowset context variable */
@@ -266,6 +274,21 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
         return { id: cv.id, type: "id[]" as LiteralType, name: { _base: "en", en: cv.name }, idTable: cv.table }
       }
     return { id: cv.id, type: (cv.type as any) as LiteralType, name: { _base: "en", en: cv.name }, enumValues: cv.enumValues }
+  })
+}
+
+/** Create the variable values as needed by mwater-expressions */
+export function createExprVariableValues(contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): { [variableId: string]: any } {
+  return _.mapValues(contextVarValues, (value, contextVarId) => {
+    const cv = contextVars.find(cv => cv.id == contextVarId)
+    if (!cv) {
+      throw new Error(`"Context variable ${contextVarId} not found`)
+    }
+
+    if (cv.type == "row") {
+      return { type: "literal", valueType: "id", idTable: cv.table!, value: value }
+    }
+    return value
   })
 }
 

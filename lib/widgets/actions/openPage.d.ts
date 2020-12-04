@@ -13,6 +13,12 @@ interface ContextVarRef {
 interface ContextVarNull {
     type: "null";
 }
+/** Literal value for context value */
+interface ContextVarLiteral {
+    type: "literal";
+    /** Value of the variable. Is an expression for non-rowset/non-row types */
+    value: any;
+}
 /** Action which opens a page */
 export interface OpenPageActionDef extends ActionDef {
     type: "openPage";
@@ -27,7 +33,7 @@ export interface OpenPageActionDef extends ActionDef {
     widgetId: string | null;
     /** Values of context variables that widget inside page needs */
     contextVarValues: {
-        [contextVarId: string]: ContextVarRef | ContextVarNull;
+        [contextVarId: string]: ContextVarRef | ContextVarNull | ContextVarLiteral;
     };
     /** True to replace current page */
     replacePage?: boolean;

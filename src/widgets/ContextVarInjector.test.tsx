@@ -369,7 +369,7 @@ test("filters are not applied for rowset variables to variable value", (done) =>
   
 test("exprs are computed for null variable with variable-based expression", (done) => {
   const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "number" }
-  const value = 1234
+  const value = { type: "literal", valueType: "number", value: 1234 }
   const contextVarExprs : Expr[] = [
     { type: "op", op: "+", exprs: [{ type: "variable", variableId: "cv1" }, { type: "literal", valueType: "number", value: 1}]}
   ]

@@ -1,4 +1,4 @@
-import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables } from "./blocks";
+import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables, createExprVariableValues } from "./blocks";
 import * as React from "react";
 import { Expr, ExprUtils, Schema, Variable, PromiseExprEvaluator } from "mwater-expressions";
 import { QueryOptions, Database } from "../database/Database";
@@ -261,7 +261,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
             schema: outer.schema, 
             locale: outer.locale,
             variables: createExprVariables(contextVars),
-            variableValues: contextVarValues
+            variableValues: createExprVariableValues(contextVars, contextVarValues)
           }).evaluateSync(expr)
         }
 

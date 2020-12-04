@@ -142,7 +142,8 @@ export declare class TableSelect extends React.Component<{
     schema: Schema;
     locale: string;
     value?: string | null;
-    onChange: (tableId: string) => void;
+    onChange: (tableId: string | null) => void;
+    allowNull?: boolean;
 }> {
     static contextTypes: {
         tableSelectElementFactory: PropTypes.Requireable<(...args: any[]) => any>;

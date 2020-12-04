@@ -4,7 +4,7 @@ import simpleSchema from '../__fixtures__/schema';
 import { Variable } from 'mwater-expressions';
 
 const variables: Variable[] = [{ id: "varnumber", name: { _base: "en", en: "Varnumber"}, type: "number" }]
-const variableValues = { varnumber: 123 }
+const variableValues = { varnumber: { type: "literal", valueType: "number", value: 123 }}
 
 const schema = simpleSchema()
 const compiler = new QueryCompiler(schema, variables, variableValues)

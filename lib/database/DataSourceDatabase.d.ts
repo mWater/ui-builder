@@ -10,7 +10,7 @@ export declare class DataSourceDatabase implements Database {
     changeListeners: DatabaseChangeListener[];
     constructor(schema: Schema, dataSource: DataSource, transactionHandler?: TransactionHandler);
     query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: {
-        [contextVarId: string]: any;
+        [variableId: string]: any;
     }): Promise<Row[]>;
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;

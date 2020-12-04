@@ -2,7 +2,7 @@ import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEva
 import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
 import * as _ from "lodash";
 import { v4 as uuid } from 'uuid'
-import { ContextVar, createExprVariables } from "../widgets/blocks";
+import { ContextVar, createExprVariables, createExprVariableValues } from "../widgets/blocks";
 import { BatchingCache } from "./BatchingCache";
 
 /**
@@ -47,7 +47,7 @@ export default class VirtualDatabase implements Database {
 
   async query(query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
     const variables = createExprVariables(contextVars)
-    const variableValues = contextVarValues
+    const variableValues = createExprVariableValues(contextVars, contextVarValues)
    
     const exprUtils = new ExprUtils(this.schema, variables)
     
@@ -330,7 +330,7 @@ export default class VirtualDatabase implements Database {
   /** Apply all known mutations to a set of rows */
   private async mutateRows(rows: Row[], from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
     const variables = createExprVariables(contextVars)
-    const variableValues = contextVarValues
+    const variableValues = createExprVariableValues(contextVars, contextVarValues)
 
     // Copy rows to be mutated safely
     rows = rows.slice()

@@ -172,7 +172,7 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
         <LabeledProperty label="Table">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="table">
             {(value, onChange) => 
-              <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange}/>
+              <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={t => onChange(t!)}/>
             }
           </PropertyEditor>
         </LabeledProperty>

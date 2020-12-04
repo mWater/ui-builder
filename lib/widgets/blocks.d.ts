@@ -28,17 +28,27 @@ export interface BlockDef {
     type: string;
 }
 export declare type CreateBlock = (blockDef: BlockDef) => Block<BlockDef>;
-/** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset */
+/** Context variable is a variable which is available to a block and all of its children. Usually row or a rowset
+ * Values:
+ * - In the case of "row", the value of the variable is the primary key
+ * - In the case of "rowset", the value of the variable is a boolean expression for the table
+ * - Otherwise, the value is an expression
+ */
 export interface ContextVar {
     /** Id of context variable */
     id: string;
     /** Name of context variable */
     name: string;
     type: "row" | "rowset" | LiteralType;
-    /** table of database (when type = "rowset" or "row" or "id" or "id[]") */
+    /** table of database.
+     * When type is "rowset" or "row", it is the table which the row or rowset is for.
+     * For other variable types, the table is present if the variable is an expression based on a table.
+     */
     table?: string;
     /** Enum values when type is "enum" or "enumset" */
     enumValues?: EnumValue[];
+    /** Table referenced by an "id" or "id[]" type variable */
+    idTable?: string;
 }
 /** A filter that applies to a particular rowset context variable */
 export interface Filter {
@@ -108,6 +118,12 @@ export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: C
 export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[];
 /** Create the variables as needed by mwater-expressions */
 export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
+/** Create the variable values as needed by mwater-expressions */
+export declare function createExprVariableValues(contextVars: ContextVar[], contextVarValues: {
+    [contextVarId: string]: any;
+}): {
+    [variableId: string]: any;
+};
 /** Make a duplicate of a block */
 export declare function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef;
 /** Validates a context variable/expr combo. Null if ok */

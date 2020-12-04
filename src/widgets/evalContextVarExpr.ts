@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { Expr, PromiseExprEvaluator } from "mwater-expressions";
 import { getFilteredContextVarValues, InstanceCtx } from "../contexts";
 import { QueryOptions } from "../database/Database";
-import { ContextVar, createExprVariables } from "./blocks";
+import { ContextVar, createExprVariables, createExprVariableValues } from "./blocks";
 
 
 /** 
@@ -28,7 +28,7 @@ export async function evalContextVarExpr(options: {
       schema: ctx.schema, 
       locale: ctx.locale,
       variables: createExprVariables(ctx.contextVars),
-      variableValues: ctx.contextVarValues
+      variableValues: createExprVariableValues(ctx.contextVars, ctx.contextVarValues)
     }).evaluateSync(expr)
   }
 
