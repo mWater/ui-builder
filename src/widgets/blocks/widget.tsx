@@ -202,7 +202,12 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         .concat(instanceCtx.contextVars)
         .concat(widgetDef.contextVars)
 
-      const innerContextVarValues = { ...instanceCtx.contextVarValues, ...mappedContextVarValues, ...widgetDef.privateContextVarValues || {} }
+      const innerContextVarValues = { 
+        ...instanceCtx.contextVarValues, 
+        ...mappedContextVarValues, 
+        // Exclude stale values
+        ...(_.pick(widgetDef.privateContextVarValues || {}, (widgetDef.privateContextVars || []).map(cv => cv.id)))
+      }
 
       const innerInstanceCtx : InstanceCtx = {
         ...instanceCtx,
@@ -252,7 +257,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         instanceCtx={innerInstanceCtx}
         innerBlock={widgetDef.blockDef}
         injectedContextVars={widgetDef.privateContextVars || []}
-        injectedContextVarValues={widgetDef.privateContextVarValues || {}}
+        injectedContextVarValues={_.pick(widgetDef.privateContextVarValues || {}, (widgetDef.privateContextVars || []).map(cv => cv.id))}
         >
           {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
             if (loading) {
