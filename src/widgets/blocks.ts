@@ -281,8 +281,10 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
 export function createExprVariableValues(contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): { [variableId: string]: Expr } {
   return _.mapValues(contextVarValues, (value, contextVarId) => {
     const cv = contextVars.find(cv => cv.id == contextVarId)
+    // TODO: For some reason, there can be values with no corresponding context var. Warn for now to unbreak.
     if (!cv) {
-      throw new Error(`"Context variable ${contextVarId} not found`)
+      console.warn(`createExprVariableValues: Context variable ${contextVarId} not found`)
+      return null
     }
 
     if (cv.type == "row") {
