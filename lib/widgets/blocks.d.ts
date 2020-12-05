@@ -122,7 +122,7 @@ export declare function createExprVariables(contextVar: ContextVar[]): Variable[
 export declare function createExprVariableValues(contextVars: ContextVar[], contextVarValues: {
     [contextVarId: string]: any;
 }): {
-    [variableId: string]: any;
+    [variableId: string]: Expr;
 };
 /** Make a duplicate of a block */
 export declare function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef;

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { TOCBlockDef, iterateItems, TOCItem, TOCBlock } from "./toc"
-import { CreateBlock, createExprVariables } from '../../blocks'
+import { CreateBlock, createExprVariables, createExprVariableValues } from '../../blocks'
 import { useState, useRef } from "react"
 import { localize } from '../../localization'
 import SplitPane from "./SplitPane"
@@ -157,7 +157,7 @@ export default function TOCInstanceComp(props: {
 
         // Inline variables used in rowsets as they may depend on context variables that aren't present in new page
         if (outerCV.type == "rowset") {
-          outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, instanceCtx.contextVarValues)
+          outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, createExprVariableValues(instanceCtx.contextVars, instanceCtx.contextVarValues))
         }
 
         mappedContextVarValues[innerContextVar.id] = outerCVValue

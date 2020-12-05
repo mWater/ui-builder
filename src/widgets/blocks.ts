@@ -278,7 +278,7 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
 }
 
 /** Create the variable values as needed by mwater-expressions */
-export function createExprVariableValues(contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): { [variableId: string]: any } {
+export function createExprVariableValues(contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): { [variableId: string]: Expr } {
   return _.mapValues(contextVarValues, (value, contextVarId) => {
     const cv = contextVars.find(cv => cv.id == contextVarId)
     if (!cv) {
