@@ -4,7 +4,7 @@ import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, Expr } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
 import { localize } from "../../localization";
-import Async from 'react-select/lib/Async'
+import { Async } from 'react-select'
 import { QueryOptions, Database } from "../../../database/Database";
 import { InstanceCtx, getFilteredContextVarValues } from '../../../contexts';
 

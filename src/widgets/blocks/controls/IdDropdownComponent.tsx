@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import AsyncReactSelect from 'react-select/lib/Async'
+import { Async } from 'react-select'
 import { Database, OrderBy, QueryOptions } from "../../../database/Database"
 import { Expr } from 'mwater-expressions';
 import { useState, useCallback, useEffect } from 'react'
@@ -212,7 +212,7 @@ export function IdDropdownComponent<T>(props: Props<T>) {
   }, [])
 
   return <div style={{ width: "100%", minWidth: 160 }}>
-    <AsyncReactSelect
+    <Async
       value={currentValue}
       placeholder={props.placeholder}
       loadOptions={loadOptions}
