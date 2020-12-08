@@ -268,12 +268,16 @@ export function createExprVariables(contextVar: ContextVar[]): Variable[] {
         return { id: cv.id, type: "id" as LiteralType, name: { _base: "en", en: cv.name }, idTable: cv.table }
       case "rowset":
         return { id: cv.id, type: "boolean" as LiteralType, name: { _base: "en", en: cv.name }, table: cv.table }
-      case "id":
-        return { id: cv.id, type: "id" as LiteralType, name: { _base: "en", en: cv.name }, idTable: cv.table }
-      case "id[]":
-        return { id: cv.id, type: "id[]" as LiteralType, name: { _base: "en", en: cv.name }, idTable: cv.table }
-      }
-    return { id: cv.id, type: (cv.type as any) as LiteralType, name: { _base: "en", en: cv.name }, enumValues: cv.enumValues }
+    }
+    
+    return { 
+      id: cv.id, 
+      type: (cv.type as any) as LiteralType, 
+      name: { _base: "en", en: cv.name }, 
+      enumValues: cv.enumValues,
+      table: cv.table,
+      idTable: cv.idTable
+    }
   })
 }
 
