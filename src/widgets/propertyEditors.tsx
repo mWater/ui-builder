@@ -286,12 +286,10 @@ export class OrderByEditor extends React.Component<{
 
   render() {
     return (
-      <div>
-        <div style={{ float: "left" }}>
-          <a onClick={this.handleDirToggle}>
-            { this.props.value.dir === "asc" ? <i className="fa fa-arrow-up"/> : <i className="fa fa-arrow-down"/> }
-          </a>
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr"}}>
+        <a onClick={this.handleDirToggle}>
+          { this.props.value.dir === "asc" ? <i className="fa fa-arrow-up"/> : <i className="fa fa-arrow-down"/> }
+        </a>
         <ExprComponent 
           schema={this.props.schema} 
           dataSource={this.props.dataSource}
