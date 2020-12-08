@@ -52,7 +52,7 @@
     "@types/react": "^16.9.43",
     "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-dom": "^16.9.8",
-    "@types/react-select": "^2.0.19",
+    "@types/react-select": "^3.0.27",
     "@types/uuid": "^3.4.9",
     "build-library": "github:mWater/build-library",
     "enzyme": "^3.11.0",

@@ -1,11 +1,11 @@
 import _ from 'lodash'
-import { Async } from 'react-select'
+import Async from 'react-select/async'
 import { Database, OrderBy, QueryOptions } from "../../../database/Database"
 import { Expr } from 'mwater-expressions';
 import { useState, useCallback, useEffect } from 'react'
 import React from 'react'
 import { ContextVar } from '../../blocks'
-import { Styles } from 'react-select/lib/styles';
+import { Styles } from 'react-select';
 
 interface SingleProps<T> {
   database: Database

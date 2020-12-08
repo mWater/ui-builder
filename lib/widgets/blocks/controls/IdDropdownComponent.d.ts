@@ -2,7 +2,7 @@
 import { Database, OrderBy } from "../../../database/Database";
 import { Expr } from 'mwater-expressions';
 import { ContextVar } from '../../blocks';
-import { Styles } from 'react-select/lib/styles';
+import { Styles } from 'react-select';
 interface SingleProps<T> {
     database: Database;
     table: string;
