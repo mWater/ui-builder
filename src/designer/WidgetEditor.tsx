@@ -224,6 +224,7 @@ class ContextVarValueEditor extends React.Component<{
       value={value}
       onChange={this.handleChange}
       variables={createExprVariables(this.props.availContextVars)}
+      preferLiteral
       />
   }
 

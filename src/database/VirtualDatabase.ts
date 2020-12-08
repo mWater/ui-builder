@@ -274,7 +274,7 @@ export default class VirtualDatabase implements Database {
       followJoin: async (columnId: string) => {
         const column = this.schema.getColumn(from, columnId)!
 
-        const idTable = column.type == "id" ? column.idTable! : column.join!.toTable
+        const idTable = column.type == "id" || column.type == "id[]" ? column.idTable! : column.join!.toTable
 
         // Inverse 1-n uses the inverse column to get rows, as these are not included in the row values
         if (column.type == "join" && column.join!.type === "1-n" && column.join!.inverse) {
