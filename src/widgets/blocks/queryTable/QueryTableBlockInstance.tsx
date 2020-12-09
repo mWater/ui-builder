@@ -1,5 +1,5 @@
 import * as React from "react";
-import { QueryTableBlock } from "./queryTable";
+import { getFixedWidth, QueryTableBlock } from "./queryTable";
 import { Row, Expr, IdExpr } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
@@ -346,13 +346,20 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   render() {
     const blockDef = this.props.block.blockDef
 
-    const style: React.CSSProperties = {
-      marginTop: 5
+    const divStyle: React.CSSProperties = {}
+
+    const tableStyle: React.CSSProperties = {
+      marginTop: 5,
+    }
+
+    if (getFixedWidth(this.props.block.blockDef)) {
+      tableStyle.width = getFixedWidth(this.props.block.blockDef)!
+      divStyle.overflowX = "auto"
     }
 
     // Fade if refreshing
     if (this.state.refreshing) {
-      style.opacity = 0.6
+      tableStyle.opacity = 0.6
     }
 
     let className = "table"
@@ -381,34 +388,36 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     }
 
     return (
-      <table className={className} style={style}>
-        <colgroup>
-          {blockDef.contents.map((b, colIndex) => {
-            // Determine width
-            const columnInfos = blockDef.columnInfos
-            const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
-            return <col key={colIndex} style={{ width: width }}/>
-          })}
-        </colgroup>
-        { !blockDef.hideHeaders ? 
-        <thead>
-          <tr key="header">
-            { blockDef.headers.map((b, index) => this.renderHeader(b, index)) }
-          </tr>
-        </thead>
-        : null }
-        <tbody>
-          {this.renderRows()}
-          {this.renderShowMore()}
-        </tbody>
-        { blockDef.footers ?
-        <tfoot>
-          <tr>
-            { blockDef.footers.map((b, index) => <td key={index}>{this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, b)}</td>)}
-          </tr>
-        </tfoot>
-        : null}
-      </table>
+      <div style={divStyle}>
+        <table className={className} style={tableStyle}>
+          <colgroup>
+            {blockDef.contents.map((b, colIndex) => {
+              // Determine width
+              const columnInfos = blockDef.columnInfos
+              const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
+              return <col key={colIndex} style={{ width: width }}/>
+            })}
+          </colgroup>
+          { !blockDef.hideHeaders ? 
+          <thead>
+            <tr key="header">
+              { blockDef.headers.map((b, index) => this.renderHeader(b, index)) }
+            </tr>
+          </thead>
+          : null }
+          <tbody>
+            {this.renderRows()}
+            {this.renderShowMore()}
+          </tbody>
+          { blockDef.footers ?
+          <tfoot>
+            <tr>
+              { blockDef.footers.map((b, index) => <td key={index}>{this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, b)}</td>)}
+            </tr>
+          </tfoot>
+          : null}
+        </table>
+      </div>
     )  
   }
 }

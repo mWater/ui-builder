@@ -241,6 +241,14 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       contentProps = { ...contentProps, contextVars: props.contextVars.concat([this.createRowContextVar(rowsetCV)]) }
     }
 
+    const divStyle: React.CSSProperties = {}
+    const tableStyle: React.CSSProperties = {}
+
+    if (getFixedWidth(this.blockDef)) {
+      tableStyle.width = getFixedWidth(this.blockDef)!
+      divStyle.overflowX = "auto"
+    }
+
     let className = "table"
     switch (this.blockDef.borders || "horizontal") {
       case "all":
@@ -262,41 +270,43 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
     }
 
     return (
-      <table className={className}>
-        <colgroup>
-          {this.blockDef.contents.map((b, colIndex) => {
-            // Determine width
-            const columnInfos = this.blockDef.columnInfos
-            const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
-            return <col key={colIndex} style={{ width: width }}/>
-          })}
-        </colgroup>
-        { !this.blockDef.hideHeaders ? 
-        <thead>
-          <tr key="header">
-            { this.blockDef.headers.map((b, index) => {
-              return <th key={index}>{props.renderChildBlock(props, b, setHeader.bind(null, index))}</th>
+      <div style={divStyle}>
+        <table className={className} style={tableStyle}>
+          <colgroup>
+            {this.blockDef.contents.map((b, colIndex) => {
+              // Determine width
+              const columnInfos = this.blockDef.columnInfos
+              const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
+              return <col key={colIndex} style={{ width: width }}/>
             })}
-          </tr>
-        </thead>
-        : null }
-        <tbody>
-          <tr key="child">
-            { this.blockDef.contents.map((b, index) => {
-              return <td key={index}>{props.renderChildBlock(contentProps, b, setContent.bind(null, index))}</td>
-            })}
-          </tr>
-        </tbody>
-        { this.blockDef.footers ?
-        <tfoot>
-          <tr key="footer">
-            { this.blockDef.footers.map((b, index) => {
-              return <td key={index}>{props.renderChildBlock(props, b, setFooter.bind(null, index))}</td>
-            })}
-          </tr>
-        </tfoot>
-        : null }
-      </table>
+          </colgroup>
+          { !this.blockDef.hideHeaders ? 
+          <thead>
+            <tr key="header">
+              { this.blockDef.headers.map((b, index) => {
+                return <th key={index}>{props.renderChildBlock(props, b, setHeader.bind(null, index))}</th>
+              })}
+            </tr>
+          </thead>
+          : null }
+          <tbody>
+            <tr key="child">
+              { this.blockDef.contents.map((b, index) => {
+                return <td key={index}>{props.renderChildBlock(contentProps, b, setContent.bind(null, index))}</td>
+              })}
+            </tr>
+          </tbody>
+          { this.blockDef.footers ?
+          <tfoot>
+            <tr key="footer">
+              { this.blockDef.footers.map((b, index) => {
+                return <td key={index}>{props.renderChildBlock(props, b, setFooter.bind(null, index))}</td>
+              })}
+            </tr>
+          </tfoot>
+          : null }
+        </table>
+      </div>
     )
   }
 
@@ -575,4 +585,12 @@ function setLength(arr: any[], length: number) {
       arr.push(null)
     }
   }
+}
+
+/** Determine if table is fixed width and if it is, return the width in pixels */
+export function getFixedWidth(blockDef: QueryTableBlockDef): number | null {
+  if (blockDef.columnInfos && blockDef.columnInfos.every(ci => ci && ci.columnWidth && ci.columnWidth.match(/[0-9]+px/))) {
+    return _.sum(blockDef.columnInfos.map(ci => parseFloat(ci!.columnWidth!)))
+  }
+  return null
 }

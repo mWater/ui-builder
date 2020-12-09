@@ -68,4 +68,6 @@ export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     renderInstance(props: InstanceCtx): JSX.Element;
     renderEditor(props: DesignCtx): JSX.Element;
 }
+/** Determine if table is fixed width and if it is, return the width in pixels */
+export declare function getFixedWidth(blockDef: QueryTableBlockDef): number | null;
 export {};
