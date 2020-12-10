@@ -61,8 +61,6 @@ export class VerticalBlock extends Block<VerticalBlockDef> {
     return this.blockDef
   }
 
-
-
   renderDesign(props: DesignCtx) {
     // Add keys
     return (

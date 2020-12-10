@@ -1,11 +1,12 @@
 import _ from 'lodash'
 import produce from 'immer'
-import * as React from 'react';
+import React from 'react'
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { Toggle, Select } from 'react-library/lib/bootstrap';
-import { LabeledProperty, PropertyEditor } from '../propertyEditors';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { CSSProperties } from 'react';
+import { LabeledProperty, PropertyEditor } from '../propertyEditors'
+import { DesignCtx, InstanceCtx } from '../../contexts'
+import { CSSProperties } from 'react'
+import AutoSizeComponent from 'react-library/lib/AutoSizeComponent'
 
 export interface HorizontalBlockDef extends BlockDef {
   type: "horizontal"
@@ -22,6 +23,11 @@ export interface HorizontalBlockDef extends BlockDef {
    * If not present, defaults to 1fr for justify, auto otherwise.
    */
   columnWidths?: string[]
+
+  /** Responsive breaks. Array with one entry for each gap (e.g. entry 0 is for gap between column 0 and 1, etc.) 
+   * If present, is the width of the horizontal block at which a line break is added
+  */
+  responsiveBreaks?: (number | null)[]
 }
 
 export class HorizontalBlock extends Block<HorizontalBlockDef> {
@@ -77,53 +83,79 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
     return produce(this.blockDef, draft => { draft.items = newItems })
   }
 
-  renderBlock(children: React.ReactNode[]) {
+  renderBlock(children: React.ReactNode[], width: number) {
     const align = this.blockDef.align || "justify"
     const columnWidths = this.blockDef.columnWidths || []
+    const responsiveBreaks = this.blockDef.responsiveBreaks || []
 
-    // Create columns
-    const gridTemplateColumns = this.blockDef.items.map((item, index) => {
-      if (align == "justify") {
-        return columnWidths[index] || "1fr"
-      }
-      return columnWidths[index] || "auto"
-    })
-
-    // Create CSS grid with style
-    const containerStyle: CSSProperties = {
-      display: "grid",
-      gridGap: 5,
-      gridTemplateColumns: gridTemplateColumns.join(" "), 
-      justifyContent: this.blockDef.align,
-    }
+    // Determine alignment (vertical)
+    let alignItems: "start" | "center" | "end" = "start"
     if (this.blockDef.verticalAlign == "middle") {
-      containerStyle.alignItems = "center"
+      alignItems = "center"
     }
     else if (this.blockDef.verticalAlign == "bottom") {
-      containerStyle.alignItems = "end"
-    }
-    else {
-      containerStyle.alignItems = "start"
+      alignItems = "end"
     }
 
-    return <div style={containerStyle}>
-      { children.map((child, index) => <React.Fragment key={index}>{child}</React.Fragment>) }
+    // Break items into rows based on responsive breaks
+    const rows: React.ReactNode[] = []
+    
+    let rowItems: React.ReactNode[] = []
+    let rowColumns: string[] = []
+
+    const addRow = () => {
+      // Create CSS grid with style
+      const containerStyle: CSSProperties = {
+        display: "grid",
+        gridGap: 5,
+        gridTemplateColumns: rowColumns.join(" "), 
+        justifyContent: this.blockDef.align,
+        alignItems
+      }
+
+      rows.push(<div style={containerStyle}>
+        { rowItems.map((child, index) => <React.Fragment key={index}>{child}</React.Fragment>) }
+      </div>)
+
+      rowItems = []
+      rowColumns = []
+    }
+
+    for (let index = 0 ; index < children.length ; index++) {
+      // Determine if break before
+      if (index > 0 && responsiveBreaks[index - 1] && responsiveBreaks[index - 1]! > width) {
+        // Add break
+        addRow()
+      }
+
+      // Add item
+      rowItems.push(children[index])
+      rowColumns.push(align == "justify" ? columnWidths[index] || "1fr" : columnWidths[index] || "auto")
+    }
+    addRow()
+
+    return <div>
+      { rows }
     </div>
   }
 
   renderDesign(props: DesignCtx) {
     return (
-      <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        { this.renderBlock(this.blockDef.items.map(childBlock => props.renderChildBlock(props, childBlock))) }
-      </div>
+      <AutoSizeComponent injectWidth>
+        { size => (
+          <div style={{ paddingTop: 5, paddingBottom: 5 }}>
+            { this.renderBlock(this.blockDef.items.map(childBlock => props.renderChildBlock(props, childBlock)), size.width!) }
+          </div>
+        )}
+      </AutoSizeComponent>
     )
   }
 
   renderInstance(props: InstanceCtx) {
     return (
-      <div>
-        { this.renderBlock(this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef))) }
-      </div>
+      <AutoSizeComponent injectWidth>
+        { size => this.renderBlock(this.blockDef.items.map(childBlockDef => props.renderChildBlock(props, childBlockDef)), size.width!) }
+      </AutoSizeComponent>
     )
   }
 
@@ -174,6 +206,17 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
             }
           </PropertyEditor>
         </LabeledProperty>
+
+        <LabeledProperty label="Responsive Breaks">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="responsiveBreaks">
+            {(value, onChange) => 
+              <ResponsiveBreaksEditor 
+                numBreaks={this.blockDef.items.length - 1}
+                breaks={value || []} 
+                onChange={onChange} />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }
@@ -190,9 +233,9 @@ const ColumnWidthsEditor = (props: {
   return <ul className="list-group">
     {
       _.range(props.numColumns).map((colIndex) => {
-
         return <li className="list-group-item" key={colIndex}>
           <ColumnWidthEditor 
+            label={`#${colIndex + 1}:`}
             columnWidth={props.columnWidths[colIndex] || props.defaultWidth}
             onChange={width => props.onChange(produce(props.columnWidths, draft => {
               draft[colIndex] = width
@@ -204,33 +247,94 @@ const ColumnWidthsEditor = (props: {
   </ul>
 }
 
-const ColumnWidthEditor = (props: {
+function ColumnWidthEditor(props: {
+  label: string
   columnWidth: string
   onChange: (columnWidth: string) => void
-}) => {
-  return <Select
-    value={props.columnWidth}
-    onChange={props.onChange}
-    options={
-      [
-        { value: "auto", label: "Auto" },
-        { value: "min-content", label: "Small as possible" },
-        { value: "1fr", label: "1 fraction" },
-        { value: "2fr", label: "2 fraction" },
-        { value: "3fr", label: "3 fraction" },
-        { value: "minmax(min-content, 16%)", label: "1/6" },
-        { value: "minmax(min-content, 25%)", label: "1/4" },
-        { value: "minmax(min-content, 33%)", label: "1/3" },
-        { value: "minmax(min-content, 50%)", label: "1/2" },
-        { value: "minmax(min-content, 67%)", label: "2/3" },
-        { value: "minmax(min-content, 75%)", label: "3/4" },
-        { value: "minmax(min-content, 83%)", label: "5/6" },
-        { value: "minmax(min-content, 100px)", label: "100px" },
-        { value: "minmax(min-content, 200px)", label: "200px" },
-        { value: "minmax(min-content, 300px)", label: "300px" },
-        { value: "minmax(min-content, 400px)", label: "400px" },
-        { value: "minmax(min-content, 500px)", label: "500px" }
-      ]
-    }
-  />
+}) {
+  return <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", alignItems: "center", columnGap: 5 }}>
+    <div>{ props.label }</div>
+    <Select
+      value={props.columnWidth}
+      onChange={props.onChange}
+      options={
+        [
+          { value: "auto", label: "Auto" },
+          { value: "min-content", label: "Small as possible" },
+          { value: "1fr", label: "1 fraction" },
+          { value: "2fr", label: "2 fraction" },
+          { value: "3fr", label: "3 fraction" },
+          { value: "minmax(min-content, 16%)", label: "1/6" },
+          { value: "minmax(min-content, 25%)", label: "1/4" },
+          { value: "minmax(min-content, 33%)", label: "1/3" },
+          { value: "minmax(min-content, 50%)", label: "1/2" },
+          { value: "minmax(min-content, 67%)", label: "2/3" },
+          { value: "minmax(min-content, 75%)", label: "3/4" },
+          { value: "minmax(min-content, 83%)", label: "5/6" },
+          { value: "minmax(min-content, 100px)", label: "100px" },
+          { value: "minmax(min-content, 200px)", label: "200px" },
+          { value: "minmax(min-content, 300px)", label: "300px" },
+          { value: "minmax(min-content, 400px)", label: "400px" },
+          { value: "minmax(min-content, 500px)", label: "500px" },
+          { value: "minmax(min-content, 600px)", label: "600px" },
+          { value: "minmax(min-content, 700px)", label: "700px" },
+          { value: "minmax(min-content, 800px)", label: "800px" }
+        ]
+      }
+    />
+  </div>
 }
+
+const ResponsiveBreaksEditor = (props: {
+  numBreaks: number
+  breaks: (number | null)[]
+  onChange: (breaks: (number | null)[]) => void
+}) => {
+  return <ul className="list-group">
+    {
+      _.range(props.numBreaks).map((breakIndex) => {
+        return <li className="list-group-item" key={breakIndex}>
+          <ResponsiveBreakEditor 
+            label={`${breakIndex + 1} / ${breakIndex + 2}:`}
+            width={props.breaks[breakIndex] || null}
+            onChange={width => props.onChange(produce(props.breaks, draft => {
+              draft[breakIndex] = width
+            }))}
+          />
+        </li>
+      })
+    }
+  </ul>
+}
+
+function ResponsiveBreakEditor(props: {
+  label: string
+  width: number | null
+  onChange: (width: number | null) => void
+}) {
+  return <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", alignItems: "center", columnGap: 5 }}>
+    <div>{ props.label }</div>
+    <Select
+      value={props.width}
+      onChange={props.onChange}
+      nullLabel="Never break"
+      options={
+        [
+          { value: 100, label: "< 100px" },
+          { value: 200, label: "< 200px" },
+          { value: 300, label: "< 300px" },
+          { value: 400, label: "< 400px" },
+          { value: 500, label: "< 500px" },
+          { value: 600, label: "< 600px" },
+          { value: 700, label: "< 700px" },
+          { value: 800, label: "< 800px" },
+          { value: 900, label: "< 900px" },
+          { value: 1000, label: "< 1000px" },
+          { value: 1100, label: "< 1100px" },
+          { value: 1200, label: "< 1200px" }
+        ]
+      }
+    />
+  </div>
+}
+
