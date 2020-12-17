@@ -275,7 +275,7 @@ class AddRowInstance extends React.Component<Props, State> {
     if (this.doesNeedAdd()) {
       // Render wait while adding
       if (!this.state.addedRowId) {
-        return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+        return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
       }
 
       // Inject context variable
@@ -286,7 +286,7 @@ class AddRowInstance extends React.Component<Props, State> {
         instanceCtx={this.props.instanceCtx}>
           {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
             if (loading) {
-              return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+              return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
             return (
               <div style={{ opacity: refreshing ? 0.6 : undefined }}>

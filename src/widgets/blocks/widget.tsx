@@ -261,7 +261,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         >
           {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
             if (loading) {
-              return <div style={{ color: "#AAA", fontSize: 18, textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+              return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
             return (
               <div style={{ opacity: refreshing ? 0.6 : undefined }}>
