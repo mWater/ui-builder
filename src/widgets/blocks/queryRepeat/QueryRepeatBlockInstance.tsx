@@ -165,14 +165,26 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
   }
 
   renderRow(row: Row, rowIndex: number) {
+    const orientation = this.props.block.blockDef.orientation || "vertical"
+    const horizontalSpacing = this.props.block.blockDef.horizontalSpacing != null ? this.props.block.blockDef.horizontalSpacing : 5
+
     const rowRIProps = this.createRowInstanceCtx(rowIndex)
 
-    return (
-      <div key={row.id}>
-        { rowIndex > 0 ? this.renderSeparator() : null }
-        {rowRIProps.renderChildBlock(rowRIProps, this.props.block.blockDef.content)}
-      </div>
-    )
+    if (orientation == "vertical") {
+      return (
+        <div key={row.id}>
+          { rowIndex > 0 ? this.renderSeparator() : null }
+          {rowRIProps.renderChildBlock(rowRIProps, this.props.block.blockDef.content)}
+        </div>
+      )
+    }
+    else {
+      return (
+        <div key={row.id} style={{ display: "inline-block", verticalAlign: "top", marginLeft: rowIndex > 0 ? horizontalSpacing : 0 }}>
+          {rowRIProps.renderChildBlock(rowRIProps, this.props.block.blockDef.content)}
+        </div>
+      )
+    }
   }
 
   renderRows() {

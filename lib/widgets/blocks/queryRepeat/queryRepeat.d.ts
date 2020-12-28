@@ -7,8 +7,12 @@ export interface QueryRepeatBlockDef extends BlockDef {
     type: "queryRepeat";
     /** Contents to repeat */
     content: BlockDef | null;
-    /** Separator between items */
+    /** Direction of repeat. Default is "vertical" */
+    orientation?: "vertical" | "horizontal";
+    /** Separator between vertical items */
     separator: "none" | "solid_line" | "page_break";
+    /** Separator between horizontal items. Default 5px */
+    horizontalSpacing?: number;
     /** Id of context variable of rowset for table to use */
     rowsetContextVarId: string | null;
     limit: number | null;

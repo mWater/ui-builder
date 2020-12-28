@@ -6,7 +6,7 @@ import { Expr, Schema, ExprValidator, LocalizedString, Row } from 'mwater-expres
 import { OrderBy } from '../../../database/Database';
 import QueryRepeatBlockInstance from './QueryRepeatBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import { NumberInput, Checkbox, Select } from 'react-library/lib/bootstrap';
+import { NumberInput, Checkbox, Select, Toggle } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 
@@ -16,8 +16,14 @@ export interface QueryRepeatBlockDef extends BlockDef {
   /** Contents to repeat */
   content: BlockDef | null
 
-  /** Separator between items */
+  /** Direction of repeat. Default is "vertical" */
+  orientation?: "vertical" | "horizontal"
+
+  /** Separator between vertical items */
   separator: "none" | "solid_line" | "page_break"
+
+  /** Separator between horizontal items. Default 5px */
+  horizontalSpacing?: number
 
   /** Id of context variable of rowset for table to use */
   rowsetContextVarId: string | null
@@ -150,6 +156,13 @@ export class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
       { value: "page_break", label: "Page Break" }
     ]
 
+    const horizontalSpacingOptions = [
+      { value: 0, label: "None" },
+      { value: 5, label: "5 pixels" },
+      { value: 10, label: "10 pixels" },
+      { value: 15, label: "15 pixels" },
+    ]
+
     return (
       <div>
         <LabeledProperty label="Rowset">
@@ -158,11 +171,30 @@ export class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
+        <LabeledProperty label="Repeat direction">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="orientation">
+            {(value, onChange) => <Toggle 
+              value={value || "vertical"} 
+              onChange={onChange} 
+              options={[{ value: "vertical", label: "Vertical" }, { value: "horizontal", label: "Horizontal" }]} 
+            />}
+          </PropertyEditor>
+        </LabeledProperty>
+        
+        { (this.blockDef.orientation || "vertical") == "vertical" ?
         <LabeledProperty label="Separator">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="separator">
             {(value, onChange) => <Select value={value} onChange={onChange} options={separatorOptions} />}
           </PropertyEditor>
         </LabeledProperty>
+        : 
+        <LabeledProperty label="Spacing">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="horizontalSpacing">
+            {(value, onChange) => <Select value={value != null ? value : 5} onChange={onChange} options={horizontalSpacingOptions} />}
+          </PropertyEditor>
+        </LabeledProperty>
+        
+        } 
 
         { rowsetCV ?
           <LabeledProperty label="Filter">
