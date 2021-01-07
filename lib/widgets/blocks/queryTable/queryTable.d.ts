@@ -63,7 +63,7 @@ export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
      * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
      * contextVars: includes rowsetCV and row one
      */
-    getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any;
+    getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[], rowsetContextVarValue: Expr): any;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(props: InstanceCtx): JSX.Element;
     renderEditor(props: DesignCtx): JSX.Element;

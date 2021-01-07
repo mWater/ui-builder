@@ -188,7 +188,12 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const innerContextVars = rips.contextVars.concat(rowcv)
 
     // Row context variable value
-    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.instanceCtx.schema, rowsetCV, innerContextVars)
+    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, 
+      this.props.instanceCtx.schema, 
+      rowsetCV, 
+      innerContextVars,
+      getFilteredContextVarValues(this.props.instanceCtx)[rowsetCV.id]
+    )
 
     return {
       ...rips, 

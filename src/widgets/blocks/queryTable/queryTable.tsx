@@ -188,7 +188,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
    * Row should have fields e0, e1, etc. to represent expressions. If singleRow mode, should have id field
    * contextVars: includes rowsetCV and row one
    */
-  getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any {
+  getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[], rowsetContextVarValue: Expr): any {
     switch (this.blockDef.mode) {
       case "singleRow":
         return row.id
@@ -197,6 +197,12 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
 
         // Create "and" filter
         const ands: Expr[] = []
+
+        // Add overall rowset filter
+        if (rowsetContextVarValue) {
+          ands.push(rowsetContextVarValue)
+        }
+
         rowExprs.forEach((expr, index) => {
           if (exprUtils.getExprAggrStatus(expr) === "individual") {
             ands.push({
