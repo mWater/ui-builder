@@ -179,8 +179,8 @@ export default class VirtualDatabase implements Database {
       return false
     }
 
-    // Don't include joins at all, as they can't be mutated
-    if (column.type == "join") {
+    // Don't include joins except 'n-1' and '1-1'
+    if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1" ) {
       return false
     }
 
@@ -262,8 +262,8 @@ export default class VirtualDatabase implements Database {
           return Promise.all(joinRows.map(r => r.getPrimaryKey()))
         }
 
-        // Other joins are not available
-        if (column.type == "join") {
+        // Non n-1 or 1-1 joins not available
+        if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1" ) {
           console.warn(`Attempt to get join field ${columnId}`)
           return null
         }
@@ -286,14 +286,14 @@ export default class VirtualDatabase implements Database {
           return joinRows
         }
 
-        // Other joins are not available
-        if (column.type == "join") {
+        // Non n-1 or 1-1 joins not available
+        if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1" ) {
           console.warn(`Attempt to get join field ${columnId}`)
           return null
         }
         
         // For ones with single row
-        if (column.type == "id") {
+        if (column.type == "id" || column.type == "join") {
           // Short-circuit if null/undefined
           if (row["c_" + columnId] == null) {
             return null

@@ -63,7 +63,7 @@ test("gets multiple row cv", () => {
 })
 
 test("gets single row cv value", () => {
-  expect(qtbSingle.getRowContextVarValue({ id: "123" }, [], schema, rowsetCV, contextVars)).toEqual("123")
+  expect(qtbSingle.getRowContextVarValue({ id: "123" }, [], schema, rowsetCV, contextVars, null)).toEqual("123")
 })
 
 test("gets multiple row cv value", () => {
@@ -72,11 +72,12 @@ test("gets multiple row cv value", () => {
     { type: "field", table: "t1", column: "text" },
     { type: "op", table: "t1", op: "count", exprs: [] }
   ]
-  expect(qtbMultiple.getRowContextVarValue({ e0: "xyz", e1: 4 }, exprs, schema, rowsetCV, contextVars)).toEqual({
+  expect(qtbMultiple.getRowContextVarValue({ e0: "xyz", e1: 4 }, exprs, schema, rowsetCV, contextVars, { type: "literal", valueType: "boolean", value: false })).toEqual({
     type: "op",
     op: "and",
     table: "t1",
     exprs: [
+      { type: "literal", valueType: "boolean", value: false },
       { type: "op", table: "t1", op: "=", exprs: [exprs[0], { type: "literal", valueType: "text", value: "xyz" }] }
     ]
   })
