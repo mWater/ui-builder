@@ -45,7 +45,10 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   renderDesign(props: DesignCtx) {
-    const summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
+    let summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
+    if (summary.length > 20) {
+      summary = summary.substr(0, 20) + "..."
+    }
 
     return this.renderText(
       <div>
