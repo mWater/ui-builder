@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import LeafBlock from '../LeafBlock';
 import { BlockDef, ContextVar } from '../blocks';
 import { ActionDef } from '../actions';
@@ -15,7 +15,7 @@ export interface ButtonBlockDef extends BlockDef {
     /** plainlink is a plain link without padding */
     style: "default" | "primary" | "link" | "plainlink";
     size: "normal" | "small" | "large" | "extrasmall";
-    icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download";
+    icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download" | "info-circle" | "link" | "external-link";
     /** True to make block-style button */
     block?: boolean;
     /** If present, message to display when confirming action */
