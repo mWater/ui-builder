@@ -51,7 +51,9 @@ export class ColumnValuesEditor extends React.Component<{
     }
     const contextVarExpr: ContextVarExpr = this.props.value[columnId]!
 
-    const contextVar = this.props.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
+    // Override for special case of allowing to set joins
+    const idTable = column.type == "join" ? column.join!.toTable : column.idTable
+    const type = column.type == "join" ? "id" : column.type as LiteralType
 
     return <tr key={columnId}>
       <td key="name">{localize(column.name, this.props.locale)}</td>
@@ -64,9 +66,9 @@ export class ColumnValuesEditor extends React.Component<{
             contextVars={this.props.contextVars} 
             schema={this.props.schema} 
             dataSource={this.props.dataSource}
-            idTable={column.type == "join" ? column.join!.toTable : column.idTable}
+            idTable={idTable}
             enumValues={column.enumValues}
-            types={[column.type as LiteralType]}
+            types={[type]}
           />
         </LabeledProperty>
       </td>
