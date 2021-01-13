@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import { BlockDef, ContextVar, ChildBlock, createExprVariables, CreateBlock, Block } from '../blocks'
 import * as _ from 'lodash';
-import { ExprValidator, Schema, LiteralExpr, Expr, ExprCompiler, ExprUtils } from 'mwater-expressions';
+import { ExprValidator, Schema, LiteralExpr, Expr, ExprCompiler, ExprUtils, LiteralType } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput,  Radio } from 'react-library/lib/bootstrap';
 import { PropertyEditor, LabeledProperty, TableSelect } from '../propertyEditors';
@@ -108,9 +108,17 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
       }
     }
 
+    // Override for special case of allowing to set joins
+    const idTable = column.type == "join" ? column.join!.toTable : column.idTable
+    const type = column.type == "join" ? "id" : column.type as LiteralType
+
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [column.type] })
+    error = exprValidator.validateExpr(contextVarExpr.expr, { 
+      table: contextVar ? contextVar.table : undefined, 
+      types: [type],
+      idTable: idTable 
+    })
     if (error) {
       return error
     }

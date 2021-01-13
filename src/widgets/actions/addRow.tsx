@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash'
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { ExprValidator, LiteralExpr, Expr, ExprUtils } from 'mwater-expressions';
+import { ExprValidator, LiteralExpr, Expr, ExprUtils, LiteralType } from 'mwater-expressions';
 import { ContextVar, createExprVariables } from '../blocks';
 import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
 import { ColumnValuesEditor } from '../columnValues';
@@ -83,9 +83,17 @@ export class AddRowAction extends Action<AddRowActionDef> {
       }
     }
 
+    // Override for special case of allowing to set joins
+    const idTable = column.type == "join" ? column.join!.toTable : column.idTable
+    const type = column.type == "join" ? "id" : column.type as LiteralType
+    
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { table: contextVar ? contextVar.table : undefined, types: [column.type] })
+    error = exprValidator.validateExpr(contextVarExpr.expr, { 
+      table: contextVar ? contextVar.table : undefined, 
+      types: [type],
+      idTable: idTable
+    })
     if (error) {
       return error
     }
