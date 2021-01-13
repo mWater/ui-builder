@@ -65,10 +65,10 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)!
     const column = options.schema.getColumn(contextVar.table!, this.blockDef.column!)!
 
-    if (column.type === "id" || column.type == "id[]") {
+    if (column.type === "id" || column.type == "id[]" || column.type == "join") {
       const idMode = this.blockDef.idMode || "simple"
       const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-      const idTable = column.idTable!
+      const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
 
       if (idMode == "simple") {
         if (!this.blockDef.idLabelExpr)  {
@@ -175,8 +175,8 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     if (column.type === "boolean") {
       return this.renderBoolean(props, column)
     }
-    // TODO: remove this by Sept 2020. Legacy support.
-    if (column.type === "join" && column.join!.type === "n-1") {
+    // Dropdowns support n-1 and 1-1 joins as well as id columns
+    if (column.type === "join" && (column.join!.type === "n-1" || column.join!.type === "1-1")) {
       return this.renderId(props, column)
     }
     throw new Error("Unsupported type")
@@ -290,7 +290,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       orderBy = [{ expr: this.blockDef.idLabelExpr!, dir: "asc" }]
     }
 
-    // TODO: Remove this and just use idTable
+    // Dropdowns support n-1 and 1-1 joins as well as id columns
     const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
 
     return <IdDropdownComponent
@@ -547,5 +547,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       || column.type === "id" 
       || column.type === "id[]"
       || column.type == "boolean"
+      || (column.type == "join" && (column.join!.type === "n-1" || column.join!.type === "1-1"))
   }
 }

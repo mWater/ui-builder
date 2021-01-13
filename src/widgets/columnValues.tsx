@@ -64,7 +64,7 @@ export class ColumnValuesEditor extends React.Component<{
             contextVars={this.props.contextVars} 
             schema={this.props.schema} 
             dataSource={this.props.dataSource}
-            idTable={column.idTable}
+            idTable={column.type == "join" ? column.join!.toTable : column.idTable}
             enumValues={column.enumValues}
             types={[column.type as LiteralType]}
           />
@@ -77,7 +77,11 @@ export class ColumnValuesEditor extends React.Component<{
   }
 
   render() {
-    const options = _.sortBy(this.props.schema.getColumns(this.props.table).map(column => ({ value: column.id, label: localize(column.name, this.props.locale)})), "label")
+    // Only allow updateable column types
+    const columns = this.props.schema.getColumns(this.props.table).filter(column => (
+      !column.expr && (column.type != "join" || column.join!.type == "1-1" || column.join!.type == "n-1")
+    ))
+    const options = _.sortBy(columns.map(column => ({ value: column.id, label: localize(column.name, this.props.locale)})), "label")
 
     // Render list of existing ones in order
     return <div>
