@@ -111,11 +111,13 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     }
 
     return (
-      <button type="button" className={className} onClick={handleClick} style={style}>
-        { icon }
-        { icon && label ? "\u00A0" : null }
-        { label }
-      </button>
+      <div>
+        <button type="button" className={className} onClick={handleClick} style={style}>
+          { icon }
+          { icon && label ? "\u00A0" : null }
+          { label }
+        </button>
+      </div>
     )
   }
 
