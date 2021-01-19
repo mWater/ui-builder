@@ -23,7 +23,7 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
     return <NumberInput
       value={props.value} 
       onChange={props.onChange}
-      style={{ width: "12em" }}
+      style={{ maxWidth: "12em", width: "100%" }}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       decimal={this.blockDef.decimal}
       decimalPlaces={this.blockDef.decimalPlaces != null ? this.blockDef.decimalPlaces : undefined}
