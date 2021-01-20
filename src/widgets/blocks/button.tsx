@@ -79,11 +79,13 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
 
     // Special case of plain link
     if (this.blockDef.style == "plainlink") {
-      return <a onClick={handleClick} style={{ cursor: "pointer" }}>
-        { icon }
-        { icon && label ? "\u00A0" : null }
-        { label }
-      </a>
+      return <div>
+        <a onClick={handleClick} style={{ cursor: "pointer" }}>
+          { icon }
+          { icon && label ? "\u00A0" : null }
+          { label }
+        </a>
+      </div>
     }
     let className = "btn btn-" + this.blockDef.style
 
