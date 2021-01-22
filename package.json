@@ -12,7 +12,7 @@
     "dompurify": "^2.2.2",
     "ez-localize": "^2.1.1",
     "font-awesome": "^4.7.0",
-    "immer": "^4.0.2",
+    "immer": "^8.0.1",
     "jsonql": "github:mWater/jsonql",
     "lodash": "^3.10.1",
     "markdown-it": "^10.0.0",
