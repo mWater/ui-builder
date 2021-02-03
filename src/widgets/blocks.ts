@@ -336,7 +336,7 @@ export function validateContextVarExpr(options: {
   error = exprValidator.validateExpr(options.expr, { 
     table: contextVar ? contextVar.table : undefined, 
     types: options.types,
-    aggrStatuses: options.aggrStatuses,
+    aggrStatuses: options.aggrStatuses || ['aggregate', 'individual', 'literal'],
     idTable: options.idTable,
     enumValueIds: options.enumValueIds
    })
