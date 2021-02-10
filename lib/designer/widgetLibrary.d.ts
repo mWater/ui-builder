@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { WidgetDef } from "../widgets/widgets";
 import { DataSource } from "mwater-expressions";
 import { BlockPaletteEntry } from "./blockPaletteEntries";

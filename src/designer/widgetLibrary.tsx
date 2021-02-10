@@ -1,14 +1,15 @@
-import * as React from "react"
-import {v4 as uuid} from 'uuid'
+import React from "react"
+import { v4 as uuid } from 'uuid'
 import { WidgetDef } from "../widgets/widgets";
 import { DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
 import produce from "immer";
-import * as _ from "lodash";
+import _ from "lodash";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import { NewTab } from "./NewTab";
 import { getBlockTree, NullBlockStore } from "../widgets/blocks";
 import { BaseCtx, DesignCtx } from "../contexts";
+import { validateContextVarValue } from "../contextVarValues";
 
 /** All widgets in current project */
 export interface WidgetLibrary {
@@ -102,7 +103,23 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     const contextVars = (this.props.baseCtx.globalContextVars || [])
       .concat(widgetDef.contextVars)
       .concat(widgetDef.privateContextVars || [])
-      
+
+    // Validate context var values
+    for (const cv of widgetDef.contextVars) {
+      const error = validateContextVarValue(this.props.baseCtx.schema, cv, widgetDef.contextVars, widgetDef.contextVarPreviewValues[cv.id])
+      if (error) {
+        return error
+      }
+    }
+
+    // Validate private context var values
+    for (const cv of widgetDef.privateContextVars || []) {
+      const error = validateContextVarValue(this.props.baseCtx.schema, cv, widgetDef.privateContextVars!, (widgetDef.privateContextVarValues || {})[cv.id])
+      if (error) {
+        return error
+      }
+    }
+    
     for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars)) {
       const block = this.props.baseCtx.createBlock(childBlock.blockDef)
 
@@ -119,9 +136,9 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       
       const error = block.validate(designCtx)
        
-       if (error) {
-         return error
-       }
+      if (error) {
+        return error
+      }
     }
 
     return null

@@ -1,18 +1,18 @@
-import * as _ from 'lodash'
-import * as React from 'react';
+import _ from 'lodash'
+import React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
-import { LocalizedString, Expr, ExprUtils } from 'mwater-expressions';
+import { LocalizedString, Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
 import { ContextVar, createExprVariables, createExprVariableValues } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
 import { evalContextVarExpr } from '../evalContextVarExpr';
-import { ExprComponent } from 'mwater-expressions-ui';
+import { ContextVarValueEditor, validateContextVarValue } from '../../contextVarValues';
 
 /** Direct reference to another context variable */
 interface ContextVarRef {
@@ -31,7 +31,10 @@ interface ContextVarNull {
 interface ContextVarLiteral {
   type: "literal"
 
-  /** Value of the variable. Is an expression for non-rowset/non-row types */
+  /** Value of the variable. 
+   * Is an expression for non-rowset/non-row types. 
+   * Is primary key for row
+   * Is boolean expression for rowset */
   value: any
 }
 
@@ -86,6 +89,12 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         const srcCV = designCtx.contextVars.find(cv => cv.id === contextVarValue.contextVarId)
         if (!srcCV || !areContextVarCompatible(srcCV, widgetCV)) {
           return "Invalid context variable"
+        }
+      }
+      else if (contextVarValue.type == "literal") {
+        const error = validateContextVarValue(designCtx.schema, widgetCV, designCtx.contextVars, contextVarValue.value)
+        if (error) {
+          return error
         }
       }
     }
@@ -239,18 +248,19 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
             />
             { !cvr ? <span className="text-warning">Value not set</span> : null}
             { cvr && cvr.type == "literal" ?
-              <ExprComponent
+              <ContextVarValueEditor
                 schema={props.schema}
                 dataSource={props.dataSource}
-                table={contextVar.table || null}
-                value={cvr.value}
-                onChange={expr => { handleCVRChange({ ...cvr, value: expr })}}
+                contextVar={contextVar}
+                contextVarValue={cvr.value}
+                availContextVars={props.contextVars}
+                onContextVarValueChange={value => { handleCVRChange({ ...cvr, value })}}
               />
             : null }
           </td>
         </tr>
       )
-}
+    }
 
     const renderContextVarValues = () => {
       if (!widgetDef) {

@@ -2,17 +2,14 @@ import * as React from "react";
 import {v4 as uuid} from 'uuid'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, TableSelect } from "../widgets/propertyEditors"
 import { WidgetDef } from "../widgets/widgets";
-import { ContextVar, createExprVariables } from "../widgets/blocks";
+import { ContextVar } from "../widgets/blocks";
 import { Schema, DataSource, EnumValue } from "mwater-expressions";
 import { localize } from "../widgets/localization";
-import { produce } from "immer";
-import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 import _ from "lodash";
 import { TextInput, Select, Checkbox, Toggle } from "react-library/lib/bootstrap";
 import { ListEditorComponent } from 'react-library/lib/ListEditorComponent'
-import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import { DesignCtx } from "../contexts";
-import { useState } from "react";
+import { ContextVarValueEditor, validateContextVarValue } from "../contextVarValues";
 
 interface WidgetEditorProps {
   designCtx: DesignCtx
@@ -34,12 +31,38 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
     this.props.onWidgetDefChange({ ...this.props.widgetDef, privateContextVarValues })
   }
 
+  validateWidget() {
+    const widgetDef = this.props.widgetDef
+    
+    // Validate context var values
+    for (const cv of widgetDef.contextVars) {
+      const error = validateContextVarValue(this.props.designCtx.schema, cv, widgetDef.contextVars, widgetDef.contextVarPreviewValues[cv.id])
+      if (error) {
+        return error
+      }
+    }
+
+    // Validate private context var values
+    for (const cv of widgetDef.privateContextVars || []) {
+      const error = validateContextVarValue(this.props.designCtx.schema, cv, widgetDef.privateContextVars!, (widgetDef.privateContextVarValues || {})[cv.id])
+      if (error) {
+        return error
+      }
+    }
+    return null
+  }
+
   render() {
     // Get list of all non-private context variables, including global
     const allContextVars = (this.props.designCtx.globalContextVars || [])
       .concat(this.props.widgetDef.contextVars)
 
+    const validationError = this.validateWidget()
+
     return (<div>
+      { validationError ? 
+        <div className="text-danger"><i className="fa fa-exclamation-circle"/> {validationError}</div> 
+      : null }
       <LabeledProperty label="Name">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="name"> 
           { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
@@ -83,8 +106,10 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             <div>{contextVar.name}:</div>
             <ContextVarValueEditor 
               contextVar={contextVar}
-              contextVarValues={this.props.widgetDef.contextVarPreviewValues}
-              onContextVarValuesChange={this.handleContextVarPreviewValues}
+              contextVarValue={this.props.widgetDef.contextVarPreviewValues[contextVar.id]}
+              onContextVarValueChange={value => {
+                this.handleContextVarPreviewValues({ ...this.props.widgetDef.contextVarPreviewValues, [contextVar.id]: value })
+              }}
               schema={this.props.designCtx.schema} 
               dataSource={this.props.designCtx.dataSource}
               availContextVars={allContextVars}
@@ -128,8 +153,8 @@ const ContextVarsEditor = (props: {
       </div>
       <ContextVarValueEditor 
         contextVar={contextVar}
-        contextVarValues={props.contextVarValues}
-        onContextVarValuesChange={props.onContextVarValuesChange}
+        contextVarValue={props.contextVarValues[contextVar.id]}
+        onContextVarValueChange={value => props.onContextVarValuesChange({ ...props.contextVarValues, [contextVar.id]: value })}
         schema={props.schema}
         dataSource={props.dataSource}
         availContextVars={props.availContextVars}
@@ -173,68 +198,6 @@ const ContextVarsEditor = (props: {
     editLink
   />
 }
-
-/** Allows editing of the value for one context variable */
-class ContextVarValueEditor extends React.Component<{
-  contextVar: ContextVar
-  contextVarValues?: { [contextVarId: string]: any }
-  onContextVarValuesChange: (values: { [contextVarId: string]: any }) => void
-  schema: Schema
-  dataSource: DataSource
-  /** Available context vars for expression builder */
-  availContextVars: ContextVar[]
-}> {
-
-  handleChange = (value: any) => {
-    this.props.onContextVarValuesChange(produce(this.props.contextVarValues || {}, (draft) => {
-      draft[this.props.contextVar.id] = value
-    })) 
-  }
-
-  renderValue(value: any) {
-    if (this.props.contextVar.type === "row" && this.props.schema.getTable(this.props.contextVar.table!)) {
-      return <IdLiteralComponent 
-        schema={this.props.schema} 
-        dataSource={this.props.dataSource}
-        idTable={this.props.contextVar.table!}
-        value={value}
-        onChange={this.handleChange}
-        />
-    }
-
-    if (this.props.contextVar.type === "rowset") {
-      return <ExprComponent 
-        schema={this.props.schema} 
-        dataSource={this.props.dataSource}
-        table={this.props.contextVar.table!}
-        types={["boolean"]}
-        value={value}
-        onChange={this.handleChange}
-        variables={createExprVariables(this.props.availContextVars)}
-        />
-    }
-
-    return <ExprComponent 
-      schema={this.props.schema} 
-      dataSource={this.props.dataSource}
-      table={this.props.contextVar.table || null}
-      types={[this.props.contextVar.type]}
-      idTable={this.props.contextVar.idTable}
-      enumValues={this.props.contextVar.enumValues}
-      value={value}
-      onChange={this.handleChange}
-      variables={createExprVariables(this.props.availContextVars)}
-      preferLiteral
-      />
-  }
-
-  render() {
-    const value = (this.props.contextVarValues || {})[this.props.contextVar.id]
-
-    return this.renderValue(value)
-  }
-}
-
 
 function ContextVarEditor(props: {
   contextVar: Partial<ContextVar>

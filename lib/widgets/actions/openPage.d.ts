@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LocalizedString } from 'mwater-expressions';
 import { EmbeddedExpr } from '../../embeddedExprs';
@@ -16,7 +16,10 @@ interface ContextVarNull {
 /** Literal value for context value */
 interface ContextVarLiteral {
     type: "literal";
-    /** Value of the variable. Is an expression for non-rowset/non-row types */
+    /** Value of the variable.
+     * Is an expression for non-rowset/non-row types.
+     * Is primary key for row
+     * Is boolean expression for rowset */
     value: any;
 }
 /** Action which opens a page */
