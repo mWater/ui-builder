@@ -114,7 +114,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
 
     // Validate private context var values
     for (const cv of widgetDef.privateContextVars || []) {
-      const error = validateContextVarValue(this.props.baseCtx.schema, cv, widgetDef.privateContextVars!, (widgetDef.privateContextVarValues || {})[cv.id])
+      const error = validateContextVarValue(this.props.baseCtx.schema, cv, widgetDef.privateContextVars!.concat(widgetDef.contextVars), (widgetDef.privateContextVarValues || {})[cv.id])
       if (error) {
         return error
       }
