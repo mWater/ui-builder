@@ -73,6 +73,11 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           { (value, onChange) => <TextInput value={value} onChange={onChange} /> }
         </PropertyEditor>
       </LabeledProperty>
+      <LabeledProperty label="Group" hint="Optional grouping of this widget. Blank for none">
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="group"> 
+          { (value, onChange) => <TextInput value={value || ""} onChange={val => onChange(val || undefined)} /> }
+        </PropertyEditor>
+      </LabeledProperty>
       <LabeledProperty label="Variables" hint="Define data sources (rowsets or rows)">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="privateContextVars"> 
           { (value, onChange) => <ContextVarsEditor 

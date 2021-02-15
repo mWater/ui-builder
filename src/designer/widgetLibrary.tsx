@@ -64,6 +64,8 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       const newDef = _.cloneDeep(widgetDef)
       newDef.id = newId
       newDef.name = newDef.name + " (duplicate)"
+      newDef.description = newDef.description
+      newDef.group = newDef.group
       draft.widgets[newId] = newDef
     })
     this.props.onWidgetLibraryChange(widgetLibrary)

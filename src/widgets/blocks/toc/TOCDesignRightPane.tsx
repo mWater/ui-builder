@@ -49,7 +49,7 @@ export function TOCDesignRightPane(props: {
   };
 
   // Create widget options 
-  const widgetOptions = _.sortBy(Object.values(renderProps.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label");
+  const widgetOptions = _.sortByAll(Object.values(renderProps.widgetLibrary.widgets), "group", "name").map(w => ({ label: (w.group ? `${w.group}: ` : "") + w.name, value: w.id }))
 
   const renderContextVarValues = () => {
     if (!item!.widgetId) {

@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react"
 import uuid = require("uuid")
 import { SearchControl } from "../widgets/blocks/search/SearchBlockInstance"
 import React from "react"
-import { getBlockTree, CreateBlock } from "../widgets/blocks"
 
 /** Tab which lists existing tabs and offers a button to create a new tab */
 export const NewTab = (props: {  
@@ -18,10 +17,14 @@ export const NewTab = (props: {
   validateWidget: (widgetDef: WidgetDef) => string | null
 }) => {
 
+  /** Search state */
   const [search, setSearch] = useState("")
 
   // Which widgets have errors
   const [errors, setErrors] = useState<string[]>([])
+
+  /** Collapsed groups (persisted to local storage) */
+  const [collapsedGroups, setCollapsedGroups] = useState<(string | undefined)[]>(JSON.parse(window.localStorage.getItem("UIBuilder.collapsedWidgetGroups") || "[]"))
 
   // Check each widget for errors
   useEffect(() => {
@@ -45,7 +48,7 @@ export const NewTab = (props: {
   }, [])
 
   /** Add a new blank widget */
-  const handleAdd = () => {
+  function handleAdd() {
     props.onAddWidget({
       id: uuid(),
       name: "Untitled",
@@ -58,44 +61,85 @@ export const NewTab = (props: {
     })
   }
 
-  const handleDuplicateWidget = (widgetDef: WidgetDef, ev: React.MouseEvent) => {
+  function handleDuplicateWidget(widgetDef: WidgetDef, ev: React.MouseEvent) {
     ev.stopPropagation()
     props.onDuplicateWidget(widgetDef)
   }
 
-  const handleRemoveWidget = (widgetId: string, ev: React.MouseEvent) => {
+  function handleRemoveWidget(widgetId: string, ev: React.MouseEvent) {
     ev.stopPropagation()
     props.onRemoveWidget(widgetId)
   }
 
-  const renderExistingWidgets = () => {
-    var widgets: WidgetDef[] = _.sortBy(Object.values(props.widgetLibrary.widgets), "name")
+  function toggleGroup(group: string | undefined) {
+    if (collapsedGroups.includes(group)) {
+      const newCollapsedGroups = collapsedGroups.filter(g => g != group)
+      setCollapsedGroups(newCollapsedGroups)
+      window.localStorage.setItem("UIBuilder.collapsedWidgetGroups", JSON.stringify(newCollapsedGroups))
+    }
+    else {
+      const newCollapsedGroups = collapsedGroups.concat([group])
+      setCollapsedGroups(newCollapsedGroups)
+      window.localStorage.setItem("UIBuilder.collapsedWidgetGroups", JSON.stringify(newCollapsedGroups))
+    }
+  }
+  
+  function renderWidgetGroupHeader(group: string | undefined) {
+    return <h4 style={{ cursor: "pointer" }} onClick={() => toggleGroup(group)}>
+      <span style={{ color: "#38D" }} >
+        { collapsedGroups.includes(group) ? <i className="fa fa-fw fa-caret-right"/> : <i className="fa fa-fw fa-caret-down"/> }
+        &nbsp;
+      </span>
+      {group || "No Group"}
+    </h4>
+  }
 
+  function renderWidgetGroup(group: string | undefined, widgets: WidgetDef[], hasGroups: boolean) {
+    return (
+      <div>
+        { hasGroups ? renderWidgetGroupHeader(group) : null }
+        { !collapsedGroups.includes(group) ?
+          <ul className="list-group">
+            {widgets.map(widget => (
+              <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={props.onOpenWidget.bind(null, widget.id)}>
+                <span style={{ float: "right" }} onClick={handleRemoveWidget.bind(null, widget.id)}>
+                  <i className="fa fa-fw fa-remove" />
+                </span>
+                <span style={{ float: "right" }} onClick={handleDuplicateWidget.bind(null, widget)}>
+                  <i className="fa fa-fw fa-files-o" />
+                </span>
+                {errors.includes(widget.id) ?
+                  <span>
+                    <i className="fa fa-fw fa-exclamation-circle text-danger" />
+                  </span>
+                  : null}
+                {widget.name}
+                {widget.description ? <span className="text-muted"> - {widget.description}</span> : null}
+              </li>
+            ))}
+          </ul>
+        : null }
+      </div>
+    )
+  }
+
+  function renderExistingWidgets() {
+    let widgets = Object.values(props.widgetLibrary.widgets)
+
+    // Filter by search
     widgets = widgets.filter(widget => {
       return search ? widget.name.toLowerCase().includes(search.toLowerCase()) : true
     })
 
-    return (
-      <ul className="list-group">
-        { widgets.map(widget => (
-          <li className="list-group-item" style={{ cursor: "pointer" }} key={widget.id} onClick={props.onOpenWidget.bind(null, widget.id)}>
-            <span style={{ float: "right" }} onClick={handleRemoveWidget.bind(null, widget.id)}>
-              <i className="fa fa-fw fa-remove"/>
-            </span>
-            <span style={{ float: "right" }} onClick={handleDuplicateWidget.bind(null, widget)}>
-              <i className="fa fa-fw fa-files-o"/>
-            </span>
-            { errors.includes(widget.id) ? 
-              <span>
-                <i className="fa fa-fw fa-exclamation-circle text-danger"/>
-              </span>
-            : null }
-            {widget.name}
-            { widget.description ? <span className="text-muted"> - {widget.description}</span> : null }
-          </li>
-        )) }
-      </ul>
-    )
+    // Get groups and sort
+    const groups = _.uniq(widgets.map(w => w.group))
+    groups.sort()
+
+    // Render each group
+    return groups.map(group => {
+      const groupWidgets = _.sortBy(widgets.filter(w => w.group == group), "name")  
+      return renderWidgetGroup(group, groupWidgets, groups.includes(undefined))
+    })
   }
 
   return (

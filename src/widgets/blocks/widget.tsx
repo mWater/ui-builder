@@ -278,7 +278,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
 
   renderEditor(props: DesignCtx) {
     // Create widget options 
-    const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
+    const widgetOptions = _.sortByAll(Object.values(props.widgetLibrary.widgets), "group", "name").map(w => ({ label: (w.group ? `${w.group}: ` : "") + w.name, value: w.id }))
 
     const handleWidgetIdChange = (widgetId: string | null) => {
       props.store.replaceBlock({ ...this.blockDef, widgetId: widgetId, contextVarMap: {} } as WidgetBlockDef)

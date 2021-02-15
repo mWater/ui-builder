@@ -204,7 +204,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
   /** Render an optional property editor for the action. This may use bootstrap */
   renderEditor(props: RenderActionEditorProps): React.ReactElement<any> | null { 
     // Create widget options 
-    const widgetOptions = _.sortBy(Object.values(props.widgetLibrary.widgets).map(w => ({ label: w.name, value: w.id })), "label")
+    const widgetOptions = _.sortByAll(Object.values(props.widgetLibrary.widgets), "group", "name").map(w => ({ label: (w.group ? `${w.group}: ` : "") + w.name, value: w.id }))
 
     const actionDef = this.actionDef as OpenPageActionDef
 

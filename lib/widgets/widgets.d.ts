@@ -3,10 +3,12 @@ import { BlockDef, ContextVar } from './blocks';
 export interface WidgetDef {
     /** Unique id (globally) */
     id: string;
-    /** Name of the block component */
+    /** Name of the widget */
     name: string;
-    /** Description of the block component */
+    /** Description of the widget */
     description: string;
+    /** Optional grouping of this widget */
+    group?: string;
     /** Block that it displays */
     blockDef: BlockDef | null;
     /** Context variables that act as arguments that will be passed to inner block */
