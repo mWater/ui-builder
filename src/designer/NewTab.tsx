@@ -138,7 +138,7 @@ export const NewTab = (props: {
     // Render each group
     return groups.map(group => {
       const groupWidgets = _.sortBy(widgets.filter(w => w.group == group), "name")  
-      return renderWidgetGroup(group, groupWidgets, groups.includes(undefined))
+      return renderWidgetGroup(group, groupWidgets, !(groups.length == 1 && groups[0] == undefined))
     })
   }
 
