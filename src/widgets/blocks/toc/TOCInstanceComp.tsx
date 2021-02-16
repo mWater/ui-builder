@@ -69,7 +69,7 @@ export default function TOCInstanceComp(props: {
     // Determine if visible
     if (item.condition && item.condition.expr) {
       const conditionValue = instanceCtx.getContextVarExprValue(item.condition.contextVarId, item.condition.expr)
-      if (conditionValue != true) {
+      if (conditionValue !== true) {
         return null
       }
     }
