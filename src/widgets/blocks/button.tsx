@@ -23,7 +23,7 @@ export interface ButtonBlockDef extends BlockDef {
   /** plainlink is a plain link without padding */
   style: "default" | "primary" | "link" | "plainlink"
   size: "normal" | "small" | "large" | "extrasmall"
-  icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download" | "info-circle" | "link" | "external-link"
+  icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download" | "info-circle" | "link" | "external-link" | "search" | "question-circle" | "folder-open" | "refresh" | "arrow-right"
 
   /** True to make block-style button */
   block?: boolean
@@ -229,6 +229,11 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
                 { value: "info-circle", label: "Information"},
                 { value: "link", label: "Link"},
                 { value: "external-link", label: "External Link"},
+                { value: "search", label: "Search" },
+                { value: "question-circle", label: "Help" },
+                { value: "folder-open", label: "Open" },
+                { value: "refresh", label: "Refresh" },
+                { value: "arrow-right", label: "Right Arrow" }
             ]}/> }
           </PropertyEditor>
         </LabeledProperty>
