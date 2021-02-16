@@ -139,6 +139,11 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       queryOptions.select["e" + index] = expr
     })
 
+    // Add count to ensure that query is aggregate
+    if (block.blockDef.mode == "multiRow") {
+      queryOptions.select["cnt"] = { type: "op", table: rowsetCV.table!, op: "count", exprs: [] }
+    }
+
     // The context variable that represents the row has a value which changes with each row
     // so replace it with { type: "id" ...} expression so that it evaluates as the row id
     queryOptions = mapObject(queryOptions, (input) => {
