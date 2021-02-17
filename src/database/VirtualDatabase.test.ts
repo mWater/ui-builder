@@ -196,6 +196,33 @@ describe("select, order, limit", () => {
     ])
   })
 
+  test("orderby query with nulls", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
+    const qopts: QueryOptions = {
+      select: { x: { type: "id", table: "t1" }},
+      from: "t1",
+      orderBy: [
+        { expr: { type: "field", table: "t1", column: "text" }, dir: "asc" },
+        { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
+      ],
+    }
+
+    const rows = await performQuery({ t1: [
+      { id: 1, text: "a", number: 1 },
+      { id: 2, text: null, number: 2 },
+      { id: 3, text: "b", number: 3 },
+      { id: 4, text: "z", number: 4 }
+    ] }, qopts)
+
+    expect(rows).toEqual([
+      { x: 1 },
+      { x: 3 },
+      { x: 4 },
+      { x: 2 }
+    ])
+  })
+
   test("orderby query with numbers", async () => {
     preventPassthrough()    // Test how queries are transformed by preventing passthrough
 

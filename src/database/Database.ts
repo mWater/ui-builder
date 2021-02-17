@@ -274,6 +274,17 @@ export function stableSort<T>(items: T[], iteratee: (item: T) => any, direction:
   
 /** Compare two values in normal sense of the word (numbers as numbers, strings as strings with locale) */
 function normalCompare(a: any, b: any): number {
+  // Null go to last
+  if (a == null && b == null) {
+    return 0
+  }
+  else if (a == null) {
+    return 1
+  }
+  else if (b == null) {
+    return -1
+  }
+  
   if (typeof a == "number" && typeof b == "number") {
     return a > b ? 1 : (a < b ? -1 : 0)
   }
