@@ -99,7 +99,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
   }
 
   /** Validate a single TOC item */
-  validateItem(designCtx: DesignCtx, tocItem: TOCItem) {
+  validateItem(designCtx: DesignCtx, tocItem: TOCItem): string | null {
     if (!tocItem.widgetId) {
       return null
     }
@@ -133,6 +133,14 @@ export class TOCBlock extends Block<TOCBlockDef> {
       })
       if (error) {
         return `Error in condition: ${error}`
+      }
+    }
+
+    // Validate children
+    for (const child of tocItem.children) {
+      const error = this.validateItem(designCtx, child)
+      if (error) {
+        return error
       }
     }
 
