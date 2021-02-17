@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../../blocks'
 import { produce, original } from 'immer'
-import { Expr, LocalizedString } from 'mwater-expressions'
+import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions'
 import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
 import './toc.css'
@@ -98,35 +98,51 @@ export class TOCBlock extends Block<TOCBlockDef> {
       item => item.condition && item.condition.contextVarId == contextVar.id ? item.condition.expr : null))
   }
 
-  validate(designCtx: DesignCtx) { 
-    const validateItem = (tocItem: TOCItem) => {
-      if (!tocItem.widgetId) {
-        return null
-      }
-
-      // Check that widget exists
-      const widget = designCtx.widgetLibrary.widgets[tocItem.widgetId]
-      if (!widget) {
-        return "Widget does not exist"
-      }
-
-      // For each inner context variable
-      for (const innerContextVar of widget.contextVars) {
-        // If mapped, check that outer context var exists
-        if (tocItem.contextVarMap && tocItem.contextVarMap[innerContextVar.id]) {
-          const outerContextVarId = tocItem.contextVarMap[innerContextVar.id]
-          if (!designCtx.contextVars.find(cv => cv.id == outerContextVarId)) {
-            return "Context variable not found. Please check mapping"
-          }
-        }
-      }
-
+  /** Validate a single TOC item */
+  validateItem(designCtx: DesignCtx, tocItem: TOCItem) {
+    if (!tocItem.widgetId) {
       return null
     }
 
+    // Check that widget exists
+    const widget = designCtx.widgetLibrary.widgets[tocItem.widgetId]
+    if (!widget) {
+      return "Widget does not exist"
+    }
+
+    // For each inner context variable
+    for (const innerContextVar of widget.contextVars) {
+      // If mapped, check that outer context var exists
+      if (tocItem.contextVarMap && tocItem.contextVarMap[innerContextVar.id]) {
+        const outerContextVarId = tocItem.contextVarMap[innerContextVar.id]
+        if (!designCtx.contextVars.find(cv => cv.id == outerContextVarId)) {
+          return "Context variable not found. Please check mapping"
+        }
+      }
+    }
+
+    // Validate condition
+    if (tocItem.condition) {
+      const error = validateContextVarExpr({
+        contextVars: designCtx.contextVars,
+        schema: designCtx.schema,
+        contextVarId: tocItem.condition.contextVarId,
+        expr: tocItem.condition.expr,
+        aggrStatuses: ["individual", "literal"],
+        types: ["boolean"]
+      })
+      if (error) {
+        return `Error in condition: ${error}`
+      }
+    }
+
+    return null
+  }
+
+  validate(designCtx: DesignCtx) { 
     // Validate all items
     for (const tocItem of iterateItems(this.blockDef.items)) {
-      const error = validateItem(tocItem)
+      const error = this.validateItem(designCtx, tocItem)
       if (error) {
         return error
       }

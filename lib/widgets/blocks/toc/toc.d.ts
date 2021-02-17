@@ -50,7 +50,9 @@ export declare class TOCBlock extends Block<TOCBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     /** Get any context variables expressions that this block needs (not including child blocks) */
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
-    validate(designCtx: DesignCtx): "Widget does not exist" | "Context variable not found. Please check mapping" | null;
+    /** Validate a single TOC item */
+    validateItem(designCtx: DesignCtx, tocItem: TOCItem): string | null;
+    validate(designCtx: DesignCtx): string | null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     /** Canonicalize the block definition. Should be done after operations on the block are completed. Only alter self, not children.
      * Can also be used to upgrade blocks
