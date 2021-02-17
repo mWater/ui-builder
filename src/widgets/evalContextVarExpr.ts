@@ -77,6 +77,7 @@ export async function evalContextVarExpr(options: {
       select: {
         value: expr
       },
+      distinct: true,
       from: table,
       where: contextVarValue as Expr,
       // If multiple returned, has no value, so use limit of 2
