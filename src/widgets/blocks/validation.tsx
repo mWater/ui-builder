@@ -120,8 +120,6 @@ const ValidationEditor = (props: {
   dataSource: DataSource
   locale: string
 }) => {
-  const contextVar = props.contextVars.find(cv => cv.id === props.validation.contextVarId)
-  
   return (
     <div>
       <LabeledProperty label="Condition that must be not be false">

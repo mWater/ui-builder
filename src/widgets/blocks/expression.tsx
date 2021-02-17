@@ -120,22 +120,10 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   renderEditor(props: DesignCtx) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.contextVarId)
+    const contextVar = this.blockDef.contextVarId ? props.contextVars.find(cv => cv.id === this.blockDef.contextVarId) || null : null
 
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
-    const handleExprChange = (expr: Expr) => {
-      // Clear format if type different
-      const newExprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(expr)
-      
-      if (newExprType !== exprType) {
-        props.store.replaceBlock({ ...this.blockDef, expr: expr, format: null } as ExpressionBlockDef)
-      }
-      else {
-        props.store.replaceBlock({ ...this.blockDef, expr: expr } as ExpressionBlockDef)
-      }
-    }
-  
     return (
       <div>
         <LabeledProperty label="Expression">
@@ -143,7 +131,7 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
             contextVars={props.contextVars}
             schema={props.schema} 
             dataSource={props.dataSource} 
-            aggrStatuses={["individual", "aggregate", "literal"]}
+            aggrStatuses={contextVar && contextVar.type == "row" ? ["individual", "literal"] : ["individual", "aggregate", "literal"]}
             contextVarId={this.blockDef.contextVarId}
             expr={this.blockDef.expr} 
             onChange={(contextVarId, expr) => {

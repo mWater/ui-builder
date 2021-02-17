@@ -89,6 +89,7 @@ export class RowBlock extends Block<RowBlockDef> {
         expr: this.blockDef.idContextVarExpr.expr,
         idTable: this.blockDef.table,
         types: ["id"],
+        aggrStatuses: ["literal", "individual"]
       })
       if (error) {
         return error

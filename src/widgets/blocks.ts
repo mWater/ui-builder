@@ -310,6 +310,7 @@ export function validateContextVarExpr(options: {
   contextVarId: string | null, 
   expr: Expr,
   types?: LiteralType[]
+  /** If not set, implies all possible */
   aggrStatuses?: AggrStatus[]
   idTable?: string
   enumValueIds?: string[]
@@ -317,7 +318,7 @@ export function validateContextVarExpr(options: {
   let error: string | null
 
   // Validate cv
-  let contextVar
+  let contextVar: ContextVar | undefined = undefined
   if (options.contextVarId) {
     contextVar = options.contextVars.find(cv => cv.id === options.contextVarId && (cv.type === "rowset" || cv.type === "row"))
     if (!contextVar) {
@@ -332,11 +333,14 @@ export function validateContextVarExpr(options: {
 
   const exprValidator = new ExprValidator(options.schema, createExprVariables(availContextVars))
 
+  // Only allow aggregate status of literal and individual for rows
+  const aggrStatuses: AggrStatus[] = options.aggrStatuses || ((contextVar && contextVar.type == "row") ? ["individual", "literal"] : ['aggregate', 'individual', 'literal'])
+
   // Validate expr
   error = exprValidator.validateExpr(options.expr, { 
     table: contextVar ? contextVar.table : undefined, 
     types: options.types,
-    aggrStatuses: options.aggrStatuses || ['aggregate', 'individual', 'literal'],
+    aggrStatuses: aggrStatuses,
     idTable: options.idTable,
     enumValueIds: options.enumValueIds
    })

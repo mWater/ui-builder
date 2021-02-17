@@ -133,6 +133,7 @@ export declare function validateContextVarExpr(options: {
     contextVarId: string | null;
     expr: Expr;
     types?: LiteralType[];
+    /** If not set, implies all possible */
     aggrStatuses?: AggrStatus[];
     idTable?: string;
     enumValueIds?: string[];
