@@ -100,27 +100,25 @@ export class TOCBlock extends Block<TOCBlockDef> {
 
   /** Validate a single TOC item */
   validateItem(designCtx: DesignCtx, tocItem: TOCItem): string | null {
-    if (!tocItem.widgetId) {
-      return null
-    }
+    if (tocItem.widgetId) {
+      // Check that widget exists
+      const widget = designCtx.widgetLibrary.widgets[tocItem.widgetId]
+      if (!widget) {
+        return "Widget does not exist"
+      }
 
-    // Check that widget exists
-    const widget = designCtx.widgetLibrary.widgets[tocItem.widgetId]
-    if (!widget) {
-      return "Widget does not exist"
-    }
-
-    // For each inner context variable
-    for (const innerContextVar of widget.contextVars) {
-      // If mapped, check that outer context var exists
-      if (tocItem.contextVarMap && tocItem.contextVarMap[innerContextVar.id]) {
-        const outerContextVarId = tocItem.contextVarMap[innerContextVar.id]
-        if (!designCtx.contextVars.find(cv => cv.id == outerContextVarId)) {
-          return "Context variable not found. Please check mapping"
+      // For each inner context variable
+      for (const innerContextVar of widget.contextVars) {
+        // If mapped, check that outer context var exists
+        if (tocItem.contextVarMap && tocItem.contextVarMap[innerContextVar.id]) {
+          const outerContextVarId = tocItem.contextVarMap[innerContextVar.id]
+          if (!designCtx.contextVars.find(cv => cv.id == outerContextVarId)) {
+            return "Context variable not found. Please check mapping"
+          }
         }
       }
     }
-
+    
     // Validate condition
     if (tocItem.condition) {
       const error = validateContextVarExpr({
@@ -133,14 +131,6 @@ export class TOCBlock extends Block<TOCBlockDef> {
       })
       if (error) {
         return `Error in condition: ${error}`
-      }
-    }
-
-    // Validate children
-    for (const child of tocItem.children) {
-      const error = this.validateItem(designCtx, child)
-      if (error) {
-        return error
       }
     }
 
