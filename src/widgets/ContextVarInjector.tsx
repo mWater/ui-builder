@@ -97,7 +97,8 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     return queryOptions
   }
 
-  createRowsetQueryOptions(table: string, variables: Variable[]) {
+  /** Create query options for aggregate and literal expressions */
+  createRowsetAggrQueryOptions(table: string, variables: Variable[]) {
     const queryOptions: QueryOptions = {
       select: {},
       from: table,
@@ -112,6 +113,34 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     // Add expressions as selects
     for (let i = 0 ; i < aggrExpressions.length ; i++) {
       queryOptions.select["e" + i] = aggrExpressions[i]
+    }
+
+    // Add filters
+    if (this.state.filters.length > 0) {
+      queryOptions.where = {
+        type: "op",
+        table: table,
+        op: "and",
+        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map(f => f.expr))))
+      }
+      if (queryOptions.where.exprs.length === 0) {
+        queryOptions.where = null
+      }
+    }
+
+    return queryOptions
+  }
+
+  /** Create query options for individual expressions */
+  createRowsetIndividualQueryOptions(table: string, variables: Variable[], expr: Expr) {
+    const queryOptions: QueryOptions = {
+      select: {
+        value: expr
+      },
+      distinct: true,
+      from: table,
+      where: this.props.value as Expr,
+      limit: 2
     }
 
     // Add filters
@@ -193,12 +222,41 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       const table: string = this.props.injectedContextVar.table!
       
       // Perform query
-      const queryOptions = this.createRowsetQueryOptions(table, variables)
+      const queryAggrOptions = this.createRowsetAggrQueryOptions(table, variables)
       try {
-        const rows = await this.props.instanceCtx.database.query(queryOptions, innerProps.contextVars, getFilteredContextVarValues(innerProps))
+        const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
+        const aggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
+        const individualExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "individual")
+
+        const exprValues = {}
+
+        // Perform one big query for all non-individual
+        const aggrRows = await this.props.instanceCtx.database.query(queryAggrOptions, innerProps.contextVars, getFilteredContextVarValues(innerProps))
+        if (aggrRows.length > 0) {
+          for (let i = 0 ; i < aggrExpressions.length ; i++) {
+            exprValues[canonical(aggrExpressions[i])] = aggrRows[0]["e" + i]
+          }
+        }
+        else {
+          for (let i = 0 ; i < aggrExpressions.length ; i++) {
+            exprValues[canonical(aggrExpressions[i])] = null
+          }
+        }
+
+        // Perform individual queries for individual expressions
+        for (const individualExpression of individualExpressions) {
+          const queryIndividualOptions = this.createRowsetIndividualQueryOptions(table, variables, individualExpression)
+          const individualRows = await this.props.instanceCtx.database.query(queryIndividualOptions, innerProps.contextVars, getFilteredContextVarValues(innerProps))
+          if (individualRows.length == 1) {
+            exprValues[canonical(individualExpression)] = individualRows[0].value
+          }
+          else {
+            exprValues[canonical(individualExpression)] = null
+          }
+        }
 
         // Ignore if query options out of date
-        if (!_.isEqual(queryOptions, this.createRowsetQueryOptions(table, variables))) {
+        if (!_.isEqual(queryAggrOptions, this.createRowsetAggrQueryOptions(table, variables))) {
           return
         }
 
@@ -212,19 +270,8 @@ export default class ContextVarInjector extends React.Component<Props, State> {
           return
         }
         
-        const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
-        const nonAggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
-
-        if (rows.length === 0) {
-          this.setState({ exprValues: {} })
-        }
-        else {
-          const exprValues = {}
-          for (let i = 0 ; i < nonAggrExpressions.length ; i++) {
-            exprValues[canonical(nonAggrExpressions[i])] = rows[0]["e" + i]
-          }
-          this.setState({ exprValues })
-        }
+        // Save values
+        this.setState({ exprValues })
       } catch (error) {
         this.setState({ error })
         return

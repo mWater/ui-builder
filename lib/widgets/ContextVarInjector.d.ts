@@ -38,7 +38,10 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     componentWillUnmount(): void;
     handleDatabaseChange: () => void;
     createRowQueryOptions(table: string): QueryOptions;
-    createRowsetQueryOptions(table: string, variables: Variable[]): QueryOptions;
+    /** Create query options for aggregate and literal expressions */
+    createRowsetAggrQueryOptions(table: string, variables: Variable[]): QueryOptions;
+    /** Create query options for individual expressions */
+    createRowsetIndividualQueryOptions(table: string, variables: Variable[], expr: Expr): QueryOptions;
     performQueries(): Promise<void>;
     /** Create props needed by inner component */
     createInnerProps(): InstanceCtx;
