@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React from 'react'
+import React, { useState } from 'react'
 import LeafBlock from '../LeafBlock'
 import { BlockDef, ContextVar } from '../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ActionDefEditor, EmbeddedExprsEditor } from '../propertyEditors';
@@ -68,103 +68,13 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     return exprs
   }
  
-  renderButton(label: string, onClick: () => void) {
-    const icon = this.blockDef.icon ? <i className={`fa fa-${this.blockDef.icon}`}/> : null
-
-    const handleClick = (ev: React.MouseEvent) => {
-      // Ensure button doesn't trigger other actions
-      ev.stopPropagation()
-      onClick()
-    }
-
-    // Special case of plain link
-    if (this.blockDef.style == "plainlink") {
-      return <div>
-        <a onClick={handleClick} style={{ cursor: "pointer" }}>
-          { icon }
-          { icon && label ? "\u00A0" : null }
-          { label }
-        </a>
-      </div>
-    }
-    let className = "btn btn-" + this.blockDef.style
-
-    switch (this.blockDef.size) {
-      case "normal":
-        break
-      case "small":
-        className += ` btn-sm`
-        break
-      case "extrasmall":
-        className += ` btn-xs`
-        break
-        case "large":
-        className += ` btn-lg`
-        break
-    }
-
-    if (this.blockDef.block) {
-      className += " btn-block"
-    }
-
-    const style: React.CSSProperties = {}
-    if (!this.blockDef.block) {
-      style.margin = 5
-    }
-
-    return (
-      <div>
-        <button type="button" className={className} onClick={handleClick} style={style}>
-          { icon }
-          { icon && label ? "\u00A0" : null }
-          { label }
-        </button>
-      </div>
-    )
-  }
-
   renderDesign(props: DesignCtx) {
     const label = localize(this.blockDef.label, props.locale)
-    return this.renderButton(label, (() => null))
+    return <ButtonComponent label={label} blockDef={this.blockDef}/>
   }
 
   renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any> {
-    const handleClick = () => {
-      // Confirm if confirm message
-      if (this.blockDef.confirmMessage) {
-        if (!confirm(localize(this.blockDef.confirmMessage, instanceCtx.locale))) {
-          return
-        }
-      }
-
-      // Run action
-      if (this.blockDef.actionDef) {
-        const action = instanceCtx.actionLibrary.createAction(this.blockDef.actionDef)
-
-        action.performAction(instanceCtx)
-      }
-    }
-
-    // Get label
-    let label = localize(this.blockDef.label, instanceCtx.locale)
-
-    if (label) {
-      // Get any embedded expression values
-      const exprValues = _.map(this.blockDef.labelEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
-
-      // Format and replace
-      label = formatEmbeddedExprString({
-        text: label, 
-        embeddedExprs: this.blockDef.labelEmbeddedExprs || [],
-        exprValues: exprValues,
-        schema: instanceCtx.schema,
-        contextVars: instanceCtx.contextVars,
-        locale: instanceCtx.locale, 
-        formatLocale: instanceCtx.formatLocale
-      })
-    }
-
-    return this.renderButton(label, handleClick)
+    return <ButtonInstance blockDef={this.blockDef} instanceCtx={instanceCtx}/>
   }
 
   renderEditor(props: DesignCtx) {
@@ -262,3 +172,116 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     )
   }
 }
+
+function ButtonInstance(props: {
+  instanceCtx: InstanceCtx
+  blockDef: ButtonBlockDef
+}) {
+  const { instanceCtx, blockDef } = props
+
+  // Track when action in process
+  const [busy, setBusy] = useState(false)
+
+  const handleClick = async (ev: React.MouseEvent) => {
+    // Ensure button doesn't trigger other actions
+    ev.stopPropagation()
+  
+    // Confirm if confirm message
+    if (blockDef.confirmMessage) {
+      if (!confirm(localize(blockDef.confirmMessage, instanceCtx.locale))) {
+        return
+      }
+    }
+
+    // Run action
+    if (blockDef.actionDef) {
+      const action = instanceCtx.actionLibrary.createAction(blockDef.actionDef)
+      try {
+        setBusy(true)
+        await action.performAction(instanceCtx)
+      }
+      finally {
+        setBusy(false)
+      }
+    }
+  }
+
+  // Get label
+  let label = localize(blockDef.label, instanceCtx.locale)
+
+  if (label) {
+    // Get any embedded expression values
+    const exprValues = _.map(blockDef.labelEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
+
+    // Format and replace
+    label = formatEmbeddedExprString({
+      text: label, 
+      embeddedExprs: blockDef.labelEmbeddedExprs || [],
+      exprValues: exprValues,
+      schema: instanceCtx.schema,
+      contextVars: instanceCtx.contextVars,
+      locale: instanceCtx.locale, 
+      formatLocale: instanceCtx.formatLocale
+    })
+  }
+
+  return <ButtonComponent blockDef={blockDef} label={label} onClick={handleClick} busy={busy} />
+}
+
+/** Draws the button */
+function ButtonComponent(props: {
+  blockDef: ButtonBlockDef
+  label: string
+  onClick?: (ev: React.MouseEvent) => void
+  busy?: boolean
+}) {
+  const { label, onClick, blockDef } = props
+
+  const icon = blockDef.icon ? <i className={`fa fa-fw fa-${blockDef.icon}`}/> : null
+
+  // Special case of plain link
+  if (blockDef.style == "plainlink") {
+    return <div>
+      <a onClick={props.onClick} style={{ cursor: "pointer" }}>
+        { icon }
+        { icon && label ? "\u00A0" : null }
+        { label }
+      </a>
+    </div>
+  }
+  let className = "btn btn-" + blockDef.style
+
+  switch (blockDef.size) {
+    case "normal":
+      break
+    case "small":
+      className += ` btn-sm`
+      break
+    case "extrasmall":
+      className += ` btn-xs`
+      break
+      case "large":
+      className += ` btn-lg`
+      break
+  }
+
+  if (blockDef.block) {
+    className += " btn-block"
+  }
+
+  const style: React.CSSProperties = {}
+  if (!blockDef.block) {
+    style.margin = 5
+  }
+
+  return (
+    <div>
+      <button type="button" className={className} onClick={props.onClick} style={style} disabled={props.busy}>
+        { props.busy && icon ? <i className="fa fa-spinner fa-spin fa-fw"/> : icon }
+        { icon && label ? "\u00A0" : null }
+        { label }
+      </button>
+    </div>
+  )
+}
+

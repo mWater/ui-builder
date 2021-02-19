@@ -24,7 +24,6 @@ export interface ButtonBlockDef extends BlockDef {
 export declare class ButtonBlock extends LeafBlock<ButtonBlockDef> {
     validate(designCtx: DesignCtx): string | null;
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
-    renderButton(label: string, onClick: () => void): JSX.Element;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(instanceCtx: InstanceCtx): React.ReactElement<any>;
     renderEditor(props: DesignCtx): JSX.Element;
