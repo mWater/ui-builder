@@ -4,7 +4,6 @@ import { getFilteredContextVarValues, InstanceCtx } from "../contexts";
 import { QueryOptions } from "../database/Database";
 import { ContextVar, createExprVariables, createExprVariableValues } from "./blocks";
 
-
 /** 
  * Evaluate a context variable expression. 
  * contextVar does not need to be part of the context, but if it is, it will still be handled correctly
