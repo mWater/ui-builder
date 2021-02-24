@@ -235,12 +235,8 @@ export default class VirtualDatabase implements Database {
 
   /** Replace temporary primary keys with different value */
   private replaceTempPrimaryKeys(input: any, replaceWith: (tempPk: string) => any): any {
-    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-
     let json = JSON.stringify(input)
-    for (const tempPk of this.tempPrimaryKeys) {
-      json = json.replace(new RegExp(escapeRegex(JSON.stringify(tempPk)), "g"), () => JSON.stringify(replaceWith(tempPk)))
-    }
+    json = json.replace(new RegExp(/pk_[0-9a-zA-Z]+_temp/, "g"), replaceWith)
     return JSON.parse(json)
   }
 
@@ -405,7 +401,8 @@ class VirtualDatabaseTransaction implements Transaction {
   }
 
   addRow(table: string, values: { [column: string]: any }) {
-    const primaryKey = uuid()
+    // Use a pattern for easy replacement
+    const primaryKey = `pk_${uuid().replace(/-/g, "")}_temp`
     
     // Save temporary primary key
     this.virtualDatabase.tempPrimaryKeys.push(primaryKey)
