@@ -117,7 +117,8 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
     error = exprValidator.validateExpr(contextVarExpr.expr, { 
       table: contextVar ? contextVar.table : undefined, 
       types: [type],
-      idTable: idTable 
+      idTable: idTable,
+      aggrStatuses: contextVar && contextVar.type == "rowset"  ? ["aggregate"] : ["individual", "literal"]
     })
     if (error) {
       return error

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Expr, PromiseExprEvaluator } from "mwater-expressions";
+import { Expr, ExprUtils, PromiseExprEvaluator } from "mwater-expressions";
 import { getFilteredContextVarValues, InstanceCtx } from "../contexts";
 import { QueryOptions } from "../database/Database";
 import { ContextVar, createExprVariables, createExprVariableValues } from "./blocks";
@@ -71,12 +71,15 @@ export async function evalContextVarExpr(options: {
   if (contextVar.type == "rowset") {
     const table = contextVar.table!
 
+    // Determine if aggregate
+    const aggrStatus = new ExprUtils(ctx.schema, createExprVariables(ctx.contextVars)).getExprAggrStatus(expr)
+
     // Create query to get value
     const queryOptions: QueryOptions = {
       select: {
         value: expr
       },
-      distinct: true,
+      distinct: aggrStatus == "aggregate" ? false : true,
       from: table,
       where: contextVarValue as Expr,
       // If multiple returned, has no value, so use limit of 2

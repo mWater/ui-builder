@@ -102,7 +102,7 @@ test("exprs are computed for rowset variable", async () => {
     select: {
       value: contextVarExpr
     },
-    distinct: true,
+    distinct: false,
     from: "t1",
     where: value,
     limit: 2

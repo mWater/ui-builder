@@ -161,6 +161,7 @@ export const ContextVarExprPropertyEditor = (props: {
   contextVarId: string | null
   expr: Expr
   onChange: (contextVarId: string | null, expr: Expr) => void
+  /** If not specified, is literal and individual */
   aggrStatuses?: AggrStatus[]
   types?: LiteralType[]
   enumValues?: Array<{ id: string, name: LocalizedString }>
