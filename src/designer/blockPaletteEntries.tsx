@@ -35,6 +35,7 @@ import { DateInjectBlockDef } from "../widgets/blocks/dateInject";
 import { ToggleBlockDef } from "../widgets/blocks/controls/toggle";
 import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart";
 import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter";
+import { TagsEditorBlockDef } from "../widgets/blocks/controls/tagsEditor";
 
 export interface BlockPaletteEntry {
   title: string
@@ -222,6 +223,11 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     title: "Repeating Block",
     blockDef: { id: "", type: "queryRepeat", content: null, separator: "solid_line", limit: 100 } as QueryRepeatBlockDef,
     subtitle: "Repeats a block once for each result of a query"
+  },
+  {
+    title: "Tags Editor",
+    blockDef: { id: "", type: "tagsEditor", rowContextVarId: null, column: null, required: false } as TagsEditorBlockDef,
+    subtitle: "Allows editing/creating tags for a text array column"
   },
   {
     title: "Date Inject",

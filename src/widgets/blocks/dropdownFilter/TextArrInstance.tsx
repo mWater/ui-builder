@@ -8,22 +8,23 @@ import Async from 'react-select/async'
 import { QueryOptions, Database } from "../../../database/Database";
 import { InstanceCtx, getFilteredContextVarValues } from '../../../contexts';
 
-/** Dropdown filter that is a text string. Should search in database for matches */
-export default class TextInstance extends React.Component<{
+/** Dropdown filter that is a text[]. Should search in database for matches, returning value to match */
+export default class TextArrInstance extends React.Component<{
   blockDef: DropdownFilterBlockDef
   schema: Schema
   contextVars: ContextVar[]
-  value: any
+  value: string | undefined
   database: Database
-  onChange: (value: any) => void
+  onChange: (value: string | undefined) => void
   locale: string
   instanceCtx: InstanceCtx
 }> {
+  /** Options to be displayed (unfiltered) */
+  options: { value: string, label: string }[]
 
-  getOptions = async (input: string) => {
+  async loadOptions() {
     const contextVar = this.props.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!
     const table = contextVar.table!
-    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
     const whereExprs: Expr[] = []
 
@@ -35,17 +36,16 @@ export default class TextInstance extends React.Component<{
       whereExprs.push(cvValue)
     }
 
-    // Filter by input string
+    // Filter out blanks
     whereExprs.push({
       type: "op",
-      op: "~*",
+      op: "is not null",
       table: table,
-      exprs: [
-        this.props.blockDef.filterExpr,
-        { type: "literal", valueType: "text", value: "^" + escapeRegex(input) }
-      ]
+      exprs: [this.props.blockDef.filterExpr]
     })
-    
+
+    // Query all distinct values, which will include possibly more than one copy of each text string, as it
+    // can appear in different combinations
     const queryOptions: QueryOptions = {
       select: { value: this.props.blockDef.filterExpr },
       distinct: true,
@@ -56,20 +56,34 @@ export default class TextInstance extends React.Component<{
         table: table,
         exprs: whereExprs
       },
-      orderBy: [{ expr: this.props.blockDef.filterExpr, dir: "asc" }],
       limit: 250
     }
 
     try {
       const rows = await this.props.database.query(queryOptions, this.props.contextVars, {})
-      
-      // Filter null and blank
-      const values = rows.map(r => r.value).filter(v => v)
-      return values.map(v => ({ value: v, label: v}))
+
+      // Flatten and keep distinct
+      const values = _.uniq(_.flatten(rows.map(r => r.value))).sort()
+      return values.map(v => ({ value: v, label: v }))
     } catch (err) {
       // TODO localize
       alert("Unable to load options")
       return []
+    }
+  }
+
+  getOptions = async (input: string) => {
+    // Load options if not loaded
+    if (!this.options) {
+      this.options = await this.loadOptions()
+    }
+
+    // Filter by input string
+    if (input) {
+      return this.options.filter(o => o.label.toLowerCase().startsWith(input.toLowerCase()))
+    }
+    else {
+      return this.options
     }
   }
 

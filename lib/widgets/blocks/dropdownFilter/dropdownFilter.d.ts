@@ -50,6 +50,7 @@ export declare class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDe
     validate(options: DesignCtx): string | null;
     /** Generate a single synthetic context variable to allow embedded expressions to work in label */
     generateEmbedContextVars(idTable: string): ContextVar[];
+    /** Create a filter of the appropriate type for the value selected */
     createFilter(rowsetContextVarId: string, filterExpr: Expr, schema: Schema, contextVars: ContextVar[], value: any): Filter;
     renderDesign(props: DesignCtx): JSX.Element;
     getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];

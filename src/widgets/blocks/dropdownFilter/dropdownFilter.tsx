@@ -18,6 +18,7 @@ import { IdInstance } from './IdInstance';
 import { Toggle } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { DateFilterInstance } from './DateFilterInstance';
+import TextArrInstance from './TextArrInstance';
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -95,7 +96,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     
     // Validate expr
     let error
-    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "enumset", "text", "date", "datetime", "id"] })
+    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "enumset", "text", "date", "datetime", "id", "text[]"] })
     if (error) {
       return error
     }
@@ -216,6 +217,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     ]
   }
   
+  /** Create a filter of the appropriate type for the value selected */
   createFilter(rowsetContextVarId: string, filterExpr: Expr, schema: Schema, contextVars: ContextVar[], value: any): Filter {
     const exprUtils = new ExprUtils(schema, createExprVariables(contextVars))
     const valueType = exprUtils.getExprType(filterExpr)
@@ -291,6 +293,17 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             table: table, 
             op: this.blockDef.idWithin ? "within" : "=", 
             exprs: [filterExpr!, { type: "literal", valueType: "id", idTable: valueIdTable!, value: value }]
+          } : null,
+          memo: value
+        }
+      case "text[]":
+        return {
+          id: this.blockDef.id,
+          expr: value ? { 
+            type: "op", 
+            table: table, 
+            op: "intersects", 
+            exprs: [filterExpr!, { type: "literal", valueType: "text[]", value: [value] }]
           } : null,
           memo: value
         }
@@ -484,6 +497,17 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           onChange={handleChange}
           locale={ctx.locale} />
         break
+      case "text[]":
+        elem = <TextArrInstance 
+          instanceCtx={ctx}
+          blockDef={this.blockDef}
+          schema={ctx.schema}
+          contextVars={ctx.contextVars}
+          value={value}
+          database={ctx.database}
+          onChange={handleChange}
+          locale={ctx.locale} />
+        break
       default:
         elem = <div/>
     }
@@ -537,7 +561,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
               dataSource={ctx.dataSource} 
               onChange={handleExprChange} 
               table={rowsetCV.table!} 
-              types={["enum", "enumset", "text", "date", "datetime", "id"]} />
+              types={["enum", "enumset", "text", "date", "datetime", "id", "text[]"]} />
           </LabeledProperty>
         : null}
 

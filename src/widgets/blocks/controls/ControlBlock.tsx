@@ -54,7 +54,9 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   abstract renderControl(props: RenderControlProps): React.ReactElement<any>
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-  abstract renderControlEditor(props: DesignCtx): React.ReactElement<any> | null
+  renderControlEditor(props: DesignCtx): React.ReactElement<any> | null {
+    return null
+  }
 
   /** Filter the columns that this control is for */
   abstract filterColumn(column: Column): boolean

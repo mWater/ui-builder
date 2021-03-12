@@ -38,7 +38,7 @@ export interface RenderControlProps {
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
     abstract renderControl(props: RenderControlProps): React.ReactElement<any>;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-    abstract renderControlEditor(props: DesignCtx): React.ReactElement<any> | null;
+    renderControlEditor(props: DesignCtx): React.ReactElement<any> | null;
     /** Filter the columns that this control is for */
     abstract filterColumn(column: Column): boolean;
     renderDesign(designCtx: DesignCtx): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
