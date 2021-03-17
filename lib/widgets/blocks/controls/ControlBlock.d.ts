@@ -1,4 +1,4 @@
-import { BlockDef, ContextVar } from "../../blocks";
+import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
@@ -28,6 +28,8 @@ export interface RenderControlProps {
     contextVarValues: {
         [contextVarId: string]: any;
     };
+    /** Get any filters set on a rowset context variable. This includes ones set by other blocks */
+    getFilters(contextVarId: string): Filter[];
     /** True if control should be disabled */
     disabled: boolean;
     onChange: (value: any) => void;

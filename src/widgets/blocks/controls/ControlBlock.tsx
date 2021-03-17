@@ -1,4 +1,4 @@
-import { BlockDef, ContextVar } from "../../blocks";
+import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
@@ -39,6 +39,9 @@ export interface RenderControlProps {
   contextVars: ContextVar[]
   contextVarValues: { [contextVarId: string]: any }
 
+  /** Get any filters set on a rowset context variable. This includes ones set by other blocks */
+  getFilters(contextVarId: string): Filter[]
+
   /** True if control should be disabled */
   disabled: boolean
 
@@ -71,6 +74,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       schema: designCtx.schema,
       dataSource: designCtx.dataSource,
       disabled: false,
+      getFilters: () => [],
       contextVars: designCtx.contextVars,
       contextVarValues: {},
       formatLocale: designCtx.formatLocale
@@ -269,6 +273,7 @@ class ControlInstance extends React.Component<Props, State> {
       schema: this.props.instanceCtx.schema,
       dataSource: this.props.instanceCtx.dataSource,
       database: this.props.instanceCtx.database,
+      getFilters: this.props.instanceCtx.getFilters,
       locale: this.props.instanceCtx.locale,
       rowContextVar: contextVar,
       disabled: id == null,
