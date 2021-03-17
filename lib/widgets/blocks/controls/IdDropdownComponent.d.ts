@@ -7,7 +7,7 @@ interface SingleProps<T> {
     database: Database;
     table: string;
     value: T | null;
-    onChange: (value: T | null) => void;
+    onChange?: (value: T | null) => void;
     placeholder?: string;
     /** True to select multiple values */
     multi: false;
@@ -32,7 +32,7 @@ interface MultiProps<T> {
     database: Database;
     table: string;
     value: T[] | null;
-    onChange: (value: T[] | null) => void;
+    onChange?: (value: T[] | null) => void;
     placeholder?: string;
     /** True to select multiple values */
     multi: true;
@@ -54,6 +54,6 @@ interface MultiProps<T> {
     styles?: Partial<Styles>;
 }
 declare type Props<T> = SingleProps<T> | MultiProps<T>;
-/** Displays a combo box that allows selecting one text values from an expression */
+/** Displays a combo box that allows selecting one id value from a list */
 export declare function IdDropdownComponent<T>(props: Props<T>): JSX.Element;
 export {};

@@ -34,7 +34,7 @@ export class DatefieldBlock extends ControlBlock<DatefieldBlockDef> {
       value={props.value} 
       onChange={props.onChange}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
-      disabled={props.disabled}
+      disabled={props.disabled || !props.onChange}
       datetime={datetime}
       format={format}
       />
@@ -101,7 +101,7 @@ export class DatefieldBlock extends ControlBlock<DatefieldBlockDef> {
 
 interface DatefieldProps {
   value: string | null
-  onChange: (value: string | null) => void
+  onChange?: (value: string | null) => void
   placeholder?: string
   disabled: boolean
   datetime: boolean
@@ -111,11 +111,15 @@ interface DatefieldProps {
 /** Date field */
 class Datefield extends React.Component<DatefieldProps> {
   handleChange = (value: Moment) => {
+    if (!this.props.onChange) {
+      return
+    }
+    
     if (this.props.datetime) {
-      this.props.onChange(value ? value.toISOString() : null)
+      this.props.onChange!(value ? value.toISOString() : null)
     }
     else {
-      this.props.onChange(value ? value.format("YYYY-MM-DD") : null)
+      this.props.onChange!(value ? value.format("YYYY-MM-DD") : null)
     }
   }
 
@@ -124,7 +128,7 @@ class Datefield extends React.Component<DatefieldProps> {
       <DatePicker
         isClearable={true}
         placeholderText={this.props.placeholder}
-        disabled={this.props.disabled}
+        disabled={this.props.disabled || !this.props.onChange}
         selected={this.props.value ? moment(this.props.value, moment.ISO_8601) : null}
         onChange={this.handleChange}
         showTimeSelect={this.props.datetime}

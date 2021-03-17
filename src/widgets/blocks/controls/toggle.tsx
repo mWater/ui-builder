@@ -70,9 +70,11 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
         return <button 
           key={option.id}
           type="button" 
-          disabled={props.disabled}
+          disabled={props.disabled || !props.onChange}
           className={ props.value == option.id ? "btn btn-primary active" : "btn btn-default" }
-          onClick={() => props.onChange(option.id == props.value ? null : option.id)}>{localize(option.name, props.locale)}</button>
+          onClick={props.onChange != null ? () => props.onChange!(option.id == props.value ? null : option.id) : undefined}>
+            {localize(option.name, props.locale)}
+        </button>
       })}
       </div>
   }
@@ -91,11 +93,11 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
     const handleToggle = (id: any) => {
       if ((props.value || []).includes(id)) {
         const newValue = _.difference(props.value || [], [id])
-        props.onChange(newValue.length > 0 ? newValue : null)
+        props.onChange!(newValue.length > 0 ? newValue : null)
       }
       else {
         const newValue = _.union(props.value || [], [id])
-        props.onChange(newValue)
+        props.onChange!(newValue)
       }
     }
 
@@ -104,7 +106,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
         return <button 
           key={option.id}
           type="button" 
-          disabled={props.disabled}
+          disabled={props.disabled || !props.onChange}
           className={ (props.value || []).includes(option.id) ? "btn btn-primary active" : "btn btn-default" }
           onClick={handleToggle.bind(null, option.id)}>{localize(option.name, props.locale)}</button>
       })}
@@ -116,17 +118,17 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
       <button 
         key="true"
         type="button" 
-        disabled={props.disabled}
+        disabled={props.disabled || !props.onChange}
         className={ props.value == true ? "btn btn-primary active" : "btn btn-default" }
-        onClick={() => props.onChange(props.value === true ? null : true)}>
+        onClick={props.onChange ? () => props.onChange!(props.value === true ? null : true) : undefined}>
           {localize(this.blockDef.trueLabel, props.locale) || "Yes"}
       </button>
       <button 
         key="false"
         type="button" 
-        disabled={props.disabled}
+        disabled={props.disabled || !props.onChange}
         className={ props.value == false ? "btn btn-primary active" : "btn btn-default" }
-        onClick={() => props.onChange(props.value === false ? null : false)}>
+        onClick={props.onChange ? () => props.onChange!(props.value === false ? null : false) : undefined}>
           {localize(this.blockDef.falseLabel, props.locale) || "No"}
       </button>
     </div>

@@ -24,9 +24,9 @@ export class TextboxBlock extends ControlBlock<TextboxBlockDef> {
   renderControl(props: RenderControlProps) {
     return <Textbox
       value={props.value} 
-      onChange={props.onChange}
+      onChange={props.onChange ? props.onChange : () => {}}
       placeholder={localize(this.blockDef.placeholder, props.locale)}
-      disabled={props.disabled}
+      disabled={props.disabled || !props.onChange}
       numLines={this.blockDef.numLines || undefined}
       editOnFocus={this.blockDef.editOnFocus || false}
       />

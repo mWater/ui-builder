@@ -11,7 +11,7 @@ interface SingleProps<T> {
   database: Database
   table: string
   value: T | null
-  onChange: (value: T | null) => void
+  onChange?: (value: T | null) => void
 
   placeholder?: string
 
@@ -44,7 +44,7 @@ interface MultiProps<T> {
   database: Database
   table: string
   value: T[] | null
-  onChange: (value: T[] | null) => void
+  onChange?: (value: T[] | null) => void
 
   placeholder?: string
 
@@ -82,7 +82,7 @@ interface Option<T> {
   id: T 
 }
 
-/** Displays a combo box that allows selecting one text values from an expression */
+/** Displays a combo box that allows selecting one id value from a list */
 export function IdDropdownComponent<T>(props: Props<T>) {
   const [currentValue, setCurrentValue] = useState<Option<T> | Option<T>[]>()
   const [loading, setLoading] = useState(false)
@@ -195,6 +195,10 @@ export function IdDropdownComponent<T>(props: Props<T>) {
   }, [props.table, props.filterExpr])
 
   const handleChange = useCallback((option: any) => {
+    if (!props.onChange) {
+      return
+    }
+
     if (props.multi) {
       props.onChange(option && option.length > 0 ? option.map((v: Option<T>) => v.id) : null) 
     } 
@@ -219,7 +223,8 @@ export function IdDropdownComponent<T>(props: Props<T>) {
       isMulti={props.multi}
       isClearable={true}
       isLoading={loading}
-      onChange={handleChange}
+      onChange={props.onChange ? handleChange : undefined}
+      isDisabled={!props.onChange}
       noOptionsMessage={() => "..."}
       defaultOptions={true}
       closeMenuOnScroll={true}

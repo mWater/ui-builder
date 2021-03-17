@@ -198,7 +198,11 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
 
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
-    const handleChange = (ev: EnumValue | null) => props.onChange(ev ? ev.id : null)
+    const handleChange = (ev: EnumValue | null) => {
+      if (props.onChange) {
+        props.onChange(ev ? ev.id : null)
+      }
+    } 
 
     return <ReactSelect
       value={enumValue} 
@@ -207,7 +211,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      isDisabled={props.disabled}
+      isDisabled={props.disabled || !props.onChange}
       isClearable={true}
       closeMenuOnScroll={true}
       menuPortalTarget={document.body}
@@ -236,7 +240,9 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
     const getOptionValue = (ev: EnumValue) => ev.id
     const handleChange = (evs: EnumValue[] | null) => {
-      props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+      if (props.onChange) {
+        props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+      }
     }
 
     return <ReactSelect
@@ -246,7 +252,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       placeholder={localize(this.blockDef.placeholder, props.locale)}
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
-      isDisabled={props.disabled}
+      isDisabled={props.disabled || !props.onChange}
       isClearable={true}
       isMulti={true}
       closeMenuOnScroll={true}

@@ -1,7 +1,7 @@
 import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import * as React from "react";
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors";
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
@@ -10,6 +10,7 @@ import { DataSourceDatabase } from "../../../database/DataSourceDatabase";
 import { DesignCtx, InstanceCtx } from "../../../contexts";
 import { FormatLocaleObject } from "d3-format";
 import { getScrollParent } from "../../scrolling";
+import { ContextVarExpr } from "../../../ContextVarExpr";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -24,6 +25,9 @@ export interface ControlBlockDef extends BlockDef {
 
   /** Message to display if required is true and control is blank */
   requiredMessage?: LocalizedString | null
+
+  /** Optional expression to make readonly if true */
+  readonlyExpr?: ContextVarExpr
 }
 
 export interface RenderControlProps {
@@ -42,10 +46,11 @@ export interface RenderControlProps {
   /** Get any filters set on a rowset context variable. This includes ones set by other blocks */
   getFilters(contextVarId: string): Filter[]
 
-  /** True if control should be disabled */
+  /** True if control should be disabled. Is disabled if has no value and cannot have one */
   disabled: boolean
 
-  onChange: (value: any) => void
+  /** Call with new value. Is undefined if value is readonly */
+  onChange?: (value: any) => void
 
   /** Locale object to use for formatting */
   formatLocale?: FormatLocaleObject
@@ -132,6 +137,21 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
             </PropertyEditor>
           </LabeledProperty>
         : null }
+
+        <LabeledProperty label="Readonly" hint="optional expression that makes read-only if true">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="readonlyExpr">
+            {(value, onChange) => (
+              <ContextVarExprPropertyEditor
+                schema={props.schema}
+                dataSource={props.dataSource}
+                contextVars={props.contextVars}
+                contextVarId={value ? value.contextVarId : null}
+                expr={value ? value.expr : null}
+                onChange={(contextVarId, expr) => { onChange({ contextVarId, expr }) }}
+                types={["boolean"]} />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
 
         {this.renderControlEditor(props)}
       </div>
@@ -267,9 +287,11 @@ class ControlInstance extends React.Component<Props, State> {
     const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
     const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
+    const readonly = blockDef.readonlyExpr ? instanceCtx.getContextVarExprValue(blockDef.readonlyExpr.contextVarId, blockDef.readonlyExpr.expr) : false
+
     const renderControlProps: RenderControlProps = {
       value: this.getValue(),
-      onChange: this.handleChange,
+      onChange: readonly ? undefined : this.handleChange,
       schema: this.props.instanceCtx.schema,
       dataSource: this.props.instanceCtx.dataSource,
       database: this.props.instanceCtx.database,

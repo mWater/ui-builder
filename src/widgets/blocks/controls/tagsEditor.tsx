@@ -61,7 +61,7 @@ class TagEditorInstance extends React.Component<{
   column: string
   database: Database
   value: string[] | null
-  onChange: (value: string[] | null) => void
+  onChange?: (value: string[] | null) => void
   disabled: boolean
 }> {
   /** Options to be displayed (unfiltered) */
@@ -114,6 +114,10 @@ class TagEditorInstance extends React.Component<{
   }
 
   handleChange = (value: any) => {
+    if (!this.props.onChange) {
+      return
+    }
+
     if (value) {
       this.props.onChange(value.map((v: any) => v.value))
     }
@@ -138,7 +142,7 @@ class TagEditorInstance extends React.Component<{
       menuPortalTarget={document.body}
       isMulti={true}
       onChange={this.handleChange}
-      isDisabled={this.props.disabled}
+      isDisabled={this.props.disabled || !this.props.onChange}
     />
   }
 }
