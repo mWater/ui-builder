@@ -11,6 +11,7 @@ import { DesignCtx, InstanceCtx } from "../../../contexts";
 import { FormatLocaleObject } from "d3-format";
 import { getScrollParent } from "../../scrolling";
 import { ContextVarExpr } from "../../../ContextVarExpr";
+import { CollapsibleComponent } from "../collapsible";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -138,22 +139,26 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
           </LabeledProperty>
         : null }
 
-        <LabeledProperty label="Readonly" hint="optional expression that makes read-only if true">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="readonlyExpr">
-            {(value, onChange) => (
-              <ContextVarExprPropertyEditor
-                schema={props.schema}
-                dataSource={props.dataSource}
-                contextVars={props.contextVars}
-                contextVarId={value ? value.contextVarId : null}
-                expr={value ? value.expr : null}
-                onChange={(contextVarId, expr) => { onChange({ contextVarId, expr }) }}
-                types={["boolean"]} />
-            )}
-          </PropertyEditor>
-        </LabeledProperty>
-
         {this.renderControlEditor(props)}
+
+        <br/>
+
+        <CollapsibleComponent label="Optional Readonly Expression" initialCollapsed>
+          <LabeledProperty label="Readonly" hint="optional expression that makes read-only if true">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="readonlyExpr">
+              {(value, onChange) => (
+                <ContextVarExprPropertyEditor
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  contextVars={props.contextVars}
+                  contextVarId={value ? value.contextVarId : null}
+                  expr={value ? value.expr : null}
+                  onChange={(contextVarId, expr) => { onChange({ contextVarId, expr }) }}
+                  types={["boolean"]} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        </CollapsibleComponent>
       </div>
     )
   }
