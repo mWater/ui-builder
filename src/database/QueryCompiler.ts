@@ -1,7 +1,7 @@
 import { Schema, ExprUtils, ExprCompiler, Row, Variable } from "mwater-expressions";
 import { QueryOptions } from "./Database";
 import * as _ from "lodash";
-import { JsonQL } from "jsonql";
+import { JsonQLQuery, JsonQLSelectQuery } from "jsonql";
 
 export class QueryCompiler {
   schema: Schema
@@ -18,12 +18,12 @@ export class QueryCompiler {
    * rows to the ones requested by the query. This is necessary due to invalid select aliases
    * that queries may have, so we normalize to c0, c1, etc. in the query
    */
-  compileQuery(options: QueryOptions): { jsonql: JsonQL, rowMapper: (row: Row) => Row } {
+  compileQuery(options: QueryOptions): { jsonql: JsonQLQuery, rowMapper: (row: Row) => Row } {
     const exprUtils = new ExprUtils(this.schema, this.variables)
     const exprCompiler = new ExprCompiler(this.schema, this.variables, this.variableValues)
 
     // Create shell of query
-    const query: JsonQL = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [],
       from: exprCompiler.compileTable(options.from, "main"),
@@ -68,7 +68,7 @@ export class QueryCompiler {
 
       // Add group by if not aggregate
       if (isAggr && exprUtils.getExprAggrStatus(colExpr) !== "aggregate") {
-        query.groupBy.push(colIndex + 1)
+        query.groupBy!.push(colIndex + 1)
       }
     })
 
@@ -82,11 +82,11 @@ export class QueryCompiler {
           alias: `o_${index}`
         })
 
-        query.orderBy.push({ ordinal: colKeys.length + index + 1, direction: order.dir, nulls: (order.dir === "desc" ? "last" : "first") })
+        query.orderBy!.push({ ordinal: colKeys.length + index + 1, direction: order.dir, nulls: (order.dir === "desc" ? "last" : "first") })
 
         // Add group by if non-aggregate
         if (isAggr && exprUtils.getExprAggrStatus(order.expr) !== "aggregate") {
-          query.groupBy.push(colKeys.length + index + 1)
+          query.groupBy!.push(colKeys.length + index + 1)
         }
       })
     }

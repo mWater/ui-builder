@@ -1,6 +1,6 @@
 import { Schema, Row, Variable } from "mwater-expressions";
 import { QueryOptions } from "./Database";
-import { JsonQL } from "jsonql";
+import { JsonQLQuery } from "jsonql";
 export declare class QueryCompiler {
     schema: Schema;
     variables: Variable[];
@@ -15,7 +15,7 @@ export declare class QueryCompiler {
      * that queries may have, so we normalize to c0, c1, etc. in the query
      */
     compileQuery(options: QueryOptions): {
-        jsonql: JsonQL;
+        jsonql: JsonQLQuery;
         rowMapper: (row: Row) => Row;
     };
 }
