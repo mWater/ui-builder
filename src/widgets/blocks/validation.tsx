@@ -1,6 +1,5 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import produce from 'immer'
-import { ExprComponent } from 'mwater-expressions-ui';
 import { default as React, useState, useEffect, useRef } from 'react';
 import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
 import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'

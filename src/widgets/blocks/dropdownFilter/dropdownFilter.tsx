@@ -561,6 +561,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
               dataSource={ctx.dataSource} 
               onChange={handleExprChange} 
               table={rowsetCV.table!} 
+              variables={createExprVariables(ctx.contextVars)}
               types={["enum", "enumset", "text", "date", "datetime", "id", "text[]"]} />
           </LabeledProperty>
         : null}
@@ -671,7 +672,15 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
                     <div>
                       <ListEditor items={value || []} onItemsChange={onItemsChange}>
                         { (expr: Expr, onExprChange) => (
-                          <ExprComponent value={expr} schema={ctx.schema} dataSource={ctx.dataSource} onChange={onExprChange} table={idTableId!} types={["text", "enum", "enumset"]} />
+                          <ExprComponent 
+                            value={expr} 
+                            schema={ctx.schema} 
+                            dataSource={ctx.dataSource} 
+                            onChange={onExprChange} 
+                            table={idTableId!} 
+                            types={["text", "enum", "enumset"]} 
+                            variables={createExprVariables(ctx.contextVars)}
+                            />
                         )}
                       </ListEditor>
                       <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>

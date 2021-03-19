@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import * as _ from 'lodash'
 import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
-import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row, DataSource, Column } from 'mwater-expressions';
+import { Expr, Schema, ExprUtils, ExprValidator, LocalizedString, Row, DataSource, Column, Variable } from 'mwater-expressions';
 import { OrderBy } from '../../../database/Database';
 import QueryTableBlockInstance from './QueryTableBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, ActionDefEditor, OrderByArrayEditor, LocalizedTextPropertyEditor, TableColumnWidthEditor } from '../../propertyEditors';
@@ -485,6 +485,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
                 dataSource={props.dataSource}
                 table={rowCV.table!}
                 numColumns={this.blockDef.contents.length}
+                variables={createExprVariables(props.contextVars)}
                 /> }
             </PropertyEditor>
           </LabeledProperty>
@@ -519,6 +520,7 @@ const ColumnInfosEditor = (props: {
   table: string
   schema: Schema
   dataSource: DataSource
+  variables: Variable[]
 }) => {
   const handleOrderExprChange = (colIndex: number, expr: Expr) => {
     props.onChange(produce(props.value || [], draft => {
@@ -556,6 +558,7 @@ const ColumnInfosEditor = (props: {
               table={props.table}
               value={props.value && props.value[colIndex] ? props.value[colIndex]!.orderExpr : null}
               types={["text", "number", "date", "datetime"]}
+              variables={props.variables}
               />
           </div>
           { props.value && props.value[colIndex] && props.value[colIndex]!.orderExpr ?

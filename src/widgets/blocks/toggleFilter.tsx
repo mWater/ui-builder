@@ -229,6 +229,7 @@ function EditFilterComponent(props: {
             dataSource={props.dataSource} 
             onChange={onChange} 
             table={extraFilterCV.table!} 
+            variables={createExprVariables(props.contextVars)}
             types={["boolean"]} /> 
           }
         </PropertyEditor>

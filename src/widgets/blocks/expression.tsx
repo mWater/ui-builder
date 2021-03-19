@@ -1,9 +1,7 @@
 import * as React from 'react';
-import LeafBlock from '../LeafBlock'
 import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
 import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarExprPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
 import { Expr, ExprUtils, ExprValidator, LocalizedString } from 'mwater-expressions';
-import { ExprComponent } from 'mwater-expressions-ui';
 import * as _ from 'lodash';
 import * as d3Format from 'd3-format';
 import moment from 'moment'

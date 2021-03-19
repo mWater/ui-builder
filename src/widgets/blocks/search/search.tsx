@@ -89,7 +89,15 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
                   <div>
                     <ListEditor items={value} onItemsChange={onItemsChange}>
                       { (expr: Expr, onExprChange) => (
-                        <ExprComponent value={expr} schema={props.schema} dataSource={props.dataSource} onChange={onExprChange} table={rowsetCV.table!} types={["text", "enum", "enumset"]} />
+                        <ExprComponent 
+                          value={expr} 
+                          schema={props.schema} 
+                          dataSource={props.dataSource} 
+                          onChange={onExprChange} 
+                          table={rowsetCV.table!} 
+                          types={["text", "enum", "enumset"]} 
+                          variables={createExprVariables(props.contextVars)}
+                          />
                       )}
                     </ListEditor>
                     <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>
