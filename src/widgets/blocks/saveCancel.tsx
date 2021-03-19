@@ -9,6 +9,8 @@ import VirtualDatabase from '../../database/VirtualDatabase'
 import ContextVarsInjector from '../ContextVarsInjector'
 import { LocalizedString } from 'mwater-expressions'
 import { DesignCtx, InstanceCtx } from '../../contexts'
+import { ListEditorComponent } from 'react-library/lib/ListEditorComponent'
+import { Transaction } from '../../database/Database'
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -27,6 +29,9 @@ export interface SaveCancelBlockDef extends BlockDef {
 
   /** Optional confirmation message for delete */
   confirmDeleteMessage?: LocalizedString | null
+
+  /** Optional additional delete context variables */
+  extraDeleteContextVarIds?: (string | null)[]
 }
 
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
@@ -60,6 +65,19 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
       }
       if (deleteCV.type !== "row") {
         return "Delete context variable wrong type"
+      }
+    }
+
+    // Check extras
+    if (this.blockDef.deleteContextVarId && this.blockDef.extraDeleteContextVarIds) {
+      for (const cvId of this.blockDef.extraDeleteContextVarIds) {
+        const deleteCV = options.contextVars.find(cv => cv.id == cvId)
+        if (!deleteCV) {
+          return "Delete context variable not found"
+        }
+        if (deleteCV.type !== "row") {
+          return "Delete context variable wrong type"
+        }
       }
     }
 
@@ -148,6 +166,26 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         : null }
+        { this.blockDef.deleteContextVarId ?
+          <LabeledProperty label="Optional Additional Delete Targets">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="extraDeleteContextVarIds">
+              {(value, onChange) => {
+                function renderItem(item: string | null, index: number, onItemChange: (item: string | null) => void) {
+                  return <ContextVarPropertyEditor value={item} onChange={onItemChange} contextVars={props.contextVars} types={["row"]} />
+                }
+
+                return <ListEditorComponent 
+                  items={value || []}
+                  onItemsChange={onChange}
+                  renderItem={renderItem}
+                  addLabel="Add"
+                  createNew={() => null}
+                />
+              }
+            }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null}
         </div>
     )
   }
@@ -249,25 +287,39 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
   }
 
   handleDelete = async () => {
+    const blockDef = this.props.blockDef
+
     // Confirm deletion
-    if (this.props.blockDef.confirmDeleteMessage && !confirm(localize(this.props.blockDef.confirmDeleteMessage, this.props.instanceCtx.locale))) {
+    if (blockDef.confirmDeleteMessage && !confirm(localize(blockDef.confirmDeleteMessage, this.props.instanceCtx.locale))) {
       return     
     }
     // Do actual deletion
     const db = this.props.instanceCtx.database
-    const deleteCV = this.props.instanceCtx.contextVars.find(cv => cv.id == this.props.blockDef.deleteContextVarId)
-    if (!deleteCV) {
-      throw new Error("Missing delete CV")
-    }
-    const rowId = this.props.instanceCtx.contextVarValues[deleteCV.id]
-    if (!rowId) {
-      throw new Error("Missing delete row id")
+
+    const deleteRow = async (tx: Transaction, contextVarId: string) => {
+      const deleteCV = this.props.instanceCtx.contextVars.find(cv => cv.id == contextVarId)
+      if (!deleteCV) {
+        throw new Error("Missing delete CV")
+      }
+      const rowId = this.props.instanceCtx.contextVarValues[deleteCV.id]
+      if (!rowId) {
+        return
+      }
+      await tx.removeRow(deleteCV.table!, rowId)
     }
 
     try {
-      const tx = db.transaction()
-      await tx.removeRow(deleteCV.table!, rowId)
-      await tx.commit()
+      const txn = db.transaction()
+
+      deleteRow(txn, blockDef.deleteContextVarId!)
+
+      if (blockDef.extraDeleteContextVarIds) {
+        for (const cvId of blockDef.extraDeleteContextVarIds) {
+          deleteRow(txn, cvId!)
+        }
+      }
+
+      await txn.commit()
     } catch (err) {
       // TODO localize
       alert("Unable to delete row: " + err.message)
@@ -303,6 +355,14 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
       registerForValidation: this.registerChildForValidation 
     }
 
+    // Determine if row to delete
+    let canDelete = this.props.blockDef.deleteContextVarId != null && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] != null
+    if (this.props.blockDef.extraDeleteContextVarIds) {
+      for (const cvId of this.props.blockDef.extraDeleteContextVarIds) {
+        canDelete = canDelete || (cvId != null && this.props.instanceCtx.contextVarValues[cvId] != null)
+      }
+    }
+
     // Inject new database and re-inject all context variables. This is needed to allow computed expressions
     // to come from the virtual database
     return (
@@ -325,7 +385,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
           </ContextVarsInjector>
 
         <div className="save-cancel-footer">
-          { this.props.blockDef.deleteContextVarId && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] ?
+          { canDelete ?
             <button type="button" className="btn btn-danger" onClick={this.handleDelete} style={{float: "left"}}>
               <i className="fa fa-remove"/> {deleteLabelText}
             </button>

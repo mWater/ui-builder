@@ -15,6 +15,8 @@ export interface SaveCancelBlockDef extends BlockDef {
     deleteLabel?: LocalizedString | null;
     /** Optional confirmation message for delete */
     confirmDeleteMessage?: LocalizedString | null;
+    /** Optional additional delete context variables */
+    extraDeleteContextVarIds?: (string | null)[];
 }
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
  * When either is clicked, the page is closed. Has optional delete button too.
