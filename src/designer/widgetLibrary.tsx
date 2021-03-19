@@ -1,6 +1,6 @@
 import React from "react"
 import { v4 as uuid } from 'uuid'
-import { WidgetDef } from "../widgets/widgets";
+import { validateWidget, WidgetDef } from "../widgets/widgets";
 import { DataSource } from "mwater-expressions";
 import WidgetDesigner from "./WidgetDesigner";
 import produce from "immer";
@@ -97,53 +97,8 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 
   /** Validate a single widget */
-  validateWidget = (widgetDef: WidgetDef): string | null => {
-    if (!widgetDef.blockDef) {
-      return null
-    }
-
-    const contextVars = (this.props.baseCtx.globalContextVars || [])
-      .concat(widgetDef.contextVars)
-      .concat(widgetDef.privateContextVars || [])
-
-    // Validate context var values
-    for (const cv of widgetDef.contextVars) {
-      const error = validateContextVarValue(this.props.baseCtx.schema, cv, widgetDef.contextVars, widgetDef.contextVarPreviewValues[cv.id])
-      if (error) {
-        return error
-      }
-    }
-
-    // Validate private context var values
-    for (const cv of widgetDef.privateContextVars || []) {
-      const error = validateContextVarValue(this.props.baseCtx.schema, cv, widgetDef.privateContextVars!.concat(widgetDef.contextVars), (widgetDef.privateContextVarValues || {})[cv.id])
-      if (error) {
-        return error
-      }
-    }
-    
-    for (const childBlock of getBlockTree(widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars)) {
-      const block = this.props.baseCtx.createBlock(childBlock.blockDef)
-
-      // Create design context for validating
-      const designCtx: DesignCtx = {
-        ...this.props.baseCtx,
-        dataSource: this.props.dataSource,
-        contextVars: childBlock.contextVars,
-        store: new NullBlockStore(),
-        blockPaletteEntries: [],
-        selectedId: null,
-        renderChildBlock: () => { throw new Error("Not implemented") }
-      }
-      
-      const error = block.validate(designCtx)
-       
-      if (error) {
-        return error
-      }
-    }
-
-    return null
+  validateSingleWidget = (widgetDef: WidgetDef): string | null => {
+    return validateWidget(widgetDef, this.props.baseCtx, true)
   }
 
   renderTab(index: number) {
@@ -191,7 +146,7 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
         onOpenWidget={this.handleOpenWidget} 
         onRemoveWidget={this.handleRemoveWidget}
         onDuplicateWidget={this.handleDuplicateWidget}
-        validateWidget={this.validateWidget}
+        validateWidget={this.validateSingleWidget}
         />
     }
   }

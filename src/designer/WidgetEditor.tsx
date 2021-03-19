@@ -1,7 +1,7 @@
 import * as React from "react";
 import {v4 as uuid} from 'uuid'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, TableSelect } from "../widgets/propertyEditors"
-import { WidgetDef } from "../widgets/widgets";
+import { validateWidget, WidgetDef } from "../widgets/widgets";
 import { ContextVar } from "../widgets/blocks";
 import { Schema, DataSource, EnumValue } from "mwater-expressions";
 import { localize } from "../widgets/localization";
@@ -31,33 +31,12 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
     this.props.onWidgetDefChange({ ...this.props.widgetDef, privateContextVarValues })
   }
 
-  validateWidget() {
-    const widgetDef = this.props.widgetDef
-    
-    // Validate context var values
-    for (const cv of widgetDef.contextVars) {
-      const error = validateContextVarValue(this.props.designCtx.schema, cv, widgetDef.contextVars, widgetDef.contextVarPreviewValues[cv.id])
-      if (error) {
-        return error
-      }
-    }
-
-    // Validate private context var values
-    for (const cv of widgetDef.privateContextVars || []) {
-      const error = validateContextVarValue(this.props.designCtx.schema, cv, widgetDef.privateContextVars!.concat(widgetDef.contextVars), (widgetDef.privateContextVarValues || {})[cv.id])
-      if (error) {
-        return error
-      }
-    }
-    return null
-  }
-
   render() {
     // Get list of all non-private context variables, including global
     const allContextVars = (this.props.designCtx.globalContextVars || [])
       .concat(this.props.widgetDef.contextVars)
 
-    const validationError = this.validateWidget()
+    const validationError = validateWidget(this.props.widgetDef, this.props.designCtx, false)
 
     return (<div>
       { validationError ? 

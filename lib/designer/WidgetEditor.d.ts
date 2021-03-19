@@ -16,7 +16,6 @@ export declare class WidgetEditor extends React.Component<WidgetEditorProps> {
     handlePrivateContextVarValuesChange: (privateContextVarValues: {
         [contextVarId: string]: any;
     }) => void;
-    validateWidget(): string | null;
     render(): JSX.Element;
 }
 export {};

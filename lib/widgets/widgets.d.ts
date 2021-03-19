@@ -1,3 +1,4 @@
+import { BaseCtx } from '../contexts';
 import { BlockDef, ContextVar } from './blocks';
 /** Widget is named and has a single block with a set of context variables specific to this widget */
 export interface WidgetDef {
@@ -27,3 +28,5 @@ export interface WidgetDef {
     virtualizeDatabaseInPreview?: boolean;
 }
 export declare type LookupWidget = (id: string) => WidgetDef | null;
+/** Validate a widget, optionally also validating all children */
+export declare function validateWidget(widgetDef: WidgetDef, ctx: BaseCtx, includeChildren: boolean): string | null;
