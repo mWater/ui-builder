@@ -1,16 +1,14 @@
+import _ from 'lodash'
+import uuid from 'uuid'
+import React from 'react'
 import produce from 'immer'
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock, CreateBlock } from '../blocks'
+import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { localize } from '../localization';
-import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors';
-import VirtualDatabase from '../../database/VirtualDatabase';
-import ContextVarsInjector from '../ContextVarsInjector';
-import * as _ from 'lodash'
-import { LocalizedString, Expr } from 'mwater-expressions';
-import uuid = require('uuid');
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import { ActionLibrary } from '../ActionLibrary';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors'
+import VirtualDatabase from '../../database/VirtualDatabase'
+import ContextVarsInjector from '../ContextVarsInjector'
+import { LocalizedString } from 'mwater-expressions'
+import { DesignCtx, InstanceCtx } from '../../contexts'
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
