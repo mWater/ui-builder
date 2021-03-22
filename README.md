@@ -48,6 +48,14 @@ The filters are not present in the `contextVarValues` and must be applied manual
 `row` is only different from `id` in that `row` can have expressions based on it. Also, `row` stores its table in `table` where 
 `id` uses `idTable`.
 
+The values of context variables depends on the type. 
+
+`row`: actual value of the row's primary key. `null` for none
+
+`rowset`: expression with a boolean value. e.g. `{ type: "op", table: "customers", op: "is not null", exprs: [{ type: "field", table: "customers", column: "name" }] }`
+
+Other: mWater expression. Which means that, for example, number variables could have value `{ type: "literal", valueType: "number", value: 123 }`, not `123`
+
 ### Widgets
 
 A widget contains a single block and has a human readable name. It also defines 0 or more contexts variables that will be passed to the block.
