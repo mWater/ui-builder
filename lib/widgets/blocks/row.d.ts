@@ -3,6 +3,7 @@ import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
 import { Expr } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { ContextVarExpr } from '../../ContextVarExpr';
+import { OrderBy } from '../../database/Database';
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
     type: "row";
@@ -12,8 +13,10 @@ export interface RowBlockDef extends BlockDef {
     name?: string | null;
     /** Mode to use to get the one row. Either by specifying a filter or by specifying an id. Default "filter" */
     mode?: "filter" | "id";
-    /** For mode = "filter": Filter which filters table down to one row. Boolean expression */
+    /** For mode = "filter": Filter which filters table down to find one row. Boolean expression */
     filter?: Expr;
+    /** Order of rows when filtered. Order is used, as first row matching filter is used. */
+    filterOrderBy?: OrderBy[] | null;
     /** For mode = "id": context var expression to get the id to use */
     idContextVarExpr?: ContextVarExpr;
     /** Block which is in the row */

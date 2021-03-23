@@ -1,16 +1,17 @@
 import produce from 'immer'
-import * as React from 'react';
-import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../blocks'
-import * as _ from 'lodash';
-import { Expr, ExprValidator, Table } from 'mwater-expressions';
+import React from 'react';
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../blocks'
+import _ from 'lodash';
+import { Expr, ExprValidator } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput, Toggle } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
-import { PropertyEditor, LabeledProperty, TableSelect, ContextVarExprPropertyEditor } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, TableSelect, ContextVarExprPropertyEditor, OrderByArrayEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { useEffect, useState } from 'react';
 import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from '../../contexts';
 import { ContextVarExpr } from '../../ContextVarExpr';
+import { OrderBy } from '../../database/Database';
 
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
@@ -25,8 +26,11 @@ export interface RowBlockDef extends BlockDef {
   /** Mode to use to get the one row. Either by specifying a filter or by specifying an id. Default "filter" */
   mode?: "filter" | "id"
 
-  /** For mode = "filter": Filter which filters table down to one row. Boolean expression */
+  /** For mode = "filter": Filter which filters table down to find one row. Boolean expression */
   filter?: Expr
+
+  /** Order of rows when filtered. Order is used, as first row matching filter is used. */
+  filterOrderBy?: OrderBy[] | null
 
   /** For mode = "id": context var expression to get the id to use */
   idContextVarExpr?: ContextVarExpr
@@ -73,6 +77,14 @@ export class RowBlock extends Block<RowBlockDef> {
       error = exprValidator.validateExpr(this.blockDef.filter || null, { table: this.blockDef.table, types: ["boolean"] })
       if (error) {
         return error
+      }
+
+      // Validate orderBy
+      for (const orderBy of this.blockDef.filterOrderBy || []) {
+        error = exprValidator.validateExpr(orderBy.expr, { table: this.blockDef.table })
+        if (error) {
+          return error
+        }
       }
     }
 
@@ -176,7 +188,7 @@ export class RowBlock extends Block<RowBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         { this.blockDef.table && mode == "filter" ? 
-        <LabeledProperty label="Filter" help="Should only match one row">
+        <LabeledProperty label="Filter">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
             {(value, onChange) => 
               <FilterExprComponent 
@@ -190,6 +202,21 @@ export class RowBlock extends Block<RowBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
         : null }
+        <LabeledProperty label="Filter Order" key="filterOrderBy" hint="If filter matches more than one row, first one is taken">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filterOrderBy">
+            {(value, onChange) => 
+              <OrderByArrayEditor 
+                value={value || []} 
+                onChange={onChange} 
+                schema={props.schema} 
+                dataSource={props.dataSource} 
+                contextVars={props.contextVars}
+                table={this.blockDef.table!}
+               />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
+
         { this.blockDef.table && mode == "id" ? 
         <LabeledProperty label="ID of row">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idContextVarExpr">
@@ -236,6 +263,7 @@ const RowInstance = (props: {
         select: { id: { type: "id", table: table }},
         from: table,
         where: blockDef.filter,
+        orderBy: blockDef.filterOrderBy || undefined,
         limit: 1
       }, instanceProps.contextVars, getFilteredContextVarValues(instanceProps))
         .then((rows) => {
