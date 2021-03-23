@@ -1,17 +1,18 @@
-import { ActionDef, Action } from "./actions";
-import { OpenPageAction, OpenPageActionDef } from "./actions/openPage";
-import { AddRowAction, AddRowActionDef } from "./actions/addRow";
-import { GotoUrlAction, GotoUrlActionDef } from "./actions/gotoUrl";
-import { RemoveRowAction, RemoveRowActionDef } from "./actions/removeRow";
+import { ActionDef, Action } from "./actions"
+import { OpenPageAction, OpenPageActionDef } from "./actions/openPage"
+import { AddRowAction, AddRowActionDef } from "./actions/addRow"
+import { GotoUrlAction, GotoUrlActionDef } from "./actions/gotoUrl"
+import { RemoveRowAction, RemoveRowActionDef } from "./actions/removeRow"
+import { BrowserBackAction, BrowserBackActionDef } from "./actions/browserBack"
 
 /** Library of actions */
 export class ActionLibrary {
   customActions: { 
-    type: string, 
-    name: string, 
+    type: string
+    name: string 
     
     /** Creates a default action definition */
-    actionDefFactory: (type: string) => ActionDef,
+    actionDefFactory: (type: string) => ActionDef
 
     /** Creates an action */
     actionFactory: (actionDef: ActionDef) => Action<ActionDef> 
@@ -36,7 +37,9 @@ export class ActionLibrary {
         return new RemoveRowAction(actionDef as RemoveRowActionDef)
       case "gotoUrl":
         return new GotoUrlAction(actionDef as GotoUrlActionDef)
-    }
+      case "browserBack":
+        return new BrowserBackAction(actionDef as BrowserBackActionDef)
+      }
 
     for (const customAction of this.customActions) {
       if (customAction.type == actionDef.type) {
@@ -72,6 +75,10 @@ export class ActionLibrary {
         return {
           type: "gotoUrl"
         } as GotoUrlActionDef
+      case "browserBack": 
+        return {
+          type: "browserBack"
+        } as BrowserBackActionDef
     }
 
     for (const customAction of this.customActions) {
@@ -89,7 +96,8 @@ export class ActionLibrary {
       { type: "openPage", name: "Open Page" },
       { type: "addRow", name: "Add Row" },
       { type: "removeRow", name: "Remove Row" },
-      { type: "gotoUrl", name: "Goto URL" }
+      { type: "gotoUrl", name: "Goto URL" },
+      { type: "browserBack", name: "Browser Back" }
     ]
 
     for (const customAction of this.customActions) {

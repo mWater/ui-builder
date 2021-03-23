@@ -1,12 +1,10 @@
-import * as React from 'react';
-import * as _ from 'lodash'
+import React from 'react';
+import _ from 'lodash'
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
 import { LabeledProperty, PropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
 import { TextInput, Checkbox } from 'react-library/lib/bootstrap';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
 import { DesignCtx, InstanceCtx } from '../../contexts';
-import { ContextVar } from '../blocks';
-import { Expr } from 'mwater-expressions';
 import { evalContextVarExpr } from '../evalContextVarExpr';
 
 export interface GotoUrlActionDef extends ActionDef {
