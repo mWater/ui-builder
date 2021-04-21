@@ -45,8 +45,8 @@ it itself.
 `rowset` can be filtered by widgets. Each widget can apply filters to the rowset dynamically as well as specifying initial filters to be applied.
 The filters are not present in the `contextVarValues` and must be applied manually if a widget wants to include filters.
 
-`row` is only different from `id` in that `row` can have expressions based on it. Also, `row` stores its table in `table` where 
-`id` uses `idTable`.
+`row` is different from `id` in that `row` can have expressions based on it. Also, `row` stores its table in `table` where 
+`id` uses `idTable`. Finally, `row` has the value of the actual primary key, where `id` has an expression as a value.
 
 The values of context variables depends on the type. 
 

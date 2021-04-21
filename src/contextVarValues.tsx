@@ -1,7 +1,6 @@
 import * as React from "react";
 import { ContextVar, createExprVariables } from "./widgets/blocks";
 import { Schema, DataSource, ExprValidator } from "mwater-expressions";
-import { produce } from "immer";
 import { ExprComponent, IdLiteralComponent } from "mwater-expressions-ui";
 
 /** Allows editing of the value for one context variable */

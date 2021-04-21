@@ -1,11 +1,9 @@
 import * as React from 'react';
 import LeafBlock from '../LeafBlock'
-import { BlockDef, ContextVar } from '../blocks'
+import { BlockDef } from '../blocks'
 import { LabeledProperty, PropertyEditor, ActionDefEditor } from '../propertyEditors';
 import { TextInput, Select, Toggle } from 'react-library/lib/bootstrap';
 import { ActionDef } from '../actions';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { localize } from '../localization';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 

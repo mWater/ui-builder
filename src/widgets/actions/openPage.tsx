@@ -1,13 +1,13 @@
 import _ from 'lodash'
 import React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
 import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
-import { LocalizedString, Expr, ExprUtils, ExprValidator } from 'mwater-expressions';
+import { LocalizedString, Expr, ExprUtils, ExprValidator, LiteralType } from 'mwater-expressions';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
-import { ContextVar, createExprVariables, createExprVariableValues } from '../blocks';
+import { ContextVar, createExprVariables, createExprVariableValues, validateContextVarExpr } from '../blocks';
 import { localize } from '../localization';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 import { Page } from '../../PageStack';
@@ -15,20 +15,20 @@ import { evalContextVarExpr } from '../evalContextVarExpr';
 import { ContextVarValueEditor, validateContextVarValue } from '../../contextVarValues';
 
 /** Direct reference to another context variable */
-interface ContextVarRef {
+interface RefValue {
   type: "ref"
   
   /** Context variable whose value should be used */
-  contextVarId: string
+  contextVarId: string | null
 }
 
 /** Null value for context value */
-interface ContextVarNull {
+interface NullValue {
   type: "null"
 }
 
 /** Literal value for context value */
-interface ContextVarLiteral {
+interface LiteralValue {
   type: "literal"
 
   /** Value of the variable. 
@@ -37,6 +37,19 @@ interface ContextVarLiteral {
    * Is boolean expression for rowset */
   value: any
 }
+
+/** Calculated value */
+interface ContextVarExprValue {
+  type: "contextVarExpr"
+
+  /** Context variable which expression is based on. Null for literal-only */
+  contextVarId: string | null
+  
+  /** Expression to use of type id */
+  expr: Expr
+}
+
+type ContextVarValue = RefValue | NullValue | LiteralValue | ContextVarExprValue
 
 /** Action which opens a page */
 export interface OpenPageActionDef extends ActionDef {
@@ -57,7 +70,7 @@ export interface OpenPageActionDef extends ActionDef {
   widgetId: string | null
 
   /** Values of context variables that widget inside page needs */
-  contextVarValues: { [contextVarId: string]: ContextVarRef | ContextVarNull | ContextVarLiteral }
+  contextVarValues: { [contextVarId: string]: ContextVarValue }
 
   /** True to replace current page */
   replacePage?: boolean
@@ -97,6 +110,24 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           return error
         }
       }
+      else if (contextVarValue.type == "contextVarExpr") {
+        // Not for rowset type
+        if (widgetCV.type == "rowset") {
+          return "Not available for rowsets"
+        }
+
+        const error = validateContextVarExpr({
+          contextVarId: contextVarValue.contextVarId,
+          contextVars: designCtx.contextVars,
+          expr: contextVarValue.expr,
+          schema: designCtx.schema,
+          idTable: widgetCV.type == "row" ? widgetCV.table : widgetCV.idTable,
+          types: widgetCV.type == "row" ? ["id"] : [widgetCV.type]
+        })
+        if (error) {
+          return error
+        }
+      }
     }
 
     // Validate expressions
@@ -113,6 +144,8 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
   async performAction(instanceCtx: InstanceCtx): Promise<void> {
     const contextVarValues = {}
+
+    const widget = instanceCtx.widgetLibrary.widgets[this.actionDef.widgetId!]
 
     // Perform mappings 
     for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
@@ -149,6 +182,22 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       }
       else if (contextVarValue.type == "literal") {
         contextVarValues[cvid] = contextVarValue.value
+      }
+      else if (contextVarValue.type == "contextVarExpr") {
+        // Get widget context variable
+        const widgetCV = widget.contextVars.find(cv => cv.id == cvid)!
+
+        // Evaluate value
+        const contextVar = instanceCtx.contextVars.find(cv => cv.id == contextVarValue.contextVarId)!
+        const value = await evalContextVarExpr({ 
+          contextVar: contextVar, 
+          contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
+          ctx: instanceCtx,
+          expr: contextVarValue.expr
+        })
+
+        // Wrap in literal expression if not row
+        contextVarValues[cvid] = widgetCV.type == "row" ? value : { type: "literal", valueType: widgetCV.type, idTable: widgetCV.idTable, value }
       }
     }
 
@@ -217,23 +266,89 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
     const widgetDef: WidgetDef | null = actionDef.widgetId ? props.widgetLibrary.widgets[actionDef.widgetId] : null
 
     const renderContextVarValue = (contextVar: ContextVar) => {
-      const cvr = actionDef.contextVarValues[contextVar.id]
-      const handleCVRChange = (cvr: ContextVarNull | ContextVarRef | ContextVarLiteral) => {
+      const cvv = actionDef.contextVarValues[contextVar.id]
+      const handleCVVTypeSelect = (cvvType: "null" | "ref" | "literal" | "contextVarExpr") => {
         props.onChange(produce(actionDef, (draft) => {
-          draft.contextVarValues[contextVar.id] = cvr
+          if (cvvType == "null") {
+            draft.contextVarValues[contextVar.id] = { type: "null" }
+          }
+          else if (cvvType == "ref") {
+            draft.contextVarValues[contextVar.id] = { type: "ref", contextVarId: null }
+          }
+          else if (cvvType == "literal") {
+            draft.contextVarValues[contextVar.id] = { type: "literal", value: null }
+          }
+          else if (cvvType == "contextVarExpr") {
+            draft.contextVarValues[contextVar.id] = { type: "contextVarExpr", contextVarId: null, expr: null }
+          }
+        }))
+      }
+
+      const handleCVVChange = (newCVV: ContextVarValue) => {
+        props.onChange(produce(actionDef, (draft) => {
+          draft.contextVarValues[contextVar.id] = newCVV
         }))
       }
 
       // Create options list
-      const options: { value: ContextVarNull | ContextVarRef | ContextVarLiteral, label: string }[] = [
-        { value: { type: "null" }, label: "No Value" },
-        { value: { type: "literal", value: null }, label: "Literal Value" }
+      const options: { value: "null" | "ref" | "literal" | "contextVarExpr", label: string }[] = [
+        { value: "null", label: "No Value" },
+        { value: "ref", label: "Existing Variable" },
       ]
+      
+      // Can't calculate value for rowset
+      if (contextVar.type != "rowset") {
+        options.push({ value: "contextVarExpr", label: "Expression" })
+      }
 
-      for (const cv of props.contextVars) {
-        if (areContextVarCompatible(cv, contextVar)) {
-          options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
+      options.push({ value: "literal", label: "Literal Value" })
+
+      // for (const cv of props.contextVars) {
+      //   if (areContextVarCompatible(cv, contextVar)) {
+      //     options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
+      //   }
+      // }
+
+      function renderContextVarValueEditor() {
+        if (cvv.type == "null") {
+          return null
         }
+        if (cvv.type == "literal") {
+          // Do not allow referencing context variables, as they will not be available in the other page
+          return <ContextVarValueEditor
+            schema={props.schema}
+            dataSource={props.dataSource}
+            contextVar={contextVar}
+            contextVarValue={cvv.value}
+            availContextVars={[]}
+            onContextVarValueChange={value => { handleCVVChange({ ...cvv, value })}}
+          />
+        }
+        if (cvv.type == "ref") {
+          const refOptions = props.contextVars
+            .filter(cv => areContextVarCompatible(cv, contextVar))
+            .map(cv => ({ value: cv.id, label: cv.name }))
+      
+          return <Select
+            options={refOptions}
+            value={cvv.contextVarId}
+            onChange={value => { handleCVVChange({ ...cvv, contextVarId: value })}}
+            nullLabel="Select Variable..."
+          />
+        }
+        if (cvv.type == "contextVarExpr") {
+          return <ContextVarExprPropertyEditor
+            contextVarId={cvv.contextVarId}
+            contextVars={props.contextVars}
+            dataSource={props.dataSource}
+            expr={cvv.expr}
+            schema={props.schema}
+            types={[contextVar.type == "row" ? "id" : contextVar.type as LiteralType]}
+            idTable={contextVar.type == "row" ? contextVar.table : contextVar.idTable}
+            onChange={(contextVarId, expr) => { handleCVVChange({ ...cvv, expr, contextVarId })}}
+          />
+        }
+        return "Not supported"
       }
 
       return (
@@ -242,21 +357,12 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           <td key="value">
             <Select
               options={options}                    
-              value={cvr && cvr.type == "literal" ? { type: "literal", value: null } : cvr}
-              onChange={handleCVRChange}
+              value={cvv ? cvv.type : null}
+              onChange={handleCVVTypeSelect}
               nullLabel="Select..."
             />
-            { !cvr ? <span className="text-warning">Value not set</span> : null}
-            { cvr && cvr.type == "literal" ?
-              <ContextVarValueEditor
-                schema={props.schema}
-                dataSource={props.dataSource}
-                contextVar={contextVar}
-                contextVarValue={cvr.value}
-                availContextVars={props.contextVars}
-                onContextVarValueChange={value => { handleCVRChange({ ...cvr, value })}}
-              />
-            : null }
+            { !cvv ? <span className="text-warning">Value not set</span> : null}
+            { renderContextVarValueEditor()}
           </td>
         </tr>
       )
