@@ -267,6 +267,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     const renderContextVarValue = (contextVar: ContextVar) => {
       const cvv = actionDef.contextVarValues[contextVar.id]
+
       const handleCVVTypeSelect = (cvvType: "null" | "ref" | "literal" | "contextVarExpr") => {
         props.onChange(produce(actionDef, (draft) => {
           if (cvvType == "null") {
@@ -303,13 +304,11 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
       options.push({ value: "literal", label: "Literal Value" })
 
-      // for (const cv of props.contextVars) {
-      //   if (areContextVarCompatible(cv, contextVar)) {
-      //     options.push({ value: { type: "ref", contextVarId: cv.id }, label: cv.name })
-      //   }
-      // }
-
       function renderContextVarValueEditor() {
+        if (!cvv) {
+          return null
+        }
+
         if (cvv.type == "null") {
           return null
         }
