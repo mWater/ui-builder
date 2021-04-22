@@ -160,6 +160,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   async performQueries() {
+    // No need to perform queries if no context var exprs
+    if (!this.props.contextVarExprs || this.props.contextVarExprs.length == 0) {
+      return
+    }
+
     const innerProps = this.createInnerProps()
 
     // Determine variables and values for expressions
@@ -169,7 +174,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     this.setState({ refreshing: true, filteredContextVarValues: variableValues })
 
     // Query database if row 
-    if (this.props.injectedContextVar.type === "row" && this.props.contextVarExprs!.length > 0) {
+    if (this.props.injectedContextVar.type === "row") {
       // Special case of null row value
       if (this.props.value == null) {
         this.setState({ exprValues: {}, loading: false, refreshing: false, filteredContextVarValues: variableValues })
@@ -217,7 +222,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
 
     // Query database if rowset
-    if (this.props.injectedContextVar.type === "rowset" && this.props.contextVarExprs!.length > 0) {
+    if (this.props.injectedContextVar.type === "rowset") {
       this.setState({ refreshing: true })
       const table: string = this.props.injectedContextVar.table!
       
