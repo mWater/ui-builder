@@ -1,11 +1,11 @@
 import * as React from "react";
 import { getFixedWidth, QueryTableBlock } from "./queryTable";
-import { Row, Expr, IdExpr } from "mwater-expressions";
+import { Row, Expr, IdExpr, PromiseExprEvaluator } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import * as _ from "lodash";
 import { localize } from "../../localization";
 import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts";
-import { BlockDef } from "../../blocks";
+import { BlockDef, createExprVariables, createExprVariableValues } from "../../blocks";
 
 interface Props {
   block: QueryTableBlock
@@ -200,14 +200,31 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       getFilteredContextVarValues(this.props.instanceCtx)[rowsetCV.id]
     )
 
+    const innerContextVarValues = { ...rips.contextVarValues, [rowcv.id]: cvvalue }
     return {
       ...rips, 
       contextVars: innerContextVars,
-      contextVarValues: { ...rips.contextVarValues, [rowcv.id]: cvvalue },
+      contextVarValues: innerContextVarValues,
       getContextVarExprValue: (cvid, expr) => {
+        // Null expression has null value
+        if (!expr) {
+          return null
+        }
+
+        // If no context variable, evaluate expression
+        if (cvid == null) {
+          return new PromiseExprEvaluator({ 
+            schema: rips.schema, 
+            locale: rips.locale,
+            variables: createExprVariables(innerContextVars),
+            variableValues: createExprVariableValues(innerContextVars, innerContextVarValues)
+          }).evaluateSync(expr)
+        }
+
         if (cvid !== rowcv.id) {
           return rips.getContextVarExprValue(cvid, expr)
         }
+        
         // Look up expression
         const exprIndex = rowExprs.findIndex(rowExpr => _.isEqual(expr, rowExpr))
         return this.state.rows![rowIndex]["e" + exprIndex]

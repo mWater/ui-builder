@@ -1,10 +1,11 @@
 import * as React from "react";
 import { QueryRepeatBlock } from "./queryRepeat";
-import { Row, Expr, IdExpr } from "mwater-expressions";
+import { Row, Expr, IdExpr, PromiseExprEvaluator } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import _ from "lodash";
 import { localize } from "../../localization";
 import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts";
+import { createExprVariables, createExprVariableValues } from "../../blocks";
 
 interface Props {
   block: QueryRepeatBlock
@@ -138,11 +139,27 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     // Row context variable value
     const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.instanceCtx.schema, rowsetCV, innerContextVars)
 
+    const innerContextVarValues = { ...rips.contextVarValues, [rowcv.id]: cvvalue }
     return {
       ...rips, 
       contextVars: innerContextVars,
-      contextVarValues: { ...rips.contextVarValues, [rowcv.id]: cvvalue },
+      contextVarValues: innerContextVarValues,
       getContextVarExprValue: (cvid, expr) => {
+        // Null expression has null value
+        if (!expr) {
+          return null
+        }
+
+        // If no context variable, evaluate expression
+        if (cvid == null) {
+          return new PromiseExprEvaluator({ 
+            schema: rips.schema, 
+            locale: rips.locale,
+            variables: createExprVariables(innerContextVars),
+            variableValues: createExprVariableValues(innerContextVars, innerContextVarValues)
+          }).evaluateSync(expr)
+        }
+
         if (cvid !== rowcv.id) {
           return rips.getContextVarExprValue(cvid, expr)
         }
