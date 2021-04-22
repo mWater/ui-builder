@@ -162,6 +162,9 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   async performQueries() {
     // No need to perform queries if no context var exprs
     if (!this.props.contextVarExprs || this.props.contextVarExprs.length == 0) {
+      if (this.state.loading || this.state.refreshing) {
+        this.setState({ loading: false, refreshing: false })
+      }
       return
     }
 
