@@ -184,16 +184,6 @@ export default class VirtualDatabase implements Database {
       return false
     }
 
-    // // Don't include 1-n joins with an inverse, as it's easy to use that to look them up
-    // if (column.type === "join" && column.join!.type == "1-n" && column.join!.inverse) {
-    //   return false
-    // }
-
-    // // TODO: remove this condition. primary keys should always exist
-    // if (column.type == "join" && !this.schema.getTable(column.join!.toTable)?.primaryKey) {
-    //   return false
-    // }
-
     return true
   }
 

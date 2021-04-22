@@ -372,7 +372,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       column = props.schema.getColumn(contextVar.table, this.blockDef.column)
     }
 
-    const isIdType = column && (column.type == "id" || column.type == "id[]")
+    const isIdType = column && (column.type == "id" || column.type == "id[]" || column.type == "join")
     const idMode = this.blockDef.idMode || "simple"
     const idTable = column ? column.idTable : null
     const isBooleanType = column && column.type == "boolean"
