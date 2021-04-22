@@ -27,11 +27,11 @@ export interface PageStack {
   openPage(page: Page): void
 
   /** Replace current page with specified one. true for success, false for failure */
-  replacePage(page: Page): boolean
+  replacePage(page: Page): Promise<boolean>
 
   /** Close top page. Returns whether successful and pages still open */
-  closePage(): { success: boolean, pageCount: number }
+  closePage(): Promise<{ success: boolean, pageCount: number }>
 
   /** Closes all pages. true for success, false for failure */
-  closeAllPages(): boolean
+  closeAllPages(): Promise<boolean>
 }

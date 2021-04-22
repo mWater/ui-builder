@@ -23,7 +23,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   /** Stores validation registrations for all sub-components so that they can be validated
    * before being saved. Contains pageIndex as well to allow validating a single page
    */
-  validationRegistrations: { [key: string]: { pageIndex: number, validate: (() => string | null) } }
+  validationRegistrations: { [key: string]: { pageIndex: number, validate: (() => string | null | Promise<string | null>) } }
 
   constructor(props: Props) {
     super(props)
@@ -41,14 +41,14 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   /** Replace current page with specified one */
-  replacePage(page: Page): boolean {
+  async replacePage(page: Page): Promise<boolean> {
     if (this.state.pages.length == 0) {
       throw new Error("Zero pages in stack")
     }
 
     // Validate all instances within page
     const pageIndex = this.state.pages.length - 1
-    const result = this.validatePage(pageIndex)
+    const result = await this.validatePage(pageIndex)
     if (!result) {
       return false
     }
@@ -61,14 +61,14 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   /** Close top page. Returns whether successful and pages still open */
-  closePage(): { success: boolean, pageCount: number } {
+  async closePage(): Promise<{ success: boolean, pageCount: number }> {
     if (this.state.pages.length == 0) {
       throw new Error("Zero pages in stack")
     }
 
     // Validate all instances within page
     const pageIndex = this.state.pages.length - 1
-    const result = this.validatePage(pageIndex)
+    const result = await this.validatePage(pageIndex)
     if (!result) {
       return { success: false, pageCount: this.state.pages.length }
     }
@@ -80,14 +80,14 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     return { success: true, pageCount: pages.length }
   }
 
-  closeAllPages(): boolean {
+  async closeAllPages(): Promise<boolean> {
     const pages = this.state.pages.slice()
 
     while (pages.length > 0) {
       // Validate all instances within page
       const pageIndex = pages.length - 1
 
-      const result = this.validatePage(pageIndex)
+      const result = await this.validatePage(pageIndex)
       if (!result) {
         return false
       }
@@ -99,7 +99,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   /** Validates a single page (by pageIndex), showing an error if fails */
-  validatePage(pageIndex: number): boolean {
+  async validatePage(pageIndex: number): Promise<boolean> {
     const validationMessages: string[] = []
 
     for (const key of Object.keys(this.validationRegistrations)) {
@@ -108,7 +108,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
         continue
       }
 
-      const msg = value.validate()
+      const msg = await value.validate()
       if (msg != null) {
         validationMessages.push(msg)
       }

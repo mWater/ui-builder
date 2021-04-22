@@ -18,21 +18,21 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     validationRegistrations: {
         [key: string]: {
             pageIndex: number;
-            validate: (() => string | null);
+            validate: (() => string | null | Promise<string | null>);
         };
     };
     constructor(props: Props);
     openPage(page: Page): void;
     /** Replace current page with specified one */
-    replacePage(page: Page): boolean;
+    replacePage(page: Page): Promise<boolean>;
     /** Close top page. Returns whether successful and pages still open */
-    closePage(): {
+    closePage(): Promise<{
         success: boolean;
         pageCount: number;
-    };
-    closeAllPages(): boolean;
+    }>;
+    closeAllPages(): Promise<boolean>;
     /** Validates a single page (by pageIndex), showing an error if fails */
-    validatePage(pageIndex: number): boolean;
+    validatePage(pageIndex: number): Promise<boolean>;
     renderChildBlock: (instanceCtx: InstanceCtx, childBlockDef: BlockDef | null) => React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
     handleClose: () => void;
     /** Stores the registration for validation of a child block and returns an unregister function */

@@ -96,7 +96,7 @@ export interface InstanceCtx extends BaseCtx {
    * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show alert
    * isFirstError is true if first block to potentially fail validation. This allows the block to scroll into view on error
    */
-  registerForValidation(validate: (isFirstError: boolean) => string | null): (() => void)
+  registerForValidation(validate: (isFirstError: boolean) => string | null | Promise<string | null>): (() => void)
 }
 
 /** Gets context variables with filters baked into rowsets. Use for all queries, as that may depend on rowset filters */
