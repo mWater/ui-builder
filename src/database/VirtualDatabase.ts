@@ -226,7 +226,7 @@ export default class VirtualDatabase implements Database {
   /** Replace temporary primary keys with different value */
   private replaceTempPrimaryKeys(input: any, replaceWith: (tempPk: string) => any): any {
     let json = JSON.stringify(input)
-    json = json.replace(new RegExp(/pk_[0-9a-zA-Z]+_temp/, "g"), replaceWith)
+    json = json.replace(new RegExp(/"pk_[0-9a-zA-Z]+_temp"/, "g"), (tempPkJson) => JSON.stringify(replaceWith(JSON.parse(tempPkJson))))
     return JSON.parse(json)
   }
 
