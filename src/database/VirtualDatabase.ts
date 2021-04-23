@@ -52,7 +52,7 @@ export default class VirtualDatabase implements Database {
     const exprUtils = new ExprUtils(this.schema, variables)
     
     // Pass through if no changes and not id query
-    if (this.shouldPassthrough(query, exprUtils)) {
+    if (this.shouldPassthrough(query, exprUtils, contextVars, contextVarValues)) {
       return this.database.query(query, contextVars, contextVarValues)
     }
     
@@ -69,7 +69,7 @@ export default class VirtualDatabase implements Database {
    * Do if no mutations to any tables referenced *and* it is not a simple id = query which 
    * is best to cache *and* it doesn't reference temporary primary keys
    */
-  private shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils) {
+  private shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
     // Determine which tables are referenced
     let tablesReferenced = [query.from]
     for (const expr of Object.values(query.select)) {
@@ -94,15 +94,23 @@ export default class VirtualDatabase implements Database {
     }
 
     // Can't passthrough if depends on primary key
-    if (this.doesReferenceTempPk(query)) {
+    if (this.doesReferenceTempPk(query.where, exprUtils, contextVars, contextVarValues)) {
       return false
     }
 
     return true
   }
 
-  private doesReferenceTempPk(queryOrExpr: QueryOptions | Expr) {
-    return (JSON.stringify(queryOrExpr).match(/"pk_[0-9a-zA-Z]+_temp"/g) || []).some(m => this.tempPrimaryKeys.includes(JSON.parse(m)))
+  /** Test if an expression references a temporary primary key, meaning it cannot be sent to the server */
+  private doesReferenceTempPk(expr: Expr | undefined, exprUtils: ExprUtils, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
+    if (!expr) {
+      return false
+    }
+
+    // Inline variables, since if an expression references a variable that has the value of a temporary primary key, 
+    // it won't show up in the JSON unless inlined
+    const inlinedExpr = exprUtils.inlineVariableValues(expr, createExprVariableValues(contextVars, contextVarValues))
+    return (JSON.stringify(inlinedExpr).match(/"pk_[0-9a-zA-Z]+_temp"/g) || []).some(m => this.tempPrimaryKeys.includes(JSON.parse(m)))
   }
   
   /** Adds a listener which is called with each change to the database */
@@ -199,6 +207,9 @@ export default class VirtualDatabase implements Database {
 
   /** Create the rows as needed by PromiseExprEvaluator for a query */
   private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
+    const variables = createExprVariables(contextVars)
+    const exprUtils = new ExprUtils(this.schema, variables)
+
     // Create query with c_ for all columns, id and just the where clause
     let queryOptions: QueryOptions = {
       select: {
@@ -222,7 +233,7 @@ export default class VirtualDatabase implements Database {
     if (this.tempPrimaryKeys.includes(getWherePrimaryKey(where))) {
       rows = []
     }
-    else if (this.doesReferenceTempPk(where)) {
+    else if (this.doesReferenceTempPk(where, exprUtils, contextVars, contextVarValues)) {
       // This is a tricky decision, as there is a query that references a temporary primary key 
       // and as such, rows that do not exist. This part of the query cannot be sent to the real 
       // database. However, a query that had a *not* on that condition would incorrectly be missing
