@@ -70,7 +70,7 @@ export class ColumnValuesEditor extends React.Component<{
             dataSource={this.props.dataSource}
             idTable={idTable}
             enumValues={column.enumValues}
-            aggrStatuses={contextVar && contextVar.type == "rowset" ? ["aggregate"] : ["individual", "literal"] }
+            aggrStatuses={contextVar && contextVar.type == "rowset" ? ["aggregate", "literal"] : ["individual", "literal"] }
             types={[type]}
           />
         </LabeledProperty>
