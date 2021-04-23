@@ -1,5 +1,5 @@
 import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
-import { Schema, Column, ExprUtils, Row } from "mwater-expressions";
+import { Schema, Column, Row } from "mwater-expressions";
 import { ContextVar } from "../widgets/blocks";
 import { BatchingCache } from "./BatchingCache";
 /**
@@ -32,9 +32,10 @@ export default class VirtualDatabase implements Database {
     }): Promise<Row[]>;
     /** Determine if query should be simply sent to the underlying database.
      * Do if no mutations to any tables referenced *and* it is not a simple id = query which
-     * is best to cache.
+     * is best to cache *and* it doesn't reference temporary primary keys
      */
-    shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils): boolean;
+    private shouldPassthrough;
+    private doesReferenceTempPk;
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;

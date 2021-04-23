@@ -1,9 +1,9 @@
-import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery, getWherePrimaryKey } from "./Database";
-import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions";
-import * as _ from "lodash";
+import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery, getWherePrimaryKey } from "./Database"
+import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions"
+import _ from "lodash"
 import { v4 as uuid } from 'uuid'
-import { ContextVar, createExprVariables, createExprVariableValues } from "../widgets/blocks";
-import { BatchingCache } from "./BatchingCache";
+import { ContextVar, createExprVariables, createExprVariableValues } from "../widgets/blocks"
+import { BatchingCache } from "./BatchingCache"
 
 /**
  * Database which is backed by a real database, but can accept changes such as adds, updates or removes
@@ -67,9 +67,9 @@ export default class VirtualDatabase implements Database {
 
   /** Determine if query should be simply sent to the underlying database. 
    * Do if no mutations to any tables referenced *and* it is not a simple id = query which 
-   * is best to cache.
+   * is best to cache *and* it doesn't reference temporary primary keys
    */
-  shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils) {
+  private shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils) {
     // Determine which tables are referenced
     let tablesReferenced = [query.from]
     for (const expr of Object.values(query.select)) {
@@ -88,11 +88,21 @@ export default class VirtualDatabase implements Database {
       return false
     }
 
-    // Passthrough if not a simple id query, so that caching still happens
+    // Don't passthrough if simple id query, so that caching still happens
     if (getWherePrimaryKey(query.where)) {
       return false
     }
+
+    // Can't passthrough if depends on primary key
+    if (this.doesReferenceTempPk(query)) {
+      return false
+    }
+
     return true
+  }
+
+  private doesReferenceTempPk(queryOrExpr: QueryOptions | Expr) {
+    return (JSON.stringify(queryOrExpr).match(/"pk_[0-9a-zA-Z]+_temp"/g) || []).some(m => this.tempPrimaryKeys.includes(JSON.parse(m)))
   }
   
   /** Adds a listener which is called with each change to the database */
@@ -210,6 +220,13 @@ export default class VirtualDatabase implements Database {
 
     // Skip if us just a query on a temporary row, which will not match anything
     if (this.tempPrimaryKeys.includes(getWherePrimaryKey(where))) {
+      rows = []
+    }
+    else if (this.doesReferenceTempPk(where)) {
+      // This is a tricky decision, as there is a query that references a temporary primary key 
+      // and as such, rows that do not exist. This part of the query cannot be sent to the real 
+      // database. However, a query that had a *not* on that condition would incorrectly be missing
+      // any real matching rows.
       rows = []
     }
     else {
