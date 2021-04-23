@@ -35,6 +35,7 @@ export default class VirtualDatabase implements Database {
      * is best to cache *and* it doesn't reference temporary primary keys
      */
     private shouldPassthrough;
+    /** Test if an expression references a temporary primary key, meaning it cannot be sent to the server */
     private doesReferenceTempPk;
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;
