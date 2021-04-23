@@ -118,7 +118,7 @@ export class AddRowBlock extends Block<AddRowBlockDef> {
       table: contextVar ? contextVar.table : undefined, 
       types: [type],
       idTable: idTable,
-      aggrStatuses: contextVar && contextVar.type == "rowset"  ? ["aggregate", "literal"] : ["individual", "literal"]
+      aggrStatuses: contextVar && contextVar.type == "rowset" ? ["aggregate", "literal"] : ["individual", "literal"]
     })
     if (error) {
       return error
