@@ -296,10 +296,6 @@ const RowInstance = (props: {
     return <div className="alert alert-danger">Error loading results</div>
   }
 
-  if (!id) {
-    return <div className="alert alert-warning">Not found</div>
-  }
-
   // Inject context variable
   return <ContextVarsInjector 
     injectedContextVars={[contextVar]} 
