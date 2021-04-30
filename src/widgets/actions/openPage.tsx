@@ -147,9 +147,11 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
     const widget = instanceCtx.widgetLibrary.widgets[this.actionDef.widgetId!]
 
-    // Perform mappings 
-    for (const cvid of Object.keys(this.actionDef.contextVarValues)) {
-      const contextVarValue = this.actionDef.contextVarValues[cvid]
+    // Perform mappings of context vars
+    for (const pageCV of widget.contextVars) {
+      const pageCVId = pageCV.id
+      const contextVarValue = this.actionDef.contextVarValues[pageCVId]
+
       if (contextVarValue.type == "ref") {
         // Look up outer context variable
         const outerCV = instanceCtx.contextVars.find(cv => cv.id == contextVarValue.contextVarId)
@@ -175,17 +177,17 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, createExprVariableValues(instanceCtx.contextVars, instanceCtx.contextVarValues))
         }
 
-        contextVarValues[cvid] = outerCVValue
+        contextVarValues[pageCVId] = outerCVValue
       }
       else if (contextVarValue.type == "null") {
-        contextVarValues[cvid] = null
+        contextVarValues[pageCVId] = null
       }
       else if (contextVarValue.type == "literal") {
-        contextVarValues[cvid] = contextVarValue.value
+        contextVarValues[pageCVId] = contextVarValue.value
       }
       else if (contextVarValue.type == "contextVarExpr") {
         // Get widget context variable
-        const widgetCV = widget.contextVars.find(cv => cv.id == cvid)!
+        const widgetCV = widget.contextVars.find(cv => cv.id == pageCVId)!
 
         // Evaluate value
         const contextVar = instanceCtx.contextVars.find(cv => cv.id == contextVarValue.contextVarId)!
@@ -197,7 +199,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
         })
 
         // Wrap in literal expression if not row
-        contextVarValues[cvid] = widgetCV.type == "row" ? value : { type: "literal", valueType: widgetCV.type, idTable: widgetCV.idTable, value }
+        contextVarValues[pageCVId] = widgetCV.type == "row" ? value : { type: "literal", valueType: widgetCV.type, idTable: widgetCV.idTable, value }
       }
     }
 

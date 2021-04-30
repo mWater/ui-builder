@@ -35,7 +35,12 @@ test("performs action", async () => {
     getContextVarExprValue: () => { throw new Error("Not implemented") },
     getFilters: (cvid: string) => {
       return cvid == "outercv1" ? [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: false }} as Filter] : []
-    }
+    },
+    widgetLibrary: { widgets: {
+      "innerPage": {
+        contextVars: [{ id: "innercv1", type: "boolean" }] as ContextVar[]
+      } as any
+    }}
   }
 
   const action = new OpenPageAction(ad)
