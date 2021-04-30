@@ -410,6 +410,18 @@ describe("select, order, limit", () => {
       ])
     })
 
+    test("update irrelevant row to become relevant", async () => {
+      const txn = vdb.transaction()
+      txn.updateRow("t1", 1, { number: 7 })
+      txn.commit()
+  
+      const rows = await performQuery({ t1: [{ id: 1, number: 2 }, { id: 2, number: 6 }] }, qopts)
+      expect(rows).toEqual([
+        { x: 6 },
+        { x: 7 }
+      ])
+    })
+
     test("remove relevant row", async () => {
       const txn = vdb.transaction()
       txn.removeRow("t1", 1)

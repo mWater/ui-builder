@@ -219,6 +219,24 @@ export default class VirtualDatabase implements Database {
       where: where
     }
 
+    // Alter where clause to include any rows that have been updated, as the update
+    // may have altered the row in such a way as it now matches the where clause
+    const updatedIds = _.uniq(this.mutations.filter(m => m.type == "update").map(m => m.primaryKey))
+    if (updatedIds.length > 0 && where) {
+      queryOptions.where = {
+        type: "op",
+        op: "or",
+        table: from,
+        exprs: [
+          { type: "op", table: from, op: "= any", exprs: [
+            { type: "id", table: from },
+            { type: "literal", valueType: "id[]", idTable: from, value: updatedIds }
+          ]},
+          where
+        ]
+      }
+    }
+
     // Add a select for each column
     for (const column of this.schema.getColumns(from)) {
       if (this.shouldIncludeColumn(column)) {
