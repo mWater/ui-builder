@@ -75,6 +75,9 @@ interface QueryTableColumnInfo {
    * If not present, defaults to auto
    */
   columnWidth?: string
+
+  /** Vertical alignment (default top) */
+  verticalAlign?: "top" | "middle" | "bottom"
 }
 
 export class QueryTableBlock extends Block<QueryTableBlockDef> {
@@ -275,6 +278,11 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       className += " table-striped"
     }
 
+    const getColumnVerticalAlign = (colIndex: number) => {
+      const columnInfos = this.blockDef.columnInfos
+      return columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.verticalAlign || "top" : "top"
+    }
+
     return (
       <div style={divStyle}>
         <table className={className} style={tableStyle}>
@@ -298,7 +306,7 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
           <tbody>
             <tr key="child">
               { this.blockDef.contents.map((b, index) => {
-                return <td key={index}>{props.renderChildBlock(contentProps, b, setContent.bind(null, index))}</td>
+                return <td key={index} style={{ verticalAlign: getColumnVerticalAlign(index) }}>{props.renderChildBlock(contentProps, b, setContent.bind(null, index))}</td>
               })}
             </tr>
           </tbody>
@@ -546,6 +554,14 @@ const ColumnInfosEditor = (props: {
     }))
   }
 
+  const handleVerticalAlignChange = (colIndex: number, verticalAlign: "top" | "middle" | "bottom") => {
+    props.onChange(produce(props.value || [], draft => {
+      // Make sure exists
+      draft[colIndex] = draft[colIndex] || { orderExpr: null, initialOrderDir: null }
+      draft[colIndex]!.verticalAlign = verticalAlign
+    }))
+  }
+
   return <ul className="list-group">
     { _.map(_.range(props.numColumns), colIndex => {
       return <li className="list-group-item" key={colIndex}>
@@ -576,6 +592,17 @@ const ColumnInfosEditor = (props: {
           columnWidth={props.value && props.value[colIndex] ? props.value[colIndex]!.columnWidth || "auto" : "auto" }
           onChange={handleColumnWidthChange.bind(null, colIndex)}
         />
+      </LabeledProperty>
+      <LabeledProperty label="Vertical Alignment">
+        <Toggle 
+          value={props.value && props.value[colIndex] ? props.value[colIndex]!.verticalAlign || "top" : "top" } 
+          onChange={handleVerticalAlignChange.bind(null, colIndex)}
+          size="xs"
+          options={[
+            { value: "top", label: "Top" },
+            { value: "middle", label: "Middle" },
+            { value: "bottom", label: "Bottom" }
+          ]} />
       </LabeledProperty>
     </li>
     })}

@@ -48,6 +48,8 @@ interface QueryTableColumnInfo {
      * If not present, defaults to auto
      */
     columnWidth?: string;
+    /** Vertical alignment (default top) */
+    verticalAlign?: "top" | "middle" | "bottom";
 }
 export declare class QueryTableBlock extends Block<QueryTableBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];

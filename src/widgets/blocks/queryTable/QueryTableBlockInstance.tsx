@@ -268,11 +268,16 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       rowStyle.cursor = "pointer"
     }
 
+    const getColumnVerticalAlign = (colIndex: number) => {
+      const columnInfos = this.props.block.blockDef.columnInfos
+      return columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.verticalAlign || "top" : "top"
+    }
+
     return (
       <tr key={rowKey} style={rowStyle}>
         { this.props.block.blockDef.contents.map((b, colIndex) => {
           return (
-            <td key={colIndex} onClick={handleRowClick}>
+            <td key={colIndex} onClick={handleRowClick} style={{ verticalAlign: getColumnVerticalAlign(colIndex) }}>
               {rowRIProps.renderChildBlock(rowRIProps, b)}
             </td>
           )
