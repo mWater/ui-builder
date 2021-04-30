@@ -461,7 +461,9 @@ class VirtualDatabaseTransaction implements Transaction {
     return Promise.resolve()
   }
 
-  commit(): Promise<void> {
+  commit(): Promise<any[]> {
+    const primaryKeys: (string | number | null)[] = this.mutations.map(m => m.type == "add" ? m.primaryKey : null)
+
     // Clear mutations and transfer to main database
     for (const mutation of this.mutations) {
       if (mutation.type == "add") {
@@ -515,7 +517,7 @@ class VirtualDatabaseTransaction implements Transaction {
       changeListener()
     }
 
-    return Promise.resolve()
+    return Promise.resolve(primaryKeys)
   }
 }
 

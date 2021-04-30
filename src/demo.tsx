@@ -46,9 +46,10 @@ class MockTransaction implements Transaction {
   async removeRow(table: string, primaryKey: any): Promise<void> {
     console.log(`remove(${table}, ${primaryKey})`)
   }
-  async commit(): Promise<void> {
+  async commit(): Promise<any[]> {
     console.log("commit()")
     alert("Note: updated ignored")
+    return []
   }
 }
 
