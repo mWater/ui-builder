@@ -34,7 +34,10 @@ export interface Database {
 }
 /** Transaction of actions to apply to the database */
 export interface Transaction {
-    /** Adds a row, returning the primary key as a promise */
+    /** Adds a row, returning a temporary primary key as a promise. This
+     * primary key is only valid within the transaction. The commit will
+     * return the actual new primary key.
+     */
     addRow(table: string, values: {
         [column: string]: any;
     }): Promise<any>;
@@ -44,8 +47,10 @@ export interface Transaction {
     }): Promise<void>;
     /** Removes a row */
     removeRow(table: string, primaryKey: any): Promise<void>;
-    /** Commits the transaction */
-    commit(): Promise<void>;
+    /** Commits the transaction, returning an array of primary keys (for add mutations) and null otherwise.
+     * For example, if there are two adds and a remove, the returned array will contain [<primary key1>, <primary key2>, null]
+     */
+    commit(): Promise<any[]>;
 }
 /** Database which performs no actions and always returns blank query results */
 export declare class NullDatabase implements Database {
@@ -67,7 +72,7 @@ declare class NullTransaction implements Transaction {
         [column: string]: any;
     }): Promise<void>;
     removeRow(table: string, primaryKey: any): Promise<void>;
-    commit(): Promise<void>;
+    commit(): Promise<never[]>;
 }
 /** Evaluates a database query given a set of rows of the type that are needed by the PromiseExprEvaluator.
  * Useful for performing a query on a non-SQL database, e.g. in memory or MongoDb, etc.
