@@ -104,7 +104,9 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="virtualizeDatabaseInPreview">
         {(value, onChange) => <Checkbox value={value != null ? value : true} onChange={onChange}>Prevent changes to database in Preview</Checkbox>}
       </PropertyEditor>
-      <div style={{ color: "#D8D8D8", fontSize: 9 }}>{this.props.widgetDef.id}</div>
+      <LabeledProperty label="Widget ID" hint="Advanced">
+        <input type="text" value={this.props.widgetDef.id} className="form-control input-sm" onFocus={ev => { ev.target.select() }}/>
+      </LabeledProperty>
     </div>)
   }
 }
@@ -286,120 +288,3 @@ function EnumValuesEditor(props: {
     createNew={() => ({ id: "", name: { _base: "en", en: "" }})}
   />
 }
-/** Individual item of a context variable list */
-// class ContextVarListItem extends React.Component<{ contextVar: ContextVar, onChange: (contextVar: ContextVar) => void, schema: Schema}> { 
-//   handleNameChange = () => {
-//     const name = window.prompt("Enter name", this.props.contextVar.name)
-//     if (name) {
-//       this.props.onChange({ ...this.props.contextVar, name })
-//     }
-//   }
-
-//   render() {
-//     let desc = this.props.contextVar.type
-//     if (this.props.contextVar.table) {
-//       desc += " of "
-//       desc += this.props.schema.getTable(this.props.contextVar.table) ? localize(this.props.schema.getTable(this.props.contextVar.table)!.name, "en") : this.props.contextVar.table
-//     }
-
-//     return (
-//       <div>
-//         <a onClick={this.handleNameChange}>{this.props.contextVar.name}</a>
-//         &nbsp; <span className="text-muted">- {desc}</span>
-//       </div>
-//     )
-//   }
-// }
-
-// interface AddContextVarModalProps {
-//   schema: Schema
-//   locale: string
-//   onAdd: (contextVar: ContextVar) => void
-// }
-
-// interface AddContextVarModalState {
-//   visible: boolean
-//   contextVar?: ContextVar
-// }
-
-// class AddContextVarModal extends React.Component<AddContextVarModalProps, AddContextVarModalState> {
-//   constructor(props: AddContextVarModalProps) {
-//     super(props)
-
-//     this.state = { visible: false }
-//   }
-
-//   show() {
-//     this.setState({
-//       visible: true,
-//       contextVar: { id: uuid(), name: "Untitled", type: "rowset" }
-//     })
-//   }
-
-//   handleAdd = () => {
-//     if (this.state.contextVar!.type === "row" || this.state.contextVar!.type === "rowset") {
-//       if (!this.state.contextVar!.table) {
-//         alert("Table required")
-//         return
-//       }
-//     }
-//     this.setState({ visible: false })
-//     this.props.onAdd(this.state.contextVar!)
-//   }
-
-//   handleCancel = () => {
-//     this.setState({ visible: false })
-//   }
-
-//   handleContextVarChange = (contextVar: ContextVar) => {
-//     // Clear table
-//     if (contextVar.type !== "row" && contextVar.type !== "rowset") {
-//       contextVar = { id: contextVar.id, type: contextVar.type, name: contextVar.name }
-//     }
-
-//     this.setState({ contextVar: contextVar })
-//   }
-
-//   render() {
-//     if (!this.state.visible) {
-//       return null
-//     }
-
-//     const typeOptions = [
-//       { value: "rowset", label: "Set of rows of a table" },
-//       { value: "row", label: "Row of a table" },
-//       { value: "text", label: "Text" },
-//       { value: "number", label: "Number" },
-//       { value: "boolean", label: "Boolean" },
-//       { value: "date", label: "Date" },
-//       { value: "datetime", label: "Datetime" }
-//     ]
-
-//     return (
-//       <ActionCancelModalComponent actionLabel="Add" onAction={this.handleAdd} onCancel={this.handleCancel}>
-//         <LabeledProperty label="Name">
-//           <PropertyEditor obj={this.state.contextVar!} property="name" onChange={this.handleContextVarChange}>
-//             {(value, onChange) => <TextInput value={value} onChange={onChange}/>}
-//           </PropertyEditor>
-//         </LabeledProperty>
-
-//         <LabeledProperty label="Type">
-//           <PropertyEditor obj={this.state.contextVar!} property="type" onChange={this.handleContextVarChange}>
-//             {(value, onChange) => <Select value={value} onChange={onChange} options={typeOptions} />}
-//           </PropertyEditor>
-//         </LabeledProperty>
-
-//         { this.state.contextVar!.type === "row" || this.state.contextVar!.type === "rowset" ?
-//           <div style={{ paddingBottom: 200 }}>
-//             <LabeledProperty label="Table">
-//               <PropertyEditor obj={this.state.contextVar!} property="table" onChange={this.handleContextVarChange}>
-//                 {(value, onChange) => <TableSelect schema={this.props.schema} value={value || null} onChange={onChange} locale={this.props.locale} />}
-//               </PropertyEditor>
-//             </LabeledProperty>
-//           </div>
-//         : null }
-
-//       </ActionCancelModalComponent>
-//     )
-//   }
-// }

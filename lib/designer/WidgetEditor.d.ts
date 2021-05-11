@@ -19,4 +19,3 @@ export declare class WidgetEditor extends React.Component<WidgetEditorProps> {
     render(): JSX.Element;
 }
 export {};
-/** Individual item of a context variable list */
