@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Page, PageStack } from "./PageStack";
 import { BlockDef } from "./widgets/blocks";
 import { BaseCtx, InstanceCtx } from "./contexts";

@@ -128,7 +128,26 @@ export const NewTab = (props: {
 
     // Filter by search
     widgets = widgets.filter(widget => {
-      return search ? widget.name.toLowerCase().includes(search.toLowerCase()) : true
+      if (!search) {
+        return true
+      }
+
+      // Search by name
+      if (widget.name.toLowerCase().includes(search.toLowerCase())) {
+        return true
+      }
+      
+      // Search by id 
+      if (widget.id.toLowerCase().includes(search.toLowerCase())) {
+        return true
+      }
+
+      // Search by json
+      if (search.startsWith("json:")) {
+        return JSON.stringify(widget).includes(search.substr(5))
+      }
+      
+      return false
     })
 
     // Get groups and sort

@@ -7,9 +7,7 @@ import produce from "immer";
 import _ from "lodash";
 import { BlockPaletteEntry } from "./blockPaletteEntries";
 import { NewTab } from "./NewTab";
-import { getBlockTree, NullBlockStore } from "../widgets/blocks";
-import { BaseCtx, DesignCtx } from "../contexts";
-import { validateContextVarValue } from "../contextVarValues";
+import { BaseCtx } from "../contexts";
 
 /** All widgets in current project */
 export interface WidgetLibrary {

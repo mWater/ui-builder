@@ -1,10 +1,10 @@
 import _ from 'lodash'
-import * as React from "react";
-import { Page, PageStack } from "./PageStack";
-import { BlockDef } from "./widgets/blocks";
-import ContextVarsInjector from "./widgets/ContextVarsInjector";
+import React from "react"
+import { Page, PageStack } from "./PageStack"
+import { BlockDef } from "./widgets/blocks"
+import ContextVarsInjector from "./widgets/ContextVarsInjector"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
-import { BaseCtx, InstanceCtx } from "./contexts";
+import { BaseCtx, InstanceCtx } from "./contexts"
 
 import './PageStackDisplay.css'
 import uuid = require("uuid");
