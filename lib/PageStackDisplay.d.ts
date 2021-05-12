@@ -5,7 +5,7 @@ import { BaseCtx, InstanceCtx } from "./contexts";
 import './PageStackDisplay.css';
 interface Props {
     baseCtx: BaseCtx;
-    initialPage: Page;
+    initialPage?: Page;
 }
 interface State {
     pages: Page[];

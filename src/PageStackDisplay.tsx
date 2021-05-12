@@ -11,7 +11,7 @@ import './PageStackDisplay.css'
 
 interface Props {
   baseCtx: BaseCtx
-  initialPage: Page
+  initialPage?: Page
 }
 
 interface State {
@@ -31,7 +31,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
 
     // Display initial page
     this.state = {
-      pages: [props.initialPage]
+      pages: props.initialPage ? [props.initialPage] : []
     }
 
     this.validationRegistrations = {}
