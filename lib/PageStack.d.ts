@@ -27,6 +27,4 @@ export interface PageStack {
         success: boolean;
         pageCount: number;
     }>;
-    /** Closes all pages. true for success, false for failure */
-    closeAllPages(): Promise<boolean>;
 }

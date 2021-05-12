@@ -31,7 +31,4 @@ export interface PageStack {
 
   /** Close top page. Returns whether successful and pages still open */
   closePage(): Promise<{ success: boolean, pageCount: number }>
-
-  /** Closes all pages. true for success, false for failure */
-  closeAllPages(): Promise<boolean>
 }

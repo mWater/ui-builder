@@ -10,10 +10,11 @@ interface Props {
 interface State {
     pages: Page[];
 }
-/** Maintains and displays the stack of pages, including modals.  */
+/** Maintains and displays the stack of pages, including modals */
 export declare class PageStackDisplay extends React.Component<Props, State> implements PageStack {
     /** Stores validation registrations for all sub-components so that they can be validated
-     * before being saved. Contains pageIndex as well to allow validating a single page
+     * before being saved. Contains pageIndex as well to allow validating a single page.
+     * Indexed by random uuid.
      */
     validationRegistrations: {
         [key: string]: {
@@ -30,6 +31,7 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
         success: boolean;
         pageCount: number;
     }>;
+    /** Closes all pages. true for success, false for failure */
     closeAllPages(): Promise<boolean>;
     /** Validates a single page (by pageIndex), showing an error if fails */
     validatePage(pageIndex: number): Promise<boolean>;

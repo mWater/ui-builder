@@ -5,9 +5,9 @@ import { BlockDef } from "./widgets/blocks"
 import ContextVarsInjector from "./widgets/ContextVarsInjector"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { BaseCtx, InstanceCtx } from "./contexts"
+import uuid from 'uuid'
 
 import './PageStackDisplay.css'
-import uuid = require("uuid");
 
 interface Props {
   baseCtx: BaseCtx
@@ -18,10 +18,11 @@ interface State {
   pages: Page[]
 }
 
-/** Maintains and displays the stack of pages, including modals.  */
+/** Maintains and displays the stack of pages, including modals */
 export class PageStackDisplay extends React.Component<Props, State> implements PageStack {
   /** Stores validation registrations for all sub-components so that they can be validated
-   * before being saved. Contains pageIndex as well to allow validating a single page
+   * before being saved. Contains pageIndex as well to allow validating a single page.
+   * Indexed by random uuid.
    */
   validationRegistrations: { [key: string]: { pageIndex: number, validate: (() => string | null | Promise<string | null>) } }
 
@@ -80,6 +81,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     return { success: true, pageCount: pages.length }
   }
 
+  /** Closes all pages. true for success, false for failure */
   async closeAllPages(): Promise<boolean> {
     const pages = this.state.pages.slice()
 
