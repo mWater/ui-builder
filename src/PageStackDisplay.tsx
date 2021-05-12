@@ -12,6 +12,9 @@ import './PageStackDisplay.css'
 interface Props {
   baseCtx: BaseCtx
   initialPage?: Page
+
+  /** Allows overriding the page stack that is passed to the widgets */
+  overridePageStack?: PageStack
 }
 
 interface State {
@@ -164,7 +167,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     // Create outer instanceCtx. Context variables will be injected after
     const outerInstanceCtx: InstanceCtx = {
       ...this.props.baseCtx,
-      pageStack: this,
+      pageStack: this.props.overridePageStack || this,
       contextVars: [],
       contextVarValues: {},
       getContextVarExprValue: () => { throw new Error("Non-existant context variable") },

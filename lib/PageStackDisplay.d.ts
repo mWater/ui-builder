@@ -6,6 +6,8 @@ import './PageStackDisplay.css';
 interface Props {
     baseCtx: BaseCtx;
     initialPage?: Page;
+    /** Allows overriding the page stack that is passed to the widgets */
+    overridePageStack?: PageStack;
 }
 interface State {
     pages: Page[];
