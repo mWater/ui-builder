@@ -107,7 +107,7 @@ const DateInjectInstance = (props: { block: DateInjectBlock, instanceCtx: Instan
       </div>
       <ContextVarsInjector
         injectedContextVars={[dateContextVar]}
-        injectedContextVarValues={{ [dateContextVar.id]: date }}
+        injectedContextVarValues={{ [dateContextVar.id]: { type: "literal", valueType: "date", value: date } }}
         innerBlock={block.blockDef.content}
         instanceCtx={instanceCtx}>
           {(innerInstanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
