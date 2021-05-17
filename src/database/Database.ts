@@ -208,6 +208,22 @@ export async function performEvalQuery(options: {
     tempRows = _.map(Object.values(groups), (group) => group[0])
   }
 
+  // If all aggregate and no rows, create single row to mirror SQL behaviour of creating single evaluated row
+  if (selects.every(s => s.isAggr) && orderBys.every(o => o.isAggr) && tempRows.length == 0) {
+    const tempRow: any = {}
+
+    // Evaluate all selects and orderbys
+    for (let i = 0 ; i < selects.length ; i++) {
+      tempRow["s" + i] = await exprEval.evaluate(selects[i].expr, { rows: [] })
+    }
+
+    for (let i = 0 ; i < orderBys.length ; i++) {
+      tempRow["o" + i] = await exprEval.evaluate(orderBys[i].expr, { rows: [] })
+    }
+
+    tempRows.push(tempRow)
+  }
+
   // Order by
   if (query.orderBy && query.orderBy.length > 0) {
     // Sort by orders in reverse to prioritize first

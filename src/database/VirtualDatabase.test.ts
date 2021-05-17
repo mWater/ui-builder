@@ -148,6 +148,23 @@ describe("select, order, limit", () => {
     ])
   })
 
+  test("count empty", async () => {
+    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+
+    const qopts: QueryOptions = {
+      select: { 
+        x: { type: "op", table: "t1", op: "count", exprs: [] }
+      },
+      from: "t1"
+    }
+
+    const rows = await performQuery({ t1: [] }, qopts)
+
+    expect(rows).toEqual([
+      { x: 0 },
+    ])
+  })
+
   test("orderby query with limit", async () => {
     preventPassthrough()    // Test how queries are transformed by preventing passthrough
 
