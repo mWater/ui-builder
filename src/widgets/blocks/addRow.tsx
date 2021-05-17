@@ -287,10 +287,24 @@ class AddRowInstance extends React.Component<Props, State> {
         return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
       }
 
+      // Re-inject all context variables if reusing, as a variable value will have changed (if the row was added)
+      // which means that all other context variables that depend on that value may compute wrong 
+      // if evaluated by the injectors outside of this block
+      let injectedContextVars: ContextVar[] = []
+      let injectedContextVarValues: { [contextVarId: string]: any } = {}
+      if (this.props.blockDef.existingContextVarId) {
+        injectedContextVars = this.props.instanceCtx.contextVars
+        injectedContextVarValues = { ...this.props.instanceCtx.contextVarValues, [this.props.contextVar.id]: this.state.addedRowId }
+      }
+      else {
+        injectedContextVars.push(this.props.contextVar)
+        injectedContextVarValues[this.props.contextVar.id] = this.state.addedRowId
+      }
+
       // Inject context variable
       return <ContextVarsInjector 
-        injectedContextVars={[this.props.contextVar]} 
-        injectedContextVarValues={{ [this.props.contextVar.id]: this.state.addedRowId }}
+        injectedContextVars={injectedContextVars} 
+        injectedContextVarValues={injectedContextVarValues}
         innerBlock={this.props.blockDef.content}
         instanceCtx={this.props.instanceCtx}>
           {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
