@@ -63,10 +63,6 @@ export class ToggleFilterBlock extends LeafBlock<ToggleFilterBlockDef> {
           return "Rowset required"
         }
 
-        if (!filter.filterExpr) {
-          return "Filter expression required"
-        }
-
         const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
         const error = exprValidator.validateExpr(filter.filterExpr, { table: rowsetCV.table, types: ["boolean"] })
         if (error) {

@@ -29,10 +29,6 @@ export class DateInjectBlock extends Block<DateInjectBlockDef> {
   }
 
   validate(options: DesignCtx) { 
-    if (!this.blockDef.content) {
-      return "Content required"
-    }
-
     return null
   }
 

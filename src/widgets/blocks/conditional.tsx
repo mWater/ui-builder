@@ -29,10 +29,6 @@ export class ConditionalBlock extends Block<ConditionalBlockDef> {
   }
 
   validate(ctx: DesignCtx) { 
-    if (!this.blockDef.content) {
-      return "Content required"
-    }
-
     return validateContextVarExpr({
       schema: ctx.schema,
       contextVars: ctx.contextVars,

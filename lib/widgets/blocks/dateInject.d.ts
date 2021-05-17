@@ -10,7 +10,7 @@ export interface DateInjectBlockDef extends BlockDef {
 export declare class DateInjectBlock extends Block<DateInjectBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
     createContextVar(): ContextVar;
-    validate(options: DesignCtx): "Content required" | null;
+    validate(options: DesignCtx): null;
     processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef;
     renderDesign(designCtx: DesignCtx): JSX.Element;
     renderInstance(instanceCtx: InstanceCtx): JSX.Element;
