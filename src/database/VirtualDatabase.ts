@@ -147,19 +147,19 @@ export default class VirtualDatabase implements Database {
       switch (mutation.type) {
         case "add":
           // Map any primary keys
-          mutation.values = this.replaceTempPrimaryKeys(mutation.values, (pk) => {
+          const mappedValues = this.replaceTempPrimaryKeys(mutation.values, (pk) => {
             if (pkMapping[pk]) {
               return pkMapping[pk]
             }
             throw new Error("Missing mapping for " + pk)
           })
 
-          const primaryKey = await txn.addRow(mutation.table, mutation.values)
+          const primaryKey = await txn.addRow(mutation.table, mappedValues)
           pkMapping[mutation.primaryKey] = primaryKey
           break
         case "update":
           // Map any primary keys
-          mutation.updates = this.replaceTempPrimaryKeys(mutation.updates, (pk) => {
+          const mappedUpdates = this.replaceTempPrimaryKeys(mutation.updates, (pk) => {
             if (pkMapping[pk]) {
               return pkMapping[pk]
             }
@@ -168,7 +168,7 @@ export default class VirtualDatabase implements Database {
 
           const updatePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
 
-          await txn.updateRow(mutation.table, updatePrimaryKey, mutation.updates)
+          await txn.updateRow(mutation.table, updatePrimaryKey, mappedUpdates)
           break
         case "remove":
           const removePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
