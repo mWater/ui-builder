@@ -9,6 +9,7 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { LabeledProperty, PropertyEditor } from '../propertyEditors';
 import { Select } from 'react-library/lib/bootstrap';
+import { JsonQLQuery } from 'jsonql';
 
 /** Block that can be printed by a print button at top right */
 export interface PrintBlockDef extends BlockDef {
@@ -305,12 +306,27 @@ class TrackingDataSource extends DataSource {
   }
 
   /** Performs a single query. Calls cb with (error, rows) */
-  performQuery(query: any, cb: (error: any, rows: Row[]) => void) {
+  performQuery(query: JsonQLQuery): Promise<Row[]>;
+  performQuery(query: JsonQLQuery, cb: (error: any, rows: Row[]) => void): void;
+  performQuery(query: any, cb?: (error: any, rows: Row[]) => void): Promise<Row[]> | void {
+    if (!cb) {
+      return new Promise<Row[]>((resolve, reject) => {
+        this.performQuery(query, (error, rows) => {
+          if (error) {
+            reject(error)
+          }
+          else {
+            resolve(error)
+          }
+        })
+      })
+    }
     this.onStartQuery()
     this.dataSource.performQuery(query, (error, rows) => {
       this.onEndQuery()
       cb(error, rows)
     })
+    return
   }
 
   /** Get the url to download an image (by id from an image or imagelist column)
