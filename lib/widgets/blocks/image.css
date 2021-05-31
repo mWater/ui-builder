@@ -1,0 +1,21 @@
+.image-block-img-normal {
+  max-width: 100%;
+}
+
+.image-block-img-fullwidth {
+  width: 100%;
+}
+
+.image-block-div-banner {
+  margin: -15px -20px 0px -20px;
+}
+
+@media screen and (max-width: 800px) {
+  .image-block-div-banner {
+    margin: -10px -5px 0px -5px;
+  }
+}
+
+.image-block-img-banner {
+  width: 100%;
+}

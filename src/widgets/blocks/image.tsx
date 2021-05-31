@@ -6,6 +6,7 @@ import { TextInput, Select, Toggle } from 'react-library/lib/bootstrap';
 import { ActionDef } from '../actions';
 import produce from 'immer';
 import { DesignCtx, InstanceCtx } from '../../contexts';
+import './image.css'
 
 export interface ImageBlockDef extends BlockDef {
   type: "image"
@@ -64,26 +65,11 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
       url = this.blockDef.url
     }
     
-    const divStyle: React.CSSProperties = {}
-    const imageStyle: React.CSSProperties = {}
-
     const sizeMode = this.blockDef.sizeMode || "normal"
-    if (sizeMode == "normal") {
-      imageStyle.maxWidth = "100%"
-    }
-    else if (sizeMode == "fullwidth") {
-      imageStyle.width = "100%"
-    }
-    else if (sizeMode == "banner") {
-      imageStyle.width = "100%"
-      divStyle.margin = "-15px -20px 0px -20px"
-    }
-
-    divStyle.textAlign = this.blockDef.align
 
     return (
-      <div onClick={handleClick} style={divStyle}>
-        <img src={url} style={imageStyle}/>
+      <div onClick={handleClick} className={`image-block-div-${sizeMode}`} style={{ textAlign: this.blockDef.align }}>
+        <img src={url}  className={`image-block-img-${sizeMode}`} />
       </div>
     )
   }

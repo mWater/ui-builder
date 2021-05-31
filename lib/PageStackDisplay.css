@@ -24,3 +24,9 @@
 .normal-page-contents {
   padding: 15px 20px 15px 20px;
 }
+
+@media screen and (max-width: 800px) {
+  .normal-page-contents {
+    padding: 10px 5px 10px 5px;
+  }
+}
