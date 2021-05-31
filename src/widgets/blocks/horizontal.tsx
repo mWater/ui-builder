@@ -100,7 +100,10 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
     // Break items into rows based on responsive breaks
     const rows: React.ReactNode[] = []
     
+    /** Items in current row being build */
     let rowItems: React.ReactNode[] = []
+
+    /** Widths of column in current row being built */
     let rowColumns: string[] = []
 
     const addRow = () => {
@@ -158,9 +161,22 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
       </AutoSizeComponent>
     )
   }
-
+  
   renderEditor(props: DesignCtx) {
     const align = this.blockDef.align || "justify"
+
+    /** Warn user if using responsive break with fixed widths */
+    const renderResponsiveWarning = () => {
+      if (this.blockDef.responsiveBreaks && this.blockDef.responsiveBreaks.some(br => br != null)) {
+        if (this.blockDef.columnWidths && this.blockDef.columnWidths.some(cw => cw.includes("%"))) {
+          return <div className="text-warning">
+            <i className="fa fa-exclamation-circle"/> Using fixed widths percentages with responsive breaks
+            can cause unexpected behaviour. It is recommended to use responsive column widths.
+          </div>
+        }
+      }
+      return null
+    }
 
     return (
       <div>
@@ -216,6 +232,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
                 onChange={onChange} />
             }
           </PropertyEditor>
+          { renderResponsiveWarning() }
         </LabeledProperty>
       </div>
     )
@@ -254,34 +271,38 @@ function ColumnWidthEditor(props: {
 }) {
   return <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", alignItems: "center", columnGap: 5 }}>
     <div>{ props.label }</div>
-    <Select
+    <select
+      className="form-control"
       value={props.columnWidth}
-      onChange={props.onChange}
-      options={
-        [
-          { value: "auto", label: "Auto" },
-          { value: "min-content", label: "Small as possible" },
-          { value: "1fr", label: "1 fraction" },
-          { value: "2fr", label: "2 fraction" },
-          { value: "3fr", label: "3 fraction" },
-          { value: "minmax(min-content, 16%)", label: "1/6" },
-          { value: "minmax(min-content, 25%)", label: "1/4" },
-          { value: "minmax(min-content, 33%)", label: "1/3" },
-          { value: "minmax(min-content, 50%)", label: "1/2" },
-          { value: "minmax(min-content, 67%)", label: "2/3" },
-          { value: "minmax(min-content, 75%)", label: "3/4" },
-          { value: "minmax(min-content, 83%)", label: "5/6" },
-          { value: "minmax(min-content, 100px)", label: "100px" },
-          { value: "minmax(min-content, 200px)", label: "200px" },
-          { value: "minmax(min-content, 300px)", label: "300px" },
-          { value: "minmax(min-content, 400px)", label: "400px" },
-          { value: "minmax(min-content, 500px)", label: "500px" },
-          { value: "minmax(min-content, 600px)", label: "600px" },
-          { value: "minmax(min-content, 700px)", label: "700px" },
-          { value: "minmax(min-content, 800px)", label: "800px" }
-        ]
-      }
-    />
+      onChange={ev => props.onChange(ev.target.value)}>
+      <optgroup label="Responsive">
+        <option value="auto">Automatic</option>
+        <option value="min-content">Small as possible</option>
+        <option value="1fr">1 share of remaining width</option>
+        <option value="2fr">2 shares of remaining width</option>
+        <option value="3fr">3 shares of remaining width</option>
+        <option value="4fr">4 shares of remaining width</option>
+        <option value="5fr">5 shares of remaining width</option>
+        <option value="6fr">6 shares of remaining width</option>
+      </optgroup>
+      <optgroup label="Fixed">
+        <option value="minmax(min-content, 16%)">17% (1/6)</option>
+        <option value="minmax(min-content, 25%)">25% (1/4)</option>
+        <option value="minmax(min-content, 33%)">33% (1/3)</option>
+        <option value="minmax(min-content, 50%)">50% (1/2)</option>
+        <option value="minmax(min-content, 67%)">67% (2/3)</option>
+        <option value="minmax(min-content, 75%)">75% (3/4)</option>
+        <option value="minmax(min-content, 83%)">83% (5/6)</option>
+        <option value="minmax(min-content, 100px)">100 pixels</option>
+        <option value="minmax(min-content, 200px)">200 pixels</option>
+        <option value="minmax(min-content, 300px)">300 pixels</option>
+        <option value="minmax(min-content, 400px)">400 pixels</option>
+        <option value="minmax(min-content, 500px)">500 pixels</option>
+        <option value="minmax(min-content, 600px)">600 pixels</option>
+        <option value="minmax(min-content, 700px)">700 pixels</option>
+        <option value="minmax(min-content, 800px)">800 pixels</option>
+      </optgroup>
+    </select>
   </div>
 }
 
