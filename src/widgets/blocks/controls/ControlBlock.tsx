@@ -164,15 +164,18 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   }
 
   getContextVarExprs(contextVar: ContextVar): Expr[] { 
+    const exprs: Expr[] = []
+
     if (this.blockDef.rowContextVarId && this.blockDef.rowContextVarId === contextVar.id && this.blockDef.column) {
-      return [
-        { type: "id", table: contextVar.table!},
-        { type: "field", table: contextVar.table!, column: this.blockDef.column },
-      ]
+      exprs.push({ type: "id", table: contextVar.table!})
+      exprs.push({ type: "field", table: contextVar.table!, column: this.blockDef.column })
     }
-    else {
-      return []
+
+    if (this.blockDef.readonlyExpr && this.blockDef.readonlyExpr.contextVarId == contextVar.id) {
+      exprs.push(this.blockDef.readonlyExpr.expr)
     }
+
+    return exprs
   }
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
