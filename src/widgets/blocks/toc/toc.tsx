@@ -7,7 +7,7 @@ import TOCDesignComp from './TOCDesignComp'
 import TOCInstanceComp from './TOCInstanceComp'
 import './toc.css'
 import { LabeledProperty, PropertyEditor } from '../../propertyEditors'
-import { Checkbox, Toggle } from 'react-library/lib/bootstrap'
+import { Checkbox, Select, Toggle } from 'react-library/lib/bootstrap'
 import { DesignCtx, InstanceCtx } from '../../../contexts'
 import { TextBlockDef } from '../text'
 import uuid from 'uuid'
@@ -31,6 +31,9 @@ export interface TOCBlockDef extends BlockDef {
 
   /** Theme (default is light) */
   theme?: "light" | "dark"
+
+  /** Width at which TOC collapses */
+  collapseWidth?: number
 }
 
 /** An item within the table of contents */
@@ -190,6 +193,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removePadding">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Remove Padding (for top-level TOCs)</Checkbox>}
         </PropertyEditor>
+
         <LabeledProperty label="Theme">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="theme">
             {(value, onChange) => (
@@ -200,6 +204,26 @@ export class TOCBlock extends Block<TOCBlockDef> {
                   { value: "light", label: "Light" },
                   { value: "dark", label: "Dark" }
                 ]}
+              />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+
+        <LabeledProperty label="Collapse Below Width">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="collapseWidth">
+            {(value, onChange) => (
+              <Select
+                value={value}
+                onChange={v => onChange(v != null ? v : undefined)}
+                options={[
+                  { value: 400, label: `< 400px (Phone)` },
+                  { value: 600, label: `< 600px (Small tablet)` },
+                  { value: 800, label: `< 800px (Tablet)` },
+                  { value: 1000, label: `< 1000px (Laptop)` },
+                  { value: 1200, label: `< 1200px (Desktop)` },
+                  { value: 1600, label: `< 1600px (Wide Desktop)` }
+                ]}
+                nullLabel="None"
               />
             )}
           </PropertyEditor>

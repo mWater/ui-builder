@@ -87,3 +87,23 @@
 .toc-item-label-selectable {
   cursor: pointer;
 }
+
+.toc-select-button {
+  padding: 5px;
+  cursor: pointer;
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  color: white;
+  background-color: #337ab7;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.toc-slide-left {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  width: 50%;
+}

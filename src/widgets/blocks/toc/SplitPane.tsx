@@ -6,10 +6,10 @@ const SplitPane = ({ left, right, removePadding, theme }: { left: ReactNode, rig
   const className = removePadding ? `toc-split remove-padding ${theme}` : `toc-split ${theme}`
   return <FillDownwardComponent>
     <div className={className}>
-      <div className="toc-split-left">
+      <div key="left" className="toc-split-left">
         {left}
       </div>
-      <div className="toc-split-right">
+      <div key="right" className="toc-split-right">
         {right}
       </div>
     </div>

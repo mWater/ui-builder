@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { TOCBlockDef, iterateItems, TOCItem, TOCBlock } from "./toc"
 import { CreateBlock, createExprVariables, createExprVariableValues } from '../../blocks'
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { localize } from '../../localization'
 import SplitPane from "./SplitPane"
 import React from "react"
@@ -9,6 +9,8 @@ import { Page } from "../../../PageStack"
 import { PageStackDisplay } from "../../../PageStackDisplay"
 import { InstanceCtx } from "../../../contexts"
 import { ExprUtils } from 'mwater-expressions'
+import ModalPopupComponent from 'react-library/lib/ModalPopupComponent'
+import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
 
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: { 
@@ -21,14 +23,34 @@ export default function TOCInstanceComp(props: {
   // Ref to page stack to ensure closed properly
   const pageStackRef = useRef<PageStackDisplay>(null)
 
+  const allItems = iterateItems(blockDef.items)
+
   // Select first item with widget by default
-  const firstItem = iterateItems(blockDef.items).find(item => item.widgetId)
+  const firstItem = allItems.find(item => item.widgetId)
   const [selectedId, setSelectedId] = useState(firstItem ? firstItem.id : null)
 
   // Store collapsed state for items. If not listed, is expanded
   const [collapsedItems, setCollapsedItems] = useState(() => {
-    return iterateItems(blockDef.items).filter(item => item.collapse == "startCollapsed").map(item => item.id)
+    return allItems.filter(item => item.collapse == "startCollapsed").map(item => item.id)
   })
+
+  // TODO
+  const [selectModalOpen, setSelectModalOpen] = useState(false)
+  
+  // Close modal when item selected
+  useEffect(() => {
+    setSelectModalOpen(false)
+  }, [selectedId])
+
+  // Store overall page width and update it
+  const [pageWidth, setPageWidth] = useState(window.innerWidth)
+  useEffect(() => {
+    function handleResize() {
+      setPageWidth(window.innerWidth)
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   // Select item
   const handleItemClick = (item: TOCItem) => { 
@@ -62,8 +84,16 @@ export default function TOCInstanceComp(props: {
     setSelectedId(item.id) 
   }
 
-  /** Render an item at a specified depth which starts at 0 */
-  const renderItem = (items: TOCItem[], index: number, depth: number) => {
+  function renderItem(item: TOCItem) {
+    // Legacy support of label
+    if (item.label != null) {
+      return <div>{localize(item.label, instanceCtx.locale)}</div>
+    } 
+    return instanceCtx.renderChildBlock(instanceCtx, item.labelBlock || null)
+  }
+
+  /** Render an item at a specified depth which starts at 0 with children, taking into account visibility */
+  const renderItemTree = (items: TOCItem[], index: number, depth: number) => {
     const item = items[index]
 
     // Determine if visible
@@ -94,15 +124,11 @@ export default function TOCInstanceComp(props: {
             ( collapsed ? <i className="fas fa-fw fa-caret-right"/> : <i className="fas fa-fw fa-caret-down"/>)
           : <i className="fas fa-fw fa-caret-right" style={{ visibility: "hidden" }}/> }
         </div>
-        { item.label != null ? 
-          localize(item.label, instanceCtx.locale) // Legacy support of label
-          : 
-          instanceCtx.renderChildBlock(instanceCtx, item.labelBlock || null)
-        }
+        { renderItem(item) }
       </div>
       { item.children.length > 0 && !collapsed ? 
         <div key="children" className="toc-item-children">
-          { item.children.map((child, index) => renderItem(item.children, index, depth + 1)) }
+          { item.children.map((child, index) => renderItemTree(item.children, index, depth + 1)) }
         </div>
       : null}
     </div>
@@ -111,7 +137,7 @@ export default function TOCInstanceComp(props: {
   const renderLeft = () => {
     return <div>
       <div key="header" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.header) }</div>
-      { blockDef.items.map((item, index) => renderItem(blockDef.items, index, 0)) }
+      { blockDef.items.map((item, index) => renderItemTree(blockDef.items, index, 0)) }
       <div key="footer" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.footer) }</div>
     </div>
   }
@@ -189,6 +215,30 @@ export default function TOCInstanceComp(props: {
       />
   }
 
+  // If below minimum, use collapsed view
+  if (blockDef.collapseWidth != null && pageWidth <= blockDef.collapseWidth) {
+    if (selectedId == null) {
+      return <div/>
+    }
+
+    const selectedItem = allItems.find(item => item.id == selectedId)
+    if (!selectedItem) {
+      return <div/>
+    }
+
+    return <FillDownwardComponent>
+      <div key="selected" onClick={() => setSelectModalOpen(true)} className="toc-select-button">
+        <i className="fa fa-bars"/> { renderItem(selectedItem) } <span className="caret"/>
+      </div>
+      { renderRight() }
+      { selectModalOpen ?
+        <div className="toc-slide-left">
+          { renderLeft() }
+        </div>
+      : null }
+    </FillDownwardComponent>
+  }
+
   // Render overall structure
   return <SplitPane
     left={renderLeft()}
@@ -197,3 +247,19 @@ export default function TOCInstanceComp(props: {
     theme={blockDef.theme || "light"}
   />
 }
+
+// return <div>
+// { selectModalOpen ?
+//   <ModalPopupComponent
+//     showCloseX
+//     onClose={() => setSelectModalOpen(false) }
+//     header={"Select Item"}
+//   >
+//     { renderLeft() }
+//   </ModalPopupComponent>
+// : null }
+// <div key="selected" onClick={() => setSelectModalOpen(true)} className="toc-select-button">
+//   <i className="fa fa-bars"/> { renderItem(selectedItem) } <span className="caret"/>
+// </div>
+// { renderRight() }
+// </div>
