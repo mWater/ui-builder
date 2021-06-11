@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { SearchBlockDef } from "./search";
 import { InstanceCtx } from "../../../contexts";
 /** Search block that filters the rowset */

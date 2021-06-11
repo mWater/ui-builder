@@ -1,8 +1,8 @@
-import * as React from "react";
+import _ from "lodash";
+import React from "react";
 import { SearchBlockDef } from "./search";
 import { createExprVariables, Filter } from "../../blocks";
 import { Expr, ExprUtils } from "mwater-expressions";
-import * as _ from "lodash";
 import { localize } from "../../localization";
 import { InstanceCtx } from "../../../contexts";
 import { useState, useRef, useEffect } from "react";
@@ -38,6 +38,18 @@ const SearchBlockInstance = (props: {
         table: table,
         exprs: [
           expr,
+          { type: "literal", valueType: "text", value: escapeRegex(searchText) }
+        ]
+      } as Expr
+    }
+
+    if (exprType === "text[]") {
+      return {
+        type: "op",
+        op: "~*",
+        table: table,
+        exprs: [
+          { type: "op", op: "to_text", table: table, exprs: [expr] },
           { type: "literal", valueType: "text", value: escapeRegex(searchText) }
         ]
       } as Expr
