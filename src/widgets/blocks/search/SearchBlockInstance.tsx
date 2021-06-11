@@ -49,7 +49,7 @@ const SearchBlockInstance = (props: {
         op: "~*",
         table: table,
         exprs: [
-          { type: "op", op: "to_text", table: table, exprs: [expr] },
+          { type: "op", op: "to text", table: table, exprs: [expr] },
           { type: "literal", valueType: "text", value: escapeRegex(searchText) }
         ]
       } as Expr
