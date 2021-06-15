@@ -1,6 +1,6 @@
 import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
-import * as React from "react";
+import React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Database } from "../../../database/Database";
 import { DesignCtx, InstanceCtx } from "../../../contexts";
@@ -20,7 +20,10 @@ export interface ControlBlockDef extends BlockDef {
     readonlyExpr?: ContextVarExpr;
 }
 export interface RenderControlProps {
+    /** Value of the control column for the current row */
     value: any;
+    /** Primary key of the current row */
+    rowId: any;
     locale: string;
     database: Database;
     schema: Schema;

@@ -1,6 +1,6 @@
 import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
-import * as React from "react";
+import React from "react"
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
@@ -32,7 +32,12 @@ export interface ControlBlockDef extends BlockDef {
 }
 
 export interface RenderControlProps {
+  /** Value of the control column for the current row */
   value: any
+
+  /** Primary key of the current row */
+  rowId: any
+
   locale: string
   database: Database
   schema: Schema
@@ -73,6 +78,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   renderDesign(designCtx: DesignCtx) {
     const renderControlProps: RenderControlProps = {
       value: null, 
+      rowId: null,
       rowContextVar: designCtx.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
       onChange: () => { return }, 
       locale: designCtx.locale,
@@ -300,6 +306,7 @@ class ControlInstance extends React.Component<Props, State> {
     const renderControlProps: RenderControlProps = {
       value: this.getValue(),
       onChange: readonly ? undefined : this.handleChange,
+      rowId: id,
       schema: this.props.instanceCtx.schema,
       dataSource: this.props.instanceCtx.dataSource,
       database: this.props.instanceCtx.database,
