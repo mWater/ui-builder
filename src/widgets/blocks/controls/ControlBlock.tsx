@@ -221,6 +221,7 @@ interface State {
   requiredError: string | null
 }
 
+/** Instance of the control that does optimistic value changes */
 function ControlInstance(props: {
   block: ControlBlock<ControlBlockDef>
   instanceCtx: InstanceCtx
@@ -240,9 +241,18 @@ function ControlInstance(props: {
     return instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: blockDef.column! })
   }
 
+  const value = getValue()
+
+  /** Store local value to update optimistically */
+  const [localValue, setLocalValue] = useState<any>(value)
+
+  // Update local value
+  useEffect(() => {
+    setLocalValue(value)
+  }, [value])
+
   /** Validate the instance. Returns null if correct, message if not */
   function validate(isFirstError: boolean) {
-
     // Check for null
     if (getValue() == null && blockDef.required) {
       setRequiredError(blockDef.requiredMessage ? localize(blockDef.requiredMessage, instanceCtx.locale) : "")
@@ -269,6 +279,9 @@ function ControlInstance(props: {
   }, [validate])
 
   async function handleChange(newValue: any) {
+    // Optimistically update local value
+    setLocalValue(newValue)
+
     const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
     const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
@@ -279,6 +292,9 @@ function ControlInstance(props: {
       await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
       await txn.commit()
     } catch (err) {
+      // Reset value
+      setLocalValue(getValue())
+
       // TODO localize
       alert("Unable to save changes: " + err.message)
       console.error(err.message)
@@ -293,7 +309,7 @@ function ControlInstance(props: {
   const readonly = blockDef.readonlyExpr ? instanceCtx.getContextVarExprValue(blockDef.readonlyExpr.contextVarId, blockDef.readonlyExpr.expr) : false
 
   const renderControlProps: RenderControlProps = {
-    value: getValue(),
+    value: localValue,
     onChange: readonly ? undefined : handleChange,
     rowId: id,
     schema: instanceCtx.schema,

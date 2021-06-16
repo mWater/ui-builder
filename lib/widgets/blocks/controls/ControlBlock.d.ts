@@ -38,6 +38,8 @@ export interface RenderControlProps {
     getFilters(contextVarId: string): Filter[];
     /** True if control should be disabled. Is disabled if has no value and cannot have one */
     disabled: boolean;
+    /** True if value is saving */
+    saving: boolean;
     /** Call with new value. Is undefined if value is readonly */
     onChange?: (value: any) => void;
     /** Locale object to use for formatting */
