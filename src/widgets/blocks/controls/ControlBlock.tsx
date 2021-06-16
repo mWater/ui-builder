@@ -1,6 +1,6 @@
 import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
@@ -221,34 +221,19 @@ interface State {
   requiredError: string | null
 }
 
-class ControlInstance extends React.Component<Props, State> {
-  controlRef: React.RefObject<HTMLDivElement>
+function ControlInstance(props: {
+  block: ControlBlock<ControlBlockDef>
+  instanceCtx: InstanceCtx
+}) {
+  const { block, instanceCtx } = props
+  const blockDef = props.block.blockDef
+  
+  const controlRef = useRef<HTMLDivElement>(null)
 
-  /** Function to call to unregister validation */
-  unregisterValidation: () => void
+  const [saving, setSaving] = useState(false)
+  const [requiredError, setRequiredError] = useState<string | null>(null)
 
-  constructor(props: Props) {
-    super(props)
-
-    this.controlRef = React.createRef()
-
-    this.state = {
-      saving: false,
-      requiredError: null
-    }
-  }
-
-  componentDidMount() {
-    this.unregisterValidation = this.props.instanceCtx.registerForValidation(this.validate)
-  }
-
-  componentWillUnmount() {
-    this.unregisterValidation()
-  }
-
-  getValue() {
-    const instanceCtx = this.props.instanceCtx
-    const blockDef = this.props.block.blockDef
+  function getValue() {
     const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
 
     // Get current value
@@ -256,39 +241,41 @@ class ControlInstance extends React.Component<Props, State> {
   }
 
   /** Validate the instance. Returns null if correct, message if not */
-  validate = (isFirstError: boolean) => {
+  function validate(isFirstError: boolean) {
+
     // Check for null
-    if (this.getValue() == null && this.props.block.blockDef.required) {
-      this.setState({ requiredError: this.props.block.blockDef.requiredMessage ? localize(this.props.block.blockDef.requiredMessage, this.props.instanceCtx.locale) : "" })
+    if (getValue() == null && blockDef.required) {
+      setRequiredError(blockDef.requiredMessage ? localize(blockDef.requiredMessage, instanceCtx.locale) : "")
 
       // Scroll into view if first error
-      if (isFirstError && this.controlRef.current && this.controlRef.current.scrollIntoView) {
-        this.controlRef.current.scrollIntoView(true)
+      if (isFirstError && controlRef.current && controlRef.current.scrollIntoView) {
+        controlRef.current.scrollIntoView(true)
 
         // Add some padding
-        const scrollParent = getScrollParent(this.controlRef.current)
+        const scrollParent = getScrollParent(controlRef.current)
         if (scrollParent)
           scrollParent.scrollBy(0, -30)
       }
-
       return ""
     }
     else {
-      this.setState({ requiredError: null })
+      setRequiredError(null)
       return null
     }
   }
 
-  handleChange = async (newValue: any) => {
-    const instanceCtx = this.props.instanceCtx
-    const blockDef = this.props.block.blockDef
+  useEffect(() => {
+    return instanceCtx.registerForValidation(validate)
+  }, [validate])
+
+  async function handleChange(newValue: any) {
     const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
     const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Update database
-    this.setState({ saving: true })
+    setSaving(true)
     try {
-      const txn = this.props.instanceCtx.database.transaction()
+      const txn = instanceCtx.database.transaction()
       await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
       await txn.commit()
     } catch (err) {
@@ -296,53 +283,49 @@ class ControlInstance extends React.Component<Props, State> {
       alert("Unable to save changes: " + err.message)
       console.error(err.message)
     } finally {
-      this.setState({ saving: false })
+      setSaving(false)
     }
   }
 
-  render() {
-    const instanceCtx = this.props.instanceCtx
-    const blockDef = this.props.block.blockDef
-    const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
-    const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
+  const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+  const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
-    const readonly = blockDef.readonlyExpr ? instanceCtx.getContextVarExprValue(blockDef.readonlyExpr.contextVarId, blockDef.readonlyExpr.expr) : false
+  const readonly = blockDef.readonlyExpr ? instanceCtx.getContextVarExprValue(blockDef.readonlyExpr.contextVarId, blockDef.readonlyExpr.expr) : false
 
-    const renderControlProps: RenderControlProps = {
-      value: this.getValue(),
-      onChange: readonly ? undefined : this.handleChange,
-      rowId: id,
-      schema: this.props.instanceCtx.schema,
-      dataSource: this.props.instanceCtx.dataSource,
-      database: this.props.instanceCtx.database,
-      getFilters: this.props.instanceCtx.getFilters,
-      locale: this.props.instanceCtx.locale,
-      rowContextVar: contextVar,
-      disabled: id == null,
-      contextVars: this.props.instanceCtx.contextVars,
-      contextVarValues: this.props.instanceCtx.contextVarValues,
-      saving: this.state.saving
-    }
+  const renderControlProps: RenderControlProps = {
+    value: getValue(),
+    onChange: readonly ? undefined : handleChange,
+    rowId: id,
+    schema: instanceCtx.schema,
+    dataSource: instanceCtx.dataSource,
+    database: instanceCtx.database,
+    getFilters: instanceCtx.getFilters,
+    locale: instanceCtx.locale,
+    rowContextVar: contextVar,
+    disabled: id == null,
+    contextVars: instanceCtx.contextVars,
+    contextVarValues: instanceCtx.contextVarValues,
+    saving: saving
+  }
 
-    const style: React.CSSProperties = {
-    }
+  const style: React.CSSProperties = {
+  }
 
-    // Add red border if required
-    if (this.state.requiredError != null) {
-      style.border = "1px solid rgb(169, 68, 66)",
-      style.padding = 3
-      style.backgroundColor = "rgb(169, 68, 66)"
-    }
+  // Add red border if required
+  if (requiredError != null) {
+    style.border = "1px solid rgb(169, 68, 66)",
+    style.padding = 3
+    style.backgroundColor = "rgb(169, 68, 66)"
+  }
 
-    return (
-      <div>
-        <div style={style} ref={this.controlRef} key="control">
-          { this.props.block.renderControl(renderControlProps) }
-        </div>
-        { this.state.requiredError ? 
-          <div key="error" className="text-danger">{this.state.requiredError}</div>
-        : null}
+  return (
+    <div>
+      <div style={style} ref={controlRef} key="control">
+        { block.renderControl(renderControlProps) }
       </div>
-    )
-  }
-} 
+      { requiredError ? 
+        <div key="error" className="text-danger">{requiredError}</div>
+      : null}
+    </div>
+  )
+}
