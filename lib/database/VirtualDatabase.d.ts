@@ -16,7 +16,7 @@ export default class VirtualDatabase implements Database {
     changeListeners: DatabaseChangeListener[];
     /** Cache of query results (of underlying database) to increase performance */
     queryCache: BatchingCache<{
-        queryOptions: QueryOptions;
+        query: QueryOptions;
         contextVars: ContextVar[];
         contextVarValues: {
             [contextVarId: string]: any;
