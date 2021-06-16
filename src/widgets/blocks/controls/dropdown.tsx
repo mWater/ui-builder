@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import * as React from 'react';
-import { BlockDef, createExprVariables, ContextVar } from '../../blocks';
+import React from 'react';
+import { createExprVariables, ContextVar } from '../../blocks';
 import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
 import { Column, EnumValue, Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
@@ -14,7 +14,7 @@ import { OrderBy } from '../../../database/Database';
 import { Toggle, Select } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { ToggleBlockDef } from './toggle';
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -162,11 +162,25 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     }
 
     if (column.type === "enum") {
-      return <EnumDropdownInstance ctx={props} blockDef={this.blockDef} column={column} />
+      return <EnumDropdownInstance 
+        blockDef={this.blockDef} 
+        column={column} 
+        locale={props.locale}
+        disabled={props.disabled}
+        value={props.value}
+        onChange={props.onChange}
+      />
     }
     if (column.type === "enumset") {
-      return <EnumsetDropdownInstance ctx={props} blockDef={this.blockDef} column={column} />
-    }
+      return <EnumsetDropdownInstance 
+        blockDef={this.blockDef} 
+        column={column} 
+        locale={props.locale}
+        disabled={props.disabled}
+        value={props.value}
+        onChange={props.onChange}
+      />
+  }
     if (column.type === "id") {
       return this.renderId(props, column)
     }
@@ -488,12 +502,15 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
 }
 
 
-function EnumDropdownInstance(props: {
+const EnumDropdownInstance = memo((props: {
   blockDef: DropdownBlockDef
-  ctx: RenderControlProps
   column: Column
-}) {
-  const { ctx, column, blockDef } = props
+  locale: string
+  disabled: boolean
+  value: any
+  onChange?: (value: any) => void
+}) => {
+  const { column, blockDef } = props
 
   const enumValues = useMemo(() => {
     let result = column.enumValues!
@@ -509,38 +526,41 @@ function EnumDropdownInstance(props: {
   }, [column.enumValues, blockDef])
 
   // Lookup enumvalue
-  const enumValue = enumValues.find(ev => ev.id === ctx.value) || null
+  const enumValue = enumValues.find(ev => ev.id === props.value) || null
 
-  const getOptionLabel = (ev: EnumValue) => localize(ev.name, ctx.locale)
+  const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
   const getOptionValue = (ev: EnumValue) => ev.id
   const handleChange = useCallback((ev: EnumValue | null) => {
-    if (ctx.onChange) {
-      ctx.onChange(ev ? ev.id : null)
+    if (props.onChange) {
+      props.onChange(ev ? ev.id : null)
     }
-  }, [ctx.onChange])
+  }, [props.onChange])
 
   return <ReactSelect
      value={enumValue} 
      onChange={handleChange}
      options={enumValues}
-     placeholder={localize(blockDef.placeholder, ctx.locale)}
+     placeholder={localize(blockDef.placeholder, props.locale)}
      getOptionLabel={getOptionLabel}
      getOptionValue={getOptionValue}
-     isDisabled={ctx.disabled || !ctx.onChange}
+     isDisabled={props.disabled || !props.onChange}
      isClearable={true}
      closeMenuOnScroll={true}
      menuPortalTarget={document.body}
      classNamePrefix="react-select-short" 
      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
      />
-}    
+})
 
-function EnumsetDropdownInstance(props: {
+const EnumsetDropdownInstance = memo((props: {
   blockDef: DropdownBlockDef
-  ctx: RenderControlProps
   column: Column
-}) {
-  const { ctx, column, blockDef } = props
+  locale: string
+  disabled: boolean
+  value: any
+  onChange?: (value: any) => void
+}) => {
+  const { column, blockDef } = props
 
   const enumValues = useMemo(() => {
     let result = column.enumValues!
@@ -557,26 +577,26 @@ function EnumsetDropdownInstance(props: {
 
   // Map value to array
   let value: EnumValue[] | null = null
-  if (ctx.value) {
-    value = _.compact(ctx.value.map((v: any) => enumValues.find(ev => ev.id === v)))
+  if (props.value) {
+    value = _.compact(props.value.map((v: any) => enumValues.find(ev => ev.id === v)))
   }
 
-  const getOptionLabel = (ev: EnumValue) => localize(ev.name, ctx.locale)
+  const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
   const getOptionValue = (ev: EnumValue) => ev.id
   const handleChange = useCallback((evs: EnumValue[] | null) => {
-    if (ctx.onChange) {
-      ctx.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+    if (props.onChange) {
+      props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
     }
-  }, [ctx.onChange])
+  }, [props.onChange])
 
   return <ReactSelect
     value={value} 
     onChange={handleChange}
     options={enumValues}
-    placeholder={localize(blockDef.placeholder, ctx.locale)}
+    placeholder={localize(blockDef.placeholder, props.locale)}
     getOptionLabel={getOptionLabel}
     getOptionValue={getOptionValue}
-    isDisabled={ctx.disabled || !ctx.onChange}
+    isDisabled={props.disabled || !props.onChange}
     isClearable={true}
     isMulti={true}
     closeMenuOnScroll={true}
@@ -584,4 +604,4 @@ function EnumsetDropdownInstance(props: {
     classNamePrefix="react-select-short" 
     styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
   />
-}
+})
