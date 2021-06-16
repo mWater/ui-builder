@@ -12,6 +12,7 @@ import { FormatLocaleObject } from "d3-format";
 import { getScrollParent } from "../../scrolling";
 import { ContextVarExpr } from "../../../ContextVarExpr";
 import { CollapsibleComponent } from "../collapsible";
+import { useStabilizeFunction } from "../../../useStabilizeFunction";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -278,7 +279,7 @@ function ControlInstance(props: {
     return instanceCtx.registerForValidation(validate)
   }, [validate])
 
-  async function handleChange(newValue: any) {
+  const onChange = useStabilizeFunction(async (newValue: any) => {
     // Optimistically update local value
     setLocalValue(newValue)
 
@@ -301,7 +302,8 @@ function ControlInstance(props: {
     } finally {
       setSaving(false)
     }
-  }
+    return    
+  })
 
   const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
   const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
@@ -310,7 +312,7 @@ function ControlInstance(props: {
 
   const renderControlProps: RenderControlProps = {
     value: localValue,
-    onChange: readonly ? undefined : handleChange,
+    onChange: readonly ? undefined : onChange,
     rowId: id,
     schema: instanceCtx.schema,
     dataSource: instanceCtx.dataSource,
