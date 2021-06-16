@@ -311,11 +311,7 @@ class AddRowInstance extends React.Component<Props, State> {
             if (loading) {
               return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
-            return (
-              <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-                { this.props.instanceCtx.renderChildBlock(instanceCtx, this.props.blockDef.content) }
-              </div>
-            )
+            return this.props.instanceCtx.renderChildBlock(instanceCtx, this.props.blockDef.content) 
           }}
         </ContextVarsInjector>
     }

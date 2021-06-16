@@ -55,6 +55,9 @@ export interface RenderControlProps {
   /** True if control should be disabled. Is disabled if has no value and cannot have one */
   disabled: boolean
 
+  /** True if value is saving */
+  saving: boolean
+
   /** Call with new value. Is undefined if value is readonly */
   onChange?: (value: any) => void
 
@@ -89,7 +92,8 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       getFilters: () => [],
       contextVars: designCtx.contextVars,
       contextVarValues: {},
-      formatLocale: designCtx.formatLocale
+      formatLocale: designCtx.formatLocale,
+      saving: false
     }
     
     return this.renderControl(renderControlProps)
@@ -210,7 +214,8 @@ interface Props {
 }
 
 interface State {
-  updating: boolean
+  /** True if mid-saving */
+  saving: boolean
 
   /** Message if a required error is present. null for no error */
   requiredError: string | null
@@ -228,7 +233,7 @@ class ControlInstance extends React.Component<Props, State> {
     this.controlRef = React.createRef()
 
     this.state = {
-      updating: false,
+      saving: false,
       requiredError: null
     }
   }
@@ -281,7 +286,7 @@ class ControlInstance extends React.Component<Props, State> {
     const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Update database
-    this.setState({ updating: true })
+    this.setState({ saving: true })
     try {
       const txn = this.props.instanceCtx.database.transaction()
       await txn.updateRow(contextVar.table!, id, { [blockDef.column!]: newValue })
@@ -291,7 +296,7 @@ class ControlInstance extends React.Component<Props, State> {
       alert("Unable to save changes: " + err.message)
       console.error(err.message)
     } finally {
-      this.setState({ updating: false })
+      this.setState({ saving: false })
     }
   }
 
@@ -315,11 +320,11 @@ class ControlInstance extends React.Component<Props, State> {
       rowContextVar: contextVar,
       disabled: id == null,
       contextVars: this.props.instanceCtx.contextVars,
-      contextVarValues: this.props.instanceCtx.contextVarValues
+      contextVarValues: this.props.instanceCtx.contextVarValues,
+      saving: this.state.saving
     }
 
     const style: React.CSSProperties = {
-      opacity: this.state.updating ? 0.6 : undefined
     }
 
     // Add red border if required

@@ -199,11 +199,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
           if (loading) {
             return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
           }
-          return (
-            <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { this.renderChildBlock(innerInstanceCtx, widgetDef.blockDef) }
-            </div>
-          )
+          return this.renderChildBlock(innerInstanceCtx, widgetDef.blockDef)
         }}
       </ContextVarsInjector>
   }

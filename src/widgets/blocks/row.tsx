@@ -306,11 +306,7 @@ const RowInstance = (props: {
         if (loading) {
           return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
         }
-        return (
-          <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-            { instanceProps.renderChildBlock(instanceCtx, blockDef.content) }
-          </div>
-        )
+        return instanceProps.renderChildBlock(instanceCtx, blockDef.content) 
       }}
     </ContextVarsInjector>
 
