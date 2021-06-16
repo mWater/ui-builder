@@ -36,8 +36,6 @@ export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     /** Generate a single synthetic context variable to allow embedded expressions to work in label */
     generateEmbedContextVars(idTable: string): ContextVar[];
     renderControl(props: RenderControlProps): JSX.Element;
-    renderEnum(props: RenderControlProps, column: Column): JSX.Element;
-    renderEnumset(props: RenderControlProps, column: Column): JSX.Element;
     formatIdLabel: (ctx: RenderControlProps, labelValues: any[]) => string;
     renderId(props: RenderControlProps, column: Column): JSX.Element;
     renderIds(props: RenderControlProps, column: Column): JSX.Element;

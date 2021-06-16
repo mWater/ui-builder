@@ -14,6 +14,7 @@ import { OrderBy } from '../../../database/Database';
 import { Toggle, Select } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { ToggleBlockDef } from './toggle';
+import { useCallback, useMemo } from 'react';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -161,10 +162,10 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     }
 
     if (column.type === "enum") {
-      return this.renderEnum(props, column)
+      return <EnumDropdownInstance ctx={props} blockDef={this.blockDef} column={column} />
     }
     if (column.type === "enumset") {
-      return this.renderEnumset(props, column)
+      return <EnumsetDropdownInstance ctx={props} blockDef={this.blockDef} column={column} />
     }
     if (column.type === "id") {
       return this.renderId(props, column)
@@ -180,86 +181,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return this.renderId(props, column)
     }
     throw new Error("Unsupported type")
-  }
-
-  renderEnum(props: RenderControlProps, column: Column) {
-    var enumValues = column.enumValues!
-
-    // Handle include/exclude
-    if (this.blockDef.includeValues && this.blockDef.includeValues.length > 0) {
-      enumValues = enumValues.filter(ev => this.blockDef.includeValues!.includes(ev.id))
-    }
-    if (this.blockDef.excludeValues && this.blockDef.excludeValues.length > 0) {
-      enumValues = enumValues.filter(ev => !this.blockDef.excludeValues!.includes(ev.id))
-    }
-
-    // Lookup enumvalue
-    const enumValue = enumValues.find(ev => ev.id === props.value) || null
-
-    const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
-    const getOptionValue = (ev: EnumValue) => ev.id
-    const handleChange = (ev: EnumValue | null) => {
-      if (props.onChange) {
-        props.onChange(ev ? ev.id : null)
-      }
-    } 
-
-    return <ReactSelect
-      value={enumValue} 
-      onChange={handleChange}
-      options={enumValues}
-      placeholder={localize(this.blockDef.placeholder, props.locale)}
-      getOptionLabel={getOptionLabel}
-      getOptionValue={getOptionValue}
-      isDisabled={props.disabled || !props.onChange}
-      isClearable={true}
-      closeMenuOnScroll={true}
-      menuPortalTarget={document.body}
-      classNamePrefix="react-select-short" 
-      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-      />
-  }
-
-  renderEnumset(props: RenderControlProps, column: Column) {
-    var enumValues = column.enumValues!
-
-    // Handle include/exclude
-    if (this.blockDef.includeValues && this.blockDef.includeValues.length > 0) {
-      enumValues = enumValues.filter(ev => this.blockDef.includeValues!.includes(ev.id))
-    }
-    if (this.blockDef.excludeValues && this.blockDef.excludeValues.length > 0) {
-      enumValues = enumValues.filter(ev => !this.blockDef.excludeValues!.includes(ev.id))
-    }
-
-    // Map value to array
-    let value: EnumValue[] | null = null
-    if (props.value) {
-      value = _.compact(props.value.map((v: any) => enumValues.find(ev => ev.id === v)))
-    }
-
-    const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
-    const getOptionValue = (ev: EnumValue) => ev.id
-    const handleChange = (evs: EnumValue[] | null) => {
-      if (props.onChange) {
-        props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
-      }
-    }
-
-    return <ReactSelect
-      value={value} 
-      onChange={handleChange}
-      options={enumValues}
-      placeholder={localize(this.blockDef.placeholder, props.locale)}
-      getOptionLabel={getOptionLabel}
-      getOptionValue={getOptionValue}
-      isDisabled={props.disabled || !props.onChange}
-      isClearable={true}
-      isMulti={true}
-      closeMenuOnScroll={true}
-      menuPortalTarget={document.body}
-      classNamePrefix="react-select-short" 
-      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-    />
   }
 
   formatIdLabel = (ctx: RenderControlProps, labelValues: any[]): string => {
@@ -564,4 +485,103 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       || column.type == "boolean"
       || (column.type == "join" && (column.join!.type === "n-1" || column.join!.type === "1-1"))
   }
+}
+
+
+function EnumDropdownInstance(props: {
+  blockDef: DropdownBlockDef
+  ctx: RenderControlProps
+  column: Column
+}) {
+  const { ctx, column, blockDef } = props
+
+  const enumValues = useMemo(() => {
+    let result = column.enumValues!
+
+    // Handle include/exclude
+    if (blockDef.includeValues && blockDef.includeValues.length > 0) {
+      result = result.filter(ev => blockDef.includeValues!.includes(ev.id))
+    }
+    if (blockDef.excludeValues && blockDef.excludeValues.length > 0) {
+      result = result.filter(ev => !blockDef.excludeValues!.includes(ev.id))
+    }
+    return result
+  }, [column.enumValues, blockDef])
+
+  // Lookup enumvalue
+  const enumValue = enumValues.find(ev => ev.id === ctx.value) || null
+
+  const getOptionLabel = (ev: EnumValue) => localize(ev.name, ctx.locale)
+  const getOptionValue = (ev: EnumValue) => ev.id
+  const handleChange = useCallback((ev: EnumValue | null) => {
+    if (ctx.onChange) {
+      ctx.onChange(ev ? ev.id : null)
+    }
+  }, [ctx.onChange])
+
+  return <ReactSelect
+     value={enumValue} 
+     onChange={handleChange}
+     options={enumValues}
+     placeholder={localize(blockDef.placeholder, ctx.locale)}
+     getOptionLabel={getOptionLabel}
+     getOptionValue={getOptionValue}
+     isDisabled={ctx.disabled || !ctx.onChange}
+     isClearable={true}
+     closeMenuOnScroll={true}
+     menuPortalTarget={document.body}
+     classNamePrefix="react-select-short" 
+     styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+     />
+}    
+
+function EnumsetDropdownInstance(props: {
+  blockDef: DropdownBlockDef
+  ctx: RenderControlProps
+  column: Column
+}) {
+  const { ctx, column, blockDef } = props
+
+  const enumValues = useMemo(() => {
+    let result = column.enumValues!
+
+    // Handle include/exclude
+    if (blockDef.includeValues && blockDef.includeValues.length > 0) {
+      result = result.filter(ev => blockDef.includeValues!.includes(ev.id))
+    }
+    if (blockDef.excludeValues && blockDef.excludeValues.length > 0) {
+      result = result.filter(ev => !blockDef.excludeValues!.includes(ev.id))
+    }
+    return result
+  }, [column.enumValues, blockDef])
+
+  // Map value to array
+  let value: EnumValue[] | null = null
+  if (ctx.value) {
+    value = _.compact(ctx.value.map((v: any) => enumValues.find(ev => ev.id === v)))
+  }
+
+  const getOptionLabel = (ev: EnumValue) => localize(ev.name, ctx.locale)
+  const getOptionValue = (ev: EnumValue) => ev.id
+  const handleChange = useCallback((evs: EnumValue[] | null) => {
+    if (ctx.onChange) {
+      ctx.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+    }
+  }, [ctx.onChange])
+
+  return <ReactSelect
+    value={value} 
+    onChange={handleChange}
+    options={enumValues}
+    placeholder={localize(blockDef.placeholder, ctx.locale)}
+    getOptionLabel={getOptionLabel}
+    getOptionValue={getOptionValue}
+    isDisabled={ctx.disabled || !ctx.onChange}
+    isClearable={true}
+    isMulti={true}
+    closeMenuOnScroll={true}
+    menuPortalTarget={document.body}
+    classNamePrefix="react-select-short" 
+    styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+  />
 }
