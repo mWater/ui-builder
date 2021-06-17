@@ -256,7 +256,7 @@ export function GanttChartInstance(props: {
       draft.contextVars.push(rowOrderContextVar)
       draft.contextVars.push(rowParentContextVar)
       draft.contextVarValues[rowOrderContextVar.id] =  { type: "literal", valueType: "number", value: order }
-      draft.contextVarValues[rowParentContextVar.id] = { type: "literal", valueType: "id", idTable: rowsetCV.table!, value: parent }
+      draft.contextVarValues[rowParentContextVar.id] = parent
     })
 
     ctx.actionLibrary.createAction(blockDef.addRowAction!).performAction(innerCtx)

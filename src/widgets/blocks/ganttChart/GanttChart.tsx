@@ -165,7 +165,7 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
 
   /** Create context variables that add row action receives */
   createAddRowParentContextVar(rowsetCV: ContextVar): ContextVar {
-    return { id: this.blockDef.id + "_add_parent", name: `Parent of new GANTT row`, type: "id", idTable: rowsetCV.table! }
+    return { id: this.blockDef.id + "_add_parent", name: `Parent of new GANTT row`, type: "row", table: rowsetCV.table }
   }
   
   renderDesign(ctx: DesignCtx) {
