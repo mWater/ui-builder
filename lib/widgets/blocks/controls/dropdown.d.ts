@@ -37,8 +37,6 @@ export declare class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     generateEmbedContextVars(idTable: string): ContextVar[];
     renderControl(props: RenderControlProps): JSX.Element;
     formatIdLabel: (ctx: RenderControlProps, labelValues: any[]) => string;
-    renderId(props: RenderControlProps, column: Column): JSX.Element;
-    renderIds(props: RenderControlProps, column: Column): JSX.Element;
     renderBoolean(props: RenderControlProps, column: Column): JSX.Element;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
     renderControlEditor(props: DesignCtx): JSX.Element;

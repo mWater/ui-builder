@@ -5,16 +5,17 @@ import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBloc
 import { Column, EnumValue, Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
 import { localize } from '../../localization';
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EnumArrayEditor, EmbeddedExprsEditor, OrderByArrayEditor } from '../../propertyEditors';
-import ReactSelect from "react-select"
+import ReactSelect, { Styles } from "react-select"
 import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
 import { IdDropdownComponent } from './IdDropdownComponent';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../../embeddedExprs';
-import { OrderBy } from '../../../database/Database';
+import { Database, OrderBy } from '../../../database/Database';
 import { Toggle, Select } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { ToggleBlockDef } from './toggle';
 import { memo, useCallback, useMemo } from 'react';
+import { useStabilizeFunction, useStabilizeValue } from '../../../stabilizingHooks';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -182,17 +183,47 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       />
   }
     if (column.type === "id") {
-      return this.renderId(props, column)
+      return <IdDropdownInstance
+        blockDef={this.blockDef}
+        column={column}
+        contextVars={props.contextVars}
+        contextVarValues={props.contextVarValues}
+        database={props.database}
+        disabled={props.disabled}
+        formatIdLabel={this.formatIdLabel.bind(null, props)}
+        value={props.value}
+        onChange={props.onChange}
+      />
     }
     if (column.type === "id[]") {
-      return this.renderIds(props, column)
+      return <IdsDropdownInstance
+        blockDef={this.blockDef}
+        column={column}
+        contextVars={props.contextVars}
+        contextVarValues={props.contextVarValues}
+        database={props.database}
+        disabled={props.disabled}
+        formatIdLabel={this.formatIdLabel.bind(null, props)}
+        value={props.value}
+        onChange={props.onChange}
+      />
     }
     if (column.type === "boolean") {
       return this.renderBoolean(props, column)
     }
     // Dropdowns support n-1 and 1-1 joins as well as id columns
     if (column.type === "join" && (column.join!.type === "n-1" || column.join!.type === "1-1")) {
-      return this.renderId(props, column)
+      return <IdDropdownInstance
+        blockDef={this.blockDef}
+        column={column}
+        contextVars={props.contextVars}
+        contextVarValues={props.contextVarValues}
+        database={props.database}
+        disabled={props.disabled}
+        formatIdLabel={this.formatIdLabel.bind(null, props)}
+        value={props.value}
+        onChange={props.onChange}
+      />
     }
     throw new Error("Unsupported type")
   }
@@ -212,77 +243,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
     else {
       return labelValues[0]
     }
-  }
-
-  renderId(props: RenderControlProps, column: Column) {
-    let labelEmbeddedExprs: Expr[]
-    let searchExprs: Expr[]
-    let orderBy: OrderBy[]
-
-    // Handle modes
-    if (this.blockDef.idMode == "advanced") {
-      labelEmbeddedExprs = (this.blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
-      searchExprs = this.blockDef.idSearchExprs! || []
-      orderBy = this.blockDef.idOrderBy! || []
-    }
-    else {
-      labelEmbeddedExprs = [this.blockDef.idLabelExpr!]
-      searchExprs = [this.blockDef.idLabelExpr!]
-      orderBy = [{ expr: this.blockDef.idLabelExpr!, dir: "asc" }]
-    }
-
-    // Dropdowns support n-1 and 1-1 joins as well as id columns
-    const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
-
-    return <IdDropdownComponent
-      database={props.database}
-      table={idTable}
-      value={props.value}
-      onChange={props.onChange}
-      multi={false}
-      labelEmbeddedExprs={labelEmbeddedExprs}
-      searchExprs={searchExprs}
-      orderBy={orderBy}
-      filterExpr={this.blockDef.idFilterExpr || null}
-      formatLabel={this.formatIdLabel.bind(null, props)}
-      contextVars={props.contextVars}
-      contextVarValues={props.contextVarValues}
-      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-    />
-  }
-
-  renderIds(props: RenderControlProps, column: Column) {
-    let labelEmbeddedExprs: Expr[]
-    let searchExprs: Expr[]
-    let orderBy: OrderBy[]
-
-    // Handle modes
-    if (this.blockDef.idMode == "advanced") {
-      labelEmbeddedExprs = (this.blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
-      searchExprs = this.blockDef.idSearchExprs! || []
-      orderBy = this.blockDef.idOrderBy! || []
-    }
-    else {
-      labelEmbeddedExprs = [this.blockDef.idLabelExpr!]
-      searchExprs = [this.blockDef.idLabelExpr!]
-      orderBy = [{ expr: this.blockDef.idLabelExpr!, dir: "asc" }]
-    }
-
-    return <IdDropdownComponent
-      database={props.database}
-      table={column.idTable!}
-      value={props.value}
-      onChange={props.onChange}
-      multi={true}
-      labelEmbeddedExprs={labelEmbeddedExprs}
-      searchExprs={searchExprs}
-      orderBy={orderBy}
-      filterExpr={this.blockDef.idFilterExpr || null}
-      formatLabel={this.formatIdLabel.bind(null, props)}
-      contextVars={props.contextVars}
-      contextVarValues={props.contextVarValues}
-      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-    />
   }
 
   renderBoolean(props: RenderControlProps, column: Column) {
@@ -501,7 +461,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
   }
 }
 
-
 const EnumDropdownInstance = memo((props: {
   blockDef: DropdownBlockDef
   column: Column
@@ -605,3 +564,122 @@ const EnumsetDropdownInstance = memo((props: {
     styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
   />
 })
+
+function IdDropdownInstance(props: {
+  blockDef: DropdownBlockDef
+  column: Column
+  database: Database
+  disabled: boolean
+  formatIdLabel: (labelValues: any[]) => string
+  contextVars: ContextVar[]
+  contextVarValues: { [contextVarId: string]: any }
+  value: any
+  onChange?: (value: any) => void
+}) {
+  const { column, blockDef } = props
+
+  const labelEmbeddedExprs: Expr[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? (blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
+      : [blockDef.idLabelExpr!]
+  }, [blockDef])
+
+  const searchExprs: Expr[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? blockDef.idSearchExprs! || []
+      : [blockDef.idLabelExpr!]
+  }, [blockDef])
+
+  const orderBy: OrderBy[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? blockDef.idOrderBy! || []
+      : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
+  }, [blockDef])
+
+  // Dropdowns support n-1 and 1-1 joins as well as id columns
+  const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
+
+  const styles = useMemo<Partial<Styles>>(() => {
+    return { menuPortal: style => ({ ...style, zIndex: 2000 })}
+  }, [])
+
+  // Stabilize functions and values
+  const onChange = useStabilizeFunction(props.onChange)
+  const formatIdLabel = useStabilizeFunction(props.formatIdLabel)
+  const contextVars = useStabilizeValue(props.contextVars)
+  const contextVarValues = useStabilizeValue(props.contextVarValues)
+
+  return <IdDropdownComponent
+    database={props.database}
+    table={idTable}
+    value={props.value}
+    onChange={onChange}
+    multi={false}
+    labelEmbeddedExprs={labelEmbeddedExprs}
+    searchExprs={searchExprs}
+    orderBy={orderBy}
+    filterExpr={blockDef.idFilterExpr || null}
+    formatLabel={formatIdLabel}
+    contextVars={contextVars}
+    contextVarValues={contextVarValues}
+    styles={styles}
+  />
+}
+
+function IdsDropdownInstance(props: {
+  blockDef: DropdownBlockDef
+  column: Column
+  database: Database
+  disabled: boolean
+  formatIdLabel: (labelValues: any[]) => string
+  contextVars: ContextVar[]
+  contextVarValues: { [contextVarId: string]: any }
+  value: any
+  onChange?: (value: any) => void
+}) {
+  const { column, blockDef } = props
+
+  const labelEmbeddedExprs: Expr[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? (blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
+      : [blockDef.idLabelExpr!]
+  }, [blockDef])
+
+  const searchExprs: Expr[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? blockDef.idSearchExprs! || []
+      : [blockDef.idLabelExpr!]
+  }, [blockDef])
+
+  const orderBy: OrderBy[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? blockDef.idOrderBy! || []
+      : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
+  }, [blockDef])
+
+  const styles = useMemo<Partial<Styles>>(() => {
+    return { menuPortal: style => ({ ...style, zIndex: 2000 })}
+  }, [])
+
+  // Stabilize functions and values
+  const onChange = useStabilizeFunction(props.onChange)
+  const formatIdLabel = useStabilizeFunction(props.formatIdLabel)
+  const contextVars = useStabilizeValue(props.contextVars)
+  const contextVarValues = useStabilizeValue(props.contextVarValues)
+
+  return <IdDropdownComponent
+    database={props.database}
+    table={column.idTable!}
+    value={props.value}
+    onChange={onChange}
+    multi={true}
+    labelEmbeddedExprs={labelEmbeddedExprs}
+    searchExprs={searchExprs}
+    orderBy={orderBy}
+    filterExpr={blockDef.idFilterExpr || null}
+    formatLabel={formatIdLabel}
+    contextVars={contextVars}
+    contextVarValues={contextVarValues}
+    styles={styles}
+  />
+}

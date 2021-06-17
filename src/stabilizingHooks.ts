@@ -4,6 +4,7 @@ import { useRef } from "react"
 export function useStabilizeFunction<T extends Function>(func: T): T
 export function useStabilizeFunction<T extends Function>(func: null): null
 export function useStabilizeFunction<T extends Function>(func: undefined): undefined
+export function useStabilizeFunction<T extends Function>(func?: T): T | undefined
 export function useStabilizeFunction<T extends Function>(func: T | undefined | null): T | undefined | null {
   // Create ref for changing func
   const variableRef = useRef<T | null>()
@@ -15,4 +16,14 @@ export function useStabilizeFunction<T extends Function>(func: T | undefined | n
   }
   const stableRef = useRef<T>(stableCallback as any)
   return func ? stableRef.current : undefined
+}
+
+/** Always returns the same value of stringifies the same to prevent unnecessary re-rendering */
+export function useStabilizeValue<T>(value: T): T {
+  const stableRef = useRef<T>(value)
+
+  if (JSON.stringify(value) != JSON.stringify(stableRef.current)) {
+    stableRef.current = value
+  }
+  return stableRef.current
 }

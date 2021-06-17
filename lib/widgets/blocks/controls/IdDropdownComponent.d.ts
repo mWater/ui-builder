@@ -1,6 +1,6 @@
-/// <reference types="react" />
 import { Database, OrderBy } from "../../../database/Database";
 import { Expr } from 'mwater-expressions';
+import React from 'react';
 import { ContextVar } from '../../blocks';
 import { Styles } from 'react-select';
 interface SingleProps<T> {
@@ -55,5 +55,6 @@ interface MultiProps<T> {
 }
 declare type Props<T> = SingleProps<T> | MultiProps<T>;
 /** Displays a combo box that allows selecting one id value from a list */
-export declare function IdDropdownComponent<T>(props: Props<T>): JSX.Element;
-export {};
+declare function IdDropdownComponent<T>(props: Props<T>): JSX.Element;
+declare const MemoIdDropdownComponent: React.MemoExoticComponent<typeof IdDropdownComponent>;
+export { MemoIdDropdownComponent as IdDropdownComponent };

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import Async from 'react-select/async'
 import { Database, OrderBy, QueryOptions } from "../../../database/Database"
 import { Expr } from 'mwater-expressions';
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, memo } from 'react'
 import React from 'react'
 import { ContextVar } from '../../blocks'
 import { Styles } from 'react-select';
@@ -83,7 +83,7 @@ interface Option<T> {
 }
 
 /** Displays a combo box that allows selecting one id value from a list */
-export function IdDropdownComponent<T>(props: Props<T>) {
+function IdDropdownComponent<T>(props: Props<T>) {
   const [currentValue, setCurrentValue] = useState<Option<T> | Option<T>[]>()
   const [loading, setLoading] = useState(false)
 
@@ -238,3 +238,7 @@ export function IdDropdownComponent<T>(props: Props<T>) {
 
 /** Escape a regex */
 const escapeRegex = (str: string) => str.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&")
+
+// Memoize for speed
+const MemoIdDropdownComponent = memo(IdDropdownComponent)
+export { MemoIdDropdownComponent as IdDropdownComponent }
