@@ -11,7 +11,6 @@ export interface RenderActionEditorProps extends DesignCtx {
  * Actions can depend on context variables, but they do not have
  * context variable expressions computed for them. They need to calculate
  * them as needed using evalContextVarExpr themselves.
- *
  */
 export declare abstract class Action<T extends ActionDef> {
     actionDef: T;
