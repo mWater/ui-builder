@@ -608,11 +608,12 @@ function IdDropdownInstance(props: {
   const formatIdLabel = useStabilizeFunction(props.formatIdLabel)
   const contextVars = useStabilizeValue(props.contextVars)
   const contextVarValues = useStabilizeValue(props.contextVarValues)
+  const value = useStabilizeValue(props.value)
 
   return <IdDropdownComponent
     database={props.database}
     table={idTable}
-    value={props.value}
+    value={value}
     onChange={onChange}
     multi={false}
     labelEmbeddedExprs={labelEmbeddedExprs}
@@ -666,11 +667,12 @@ function IdsDropdownInstance(props: {
   const formatIdLabel = useStabilizeFunction(props.formatIdLabel)
   const contextVars = useStabilizeValue(props.contextVars)
   const contextVarValues = useStabilizeValue(props.contextVarValues)
+  const value = useStabilizeValue(props.value)
 
   return <IdDropdownComponent
     database={props.database}
     table={column.idTable!}
-    value={props.value}
+    value={value}
     onChange={onChange}
     multi={true}
     labelEmbeddedExprs={labelEmbeddedExprs}
