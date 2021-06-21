@@ -9,7 +9,6 @@ import { Page } from "../../../PageStack"
 import { PageStackDisplay } from "../../../PageStackDisplay"
 import { InstanceCtx } from "../../../contexts"
 import { ExprUtils } from 'mwater-expressions'
-import ModalPopupComponent from 'react-library/lib/ModalPopupComponent'
 import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
 
 /** Instance component for TOC */
@@ -34,12 +33,12 @@ export default function TOCInstanceComp(props: {
     return allItems.filter(item => item.collapse == "startCollapsed").map(item => item.id)
   })
 
-  // TODO
-  const [selectModalOpen, setSelectModalOpen] = useState(false)
+  // When TOC selector is open in collapsed mode
+  const [selectorOpen, setSelectorOpen] = useState(false)
   
-  // Close modal when item selected
+  // Close selector when item selected
   useEffect(() => {
-    setSelectModalOpen(false)
+    setSelectorOpen(false)
   }, [selectedId])
 
   // Store overall page width and update it
@@ -227,15 +226,15 @@ export default function TOCInstanceComp(props: {
     }
 
     return <FillDownwardComponent>
-      <div key="selected" onClick={() => setSelectModalOpen(true)} className="toc-select-button">
+      <div key="selected" onClick={() => setSelectorOpen(v => !v)} className="toc-select-button">
         <i className="fa fa-bars"/> { renderItem(selectedItem) } <span className="caret"/>
       </div>
-      { renderRight() }
-      { selectModalOpen ?
-        <div className="toc-slide-left">
+      { selectorOpen ?
+        <div className="toc-selector">
           { renderLeft() }
         </div>
       : null }
+      { renderRight() }
     </FillDownwardComponent>
   }
 
@@ -247,19 +246,3 @@ export default function TOCInstanceComp(props: {
     theme={blockDef.theme || "light"}
   />
 }
-
-// return <div>
-// { selectModalOpen ?
-//   <ModalPopupComponent
-//     showCloseX
-//     onClose={() => setSelectModalOpen(false) }
-//     header={"Select Item"}
-//   >
-//     { renderLeft() }
-//   </ModalPopupComponent>
-// : null }
-// <div key="selected" onClick={() => setSelectModalOpen(true)} className="toc-select-button">
-//   <i className="fa fa-bars"/> { renderItem(selectedItem) } <span className="caret"/>
-// </div>
-// { renderRight() }
-// </div>

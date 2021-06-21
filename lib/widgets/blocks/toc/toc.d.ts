@@ -17,6 +17,8 @@ export interface TOCBlockDef extends BlockDef {
     removePadding?: boolean;
     /** Theme (default is light) */
     theme?: "light" | "dark";
+    /** Width at which TOC collapses */
+    collapseWidth?: number;
 }
 /** An item within the table of contents */
 export interface TOCItem {
