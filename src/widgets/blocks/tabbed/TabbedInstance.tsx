@@ -1,77 +1,98 @@
-import React from "react"
+import React, { useState } from "react"
 import * as _ from 'lodash'
 import { TabbedBlockDef, TabbedBlockTab } from "./tabbed"
 import { localize } from "../../localization"
 import { InstanceCtx } from "../../../contexts"
+import { usePageWidth } from "../../../hooks"
 
 interface Props {
   tabbedBlockDef: TabbedBlockDef
   instanceCtx: InstanceCtx
 }
 
-interface State {
+export function TabbedInstance(props: {
+  blockDef: TabbedBlockDef
+  instanceCtx: InstanceCtx
+}) {
+
   /** Index of currently active tab */
-  activeIndex: number
+  const [activeIndex, setActiveIndex] = useState(0)
 
   /** List of indexes of open tabs. This is to *not* render tabs that have not been opened, as maps in particular
    * don't handle rendering when invisible.
    */
-  openTabIndexes: number[]
-}
+  const [openTabIndexes, setOpenTabIndexes] = useState<number[]>([0])
+  
+  // Store overall page width and update it
+  const pageWidth = usePageWidth()
 
-export default class TabbedInstance extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      activeIndex: 0,
-      openTabIndexes: [0]
-    }
+  function handleSelectTab(index: number) {
+    setActiveIndex(index)
+    setOpenTabIndexes(openTabIndexes => _.union(openTabIndexes, [index]))
   }
 
-  handleSelectTab = (index: number) => {
-    this.setState({ 
-      activeIndex: index,
-      openTabIndexes: _.union(this.state.openTabIndexes, [index])
-    })
-  }
-
-  renderTab(tab: TabbedBlockTab, index: number) {
-    const labelText = localize(tab.label, this.props.instanceCtx.locale)
+  function renderTab(tab: TabbedBlockTab, index: number) {
+    const labelText = localize(tab.label, props.instanceCtx.locale)
 
     return (
-      <li className={(this.state.activeIndex === index) ? "active" : ""} key={index}>
-        <a onClick={this.handleSelectTab.bind(null, index)} style={{ cursor: "pointer" }}>
+      <li className={(activeIndex === index) ? "active" : ""} key={index}>
+        <a onClick={handleSelectTab.bind(null, index)} style={{ cursor: "pointer" }}>
           {labelText}
         </a>
       </li>
     )  
   }
 
-  renderTabContent(tab: TabbedBlockTab, index: number) {
+  function renderTabContent(tab: TabbedBlockTab, index: number) {
     // If not opened, do not render
-    if (!this.state.openTabIndexes.includes(index)) {
+    if (!openTabIndexes.includes(index)) {
       return null
     }
     
-    const content = this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, tab.content)
+    const content = props.instanceCtx.renderChildBlock(props.instanceCtx, tab.content)
 
     return (
-      <div key={index} style={{ display: (this.state.activeIndex === index) ? "block" : "none" }}>
+      <div key={index} style={{ display: (activeIndex === index) ? "block" : "none" }}>
         {content}
       </div>
     )  
   }
 
-  render() {
-    // Render tabs
+  // If below minimum, use collapsed view
+  if (props.blockDef.collapseWidth != null && pageWidth <= props.blockDef.collapseWidth) {
+    function getTabLabel(tab: TabbedBlockTab) {
+      return localize(tab.label, props.instanceCtx.locale)
+    }
+
+    // Get current tab label
+    const labelText = getTabLabel(props.blockDef.tabs[activeIndex])
+
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
-          {this.props.tabbedBlockDef.tabs.map((tab, index) => this.renderTab(tab, index))}
-        </ul>
-        {this.props.tabbedBlockDef.tabs.map((tab, index) => this.renderTabContent(tab, index))}
+        <div className="btn-group">
+          <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            {labelText} <i className="fa fa-caret-down"/>
+          </button>
+          <ul className="dropdown-menu">
+            { props.blockDef.tabs.map((tab, index) => {
+              return <li key={index}><a onClick={handleSelectTab.bind(null, index)}>{getTabLabel(tab)}</a></li>
+            })}
+          </ul>
+        </div>    
+        <div style={{ paddingTop: 10 }}>
+          {props.blockDef.tabs.map((tab, index) => renderTabContent(tab, index))}
+        </div>
       </div>
     )
   }
+
+  // Render tabs
+  return (
+    <div style={{ paddingTop: 5, paddingBottom: 5 }}>
+      <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
+        {props.blockDef.tabs.map((tab, index) => renderTab(tab, index))}
+      </ul>
+      {props.blockDef.tabs.map((tab, index) => renderTabContent(tab, index))}
+    </div>
+  )
 }

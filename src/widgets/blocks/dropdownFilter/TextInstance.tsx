@@ -8,7 +8,7 @@ import Async from 'react-select/async'
 import { QueryOptions, Database } from "../../../database/Database";
 import { InstanceCtx, getFilteredContextVarValues } from '../../../contexts';
 import { Styles } from 'react-select';
-import { useStabilizeFunction } from '../../../stabilizingHooks';
+import { useStabilizeFunction } from '../../../hooks';
 
 /** Dropdown filter that is a text string. Should search in database for matches */
 export default function TextInstance(props: {

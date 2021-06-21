@@ -10,6 +10,7 @@ import { PageStackDisplay } from "../../../PageStackDisplay"
 import { InstanceCtx } from "../../../contexts"
 import { ExprUtils } from 'mwater-expressions'
 import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
+import { usePageWidth } from '../../../hooks'
 
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: { 
@@ -42,15 +43,8 @@ export default function TOCInstanceComp(props: {
   }, [selectedId])
 
   // Store overall page width and update it
-  const [pageWidth, setPageWidth] = useState(window.innerWidth)
-  useEffect(() => {
-    function handleResize() {
-      setPageWidth(window.innerWidth)
-    }
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
+  const pageWidth = usePageWidth()
+  
   // Select item
   const handleItemClick = (item: TOCItem) => { 
     // Toggle collapse

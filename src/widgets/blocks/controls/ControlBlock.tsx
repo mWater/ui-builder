@@ -12,7 +12,7 @@ import { FormatLocaleObject } from "d3-format";
 import { getScrollParent } from "../../scrolling";
 import { ContextVarExpr } from "../../../ContextVarExpr";
 import { CollapsibleComponent } from "../collapsible";
-import { useStabilizeFunction, useStabilizeValue } from "../../../stabilizingHooks";
+import { useStabilizeFunction, useStabilizeValue } from "../../../hooks";
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {

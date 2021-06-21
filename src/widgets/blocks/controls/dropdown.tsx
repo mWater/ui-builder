@@ -15,7 +15,7 @@ import { Toggle, Select } from 'react-library/lib/bootstrap';
 import ListEditor from '../../ListEditor';
 import { ToggleBlockDef } from './toggle';
 import { memo, useCallback, useMemo } from 'react';
-import { useStabilizeFunction, useStabilizeValue } from '../../../stabilizingHooks';
+import { useStabilizeFunction, useStabilizeValue } from '../../../hooks';
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"

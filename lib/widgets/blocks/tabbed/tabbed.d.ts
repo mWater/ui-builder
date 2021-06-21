@@ -5,12 +5,16 @@ import { DesignCtx, InstanceCtx } from '../../../contexts';
 export interface TabbedBlockTab {
     /** Unique id for tab */
     id: string;
+    /** Label for tab */
     label: LocalizedString | null;
     content: BlockDef | null;
 }
 export interface TabbedBlockDef extends BlockDef {
     type: "tabbed";
+    /** Tabs to use */
     tabs: TabbedBlockTab[];
+    /** Width at which tabs collapse */
+    collapseWidth?: number;
 }
 /** Tabbed control */
 export declare class TabbedBlock extends Block<TabbedBlockDef> {

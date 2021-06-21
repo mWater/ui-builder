@@ -1,23 +1,7 @@
-import React from "react";
-import { TabbedBlockDef, TabbedBlockTab } from "./tabbed";
+/// <reference types="react" />
+import { TabbedBlockDef } from "./tabbed";
 import { InstanceCtx } from "../../../contexts";
-interface Props {
-    tabbedBlockDef: TabbedBlockDef;
+export declare function TabbedInstance(props: {
+    blockDef: TabbedBlockDef;
     instanceCtx: InstanceCtx;
-}
-interface State {
-    /** Index of currently active tab */
-    activeIndex: number;
-    /** List of indexes of open tabs. This is to *not* render tabs that have not been opened, as maps in particular
-     * don't handle rendering when invisible.
-     */
-    openTabIndexes: number[];
-}
-export default class TabbedInstance extends React.Component<Props, State> {
-    constructor(props: Props);
-    handleSelectTab: (index: number) => void;
-    renderTab(tab: TabbedBlockTab, index: number): JSX.Element;
-    renderTabContent(tab: TabbedBlockTab, index: number): JSX.Element | null;
-    render(): JSX.Element;
-}
-export {};
+}): JSX.Element;

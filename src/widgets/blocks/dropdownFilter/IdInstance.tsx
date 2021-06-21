@@ -8,7 +8,7 @@ import { IdDropdownComponent } from '../controls/IdDropdownComponent';
 import { formatEmbeddedExprString } from '../../../embeddedExprs';
 import { InstanceCtx } from '../../../contexts';
 import { localize } from '../../localization';
-import { useStabilizeFunction, useStabilizeValue } from '../../../stabilizingHooks';
+import { useStabilizeFunction, useStabilizeValue } from '../../../hooks';
 import { Styles } from 'react-select';
 
 /** Dropdown filter that is an id */

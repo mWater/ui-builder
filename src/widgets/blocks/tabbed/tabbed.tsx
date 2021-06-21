@@ -1,24 +1,33 @@
 import produce from 'immer'
-import * as React from 'react';
+import React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../../propertyEditors';
 import TabbedDesigner from './TabbedDesigner';
 import ListEditor from '../../ListEditor';
 import uuid from 'uuid/v4';
-import TabbedInstance from './TabbedInstance';
+import { TabbedInstance } from './TabbedInstance';
 import { LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
+import { Select } from 'react-library/lib/bootstrap';
 
 export interface TabbedBlockTab {
   /** Unique id for tab */
   id: string
-  label: LocalizedString | null,
+
+  /** Label for tab */
+  label: LocalizedString | null
+
   content: BlockDef | null
 }
 
 export interface TabbedBlockDef extends BlockDef {
   type: "tabbed"
+
+  /** Tabs to use */
   tabs: TabbedBlockTab[]
+
+  /** Width at which tabs collapse */
+  collapseWidth?: number
 }
 
 /** Tabbed control */
@@ -45,7 +54,7 @@ export class TabbedBlock extends Block<TabbedBlockDef> {
   }
 
   renderInstance(props: InstanceCtx) {
-    return <TabbedInstance instanceCtx={props} tabbedBlockDef={this.blockDef}/>
+    return <TabbedInstance instanceCtx={props} blockDef={this.blockDef}/>
   }
   
   renderEditor(props: DesignCtx) {
@@ -79,6 +88,26 @@ export class TabbedBlock extends Block<TabbedBlockDef> {
           <button type="button" className="btn btn-link btn-sm" onClick={handleAddTab}>
             <i className="fa fa-plus"/> Add Tab
           </button>
+        </LabeledProperty>
+
+        <LabeledProperty label="Collapse Below Width">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="collapseWidth">
+            {(value, onChange) => (
+              <Select
+                value={value}
+                onChange={v => onChange(v != null ? v : undefined)}
+                options={[
+                  { value: 400, label: `< 400px (Phone)` },
+                  { value: 600, label: `< 600px (Small tablet)` },
+                  { value: 800, label: `< 800px (Tablet)` },
+                  { value: 1000, label: `< 1000px (Laptop)` },
+                  { value: 1200, label: `< 1200px (Desktop)` },
+                  { value: 1600, label: `< 1600px (Wide Desktop)` }
+                ]}
+                nullLabel="None"
+              />
+            )}
+          </PropertyEditor>
         </LabeledProperty>
       </div>
     )
