@@ -106,11 +106,7 @@ export class RowsetBlock extends Block<RowsetBlockDef> {
           if (loading) {
             return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
           }
-          return (
-            <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-              { props.renderChildBlock(instanceCtx, this.blockDef.content) }
-            </div>
-          )
+          return props.renderChildBlock(instanceCtx, this.blockDef.content)
         }}
       </ContextVarsInjector>
   }

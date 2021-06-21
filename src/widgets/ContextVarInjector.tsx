@@ -12,7 +12,7 @@ interface Props {
   instanceCtx: InstanceCtx
   contextVarExprs?: Expr[]
   initialFilters?: Filter[]
-  children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any>
+  children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any> | null
 }
 
 interface State {

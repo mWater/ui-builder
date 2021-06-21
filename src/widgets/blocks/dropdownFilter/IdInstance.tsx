@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema, ExprUtils, Expr } from "mwater-expressions";
 import { ContextVar, createExprVariables } from "../../blocks";
@@ -8,6 +8,8 @@ import { IdDropdownComponent } from '../controls/IdDropdownComponent';
 import { formatEmbeddedExprString } from '../../../embeddedExprs';
 import { InstanceCtx } from '../../../contexts';
 import { localize } from '../../localization';
+import { useStabilizeFunction, useStabilizeValue } from '../../../stabilizingHooks';
+import { Styles } from 'react-select';
 
 /** Dropdown filter that is an id */
 export const IdInstance = (props: {
@@ -17,47 +19,63 @@ export const IdInstance = (props: {
   onChange: (value: any) => void
   locale: string
 }) => {
+  const { blockDef } = props
   const exprUtils = new ExprUtils(props.ctx.schema, createExprVariables(props.ctx.contextVars))
   const idTable = exprUtils.getExprIdTable(props.blockDef.filterExpr)
 
-  const formatIdLabel = (labelValues: any[]): string => {
+  const locale = props.ctx.locale
+  const schema = props.ctx.schema
+  const formatLocale = props.ctx.formatLocale
+
+  const formatIdLabel = useCallback((labelValues: any[]): string => {
     if (props.blockDef.idMode == "advanced") {
       return formatEmbeddedExprString({
-        text: localize(props.blockDef.idLabelText, props.ctx.locale),
+        text: localize(blockDef.idLabelText, props.ctx.locale),
         contextVars: [],
-        embeddedExprs: props.blockDef.idLabelEmbeddedExprs!,
+        embeddedExprs: blockDef.idLabelEmbeddedExprs!,
         exprValues: labelValues,
-        formatLocale: props.ctx.formatLocale,
-        locale: props.ctx.locale,
-        schema: props.ctx.schema
+        formatLocale: formatLocale,
+        locale: locale,
+        schema: schema
       })
     }
     else {
       return labelValues[0]
     }
-  }
+  }, [blockDef, locale, schema, formatLocale])
 
-  let labelEmbeddedExprs: Expr[]
-  let searchExprs: Expr[]
-  let orderBy: OrderBy[]
+  const labelEmbeddedExprs: Expr[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? (blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
+      : [blockDef.idLabelExpr!]
+  }, [blockDef])
 
-  // Handle modes
-  if (props.blockDef.idMode == "advanced") {
-    labelEmbeddedExprs = (props.blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
-    searchExprs = props.blockDef.idSearchExprs! || []
-    orderBy = props.blockDef.idOrderBy! || []
-  }
-  else {
-    labelEmbeddedExprs = [props.blockDef.idLabelExpr!]
-    searchExprs = [props.blockDef.idLabelExpr!]
-    orderBy = [{ expr: props.blockDef.idLabelExpr!, dir: "asc" }]
-  }
+  const searchExprs: Expr[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? blockDef.idSearchExprs! || []
+      : [blockDef.idLabelExpr!]
+  }, [blockDef])
+
+  const orderBy: OrderBy[] = useMemo(() => {
+    return blockDef.idMode == "advanced"
+      ? blockDef.idOrderBy! || []
+      : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
+  }, [blockDef])
+
+  const styles = useMemo<Partial<Styles>>(() => {
+    return { menuPortal: style => ({ ...style, zIndex: 2000 })}
+  }, [])
+
+  // Stabilize functions and values
+  const onChange = useStabilizeFunction(props.onChange)
+  const contextVars = useStabilizeValue(props.ctx.contextVars)
+  const contextVarValues = useStabilizeValue(props.ctx.contextVarValues)
 
   return <IdDropdownComponent
     database={props.ctx.database}
     table={idTable!}
     value={props.value}
-    onChange={props.onChange}
+    onChange={onChange}
     multi={false}
     labelEmbeddedExprs={labelEmbeddedExprs}
     searchExprs={searchExprs}
@@ -65,8 +83,8 @@ export const IdInstance = (props: {
     filterExpr={props.blockDef.idFilterExpr || null}
     formatLabel={formatIdLabel}
     placeholder={localize(props.blockDef.placeholder, props.locale)}
-    contextVars={props.ctx.contextVars}
-    contextVarValues={props.ctx.contextVarValues}
-    styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+    contextVars={contextVars}
+    contextVarValues={contextVarValues}
+    styles={styles}
   />
 }

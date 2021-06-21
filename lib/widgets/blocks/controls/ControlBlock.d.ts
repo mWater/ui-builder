@@ -1,6 +1,6 @@
 import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
-import * as React from "react";
+import React from "react";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Database } from "../../../database/Database";
 import { DesignCtx, InstanceCtx } from "../../../contexts";
@@ -20,7 +20,10 @@ export interface ControlBlockDef extends BlockDef {
     readonlyExpr?: ContextVarExpr;
 }
 export interface RenderControlProps {
+    /** Value of the control column for the current row */
     value: any;
+    /** Primary key of the current row */
+    rowId: any;
     locale: string;
     database: Database;
     schema: Schema;
@@ -35,6 +38,8 @@ export interface RenderControlProps {
     getFilters(contextVarId: string): Filter[];
     /** True if control should be disabled. Is disabled if has no value and cannot have one */
     disabled: boolean;
+    /** True if value is saving */
+    saving: boolean;
     /** Call with new value. Is undefined if value is readonly */
     onChange?: (value: any) => void;
     /** Locale object to use for formatting */

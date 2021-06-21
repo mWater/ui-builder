@@ -263,11 +263,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
             if (loading) {
               return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
-            return (
-              <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-                { innerBlock.renderInstance(instanceCtx) }
-              </div>
-            )            
+            return innerBlock.renderInstance(instanceCtx)
           }}
         </ContextVarsInjector>
     } 

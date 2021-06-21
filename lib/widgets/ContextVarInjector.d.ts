@@ -9,7 +9,7 @@ interface Props {
     instanceCtx: InstanceCtx;
     contextVarExprs?: Expr[];
     initialFilters?: Filter[];
-    children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any>;
+    children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any> | null;
 }
 interface State {
     filters: Filter[];
@@ -45,6 +45,6 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     performQueries(): Promise<void>;
     /** Create props needed by inner component */
     createInnerProps(): InstanceCtx;
-    render(): JSX.Element;
+    render(): JSX.Element | null;
 }
 export {};

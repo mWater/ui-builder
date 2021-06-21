@@ -19,7 +19,7 @@ export default class VirtualDatabase implements Database {
   changeListeners: DatabaseChangeListener[]
 
   /** Cache of query results (of underlying database) to increase performance */
-  queryCache: BatchingCache<{ queryOptions: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>
+  queryCache: BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>
 
   /** Array of temporary primary keys that will be replaced by real ones when the insertions are committed */
   tempPrimaryKeys: string[]
@@ -38,8 +38,8 @@ export default class VirtualDatabase implements Database {
     this.destroyed = false
 
     // Create cache that calls underlying database
-    this.queryCache = new BatchingCache<{ queryOptions: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
-      return this.database.query(request.queryOptions, request.contextVars, request.contextVarValues)
+    this.queryCache = new BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
+      return this.database.query(request.query, request.contextVars, request.contextVarValues)
     })
 
     database.addChangeListener(this.handleChange)
@@ -53,7 +53,7 @@ export default class VirtualDatabase implements Database {
     
     // Pass through if no changes and not id query
     if (this.shouldPassthrough(query, exprUtils, contextVars, contextVarValues)) {
-      return this.database.query(query, contextVars, contextVarValues)
+      return this.queryCache.get({ query, contextVars, contextVarValues })
     }
     
     const exprEval = new PromiseExprEvaluator({ schema: this.schema, locale: this.locale, variables, variableValues })
@@ -259,7 +259,7 @@ export default class VirtualDatabase implements Database {
       rows = []
     }
     else {
-      rows = await this.queryCache.get({ queryOptions: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
+      rows = await this.queryCache.get({ query: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
     }
 
     // Apply mutations
@@ -419,8 +419,8 @@ export default class VirtualDatabase implements Database {
     }
 
     // Clear caches
-    this.queryCache = new BatchingCache<{ queryOptions: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
-      return this.database.query(request.queryOptions, request.contextVars, request.contextVarValues)
+    this.queryCache = new BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
+      return this.database.query(request.query, request.contextVars, request.contextVarValues)
     })
   }
 }

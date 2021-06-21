@@ -110,11 +110,7 @@ const DateInjectInstance = (props: { block: DateInjectBlock, instanceCtx: Instan
             if (loading) {
               return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
             }
-            return (
-              <div style={{ opacity: refreshing ? 0.6 : undefined }}>
-                { innerInstanceCtx.renderChildBlock(innerInstanceCtx, block.blockDef.content) }
-              </div>
-            )
+            return innerInstanceCtx.renderChildBlock(innerInstanceCtx, block.blockDef.content)
           }}
       </ContextVarsInjector>
     </div>

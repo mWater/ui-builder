@@ -11,7 +11,7 @@ interface Props {
 
   /** Block that will be inside the context var injector. Needed to get expressions that will be evaluated */
   innerBlock: BlockDef | null
-  children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any>
+  children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any> | null
 }
 
 /** Injects one or more context variables into the inner render instance props. 

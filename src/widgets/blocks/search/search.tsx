@@ -48,7 +48,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
       let error: string | null
       
       // Validate expr
-      error = exprValidator.validateExpr(searchExpr, { table: rowsetCV.table, types: ["text", "enum", "enumset"] })
+      error = exprValidator.validateExpr(searchExpr, { table: rowsetCV.table, types: ["text", "enum", "enumset", "text[]"] })
       if (error) {
         return error
       }
@@ -95,7 +95,7 @@ export class SearchBlock extends LeafBlock<SearchBlockDef> {
                           dataSource={props.dataSource} 
                           onChange={onExprChange} 
                           table={rowsetCV.table!} 
-                          types={["text", "enum", "enumset"]} 
+                          types={["text", "enum", "enumset", "text[]"]} 
                           variables={createExprVariables(props.contextVars)}
                           />
                       )}
