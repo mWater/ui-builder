@@ -2,16 +2,20 @@ import produce from 'immer'
 import * as React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
-import { PropertyEditor } from '../propertyEditors';
-import { Checkbox } from 'react-library/lib/bootstrap';
+import { LabeledProperty, PropertyEditor } from '../propertyEditors';
+import { Checkbox, Select } from 'react-library/lib/bootstrap';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
 export interface CollapsibleBlockDef extends BlockDef {
   type: "collapsible"
   label: BlockDef | null
   content: BlockDef | null
+  
   /** True if collapsible section is initially collapsed */
   initialCollapsed?: boolean
+
+  /** Width at which collapses whether initially collapsed or not */
+  collapseWidth?: number
 }
 
 export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
@@ -65,9 +69,12 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
     const contentNode = this.blockDef.content ?
       props.createBlock(this.blockDef.content).renderInstance(props) : null
 
+    // Determine if initially collapsed
+    const initialCollapsed = this.blockDef.initialCollapsed || (this.blockDef.collapseWidth != null && window.innerWidth <= this.blockDef.collapseWidth)
+
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <CollapsibleComponent label={labelNode} initialCollapsed={this.blockDef.initialCollapsed}>
+        <CollapsibleComponent label={labelNode} initialCollapsed={initialCollapsed}>
           {contentNode}
         </CollapsibleComponent>
       </div>
@@ -80,6 +87,26 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="initialCollapsed">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Initially Collapsed</Checkbox>}
         </PropertyEditor>
+
+        <LabeledProperty label="Collapse Below Width">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="collapseWidth">
+            {(value, onChange) => (
+              <Select
+                value={value}
+                onChange={v => onChange(v != null ? v : undefined)}
+                options={[
+                  { value: 400, label: `< 400px (Phone)` },
+                  { value: 600, label: `< 600px (Small tablet)` },
+                  { value: 800, label: `< 800px (Tablet)` },
+                  { value: 1000, label: `< 1000px (Laptop)` },
+                  { value: 1200, label: `< 1200px (Desktop)` },
+                  { value: 1600, label: `< 1600px (Wide Desktop)` }
+                ]}
+                nullLabel="None"
+              />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }

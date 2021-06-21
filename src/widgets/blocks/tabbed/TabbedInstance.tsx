@@ -5,11 +5,6 @@ import { localize } from "../../localization"
 import { InstanceCtx } from "../../../contexts"
 import { usePageWidth } from "../../../hooks"
 
-interface Props {
-  tabbedBlockDef: TabbedBlockDef
-  instanceCtx: InstanceCtx
-}
-
 export function TabbedInstance(props: {
   blockDef: TabbedBlockDef
   instanceCtx: InstanceCtx
@@ -69,7 +64,7 @@ export function TabbedInstance(props: {
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
-        <div className="btn-group">
+        <div className="btn-group" key="selector" style={{ marginBottom: 10 }}>
           <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
             {labelText} <i className="fa fa-caret-down"/>
           </button>
@@ -79,9 +74,7 @@ export function TabbedInstance(props: {
             })}
           </ul>
         </div>    
-        <div style={{ paddingTop: 10 }}>
-          {props.blockDef.tabs.map((tab, index) => renderTabContent(tab, index))}
-        </div>
+        {props.blockDef.tabs.map((tab, index) => renderTabContent(tab, index))}
       </div>
     )
   }

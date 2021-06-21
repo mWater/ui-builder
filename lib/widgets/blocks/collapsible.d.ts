@@ -7,6 +7,8 @@ export interface CollapsibleBlockDef extends BlockDef {
     content: BlockDef | null;
     /** True if collapsible section is initially collapsed */
     initialCollapsed?: boolean;
+    /** Width at which collapses whether initially collapsed or not */
+    collapseWidth?: number;
 }
 export declare class CollapsibleBlock extends Block<CollapsibleBlockDef> {
     getChildren(contextVars: ContextVar[]): ChildBlock[];
