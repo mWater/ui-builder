@@ -29,4 +29,9 @@
   .normal-page-contents {
     padding: 10px 5px 10px 5px;
   }
+
+  .normal-page-header {
+    padding: 10px 5px 10px 10px;
+    margin-bottom: 5px;  
+  }
 }

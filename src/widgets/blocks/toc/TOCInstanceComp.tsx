@@ -219,17 +219,26 @@ export default function TOCInstanceComp(props: {
       return <div/>
     }
 
-    return <FillDownwardComponent>
-      <div key="selected" onClick={() => setSelectorOpen(v => !v)} className="toc-select-button">
-        <i className="fa fa-bars"/> { renderItem(selectedItem) } <span className="caret"/>
-      </div>
-      { selectorOpen ?
-        <div className="toc-selector">
-          { renderLeft() }
+    return <div onClick={() => setSelectorOpen(false)}>
+      <FillDownwardComponent>
+        <div 
+          key="selected" 
+          onClick={ev => {
+            ev.stopPropagation()
+            setSelectorOpen(v => !v)
+          }} 
+          className={`toc-select-button${selectorOpen ? " open" : ""}`}
+        >
+          <i className="fa fa-bars"/>
         </div>
-      : null }
-      { renderRight() }
-    </FillDownwardComponent>
+        { selectorOpen ?
+          <div className="toc-selector">
+            { renderLeft() }
+          </div>
+        : null }
+        { renderRight() }
+      </FillDownwardComponent>
+    </div>
   }
 
   // Render overall structure
