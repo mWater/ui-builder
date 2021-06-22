@@ -20,6 +20,9 @@ export default function TOCInstanceComp(props: {
 }) {
   const { blockDef, instanceCtx } = props
 
+  // Store overall page width and update it
+  const pageWidth = usePageWidth()
+
   // Ref to page stack to ensure closed properly
   const pageStackRef = useRef<PageStackDisplay>(null)
 
@@ -31,7 +34,9 @@ export default function TOCInstanceComp(props: {
 
   // Store collapsed state for items. If not listed, is expanded
   const [collapsedItems, setCollapsedItems] = useState(() => {
-    return allItems.filter(item => item.collapse == "startCollapsed").map(item => item.id)
+    return allItems
+      .filter(item => item.collapse == "startCollapsed" || (item.collapse == "startExpanded" && item.collapseWidth != null && pageWidth <= item.collapseWidth))
+      .map(item => item.id)
   })
 
   // When TOC selector is open in collapsed mode
@@ -42,9 +47,6 @@ export default function TOCInstanceComp(props: {
     setSelectorOpen(false)
   }, [selectedId])
 
-  // Store overall page width and update it
-  const pageWidth = usePageWidth()
-  
   // Select item
   const handleItemClick = (item: TOCItem) => { 
     // Toggle collapse

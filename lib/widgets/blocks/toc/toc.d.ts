@@ -42,6 +42,8 @@ export interface TOCItem {
     condition?: ContextVarExpr;
     /** Collapse behaviour. Default is expanded */
     collapse?: "expanded" | "startCollapsed" | "startExpanded";
+    /** Width at which TOC item collapses. Only for startExpanded */
+    collapseWidth?: number;
 }
 /** Create a flat list of all items */
 export declare const iterateItems: (items: TOCItem[]) => TOCItem[];

@@ -2,7 +2,7 @@ import produce from 'immer'
 import * as React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import * as _ from 'lodash';
-import { LabeledProperty, PropertyEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor, ResponsiveWidthSelector } from '../propertyEditors';
 import { Checkbox, Select } from 'react-library/lib/bootstrap';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
@@ -90,21 +90,7 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
 
         <LabeledProperty label="Collapse Below Width">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="collapseWidth">
-            {(value, onChange) => (
-              <Select
-                value={value}
-                onChange={v => onChange(v != null ? v : undefined)}
-                options={[
-                  { value: 400, label: `< 400px (Phone)` },
-                  { value: 600, label: `< 600px (Small tablet)` },
-                  { value: 800, label: `< 800px (Tablet)` },
-                  { value: 1000, label: `< 1000px (Laptop)` },
-                  { value: 1200, label: `< 1200px (Desktop)` },
-                  { value: 1600, label: `< 1600px (Wide Desktop)` }
-                ]}
-                nullLabel="None"
-              />
-            )}
+            {(value, onChange) => <ResponsiveWidthSelector value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
       </div>

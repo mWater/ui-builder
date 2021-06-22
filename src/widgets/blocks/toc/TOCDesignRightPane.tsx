@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { TOCItem } from "./toc";
 import { BlockDef } from "..";
 import produce from "immer";
-import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor, PropertyEditor } from "../../propertyEditors";
+import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor, PropertyEditor, ResponsiveWidthSelector } from "../../propertyEditors";
 import { Select, Toggle } from "react-library/lib/bootstrap";
 import { LocalizedString } from "mwater-expressions";
 import { DesignCtx } from "../../../contexts";
@@ -124,6 +124,13 @@ export function TOCDesignRightPane(props: {
                   { value: "startCollapsed", label: "Start Collapsed" }
                 ]} />
             }}
+          </PropertyEditor>
+        </LabeledProperty>
+      : null }
+      { item.children.length > 0 && item.collapse == "startExpanded" ?
+        <LabeledProperty label="Collapse at width">
+          <PropertyEditor obj={item} onChange={onItemChange} property="collapseWidth">
+            {(value, onChange) => <ResponsiveWidthSelector value={value} onChange={onChange} />}  
           </PropertyEditor>
         </LabeledProperty>
       : null }

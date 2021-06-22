@@ -595,3 +595,23 @@ export const TableColumnWidthEditor = (props: {
   />
 }
 
+/** For selecting common responsive widths */
+export function ResponsiveWidthSelector(props: {
+  value: number | undefined
+  onChange: (value: number | undefined) => void
+}) {
+  return <Select
+    value={props.value}
+    onChange={v => props.onChange(v != null ? v : undefined)}
+    options={[
+      { value: 400, label: `< 400px (Phone)` },
+      { value: 600, label: `< 600px (Small tablet)` },
+      { value: 800, label: `< 800px (Tablet)` },
+      { value: 1000, label: `< 1000px (Laptop)` },
+      { value: 1200, label: `< 1200px (Desktop)` },
+      { value: 1600, label: `< 1600px (Wide Desktop)` }
+    ]}
+    nullLabel="None"
+  />
+}
+

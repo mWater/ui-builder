@@ -185,4 +185,9 @@ export declare const TableColumnWidthEditor: (props: {
     columnWidth: string;
     onChange: (columnWidth: string) => void;
 }) => JSX.Element;
+/** For selecting common responsive widths */
+export declare function ResponsiveWidthSelector(props: {
+    value: number | undefined;
+    onChange: (value: number | undefined) => void;
+}): JSX.Element;
 export {};
