@@ -133,7 +133,16 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
 
       // Add item
       rowItems.push(children[index])
-      rowColumns.push(align == "justify" ? columnWidths[index] || "1fr" : columnWidths[index] || "auto")
+
+      // Create grid size
+      let size = align == "justify" ? columnWidths[index] || "1fr" : columnWidths[index] || "auto"
+
+      // Due to strange css grid issue, always use minmax(0px, 1fr) rather than 1fr
+      if (!size.startsWith("minmax")) {
+        size = `minmax(0px, ${size})`
+      }
+
+      rowColumns.push(size)
     }
     addRow()
 
