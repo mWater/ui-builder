@@ -44,6 +44,8 @@ export interface RenderControlProps {
     onChange?: (value: any) => void;
     /** Locale object to use for formatting */
     formatLocale?: FormatLocaleObject;
+    /** True if in design mode */
+    designMode: boolean;
 }
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {

@@ -177,7 +177,7 @@ export class HorizontalBlock extends Block<HorizontalBlockDef> {
     /** Warn user if using responsive break with fixed widths */
     const renderResponsiveWarning = () => {
       if (this.blockDef.responsiveBreaks && this.blockDef.responsiveBreaks.some(br => br != null)) {
-        if (this.blockDef.columnWidths && this.blockDef.columnWidths.some(cw => cw.includes("%"))) {
+        if (this.blockDef.columnWidths && this.blockDef.columnWidths.some(cw => cw != null && cw.includes("%"))) {
           return <div className="text-warning">
             <i className="fa fa-exclamation-circle"/> Using fixed widths percentages with responsive breaks
             can cause unexpected behaviour. It is recommended to use responsive column widths.

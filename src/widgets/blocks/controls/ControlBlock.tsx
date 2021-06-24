@@ -64,6 +64,9 @@ export interface RenderControlProps {
 
   /** Locale object to use for formatting */
   formatLocale?: FormatLocaleObject
+
+  /** True if in design mode */
+  designMode: boolean
 }
 
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
@@ -94,7 +97,8 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       contextVars: designCtx.contextVars,
       contextVarValues: {},
       formatLocale: designCtx.formatLocale,
-      saving: false
+      saving: false,
+      designMode: true
     }
     
     return this.renderControl(renderControlProps)
@@ -327,7 +331,8 @@ function ControlInstance(props: {
     disabled: id == null,
     contextVars: instanceCtx.contextVars,
     contextVarValues: instanceCtx.contextVarValues,
-    saving: saving
+    saving: saving,
+    designMode: false
   }
 
   const style: React.CSSProperties = {
