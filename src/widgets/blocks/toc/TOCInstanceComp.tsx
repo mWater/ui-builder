@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { TOCBlockDef, iterateItems, TOCItem, TOCBlock } from "./toc"
 import { CreateBlock, createExprVariables, createExprVariableValues } from '../../blocks'
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, MouseEvent } from "react"
 import { localize } from '../../localization'
 import SplitPane from "./SplitPane"
 import React from "react"
@@ -42,13 +42,25 @@ export default function TOCInstanceComp(props: {
   // When TOC selector is open in collapsed mode
   const [selectorOpen, setSelectorOpen] = useState(false)
   
-  // Close selector when item selected
-  useEffect(() => {
-    setSelectorOpen(false)
-  }, [selectedId])
+  /** Only toggle item */
+  function handleItemToggle(item: TOCItem, ev: MouseEvent) { 
+    ev.stopPropagation()
+
+    // Toggle collapse
+    if (item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")) {
+      if (collapsedItems.includes(item.id)) {
+        setCollapsedItems(_.without(collapsedItems, item.id))
+      }
+      else {
+        setCollapsedItems(_.union(collapsedItems, [item.id]))
+      }
+    }
+  }
 
   // Select item
-  const handleItemClick = (item: TOCItem) => { 
+  function handleItemClick(item: TOCItem, ev: MouseEvent) { 
+    ev.stopPropagation()
+
     // Toggle collapse
     if (item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")) {
       if (collapsedItems.includes(item.id)) {
@@ -77,6 +89,7 @@ export default function TOCInstanceComp(props: {
     }
 
     setSelectedId(item.id) 
+    setSelectorOpen(false)
   }
 
   function renderItem(item: TOCItem) {
@@ -114,7 +127,7 @@ export default function TOCInstanceComp(props: {
 
     return <div key={item.id} className={`toc-item toc-item-level${depth}`}>
       <div key="label" className={labelClasses.join(" ")} onClick={handleItemClick.bind(null, item)}>
-        <div key="expand" className="chevron">
+        <div key="expand" className="chevron" onClick={handleItemToggle.bind(null, item)}>
           { collapsible ?
             ( collapsed ? <i className="fas fa-fw fa-caret-right"/> : <i className="fas fa-fw fa-caret-down"/>)
           : <i className="fas fa-fw fa-caret-right" style={{ visibility: "hidden" }}/> }
@@ -129,7 +142,7 @@ export default function TOCInstanceComp(props: {
     </div>
   }
 
-  const renderLeft = () => {
+  function renderLeft() {
     return <div>
       <div key="header" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.header) }</div>
       { blockDef.items.map((item, index) => renderItemTree(blockDef.items, index, 0)) }
@@ -141,7 +154,10 @@ export default function TOCInstanceComp(props: {
   const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
   const selectedWidgetId = selectedItem ? selectedItem.widgetId : null
   
-  const renderRight = () => {
+  /** Render the right pane (or only pane if collapsed) 
+   * @param noTitle do not render title even if item has one
+   */
+  function renderRight(noTitle: boolean) {
     if (!selectedId || !selectedWidgetId || !selectedItem) {
       return null
     }
@@ -197,7 +213,7 @@ export default function TOCInstanceComp(props: {
       contextVarValues: mappedContextVarValues,
       database: instanceCtx.database,
       type: "normal",
-      title: selectedItem.title ? localize(selectedItem.title, instanceCtx.locale) : undefined,
+      title: !noTitle && selectedItem.title ? localize(selectedItem.title, instanceCtx.locale) : undefined,
       widgetId: selectedWidgetId
     }
 
@@ -221,24 +237,30 @@ export default function TOCInstanceComp(props: {
       return <div/>
     }
 
+    const title = selectedItem.title ? localize(selectedItem.title, instanceCtx.locale) : undefined
+
     return <div onClick={() => setSelectorOpen(false)}>
       <FillDownwardComponent>
-        <div 
-          key="selected" 
-          onClick={ev => {
-            ev.stopPropagation()
-            setSelectorOpen(v => !v)
-          }} 
-          className={`toc-select-button${selectorOpen ? " open" : ""}`}
-        >
-          <i className="fa fa-bars"/>
-        </div>
-        { selectorOpen ?
-          <div className="toc-selector">
-            { renderLeft() }
+        <div key="header">
+          <div 
+              key="selected" 
+              onClick={ev => {
+                ev.stopPropagation()
+                setSelectorOpen(v => !v)
+              }} 
+              className={`toc-select-button${selectorOpen ? " open" : ""}`}
+            >
+            <i className="fa fa-bars"/>
           </div>
-        : null }
-        { renderRight() }
+          {" "}
+          <div className="toc-select-title">{title}</div>
+          { selectorOpen ?
+            <div className="toc-selector">
+              { renderLeft() }
+            </div>
+          : null }
+        </div>
+        { renderRight(true) }
       </FillDownwardComponent>
     </div>
   }
@@ -246,7 +268,7 @@ export default function TOCInstanceComp(props: {
   // Render overall structure
   return <SplitPane
     left={renderLeft()}
-    right={renderRight()}
+    right={renderRight(false)}
     removePadding={blockDef.removePadding || false}
     theme={blockDef.theme || "light"}
   />
