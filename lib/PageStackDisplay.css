@@ -35,3 +35,13 @@
     margin-bottom: 5px;  
   }
 }
+
+.normal-page-contents-remove-padding {
+  margin: -15px -20px -15px -20px;
+}
+
+@media screen and (max-width: 800px) {
+  .normal-page-contents-remove-padding {
+    margin: -10px -5px -10px -5px;
+  }
+}

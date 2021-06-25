@@ -40,16 +40,6 @@
   overflow-y: auto;
 }
 
-.toc-split.remove-padding {
-  margin: -15px -20px -15px -20px;
-}
-
-@media screen and (max-width: 800px) {
-  .toc-split.remove-padding {
-    margin: -10px -5px -10px -5px;
-  }
-}
-
 @media (min-width: 1200px) {
   .toc-split-left {
     width: 17%;
