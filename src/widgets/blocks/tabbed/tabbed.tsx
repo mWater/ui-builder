@@ -8,7 +8,7 @@ import uuid from 'uuid/v4';
 import { TabbedInstance } from './TabbedInstance';
 import { LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
-import { Select } from 'react-library/lib/bootstrap';
+import { Checkbox, Select } from 'react-library/lib/bootstrap';
 
 export interface TabbedBlockTab {
   /** Unique id for tab */
@@ -25,6 +25,9 @@ export interface TabbedBlockDef extends BlockDef {
 
   /** Tabs to use */
   tabs: TabbedBlockTab[]
+
+  /** True to always collapse */
+  alwaysCollapse?: boolean 
 
   /** Width at which tabs collapse */
   collapseWidth?: number
@@ -90,11 +93,17 @@ export class TabbedBlock extends Block<TabbedBlockDef> {
           </button>
         </LabeledProperty>
 
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="alwaysCollapse">
+          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Always Collapse</Checkbox>}
+        </PropertyEditor>
+
+        { !this.blockDef.alwaysCollapse ?
         <LabeledProperty label="Collapse Below Width">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="collapseWidth">
             {(value, onChange) => <ResponsiveWidthSelector value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
+        : null }
       </div>
     )
   }

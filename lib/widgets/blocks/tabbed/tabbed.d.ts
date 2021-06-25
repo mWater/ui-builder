@@ -13,6 +13,8 @@ export interface TabbedBlockDef extends BlockDef {
     type: "tabbed";
     /** Tabs to use */
     tabs: TabbedBlockTab[];
+    /** True to always collapse */
+    alwaysCollapse?: boolean;
     /** Width at which tabs collapse */
     collapseWidth?: number;
 }

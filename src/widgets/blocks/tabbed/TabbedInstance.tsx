@@ -54,7 +54,7 @@ export function TabbedInstance(props: {
   }
 
   // If below minimum, use collapsed view
-  if (props.blockDef.collapseWidth != null && pageWidth <= props.blockDef.collapseWidth) {
+  if (props.blockDef.alwaysCollapse || (props.blockDef.collapseWidth != null && pageWidth <= props.blockDef.collapseWidth)) {
     function getTabLabel(tab: TabbedBlockTab) {
       return localize(tab.label, props.instanceCtx.locale)
     }
