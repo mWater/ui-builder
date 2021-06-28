@@ -104,7 +104,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="virtualizeDatabaseInPreview">
         {(value, onChange) => <Checkbox value={value != null ? value : true} onChange={onChange}>Prevent changes to database in Preview</Checkbox>}
       </PropertyEditor>
-      <LabeledProperty label="Marings" hint="Use to remove all margins from control for TOC or dashboard">
+      <LabeledProperty label="Margins" hint="Use to remove all margins from control for TOC or dashboard">
         <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="pageMargins">
           {(value, onChange) => 
             <Toggle 
