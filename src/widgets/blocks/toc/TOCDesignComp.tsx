@@ -187,7 +187,6 @@ export default function TOCDesignComp(props: {
   return <SplitPane
     left={renderLeft()}
     right={renderRight()}
-    removePadding={false}
     theme={blockDef.theme || "light"}
   />
 }

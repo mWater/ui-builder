@@ -42,7 +42,7 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     /** Stores the registration for validation of a child block and returns an unregister function */
     registerChildForValidation: (pageIndex: number, validate: () => string | null) => (() => void);
     renderPageContents(page: Page, pageIndex: number): JSX.Element | null;
-    renderPage(page: Page, index: number): JSX.Element;
-    render(): JSX.Element[];
+    renderPage(page: Page, index: number): JSX.Element | null;
+    render(): (JSX.Element | null)[];
 }
 export {};

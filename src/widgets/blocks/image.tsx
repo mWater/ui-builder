@@ -23,7 +23,7 @@ export interface ImageBlockDef extends BlockDef {
   /** Size mode:
    * normal: displays image with maximum width of 100%
    * fullwidth: stretches to 100%
-   * banner: stretches to 100% and includes reverse page margin to fill completely
+   * banner: same as fullwidth. Use pageMargins to remove margins instead
    */
   sizeMode?: "normal" | "fullwidth" | "banner"
 
@@ -123,7 +123,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
               options={[
                 { value: "normal", label: "Normal"},
                 { value: "fullwidth", label: "Full width"},
-                { value: "banner", label: "Banner"}
+                { value: "banner", label: "Banner (deprecated)"}
               ]}/> }
           </PropertyEditor>
         </LabeledProperty>

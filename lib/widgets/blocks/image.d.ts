@@ -17,7 +17,7 @@ export interface ImageBlockDef extends BlockDef {
     /** Size mode:
      * normal: displays image with maximum width of 100%
      * fullwidth: stretches to 100%
-     * banner: stretches to 100% and includes reverse page margin to fill completely
+     * banner: same as fullwidth. Use pageMargins to remove margins instead
      */
     sizeMode?: "normal" | "fullwidth" | "banner";
     /** How to align image. Default is left */

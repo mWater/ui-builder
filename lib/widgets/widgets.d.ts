@@ -26,6 +26,8 @@ export interface WidgetDef {
     };
     /** True to virtualize database in preview. Default true */
     virtualizeDatabaseInPreview?: boolean;
+    /** Size of margins when displaying widget in page. Default is "normal" */
+    pageMargins?: "normal" | "none";
 }
 export declare type LookupWidget = (id: string) => WidgetDef | null;
 /** Validate a widget, optionally also validating all children */

@@ -104,9 +104,24 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
       <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="virtualizeDatabaseInPreview">
         {(value, onChange) => <Checkbox value={value != null ? value : true} onChange={onChange}>Prevent changes to database in Preview</Checkbox>}
       </PropertyEditor>
-      <LabeledProperty label="Widget ID" hint="Advanced">
-        <input type="text" value={this.props.widgetDef.id} className="form-control input-sm" onFocus={ev => { ev.target.select() }}/>
+      <LabeledProperty label="Marings" hint="Use to remove all margins from control for TOC or dashboard">
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="pageMargins">
+          {(value, onChange) => 
+            <Toggle 
+              value={value || "normal"} 
+              onChange={onChange} 
+              size="sm"
+              options={[
+                { value: "normal", label: "Normal" },
+                { value: "none", label: "None" },
+              ]}
+            />
+          }
+        </PropertyEditor>
       </LabeledProperty>
+      {/* <LabeledProperty label="Widget ID" hint="Advanced">
+        <input type="text" value={this.props.widgetDef.id} className="form-control input-sm" onFocus={ev => { ev.target.select() }}/>
+      </LabeledProperty> */}
     </div>)
   }
 }

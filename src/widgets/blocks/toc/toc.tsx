@@ -26,7 +26,7 @@ export interface TOCBlockDef extends BlockDef {
   /** Optional footer */
   footer: BlockDef | null
 
-  /** Remove padding (for top-level TOC that should fit page completely) */
+  /** Remove padding (for top-level TOC that should fit page completely) @deprecated */
   removePadding?: boolean
 
   /** Theme (default is light) */
@@ -193,9 +193,9 @@ export class TOCBlock extends Block<TOCBlockDef> {
   renderEditor(props: DesignCtx) {
     return (
       <div>
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removePadding">
+        {/* <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removePadding">
           {(value, onChange) => <Checkbox value={value} onChange={onChange}>Remove Padding (for top-level TOCs)</Checkbox>}
-        </PropertyEditor>
+        </PropertyEditor> */}
 
         <LabeledProperty label="Theme">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="theme">

@@ -213,13 +213,19 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       }
     }
 
+    // Lookup widget
+    const widgetDef = this.props.baseCtx.widgetLibrary.widgets[page.widgetId!]
+    if (!widgetDef) {
+      return null
+    }
+
     const contents = this.renderPageContents(page, index)
 
     switch (page.type) {
       case "normal":
         return (
           <div style={{ display: invisible ? "none" : "block" }} key={index}>
-            <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index} title={page.title}>
+            <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index} title={page.title} pageMargins={widgetDef.pageMargins || "normal"}>
               {contents}
             </NormalPage>
           </div>
@@ -250,10 +256,11 @@ class NormalPage extends React.Component<{
   isFirst: boolean
   onClose: () => void
   title?: string 
+  pageMargins: "normal" | "none"
 }> {
   render() {
     return (
-      <div className="normal-page">
+      <div className={`normal-page normal-page-margins-${this.props.pageMargins}`}>
         { !this.props.isFirst || this.props.title ?
           <div className="normal-page-header" key="header">
             <h4>

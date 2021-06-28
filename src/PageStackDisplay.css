@@ -21,27 +21,21 @@
   margin: 0;
 }
 
-.normal-page-contents {
+.normal-page-margins-normal > .normal-page-contents {
   padding: 15px 20px 15px 20px;
 }
 
+.normal-page-margins-none > .normal-page-contents {
+  padding: 0px;
+}
+
 @media screen and (max-width: 800px) {
-  .normal-page-contents {
+  .normal-page-margins-normal > .normal-page-contents {
     padding: 10px 5px 10px 5px;
   }
 
   .normal-page-header {
     padding: 10px 5px 10px 10px;
     margin-bottom: 5px;  
-  }
-}
-
-.normal-page-contents-remove-padding {
-  margin: -15px -20px -15px -20px;
-}
-
-@media screen and (max-width: 800px) {
-  .normal-page-contents-remove-padding {
-    margin: -10px -5px -10px -5px;
   }
 }

@@ -2,10 +2,9 @@ import React, { ReactNode } from "react"
 import FillDownwardComponent from "react-library/lib/FillDownwardComponent"
 
 /** Pane that is split left right */
-const SplitPane = ({ left, right, removePadding, theme }: { left: ReactNode, right : ReactNode, removePadding: boolean, theme: "light" | "dark" }) => {
-  const className = removePadding ? `toc-split normal-page-contents-remove-padding ${theme}` : `toc-split ${theme}`
+const SplitPane = ({ left, right, theme }: { left: ReactNode, right : ReactNode, theme: "light" | "dark" }) => {
   return <FillDownwardComponent>
-    <div className={className}>
+    <div className={`toc-split ${theme}`}>
       <div key="left" className="toc-split-left">
         {left}
       </div>

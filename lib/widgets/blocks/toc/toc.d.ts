@@ -13,7 +13,7 @@ export interface TOCBlockDef extends BlockDef {
     header: BlockDef | null;
     /** Optional footer */
     footer: BlockDef | null;
-    /** Remove padding (for top-level TOC that should fit page completely) */
+    /** Remove padding (for top-level TOC that should fit page completely) @deprecated */
     removePadding?: boolean;
     /** Theme (default is light) */
     theme?: "light" | "dark";
