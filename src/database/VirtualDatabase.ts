@@ -414,14 +414,14 @@ export default class VirtualDatabase implements Database {
   }
 
   private handleChange = () => {
-    for (const changeListener of this.changeListeners) {
-      changeListener()
-    }
-
     // Clear caches
     this.queryCache = new BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
       return this.database.query(request.query, request.contextVars, request.contextVarValues)
     })
+
+    for (const changeListener of this.changeListeners) {
+      changeListener()
+    }
   }
 }
 
