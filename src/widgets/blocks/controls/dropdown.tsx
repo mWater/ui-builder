@@ -72,6 +72,12 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
       const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
 
+      // Validate filter
+      error = exprValidator.validateExpr(this.blockDef.idFilterExpr || null, { table: idTable, types: ["boolean"] })
+      if (error) {
+        return error
+      }
+
       if (idMode == "simple") {
         if (!this.blockDef.idLabelExpr)  {
           return "Label Expression required"
@@ -129,7 +135,6 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
             return error
           }
         }
-    
       }
     }
     return null
