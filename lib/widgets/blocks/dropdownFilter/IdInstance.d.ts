@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { InstanceCtx } from '../../../contexts';
 /** Dropdown filter that is an id */

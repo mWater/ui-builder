@@ -20,7 +20,7 @@ export declare class PropertyEditor<T, K extends keyof T> extends React.Componen
     children: (value: T[K], onChange: (value: T[K]) => void) => React.ReactElement<any>;
 }> {
     handleChange: (value: T[K]) => void;
-    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>>;
 }
 export declare class LocalizedTextPropertyEditor extends React.Component<{
     value?: LocalizedString | null;

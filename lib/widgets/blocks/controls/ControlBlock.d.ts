@@ -54,7 +54,7 @@ export declare abstract class ControlBlock<T extends ControlBlockDef> extends Le
     renderControlEditor(props: DesignCtx): React.ReactElement<any> | null;
     /** Filter the columns that this control is for */
     abstract filterColumn(column: Column): boolean;
-    renderDesign(designCtx: DesignCtx): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    renderDesign(designCtx: DesignCtx): React.ReactElement<any, string | React.JSXElementConstructor<any>>;
     renderInstance(props: InstanceCtx): JSX.Element;
     /** Allow subclasses to clear/update other fields on the column changing */
     processColumnChanged(blockDef: T): T;

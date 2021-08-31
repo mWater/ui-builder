@@ -37,7 +37,7 @@ export declare class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
      * contextVars: includes rowsetCV and row one
      */
     getRowContextVarValue(row: Row, rowExprs: Expr[], schema: Schema, rowsetCV: ContextVar, contextVars: ContextVar[]): any;
-    renderDesign(props: DesignCtx): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    renderDesign(props: DesignCtx): React.ReactElement<any, string | React.JSXElementConstructor<any>>;
     renderInstance(props: InstanceCtx): JSX.Element;
     renderEditor(props: DesignCtx): JSX.Element;
 }

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { WidgetLibrary } from "./widgetLibrary";
 import { WidgetDef } from "../widgets/widgets";
 /** Tab which lists existing tabs and offers a button to create a new tab */

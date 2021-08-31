@@ -6,5 +6,5 @@ export default class ErrorBoundary extends React.Component<{}, {
 }> {
     constructor(props: {});
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void;
-    render(): {} | null | undefined;
+    render(): React.ReactNode;
 }

@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 declare const _default: () => {
     query: jest.Mock<any, any>;
     addChangeListener: jest.Mock<any, any>;

@@ -16,6 +16,6 @@ interface Props {
  * Computes values of expressions
  */
 export default class ContextVarsInjector extends React.Component<Props> {
-    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
+    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | null;
 }
 export {};
