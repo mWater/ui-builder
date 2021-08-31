@@ -191,7 +191,7 @@ export const ContextVarExprPropertyEditor = (props: {
         aggrStatuses={props.aggrStatuses}
         types={props.types}
         variables={createExprVariables(availContextVars)}
-        table={contextVar ? contextVar.table || null : null}
+        table={contextVar ? contextVar.table || undefined : undefined}
         enumValues={props.enumValues}
         idTable={props.idTable} />
     </div>

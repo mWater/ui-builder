@@ -3,12 +3,12 @@ import React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks'
 import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, ResponsiveWidthSelector } from '../../propertyEditors';
 import TabbedDesigner from './TabbedDesigner';
-import ListEditor from '../../ListEditor';
 import uuid from 'uuid/v4';
 import { TabbedInstance } from './TabbedInstance';
 import { LocalizedString } from 'mwater-expressions';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 import { Checkbox, Select } from 'react-library/lib/bootstrap';
+import { ListEditorComponent } from 'react-library/lib/ListEditorComponent';
 
 export interface TabbedBlockTab {
   /** Unique id for tab */
@@ -71,21 +71,26 @@ export class TabbedBlock extends Block<TabbedBlockDef> {
       }))
     }
 
+    function renderTab(tab: TabbedBlockTab, index: number, onTabChange: (tab: TabbedBlockTab) => void) {
+      return <PropertyEditor obj={tab} onChange={onTabChange} property="label">
+        {(label, onLabelChange) => 
+          <LocalizedTextPropertyEditor value={label} onChange={onLabelChange} locale={props.locale} />
+        }
+      </PropertyEditor>
+    }
+
     return (
       <div>
         <h3>Tabbed</h3>
         <LabeledProperty label="Tabs">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="tabs">
             {(tabs, onTabsChange) =>
-              <ListEditor items={this.blockDef.tabs} onItemsChange={onTabsChange}>
-                {(tab: TabbedBlockTab, onTabChange) =>
-                  <PropertyEditor obj={tab} onChange={onTabChange} property="label">
-                    {(label, onLabelChange) => 
-                      <LocalizedTextPropertyEditor value={label} onChange={onLabelChange} locale={props.locale} />
-                    }
-                  </PropertyEditor>
-                }
-              </ListEditor>
+              <ListEditorComponent 
+                items={this.blockDef.tabs} 
+                onItemsChange={onTabsChange}
+                renderItem={renderTab}
+                getReorderableKey={tab => tab.id}
+              />
             }
           </PropertyEditor>
           <button type="button" className="btn btn-link btn-sm" onClick={handleAddTab}>
