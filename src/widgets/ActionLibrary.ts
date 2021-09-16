@@ -82,7 +82,7 @@ export class ActionLibrary {
         return {
           type: "browserBack"
         } as BrowserBackActionDef
-      case "refresh": 
+      case "refreshData": 
         return {
           type: "refreshData"
         } as RefreshDataActionDef
