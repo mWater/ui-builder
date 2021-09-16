@@ -289,6 +289,10 @@ class TrackingDatabase implements Database {
   transaction(): Transaction {
     return this.database.transaction()
   } 
+
+  refresh() {
+    // Do nothing as printing should not update dynamically
+  }
 }
 
 /** Data source that proxies another data source but calls callback whenever a query is performed. 

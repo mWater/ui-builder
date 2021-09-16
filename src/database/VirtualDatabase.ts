@@ -129,6 +129,11 @@ export default class VirtualDatabase implements Database {
     return new VirtualDatabaseTransaction(this)
   }
 
+  refresh() {
+    // Refresh underlying database
+    this.database.refresh()
+  }
+
   /** Commit the changes that have been applied to this virtual database to the real underlying database and destroy the virtual database */
   async commit(): Promise<void> {
     if (this.mutations.length === 0) {

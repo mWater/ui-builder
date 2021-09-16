@@ -3,6 +3,7 @@ export default () => {
     query: jest.fn(),
     addChangeListener: jest.fn(),
     removeChangeListener: jest.fn(),
-    transaction: jest.fn()
+    transaction: jest.fn(),
+    refresh: jest.fn()
   }
 }

@@ -41,6 +41,7 @@ export default class VirtualDatabase implements Database {
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;
     transaction(): Transaction;
+    refresh(): void;
     /** Commit the changes that have been applied to this virtual database to the real underlying database and destroy the virtual database */
     commit(): Promise<void>;
     /** Rollback any changes and destroy the virtual database */
