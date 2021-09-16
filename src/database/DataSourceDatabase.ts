@@ -47,7 +47,7 @@ export class DataSourceDatabase implements Database {
   }
 
   /** Force change event to fire after clearing cache */
-  triggerChange() {
+  refresh() {
     this.dataSource.clearCache()
     
     for (const changeListener of this.changeListeners) {

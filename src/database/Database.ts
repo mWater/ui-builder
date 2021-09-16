@@ -30,13 +30,17 @@ export type DatabaseChangeListener = () => void
  */
 export interface Database {
   /** Perform a query. Note: contextVarValues should have filters baked into them. Use getFilteredContextVarValues(...) */
-  query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: { [contextVarId: string]: any }): Promise<Row[]>;
-  
-  /** Adds a listener which is called with each change to the database */
-  addChangeListener(changeListener: DatabaseChangeListener): void;
-  removeChangeListener(changeListener: DatabaseChangeListener): void;
+  query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: { [contextVarId: string]: any }): Promise<Row[]>
 
+  /** Adds a listener which is called with each change to the database */
+  addChangeListener(changeListener: DatabaseChangeListener): void
+  removeChangeListener(changeListener: DatabaseChangeListener): void
+
+  /** Start a transaction */
   transaction(): Transaction
+
+  /** Trigger all change listeners to perform a refresh. Automatically done after transaction completion */
+  refresh(): void
 }
 
 /** Transaction of actions to apply to the database */
@@ -45,18 +49,18 @@ export interface Transaction {
    * primary key is only valid within the transaction. The commit will 
    * return the actual new primary key.
    */
-  addRow(table: string, values: { [column: string]: any }): Promise<any>;
+  addRow(table: string, values: { [column: string]: any }): Promise<any>
 
   /** Updates a row */
-  updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>;
+  updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void>
   
   /** Removes a row */
-  removeRow(table: string, primaryKey: any): Promise<void>;
+  removeRow(table: string, primaryKey: any): Promise<void>
 
   /** Commits the transaction, returning an array of primary keys (for add mutations) and null otherwise.
    * For example, if there are two adds and a remove, the returned array will contain [<primary key1>, <primary key2>, null]
    */
-  commit(): Promise<any[]>;
+  commit(): Promise<any[]>
 }
 
 /** Database which performs no actions and always returns blank query results */
@@ -68,6 +72,8 @@ export class NullDatabase implements Database {
   removeChangeListener(changeListener: DatabaseChangeListener) { return }
 
   transaction() { return new NullTransaction() }
+
+  refresh() { return }
 }
 
 /** Transaction which performs no actions */

@@ -30,7 +30,10 @@ export interface Database {
     /** Adds a listener which is called with each change to the database */
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;
+    /** Start a transaction */
     transaction(): Transaction;
+    /** Trigger all change listeners to perform a refresh. Automatically done after transaction completion */
+    refresh(): void;
 }
 /** Transaction of actions to apply to the database */
 export interface Transaction {
@@ -61,6 +64,7 @@ export declare class NullDatabase implements Database {
     addChangeListener(changeListener: DatabaseChangeListener): void;
     removeChangeListener(changeListener: DatabaseChangeListener): void;
     transaction(): NullTransaction;
+    refresh(): void;
 }
 /** Transaction which performs no actions */
 declare class NullTransaction implements Transaction {
