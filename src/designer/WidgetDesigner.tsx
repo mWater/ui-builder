@@ -5,7 +5,7 @@ import { WidgetDef } from "../widgets/widgets"
 import { BlockDef, findBlockAncestry, getBlockTree, ContextVar } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
-import { Toggle } from 'react-library/lib/bootstrap'
+import { Select, Toggle } from 'react-library/lib/bootstrap'
 import { WidgetEditor } from "./WidgetEditor";
 import { PageStackDisplay } from "../PageStackDisplay";
 import { Page } from "../PageStack";
@@ -34,6 +34,9 @@ interface State {
   selectedBlockId: string | null
   undoStack: WidgetDef[]
   redoStack: WidgetDef[]
+
+  /** Current locale */
+  locale: string
 }
 
 /** Design mode for a single widget. Ensures that blockdefs are always canonical */
@@ -44,7 +47,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       mode: Mode.Design,
       selectedBlockId: null,
       undoStack: [],
-      redoStack: []
+      redoStack: [],
+      locale: props.baseCtx.locale
     }
   }
 
@@ -302,7 +306,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       widgetId: this.props.widgetDef.id
     }
     const pageElem = <PageStackDisplay 
-      baseCtx={this.props.baseCtx}
+      baseCtx={{ ...this.props.baseCtx, locale: this.state.locale }}
       initialPage={page} />
 
     return [
@@ -313,6 +317,19 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       </div>),
       (<div key="editor" className="widget-designer-editor"/>)
     ]
+  }
+
+  renderPreviewLocale() {
+    const options = (this.props.baseCtx.locales || [{ code: "en", name: "English" }]).map(l => ({ value: l.code, label: l.name }))
+    return <div style={{ display: "inline-block", marginRight: 10 }}>
+      <Select
+        options={options}
+        value={this.state.locale}
+        onChange={locale => this.setState({ locale: locale! })}
+        inline
+        size="sm"
+      />
+    </div>
   }
 
   render() {
@@ -330,15 +347,26 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     return (
       <div className="widget-designer">
         <div className="widget-designer-header">
-          <AddWizardPalette onSelect={this.handleSelect}/>
+          { this.state.mode == Mode.Design ? 
+            <AddWizardPalette onSelect={this.handleSelect}/> 
+          : null }
           <div style={{float: "right"}}>
-            <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.baseCtx.createBlock}/>
-            <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
-              <i className="fa fa-undo"/> Undo              
-            </button>
-            <button type="button" className="btn btn-link btn-sm" onClick={this.handleRedo} disabled={this.state.redoStack.length === 0}>
-              <i className="fa fa-repeat"/> Redo
-            </button>
+            { this.state.mode == Mode.Design ? 
+              <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.baseCtx.createBlock}/>
+            : null }
+            { this.state.mode == Mode.Design ? 
+              <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
+                <i className="fa fa-undo"/> Undo              
+              </button>
+            : null }
+            { this.state.mode == Mode.Design ? 
+              <button type="button" className="btn btn-link btn-sm" onClick={this.handleRedo} disabled={this.state.redoStack.length === 0}>
+                <i className="fa fa-repeat"/> Redo
+              </button>
+            : null }
+            { this.state.mode == Mode.Preview ? 
+              this.renderPreviewLocale()
+            : null }
             <Toggle 
               value={this.state.mode}
               options={[

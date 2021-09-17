@@ -21,6 +21,8 @@ interface State {
     selectedBlockId: string | null;
     undoStack: WidgetDef[];
     redoStack: WidgetDef[];
+    /** Current locale */
+    locale: string;
 }
 /** Design mode for a single widget. Ensures that blockdefs are always canonical */
 export default class WidgetDesigner extends React.Component<WidgetDesignerProps, State> {
@@ -46,6 +48,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     renderDesign(): JSX.Element[];
     /** Render a preview of the widget in a page */
     renderPreview(): JSX.Element[] | null;
+    renderPreviewLocale(): JSX.Element;
     render(): JSX.Element | null;
 }
 export {};

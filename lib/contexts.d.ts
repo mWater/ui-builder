@@ -30,6 +30,14 @@ export interface BaseCtx {
     formatLocale?: FormatLocaleObject;
     /** Global context variables that are passed to all blocks */
     globalContextVars?: ContextVar[];
+    /** All available locales (for preview purposes) */
+    locales?: Locale[];
+}
+export interface Locale {
+    /** ISO code for locale (e.g. "en") */
+    code: string;
+    /** Local name for locale (e.g. Espanol) */
+    name: string;
 }
 /** Context that all design-mode operations need */
 export interface DesignCtx extends BaseCtx {
