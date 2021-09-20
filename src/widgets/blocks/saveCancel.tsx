@@ -11,7 +11,7 @@ import { Expr, LocalizedString } from 'mwater-expressions'
 import { DesignCtx, InstanceCtx } from '../../contexts'
 import { ListEditorComponent } from 'react-library/lib/ListEditorComponent'
 import { Transaction } from '../../database/Database'
-import { ContextVarExpr, validateContextVarExpr } from '../..'
+import { ContextVarExpr, ContextVarExprPropertyEditor, validateContextVarExpr } from '../..'
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -195,13 +195,12 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
           <LabeledProperty label="Delete condition" hint="optional expression that must be true to show delete button">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="deleteCondition">
               {(value, onChange) => 
-                <ContextVarAndExprPropertyEditor
+                <ContextVarExprPropertyEditor
                   schema={props.schema}
                   dataSource={props.dataSource}
                   contextVars={props.contextVars}
-                  contextVarId={value ? value.contextVarId : null}
-                  expr={value ? value.expr : null}
-                  onChange={(contextVarId, expr) => { onChange({ contextVarId, expr }) }}
+                  contextVarExpr={value}
+                  onChange={onChange}
                   types={["boolean"]} />
               }
             </PropertyEditor>

@@ -13,6 +13,7 @@ import { localize } from "./localization";
 import { EmbeddedExpr } from "../embeddedExprs";
 import { DesignCtx } from "../contexts";
 import { CollapsibleComponent } from './blocks/collapsible';
+import { ContextVarExpr } from '..';
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
@@ -153,6 +154,50 @@ export class ContextVarPropertyEditor extends React.Component<{
   }
 }
 
+/** Edits a context variable expression */
+export function ContextVarExprPropertyEditor(props: { 
+  schema: Schema
+  dataSource: DataSource
+  contextVars: ContextVar[]
+  contextVarExpr: ContextVarExpr | undefined
+  onChange: (contextVarExpr: ContextVarExpr) => void
+  /** If not specified, is literal and individual */
+  aggrStatuses?: AggrStatus[]
+  types?: LiteralType[]
+  enumValues?: Array<{ id: string, name: LocalizedString }>
+  idTable?: string
+}) {
+  const contextVar = props.contextVars.find(cv => props.contextVarExpr != null && cv.id === props.contextVarExpr.contextVarId)
+
+  // Get all context variables up to an including one above. All context variables if null
+  // This is because an outer context var expr cannot reference an inner context variable
+  const cvIndex = props.contextVars.findIndex(cv => props.contextVarExpr != null && cv.id === props.contextVarExpr.contextVarId)
+  const availContextVars = cvIndex >= 0 ? _.take(props.contextVars, cvIndex + 1)  : props.contextVars
+
+  return <div style={{ border: "solid 1px #DDD", borderRadius: 5, padding: 10 }}>
+    <ContextVarPropertyEditor 
+      value={props.contextVarExpr ? props.contextVarExpr.contextVarId : null} 
+      onChange={cv => { props.onChange({ contextVarId: cv, expr: null })} }
+      nullLabel="No Row/Rowset"
+      contextVars={props.contextVars} 
+      types={["row", "rowset"]} />
+
+    <div style={{ paddingTop: 10 }}>
+      <ExprComponent 
+        value={props.contextVarExpr ? props.contextVarExpr.expr : null} 
+        onChange={expr => { props.onChange({ contextVarId: contextVar ? contextVar.id : null, expr }) }}
+        schema={props.schema} 
+        dataSource={props.dataSource} 
+        aggrStatuses={props.aggrStatuses}
+        types={props.types}
+        variables={createExprVariables(availContextVars)}
+        table={contextVar ? contextVar.table || undefined : undefined}
+        enumValues={props.enumValues}
+        idTable={props.idTable} />
+    </div>
+  </div>
+}
+
 /** Edits both a context variable selection and a related expression as separate props */
 export function ContextVarAndExprPropertyEditor(props: { 
   schema: Schema
@@ -167,35 +212,17 @@ export function ContextVarAndExprPropertyEditor(props: {
   enumValues?: Array<{ id: string, name: LocalizedString }>
   idTable?: string
 }) {
-  const contextVar = props.contextVars.find(cv => cv.id === props.contextVarId)
-
-  // Get all context variables up to an including one above. All context variables if null
-  // This is because an outer context var expr cannot reference an inner context variable
-  const cvIndex = props.contextVars.findIndex(cv => cv.id === props.contextVarId)
-  const availContextVars = cvIndex >= 0 ? _.take(props.contextVars, cvIndex + 1)  : props.contextVars
-
-  return <div style={{ border: "solid 1px #DDD", borderRadius: 5, padding: 10 }}>
-    <ContextVarPropertyEditor 
-      value={props.contextVarId} 
-      onChange={cv => { props.onChange(cv, null)} }
-      nullLabel="No Row/Rowset"
-      contextVars={props.contextVars} 
-      types={["row", "rowset"]} />
-
-    <div style={{ paddingTop: 10 }}>
-      <ExprComponent 
-        value={props.expr} 
-        onChange={expr => { props.onChange(props.contextVarId, expr)} }
-        schema={props.schema} 
-        dataSource={props.dataSource} 
-        aggrStatuses={props.aggrStatuses}
-        types={props.types}
-        variables={createExprVariables(availContextVars)}
-        table={contextVar ? contextVar.table || undefined : undefined}
-        enumValues={props.enumValues}
-        idTable={props.idTable} />
-    </div>
-  </div>
+  return <ContextVarExprPropertyEditor
+    schema={props.schema}
+    dataSource={props.dataSource}
+    contextVars={props.contextVars}
+    contextVarExpr={{ contextVarId: props.contextVarId, expr: props.expr }}
+    onChange={cve => { props.onChange(cve.contextVarId, cve.expr) }}
+    aggrStatuses={props.aggrStatuses}
+    types={props.types}
+    enumValues={props.enumValues}
+    idTable={props.idTable}
+  />
 }
 
 /** Edits an action definition, allowing selection of action */

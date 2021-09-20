@@ -1,7 +1,7 @@
 import { BlockDef, ContextVar, Filter } from "../../blocks";
 import LeafBlock from "../../LeafBlock";
 import React, { useEffect, useRef, useState } from "react"
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarAndExprPropertyEditor } from "../../propertyEditors";
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarAndExprPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors";
 import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
 import { Select, Checkbox } from "react-library/lib/bootstrap";
 import { localize } from "../../localization";
@@ -162,13 +162,12 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
           <LabeledProperty label="Readonly" hint="optional expression that makes read-only if true">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="readonlyExpr">
               {(value, onChange) => (
-                <ContextVarAndExprPropertyEditor
+                <ContextVarExprPropertyEditor
                   schema={props.schema}
                   dataSource={props.dataSource}
                   contextVars={props.contextVars}
-                  contextVarId={value ? value.contextVarId : null}
-                  expr={value ? value.expr : null}
-                  onChange={(contextVarId, expr) => { onChange({ contextVarId, expr }) }}
+                  contextVarExpr={value}
+                  onChange={onChange}
                   types={["boolean"]} />
               )}
             </PropertyEditor>

@@ -6,6 +6,7 @@ import { OrderBy } from "../database/Database";
 import * as PropTypes from 'prop-types';
 import { EmbeddedExpr } from "../embeddedExprs";
 import { DesignCtx } from "../contexts";
+import { ContextVarExpr } from '..';
 /** Labeled group */
 export declare const LabeledProperty: React.FC<{
     label: string;
@@ -60,6 +61,22 @@ export declare class ContextVarPropertyEditor extends React.Component<{
 }> {
     render(): JSX.Element;
 }
+/** Edits a context variable expression */
+export declare function ContextVarExprPropertyEditor(props: {
+    schema: Schema;
+    dataSource: DataSource;
+    contextVars: ContextVar[];
+    contextVarExpr: ContextVarExpr | undefined;
+    onChange: (contextVarExpr: ContextVarExpr) => void;
+    /** If not specified, is literal and individual */
+    aggrStatuses?: AggrStatus[];
+    types?: LiteralType[];
+    enumValues?: Array<{
+        id: string;
+        name: LocalizedString;
+    }>;
+    idTable?: string;
+}): JSX.Element;
 /** Edits both a context variable selection and a related expression as separate props */
 export declare function ContextVarAndExprPropertyEditor(props: {
     schema: Schema;
