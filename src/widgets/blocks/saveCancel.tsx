@@ -4,7 +4,7 @@ import React from 'react'
 import produce from 'immer'
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { localize } from '../localization';
-import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors'
+import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarAndExprPropertyEditor } from '../propertyEditors'
 import VirtualDatabase from '../../database/VirtualDatabase'
 import ContextVarsInjector from '../ContextVarsInjector'
 import { Expr, LocalizedString } from 'mwater-expressions'
@@ -195,7 +195,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
           <LabeledProperty label="Delete condition" hint="optional expression that must be true to show delete button">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="deleteCondition">
               {(value, onChange) => 
-                <ContextVarExprPropertyEditor
+                <ContextVarAndExprPropertyEditor
                   schema={props.schema}
                   dataSource={props.dataSource}
                   contextVars={props.contextVars}

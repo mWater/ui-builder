@@ -60,8 +60,8 @@ export declare class ContextVarPropertyEditor extends React.Component<{
 }> {
     render(): JSX.Element;
 }
-/** Edits both a context variable selection and a related expression */
-export declare const ContextVarExprPropertyEditor: (props: {
+/** Edits both a context variable selection and a related expression as separate props */
+export declare function ContextVarAndExprPropertyEditor(props: {
     schema: Schema;
     dataSource: DataSource;
     contextVars: ContextVar[];
@@ -69,14 +69,14 @@ export declare const ContextVarExprPropertyEditor: (props: {
     expr: Expr;
     onChange: (contextVarId: string | null, expr: Expr) => void;
     /** If not specified, is literal and individual */
-    aggrStatuses?: AggrStatus[] | undefined;
-    types?: LiteralType[] | undefined;
-    enumValues?: {
+    aggrStatuses?: AggrStatus[];
+    types?: LiteralType[];
+    enumValues?: Array<{
         id: string;
         name: LocalizedString;
-    }[] | undefined;
-    idTable?: string | undefined;
-}) => JSX.Element;
+    }>;
+    idTable?: string;
+}): JSX.Element;
 /** Edits an action definition, allowing selection of action */
 export declare class ActionDefEditor extends React.Component<{
     value?: ActionDef | null;

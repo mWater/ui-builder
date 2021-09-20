@@ -6,7 +6,7 @@ import { Expr, ExprValidator } from 'mwater-expressions';
 import ContextVarsInjector from '../ContextVarsInjector';
 import { TextInput, Toggle } from 'react-library/lib/bootstrap';
 import { FilterExprComponent } from 'mwater-expressions-ui';
-import { PropertyEditor, LabeledProperty, TableSelect, ContextVarExprPropertyEditor, OrderByArrayEditor } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, TableSelect, ContextVarAndExprPropertyEditor, OrderByArrayEditor } from '../propertyEditors';
 import { localize } from '../localization';
 import { useEffect, useState } from 'react';
 import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from '../../contexts';
@@ -221,7 +221,7 @@ export class RowBlock extends Block<RowBlockDef> {
         <LabeledProperty label="ID of row">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idContextVarExpr">
             {(value, onChange) => 
-              <ContextVarExprPropertyEditor
+              <ContextVarAndExprPropertyEditor
                 contextVars={props.contextVars}
                 contextVarId={value ? value.contextVarId : null}
                 expr={value ? value.expr : null}

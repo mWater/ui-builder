@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
-import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarExprPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
+import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarAndExprPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
 import { Expr, ExprUtils, ExprValidator, LocalizedString } from 'mwater-expressions';
 import * as _ from 'lodash';
 import * as d3Format from 'd3-format';
@@ -125,7 +125,7 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     return (
       <div>
         <LabeledProperty label="Expression">
-          <ContextVarExprPropertyEditor
+          <ContextVarAndExprPropertyEditor
             contextVars={props.contextVars}
             schema={props.schema} 
             dataSource={props.dataSource} 

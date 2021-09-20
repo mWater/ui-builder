@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../blocks'
 import * as _ from 'lodash';
 import { ExprValidator, Expr } from 'mwater-expressions';
-import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarAndExprPropertyEditor } from '../propertyEditors';
 import { DesignCtx, InstanceCtx } from '../../contexts';
 
 /** Block which only displays content if an expression is true */
@@ -83,7 +83,7 @@ export class ConditionalBlock extends Block<ConditionalBlockDef> {
       <div>
         <h3>Conditional</h3>
         <LabeledProperty label="Conditional Expression">
-          <ContextVarExprPropertyEditor
+          <ContextVarAndExprPropertyEditor
             contextVars={props.contextVars}
             schema={props.schema} 
             dataSource={props.dataSource} 

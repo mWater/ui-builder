@@ -153,8 +153,8 @@ export class ContextVarPropertyEditor extends React.Component<{
   }
 }
 
-/** Edits both a context variable selection and a related expression */
-export const ContextVarExprPropertyEditor = (props: { 
+/** Edits both a context variable selection and a related expression as separate props */
+export function ContextVarAndExprPropertyEditor(props: { 
   schema: Schema
   dataSource: DataSource
   contextVars: ContextVar[]
@@ -166,7 +166,7 @@ export const ContextVarExprPropertyEditor = (props: {
   types?: LiteralType[]
   enumValues?: Array<{ id: string, name: LocalizedString }>
   idTable?: string
-}) => {
+}) {
   const contextVar = props.contextVars.find(cv => cv.id === props.contextVarId)
 
   // Get all context variables up to an including one above. All context variables if null
@@ -511,7 +511,7 @@ export const EmbeddedExprEditor = (props: {
   return (
     <div>
       <LabeledProperty label={`Expression "{${props.index}}"`}>
-        <ContextVarExprPropertyEditor 
+        <ContextVarAndExprPropertyEditor 
           contextVarId={props.value.contextVarId}
           expr={props.value.expr} 
           onChange={handleChange} 

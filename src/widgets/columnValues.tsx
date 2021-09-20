@@ -4,7 +4,7 @@ import React from "react";
 import { ContextVar } from "./blocks";
 import produce from "immer";
 import { localize } from "./localization";
-import { LabeledProperty, ContextVarExprPropertyEditor } from "./propertyEditors";
+import { LabeledProperty, ContextVarAndExprPropertyEditor } from "./propertyEditors";
 import ReactSelect from 'react-select'
 import { ContextVarExpr } from '../ContextVarExpr';
 
@@ -61,7 +61,7 @@ export class ColumnValuesEditor extends React.Component<{
       <td key="name">{localize(column.name, this.props.locale)}</td>
       <td key="value">
         <LabeledProperty label="Expression">
-          <ContextVarExprPropertyEditor 
+          <ContextVarAndExprPropertyEditor 
             contextVarId={contextVarExpr.contextVarId} 
             expr={contextVarExpr.expr}
             onChange={this.handleContextVarExprChange.bind(null, columnId)}

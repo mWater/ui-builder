@@ -3,7 +3,7 @@ import produce from 'immer'
 import { default as React, useState, useEffect, useRef } from 'react';
 import { ExprValidator, Schema, Expr, LocalizedString, DataSource } from 'mwater-expressions';
 import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
-import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
+import { PropertyEditor, LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarAndExprPropertyEditor } from '../propertyEditors';
 import ListEditor from '../ListEditor';
 import { localize } from '../localization';
 import LeafBlock from '../LeafBlock';
@@ -122,7 +122,7 @@ const ValidationEditor = (props: {
   return (
     <div>
       <LabeledProperty label="Condition that must be not be false">
-        <ContextVarExprPropertyEditor
+        <ContextVarAndExprPropertyEditor
           contextVars={props.contextVars}
           schema={props.schema} 
           dataSource={props.dataSource} 

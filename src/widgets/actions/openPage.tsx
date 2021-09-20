@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React from 'react';
 import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor, ContextVarExprPropertyEditor } from '../propertyEditors';
+import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor, ContextVarAndExprPropertyEditor } from '../propertyEditors';
 import { Select, Checkbox, Toggle } from 'react-library/lib/bootstrap';
 import { WidgetDef } from '../widgets';
 import produce from 'immer';
@@ -338,7 +338,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           />
         }
         if (cvv.type == "contextVarExpr") {
-          return <ContextVarExprPropertyEditor
+          return <ContextVarAndExprPropertyEditor
             contextVarId={cvv.contextVarId}
             contextVars={props.contextVars}
             dataSource={props.dataSource}

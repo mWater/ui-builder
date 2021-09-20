@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { TOCItem } from "./toc";
 import { BlockDef } from "..";
 import produce from "immer";
-import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarExprPropertyEditor, PropertyEditor, ResponsiveWidthSelector } from "../../propertyEditors";
+import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarAndExprPropertyEditor, PropertyEditor, ResponsiveWidthSelector } from "../../propertyEditors";
 import { Select, Toggle } from "react-library/lib/bootstrap";
 import { LocalizedString } from "mwater-expressions";
 import { DesignCtx } from "../../../contexts";
@@ -135,7 +135,7 @@ export function TOCDesignRightPane(props: {
         </LabeledProperty>
       : null }
       <LabeledProperty label="Conditional display (optional)">
-        <ContextVarExprPropertyEditor
+        <ContextVarAndExprPropertyEditor
           schema={renderProps.schema}
           dataSource={renderProps.dataSource}
           contextVars={renderProps.contextVars}
