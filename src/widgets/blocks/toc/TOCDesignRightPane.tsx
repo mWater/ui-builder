@@ -3,11 +3,12 @@ import _ from 'lodash';
 import { TOCItem } from "./toc";
 import { BlockDef } from "..";
 import produce from "immer";
-import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, PropertyEditor, ResponsiveWidthSelector, ContextVarExprPropertyEditor } from "../../propertyEditors";
+import { LabeledProperty, ContextVarPropertyEditor, LocalizedTextPropertyEditor, PropertyEditor, ResponsiveWidthSelector, ContextVarExprPropertyEditor, EmbeddedExprsEditor } from "../../propertyEditors";
 import { Select, Toggle } from "react-library/lib/bootstrap";
 import { LocalizedString } from "mwater-expressions";
 import { DesignCtx } from "../../../contexts";
 import { ContextVarExpr } from "../../../ContextVarExpr";
+import { EmbeddedExpr } from "../../../embeddedExprs";
 
 export function TOCDesignRightPane(props: {
   item: TOCItem;
@@ -108,6 +109,20 @@ export function TOCDesignRightPane(props: {
       <LabeledProperty label="Page title (optional)">
         <LocalizedTextPropertyEditor value={item.title || null} onChange={handleTitleChange} locale={props.renderProps.locale} />
       </LabeledProperty>
+      { item.title ? 
+        <LabeledProperty label="Title embedded expressions" help="Reference in text as {0}, {1}, etc.">
+          <PropertyEditor obj={item} onChange={onItemChange} property="titleEmbeddedExprs">
+            {(value: EmbeddedExpr[] | null | undefined, onChange) => (
+              <EmbeddedExprsEditor 
+                value={value} 
+                onChange={onChange} 
+                schema={renderProps.schema} 
+                dataSource={renderProps.dataSource}
+                contextVars={renderProps.contextVars} />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+      : null }
       <LabeledProperty label="Variable Mappings">
         {renderContextVarValues()}
       </LabeledProperty>

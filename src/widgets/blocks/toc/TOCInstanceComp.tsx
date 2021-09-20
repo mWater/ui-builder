@@ -11,6 +11,7 @@ import { InstanceCtx } from "../../../contexts"
 import { ExprUtils } from 'mwater-expressions'
 import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
 import { usePageWidth } from '../../../hooks'
+import { formatEmbeddedExprString } from '../../../embeddedExprs'
 
 /** Instance component for TOC */
 export default function TOCInstanceComp(props: { 
@@ -153,6 +154,29 @@ export default function TOCInstanceComp(props: {
   // Get selected item
   const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
   const selectedWidgetId = selectedItem ? selectedItem.widgetId : null
+
+  function getTitle(item: TOCItem): string | undefined {
+    if (!item.title) {
+      return undefined
+    }
+
+    // Get any embedded expression values
+    const exprValues = _.map(item.titleEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
+
+    // Format and replace
+    let title = localize(item.title, instanceCtx.locale) 
+    title = formatEmbeddedExprString({
+      text: title, 
+      embeddedExprs: item.titleEmbeddedExprs || [],
+      exprValues: exprValues,
+      schema: instanceCtx.schema,
+      contextVars: instanceCtx.contextVars,
+      locale: instanceCtx.locale, 
+      formatLocale: instanceCtx.formatLocale
+    })
+    
+    return title
+  }
   
   /** Render the right pane (or only pane if collapsed) 
    * @param noTitle do not render title even if item has one
@@ -213,7 +237,7 @@ export default function TOCInstanceComp(props: {
       contextVarValues: mappedContextVarValues,
       database: instanceCtx.database,
       type: "normal",
-      title: !noTitle && selectedItem.title ? localize(selectedItem.title, instanceCtx.locale) : undefined,
+      title: !noTitle ? getTitle(selectedItem) : undefined,
       widgetId: selectedWidgetId
     }
 
@@ -237,7 +261,7 @@ export default function TOCInstanceComp(props: {
       return <div/>
     }
 
-    const title = selectedItem.title ? localize(selectedItem.title, instanceCtx.locale) : undefined
+    const title = getTitle(selectedItem)
 
     return <div onClick={() => setSelectorOpen(false)}>
       <FillDownwardComponent>

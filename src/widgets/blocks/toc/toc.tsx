@@ -12,6 +12,7 @@ import { DesignCtx, InstanceCtx } from '../../../contexts'
 import { TextBlockDef } from '../text'
 import uuid from 'uuid'
 import { ContextVarExpr } from '../../../ContextVarExpr'
+import { EmbeddedExpr, validateEmbeddedExprs } from '../../../embeddedExprs'
 
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
@@ -49,6 +50,9 @@ export interface TOCItem {
 
   /** Localized title of page */
   title?: LocalizedString | null
+
+  /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
+  titleEmbeddedExprs?: EmbeddedExpr[] 
 
   /** Widget to be displayed when the item is selected */
   widgetId?: string | null
@@ -100,8 +104,23 @@ export class TOCBlock extends Block<TOCBlockDef> {
 
   /** Get any context variables expressions that this block needs (not including child blocks) */
   getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
-    return _.compact(iterateItems(this.blockDef.items).map(
-      item => item.condition && item.condition.contextVarId == contextVar.id ? item.condition.expr : null))
+    const exprs: Expr[] = []
+    for (const item of iterateItems(this.blockDef.items)) {
+      // Add conditions
+      if (item.condition && item.condition.contextVarId == contextVar.id) {
+        exprs.push(item.condition.expr)
+      }
+
+      if (item.titleEmbeddedExprs) {
+        for (const titleEmbeddedExpr of item.titleEmbeddedExprs) {
+          if (titleEmbeddedExpr.contextVarId == contextVar.id) {
+            exprs.push(titleEmbeddedExpr.expr)
+          }
+        }
+      }
+    }      
+
+    return _.compact(exprs)
   }
 
   /** Validate a single TOC item */
@@ -137,6 +156,17 @@ export class TOCBlock extends Block<TOCBlockDef> {
       })
       if (error) {
         return `Error in condition: ${error}`
+      }
+    }
+
+    // Validate expressions
+    if (tocItem.titleEmbeddedExprs) {
+      const error = validateEmbeddedExprs({
+        embeddedExprs: tocItem.titleEmbeddedExprs,
+        schema: designCtx.schema,
+        contextVars: designCtx.contextVars})
+      if (error) {
+        return error
       }
     }
 
