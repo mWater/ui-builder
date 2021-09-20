@@ -70,12 +70,10 @@
 
 /* Make react-select in front and shorter */
 .react-select-short__control {
-  height: 34px;
   min-height: 34px !important;
 }
 
 .react-select-short__value-container {
-  top: -2px;
 }
 
 .react-select-short__menu {
@@ -84,7 +82,7 @@
 
 .react-select-short__indicators {
   margin-top: -2px;
-  margin-bottom: 2px;
+  margin-bottom: -2px;
 }
 
 /* Add borderless table */
