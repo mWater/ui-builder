@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import { SearchBlockDef } from "./search";
+import { SearchBlockDef, SearchTarget } from "./search";
 import { createExprVariables, Filter } from "../../blocks";
 import { Expr, ExprUtils } from "mwater-expressions";
 import { localize } from "../../localization";
@@ -93,12 +93,13 @@ const SearchBlockInstance = (props: {
   }
 
 
-  const createFilter = (searchText: string): Filter => {
+  /** Create a filter for the target with the specified filter id */
+  function createFilter(searchTarget: SearchTarget, filterId: string, searchText: string): Filter {
     // Get table
-    const table = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowsetContextVarId)!.table!
+    const table = instanceCtx.contextVars.find(cv => cv.id === searchTarget.rowsetContextVarId)!.table!
     
     if (searchText) {
-      const searchExprs: Expr[] = blockDef.searchExprs.map(se => createExprFilter(se, searchText, table))
+      const searchExprs: Expr[] = searchTarget.searchExprs.map(se => createExprFilter(se, searchText, table))
 
       const expr: Expr = {
         type: "op", 
@@ -107,10 +108,10 @@ const SearchBlockInstance = (props: {
         exprs: searchExprs
       }
 
-      return { id: blockDef.id, expr: expr }
+      return { id: filterId, expr: expr }
     }
     else {
-      return { id: blockDef.id, expr: null }
+      return { id: filterId, expr: null }
     }
   }
 
@@ -118,8 +119,17 @@ const SearchBlockInstance = (props: {
   const handleChange = (value: string) => {
     setSearchText(value)
 
-    // Set filter 
-    instanceCtx.setFilter(blockDef.rowsetContextVarId!, createFilter(value))
+    // Set filters 
+    instanceCtx.setFilter(blockDef.rowsetContextVarId!, createFilter(blockDef, blockDef.id, value))
+
+    // Set extra filters
+    if (blockDef.extraSearchTargets) {
+      for (let i = 0 ; i < blockDef.extraSearchTargets.length ; i++) {
+        const searchTarget = blockDef.extraSearchTargets[i]
+        instanceCtx.setFilter(searchTarget.rowsetContextVarId!,
+          createFilter(searchTarget, `${blockDef.id}-${i}`, value))
+      }
+    }
   }
 
   return <SearchControl 
