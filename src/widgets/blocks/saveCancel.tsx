@@ -4,13 +4,14 @@ import React from 'react'
 import produce from 'immer'
 import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
 import { localize } from '../localization';
-import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor } from '../propertyEditors'
+import { LocalizedTextPropertyEditor, PropertyEditor, LabeledProperty, ContextVarPropertyEditor, ContextVarExprPropertyEditor } from '../propertyEditors'
 import VirtualDatabase from '../../database/VirtualDatabase'
 import ContextVarsInjector from '../ContextVarsInjector'
-import { LocalizedString } from 'mwater-expressions'
+import { Expr, LocalizedString } from 'mwater-expressions'
 import { DesignCtx, InstanceCtx } from '../../contexts'
 import { ListEditorComponent } from 'react-library/lib/ListEditorComponent'
 import { Transaction } from '../../database/Database'
+import { ContextVarExpr, validateContextVarExpr } from '../..'
 
 export interface SaveCancelBlockDef extends BlockDef {
   type: "saveCancel"
@@ -32,6 +33,9 @@ export interface SaveCancelBlockDef extends BlockDef {
 
   /** Optional additional delete context variables */
   extraDeleteContextVarIds?: (string | null)[]
+
+  /** Optional delete condition (only visible if true) */
+  deleteCondition?: ContextVarExpr
 }
 
 /** Block that has a save/cancel button pair at bottom. Changes are only sent to the database if save is clicked.
@@ -42,7 +46,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
     return this.blockDef.child ? [{ blockDef: this.blockDef.child, contextVars: contextVars}] : []
   }
 
-  validate(options: DesignCtx) { 
+  validate(ctx: DesignCtx) { 
     if (!this.blockDef.saveLabel) {
       return "Save label required"
     }
@@ -59,7 +63,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
       if (!this.blockDef.deleteLabel) {
         return "Delete label required"
       }
-      const deleteCV = options.contextVars.find(cv => cv.id == this.blockDef.deleteContextVarId)
+      const deleteCV = ctx.contextVars.find(cv => cv.id == this.blockDef.deleteContextVarId)
       if (!deleteCV) {
         return "Delete context variable not found"
       }
@@ -71,7 +75,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
     // Check extras
     if (this.blockDef.deleteContextVarId && this.blockDef.extraDeleteContextVarIds) {
       for (const cvId of this.blockDef.extraDeleteContextVarIds) {
-        const deleteCV = options.contextVars.find(cv => cv.id == cvId)
+        const deleteCV = ctx.contextVars.find(cv => cv.id == cvId)
         if (!deleteCV) {
           return "Delete context variable not found"
         }
@@ -81,7 +85,28 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
       }
     }
 
+    if (this.blockDef.deleteCondition) {
+      const error = validateContextVarExpr({
+        schema: ctx.schema,
+        contextVars: ctx.contextVars,
+        contextVarId: this.blockDef.deleteCondition.contextVarId,
+        expr: this.blockDef.deleteCondition.expr,
+        aggrStatuses: ["individual", "literal"],
+        types: ["boolean"]
+      })
+      if (error) {
+        return error
+      }
+    }
+
     return null 
+  }
+
+  /** Get any context variables expressions that this block needs (not including child blocks) */
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
+    return (this.blockDef.deleteCondition != null 
+      && contextVar.id === this.blockDef.deleteCondition.contextVarId 
+      && this.blockDef.deleteCondition.expr) ? [this.blockDef.deleteCondition.expr] : [] 
   }
  
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
@@ -122,7 +147,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
 
   /** Special case as the inner block will have a virtual database and its own expression evaluator */
   getSubtreeContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx) {
-    return []
+    return this.getContextVarExprs(contextVar, ctx)
   }
 
   renderInstance(props: InstanceCtx) {
@@ -166,6 +191,22 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         : null }
+        { this.blockDef.deleteContextVarId ?
+          <LabeledProperty label="Delete condition" hint="optional expression that must be true to show delete button">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="deleteCondition">
+              {(value, onChange) => 
+                <ContextVarExprPropertyEditor
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  contextVars={props.contextVars}
+                  contextVarId={value ? value.contextVarId : null}
+                  expr={value ? value.expr : null}
+                  onChange={(contextVarId, expr) => { onChange({ contextVarId, expr }) }}
+                  types={["boolean"]} />
+              }
+            </PropertyEditor>
+          </LabeledProperty>
+        : null}
         { this.blockDef.deleteContextVarId ?
           <LabeledProperty label="Optional Additional Delete Targets">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="extraDeleteContextVarIds">
@@ -356,7 +397,13 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     }
 
     // Determine if row to delete
-    let canDelete = this.props.blockDef.deleteContextVarId != null && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] != null
+    let canDelete = this.props.blockDef.deleteContextVarId != null 
+      && this.props.instanceCtx.contextVarValues[this.props.blockDef.deleteContextVarId] != null
+      && (this.props.blockDef.deleteCondition == null 
+        || this.props.blockDef.deleteCondition.expr == null
+        || this.props.instanceCtx.getContextVarExprValue(this.props.blockDef.deleteCondition.contextVarId, this.props.blockDef.deleteCondition.expr) == true
+      )
+
     if (this.props.blockDef.extraDeleteContextVarIds) {
       for (const cvId of this.props.blockDef.extraDeleteContextVarIds) {
         canDelete = canDelete || (cvId != null && this.props.instanceCtx.contextVarValues[cvId] != null)
