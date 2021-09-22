@@ -6,7 +6,7 @@ import { Expr, Schema, ExprValidator, LocalizedString, Row } from 'mwater-expres
 import { OrderBy } from '../../../database/Database';
 import QueryRepeatBlockInstance from './QueryRepeatBlockInstance';
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, OrderByArrayEditor, LocalizedTextPropertyEditor } from '../../propertyEditors';
-import { NumberInput, Checkbox, Select, Toggle } from 'react-library/lib/bootstrap';
+import { NumberInput, Select, Toggle } from 'react-library/lib/bootstrap';
 import { ExprComponent } from 'mwater-expressions-ui';
 import { DesignCtx, InstanceCtx } from '../../../contexts';
 
@@ -161,6 +161,7 @@ export class QueryRepeatBlock extends Block<QueryRepeatBlockDef> {
       { value: 5, label: "5 pixels" },
       { value: 10, label: "10 pixels" },
       { value: 15, label: "15 pixels" },
+      { value: 20, label: "20 pixels" }
     ]
 
     return (
