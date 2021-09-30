@@ -133,7 +133,7 @@ export abstract class Block<T extends BlockDef> {
    * Processes entire tree, starting at bottom. Allows 
    * easy mutation of the tree
    */
-  process(createBlock: CreateBlock, action: (self: BlockDef | null) => BlockDef | null): BlockDef | null {
+  process(createBlock: CreateBlock, action: (self: BlockDef) => BlockDef | null): BlockDef | null {
     const blockDef = this.processChildren((childBlockDef) => {
       // Recursively process, starting at bottom
       if (childBlockDef != null) {
@@ -298,9 +298,32 @@ export function createExprVariableValues(contextVars: ContextVar[], contextVarVa
   })
 }
 
+function escapeRegex(s: string) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
 /** Make a duplicate of a block */
 export function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef {
-  return createBlock(blockDef).process(createBlock, (bd) => bd ? ({ ...bd, id: uuid() }) : null)!
+  // Remap any changed ids
+  const idMaps: { from: string, to: string }[] = []
+
+  let newBlockDef = createBlock(blockDef).process(createBlock, (bd) => {
+    const newId = uuid()
+    idMaps.push({ from: bd.id, to: newId })
+    return { ...bd, id: newId }
+  })!
+
+  // Swap any referenced ids
+  let json = JSON.stringify(newBlockDef)
+  for (const idMap of idMaps) {
+    // Don't swap empty ids
+    if (idMap.from) {
+      json = json.replace(new RegExp(escapeRegex(JSON.stringify(idMap.from)), "g"), JSON.stringify(idMap.to))
+    }
+  }
+  newBlockDef = JSON.parse(json)
+
+  return newBlockDef
 }
 
 /** Validates a context variable/expr combo. Null if ok */

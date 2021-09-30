@@ -88,7 +88,7 @@ export declare abstract class Block<T extends BlockDef> {
      * Processes entire tree, starting at bottom. Allows
      * easy mutation of the tree
      */
-    process(createBlock: CreateBlock, action: (self: BlockDef | null) => BlockDef | null): BlockDef | null;
+    process(createBlock: CreateBlock, action: (self: BlockDef) => BlockDef | null): BlockDef | null;
     /**
      * Call action child blocks (if any), replacing with result. Return changed blockDef. Allows easy mutation of the tree
      */
