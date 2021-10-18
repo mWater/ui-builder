@@ -260,7 +260,7 @@ function ButtonComponent(props: {
     case "extrasmall":
       className += ` btn-xs`
       break
-      case "large":
+    case "large":
       className += ` btn-lg`
       break
   }
