@@ -316,8 +316,8 @@ export function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock):
   // Swap any referenced ids
   let json = JSON.stringify(newBlockDef)
   for (const idMap of idMaps) {
-    // Don't swap empty ids
-    if (idMap.from) {
+    // Don't swap empty ids or temporary ids (anything shorter than an uuid)
+    if (idMap.from.length >= 32) {
       json = json.replace(new RegExp(escapeRegex(JSON.stringify(idMap.from)), "g"), JSON.stringify(idMap.to))
     }
   }
