@@ -87,7 +87,7 @@ export function TOCDesignRightPane(props: {
     const contextVarMap = item!.contextVarMap || {}
 
     return (
-      <table className="table table-bordered table-condensed">
+      <table className="table table-bordered table-sm">
         <tbody>
           {widgetDef.contextVars.map((contextVar) => {
             const cv = contextVarMap[contextVar.id]

@@ -399,7 +399,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     return (
       <tr key="showMore">
         <td colSpan={this.props.block.blockDef.contents.length}>
-          <a style={{ cursor: "pointer" }} onClick={this.handleShowMore}>
+          <a className="link-plain" onClick={this.handleShowMore}>
             {this.props.instanceCtx.T("Show more...")}
           </a>
         </td>

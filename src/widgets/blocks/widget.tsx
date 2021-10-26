@@ -303,7 +303,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
       }
 
       return (
-        <table className="table table-bordered table-condensed">
+        <table className="table table-bordered table-sm">
           <tbody>
             {widgetDef.contextVars.map((contextVar) => {
               const cv = this.blockDef.contextVarMap[contextVar.id]

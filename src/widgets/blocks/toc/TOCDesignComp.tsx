@@ -130,7 +130,7 @@ export default function TOCDesignComp(props: { blockDef: TOCBlockDef; renderProp
       <div style={{ padding: 10 }}>
         {renderProps.renderChildBlock(renderProps, blockDef.header, handleHeaderSet)}
         {renderItems(blockDef.items, 0, handleSetItems)}
-        <button type="button" className="btn btn-link btn-xs" onClick={handleAddItem}>
+        <button type="button" className="btn btn-link btn-sm" onClick={handleAddItem}>
           <i className="fa fa-plus" /> Add Item
         </button>
         {renderProps.renderChildBlock(renderProps, blockDef.footer, handleFooterSet)}
@@ -217,15 +217,15 @@ export default function TOCDesignComp(props: { blockDef: TOCBlockDef; renderProp
 /** Drop down menu that shows as a downward caret */
 const CaretMenu = (props: { items: Array<{ label: ReactNode; onClick: () => void }> }) => {
   return (
-    <div className="btn-group">
-      <button type="button" className="btn btn-link btn-xs dropdown-toggle" data-toggle="dropdown">
-        <i className="fa fa-caret-down" />
-      </button>
+    <div className="dropdown">
+      <button type="button" className="btn btn-link btn-sm dropdown-toggle" data-bs-toggle="dropdown"></button>
       <ul className="dropdown-menu">
         {props.items.map((item, index) => {
           return (
             <li key={index}>
-              <a onClick={item.onClick}>{item.label}</a>
+              <a className="dropdown-item" onClick={item.onClick}>
+                {item.label}
+              </a>
             </li>
           )
         })}

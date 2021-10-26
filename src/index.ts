@@ -1,3 +1,4 @@
+import "./index.css"
 export { default as BlockFactory } from "./widgets/BlockFactory"
 export { WidgetLibraryDesigner, WidgetLibrary } from "./designer/widgetLibrary"
 export { ActionLibrary } from "./widgets/ActionLibrary"

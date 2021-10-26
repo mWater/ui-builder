@@ -179,9 +179,9 @@ function StackedLabeledControl(props: {
       </div>
       {props.children}
       {props.helpText ? (
-        <p className="help-block" style={{ marginLeft: 5 }}>
+        <div className="form-text text-muted" style={{ marginLeft: 5 }}>
           {props.helpText}
-        </p>
+        </div>
       ) : null}
     </div>
   )

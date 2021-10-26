@@ -31,7 +31,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
         <button key="1" type="button" className="btn btn-primary active">
           Option 1
         </button>
-        <button key="2" type="button" className="btn btn-default">
+        <button key="2" type="button" className="btn btn-secondary">
           Option 2
         </button>
       </div>
@@ -79,7 +79,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
               key={option.id}
               type="button"
               disabled={props.disabled || !props.onChange}
-              className={props.value == option.id ? "btn btn-primary active" : "btn btn-default"}
+              className={props.value == option.id ? "btn btn-primary active" : "btn btn-outline-primary"}
               onClick={
                 props.onChange != null ? () => props.onChange!(option.id == props.value ? null : option.id) : undefined
               }
@@ -121,7 +121,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
               key={option.id}
               type="button"
               disabled={props.disabled || !props.onChange}
-              className={(props.value || []).includes(option.id) ? "btn btn-primary active" : "btn btn-default"}
+              className={(props.value || []).includes(option.id) ? "btn btn-primary active" : "btn btn-outline-primary"}
               onClick={handleToggle.bind(null, option.id)}
             >
               {localize(option.name, props.locale)}
@@ -139,7 +139,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
           key="true"
           type="button"
           disabled={props.disabled || !props.onChange}
-          className={props.value == true ? "btn btn-primary active" : "btn btn-default"}
+          className={props.value == true ? "btn btn-primary active" : "btn btn-outline-primary"}
           onClick={props.onChange ? () => props.onChange!(props.value === true ? null : true) : undefined}
         >
           {localize(this.blockDef.trueLabel, props.locale) || "Yes"}
@@ -148,7 +148,7 @@ export class ToggleBlock extends ControlBlock<ToggleBlockDef> {
           key="false"
           type="button"
           disabled={props.disabled || !props.onChange}
-          className={props.value == false ? "btn btn-primary active" : "btn btn-default"}
+          className={props.value == false ? "btn btn-primary active" : "btn btn-outline-primary"}
           onClick={props.onChange ? () => props.onChange!(props.value === false ? null : false) : undefined}
         >
           {localize(this.blockDef.falseLabel, props.locale) || "No"}

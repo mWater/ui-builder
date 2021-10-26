@@ -111,8 +111,11 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     }
 
     return (
-      <li className={index === this.state.activeTabIndex ? "active" : ""} key={index}>
-        <a onClick={this.handleSelectTab.bind(null, index)}>
+      <li className="nav-item" key={index}>
+        <a
+          className={index === this.state.activeTabIndex ? "nav-link active" : "nav-link"}
+          onClick={this.handleSelectTab.bind(null, index)}
+        >
           {widgetDef.name}
           &nbsp;
           <i onClick={this.handleCloseTab.bind(null, index)} className="fa fa-remove text-muted" />
@@ -159,8 +162,11 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       <div style={{ height: "100%", display: "grid", gridTemplateRows: "auto 1fr" }}>
         <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
           {this.props.openTabs.map((tab, index) => this.renderTab(index))}
-          <li className={this.state.activeTabIndex >= this.props.openTabs.length ? "active" : ""} key="new">
-            <a onClick={this.handleSelectTab.bind(null, this.props.openTabs.length)}>
+          <li className="nav-item" key="new">
+            <a
+              className={this.state.activeTabIndex >= this.props.openTabs.length ? "nav-link active" : "nav-link"}
+              onClick={this.handleSelectTab.bind(null, this.props.openTabs.length)}
+            >
               <i className="fa fa-plus" />
             </a>
           </li>

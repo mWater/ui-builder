@@ -153,7 +153,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
             {saveLabelText}
           </button>
           &nbsp;
-          <button type="button" className="btn btn-default">
+          <button type="button" className="btn btn-secondary">
             {cancelLabelText}
           </button>
         </div>
@@ -493,7 +493,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
             {saveLabelText}
           </button>
           &nbsp;
-          <button type="button" className="btn btn-default" onClick={this.handleCancel} disabled={this.state.saving}>
+          <button type="button" className="btn btn-secondary" onClick={this.handleCancel} disabled={this.state.saving}>
             {cancelLabelText}
           </button>
         </div>

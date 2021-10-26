@@ -736,7 +736,7 @@ const ColumnInfosEditor = (props: {
               <Toggle
                 value={props.value && props.value[colIndex] ? props.value[colIndex]!.verticalAlign || "top" : "top"}
                 onChange={handleVerticalAlignChange.bind(null, colIndex)}
-                size="xs"
+                size="sm"
                 options={[
                   { value: "top", label: "Top" },
                   { value: "middle", label: "Middle" },

@@ -23,7 +23,7 @@ export default class ListEditor<T> extends React.Component<ListEditorProps<T>> {
   renderItem(item: T, index: number) {
     return (
       <li className="list-group-item" key={index}>
-        <span style={{ float: "right" }} onClick={this.handleRemove.bind(null, index)}>
+        <span style={{ float: "right" }} className="text-primary" onClick={this.handleRemove.bind(null, index)}>
           <i className="fa fa-remove" />
         </span>
         {this.props.children(item, this.handleItemChange.bind(null, index), index)}

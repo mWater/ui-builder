@@ -26,8 +26,12 @@ export function TabbedInstance(props: { blockDef: TabbedBlockDef; instanceCtx: I
     const labelText = localize(tab.label, props.instanceCtx.locale)
 
     return (
-      <li className={activeIndex === index ? "active" : ""} key={index}>
-        <a onClick={handleSelectTab.bind(null, index)} style={{ cursor: "pointer" }}>
+      <li className="nav-item" key={index}>
+        <a
+          className={activeIndex === index ? "nav-link active" : "nav-link"}
+          onClick={handleSelectTab.bind(null, index)}
+          style={{ cursor: "pointer" }}
+        >
           {labelText}
         </a>
       </li>
@@ -64,14 +68,16 @@ export function TabbedInstance(props: { blockDef: TabbedBlockDef; instanceCtx: I
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
         <div className="btn-group" key="selector" style={{ marginBottom: 10 }}>
-          <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
-            {labelText} <i className="fa fa-caret-down" />
+          <button type="button" className="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            {labelText}
           </button>
           <ul className="dropdown-menu">
             {props.blockDef.tabs.map((tab, index) => {
               return (
                 <li key={index}>
-                  <a onClick={handleSelectTab.bind(null, index)}>{getTabLabel(tab)}</a>
+                  <a className="dropdown-item" onClick={handleSelectTab.bind(null, index)}>
+                    {getTabLabel(tab)}
+                  </a>
                 </li>
               )
             })}

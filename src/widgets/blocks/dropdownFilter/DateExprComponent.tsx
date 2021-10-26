@@ -283,7 +283,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
           borderRadius: 4
         }}
       >
-        <ul className="nav nav-pills nav-stacked">
+        <ul className="nav nav-pills nav-justified">
           {presets.map((preset) => {
             return (
               <li key={preset.id}>
@@ -368,7 +368,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
     return (
       <ClickOutHandler onClickOut={this.handleClickOut}>
         <div style={{ display: "inline-block", position: "relative" }}>
-          <div className="form-control" style={{ width: 220, height: 34 }} onClick={this.handleOpen}>
+          <div style={{ width: 220, height: 34 }} onClick={this.handleOpen}>
             {this.renderSummary()}
           </div>
           {this.props.value && this.props.onChange ? this.renderClear() : null}

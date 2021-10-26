@@ -122,7 +122,7 @@ export class ToggleFilterBlock extends LeafBlock<ToggleFilterBlockDef> {
                 options={[
                   { value: "normal", label: "Default" },
                   { value: "small", label: "Small" },
-                  { value: "extrasmall", label: "Extra-small" },
+                  { value: "extrasmall", label: "Extra-small (deprecated!)" },
                   { value: "large", label: "Large" }
                 ]}
               />
@@ -213,7 +213,7 @@ function EditOptionComponent(props: {
                     )
                   }}
                 </ListEditor>
-                <button type="button" className="btn btn-link btn-xs" onClick={handleAddFilter}>
+                <button type="button" className="btn btn-link btn-sm" onClick={handleAddFilter}>
                   + Add Filter
                 </button>
               </div>
@@ -315,15 +315,16 @@ function ToggleFilterInstance(props: { blockDef: ToggleFilterBlockDef; ctx: Inst
 }
 
 /** Map to toggle sizes */
-function mapToggleSize(size: "normal" | "small" | "large" | "extrasmall" | undefined): "xs" | "sm" | "lg" | undefined {
+function mapToggleSize(size: "normal" | "small" | "large" | "extrasmall" | undefined): "sm" | "lg" | undefined {
   if (size == "small") {
     return "sm"
   }
   if (size == "large") {
     return "lg"
   }
+  // DEPRECATED
   if (size == "extrasmall") {
-    return "xs"
+    return "sm"
   }
   return undefined
 }

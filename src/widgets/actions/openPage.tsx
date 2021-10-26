@@ -404,7 +404,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
       }
 
       return (
-        <table className="table table-bordered table-condensed">
+        <table className="table table-bordered table-sm">
           <tbody>{widgetDef.contextVars.map(renderContextVarValue)}</tbody>
         </table>
       )
