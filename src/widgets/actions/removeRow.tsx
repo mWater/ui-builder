@@ -1,8 +1,8 @@
-import * as React from 'react';
-import * as _ from 'lodash'
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from '../propertyEditors';
-import { InstanceCtx, DesignCtx } from '../../contexts';
+import * as React from "react"
+import * as _ from "lodash"
+import { ActionDef, Action, RenderActionEditorProps } from "../actions"
+import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from "../propertyEditors"
+import { InstanceCtx, DesignCtx } from "../../contexts"
 
 export interface RemoveRowActionDef extends ActionDef {
   type: "removeRow"
@@ -14,7 +14,7 @@ export interface RemoveRowActionDef extends ActionDef {
 /** Remove a single row specified by a context variable */
 export class RemoveRowAction extends Action<RemoveRowActionDef> {
   async performAction(instanceCtx: InstanceCtx): Promise<void> {
-    const contextVar = instanceCtx.contextVars.find(cv => cv.id === this.actionDef.contextVarId)
+    const contextVar = instanceCtx.contextVars.find((cv) => cv.id === this.actionDef.contextVarId)
 
     // Remove row
     const table = contextVar!.table!
@@ -32,7 +32,7 @@ export class RemoveRowAction extends Action<RemoveRowActionDef> {
 
   validate(designCtx: DesignCtx) {
     // Validate cv
-    const contextVar = designCtx.contextVars.find(cv => cv.id === this.actionDef.contextVarId && cv.type === "row")
+    const contextVar = designCtx.contextVars.find((cv) => cv.id === this.actionDef.contextVarId && cv.type === "row")
     if (!contextVar) {
       return "Context variable required"
     }
@@ -47,11 +47,17 @@ export class RemoveRowAction extends Action<RemoveRowActionDef> {
       <div>
         <LabeledProperty label="Row Variable to delete">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="contextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row"]} />}
+            {(value, onChange) => (
+              <ContextVarPropertyEditor
+                value={value}
+                onChange={onChange}
+                contextVars={props.contextVars}
+                types={["row"]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
       </div>
-    )            
+    )
   }
 }
-

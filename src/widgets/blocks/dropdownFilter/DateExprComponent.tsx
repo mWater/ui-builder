@@ -1,12 +1,12 @@
-import _ from 'lodash'
-import ClickOutHandler from 'react-onclickout'
-import DatePicker from 'react-datepicker'
-import moment from 'moment';
-import React from 'react';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import "react-datepicker/dist/react-datepicker.css" 
-import './datepicker-tweaks.css'
-import { localize } from '../../localization';
+import _ from "lodash"
+import ClickOutHandler from "react-onclickout"
+import DatePicker from "react-datepicker"
+import moment from "moment"
+import React from "react"
+import { Expr, LocalizedString } from "mwater-expressions"
+import "react-datepicker/dist/react-datepicker.css"
+import "./datepicker-tweaks.css"
+import { localize } from "../../localization"
 
 /** Either range or preset id or null */
 export type DateValue = [string | null, string | null] | string | null
@@ -33,86 +33,86 @@ interface Preset {
 }
 
 const presets: Preset[] = [
-  { 
-    id: "thisyear", 
+  {
+    id: "thisyear",
     name: {
       _base: "en",
       en: "This Year",
       es: "Este año"
     }
   },
-  { 
-    id: "lastyear", 
+  {
+    id: "lastyear",
     name: {
       _base: "en",
       en: "Last Year",
       es: "El año pasado"
     }
   },
-  { 
-    id: "thismonth", 
+  {
+    id: "thismonth",
     name: {
       _base: "en",
       en: "This Month",
       es: "Este mes"
     }
   },
-  { 
-    id: "lastmonth", 
+  {
+    id: "lastmonth",
     name: {
       _base: "en",
       en: "Last Month",
       es: "Último Mes"
     }
   },
-  { 
-    id: "today", 
+  {
+    id: "today",
     name: {
       _base: "en",
       en: "Today",
       es: "Hoy"
     }
   },
-  { 
-    id: "yesterday", 
+  {
+    id: "yesterday",
     name: {
       _base: "en",
       en: "Yesterday",
       es: "Ayer"
     }
   },
-  { 
-    id: "last24hours", 
+  {
+    id: "last24hours",
     name: {
       _base: "en",
       en: "In Last 24 Hours",
       es: "En las últimas 24 horas"
     }
   },
-  { 
-    id: "last7days", 
+  {
+    id: "last7days",
     name: {
       _base: "en",
       en: "In Last 7 Days",
       es: "En los últimos 7 días"
     }
   },
-  { 
-    id: "last30days", 
+  {
+    id: "last30days",
     name: {
       _base: "en",
       en: "In Last 30 Days",
       es: "En los últimos 30 días"
     }
   },
-  { 
-    id: "last365days", 
+  {
+    id: "last365days",
     name: {
       _base: "en",
       en: "In Last 365 Days",
       es: "En los últimos 365 días"
     }
-   }
+  }
 ]
 
 const toLiteral = (datetime: boolean, value: string | null): Expr => {
@@ -122,8 +122,7 @@ const toLiteral = (datetime: boolean, value: string | null): Expr => {
 
   if (datetime) {
     return { type: "literal", valueType: "datetime", value: value }
-  }
-  else {
+  } else {
     return { type: "literal", valueType: "date", value: value }
   }
 }
@@ -170,8 +169,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
     if (this.props.datetime) {
       return moment(value, moment.ISO_8601)
-    }
-    else {
+    } else {
       return moment(value, "YYYY-MM-DD")
     }
   }
@@ -183,8 +181,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
     if (this.props.datetime) {
       return value.toISOString()
-    }
-    else {
+    } else {
       return value.format("YYYY-MM-DD")
     }
   }
@@ -201,8 +198,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
     // Clear end if after
     if (_.isArray(this.props.value) && this.props.value[1] && this.fromMoment(value)! > this.props.value[1]!) {
       this.props.onChange([this.fromMoment(value), null])
-    }
-    else {
+    } else {
       this.props.onChange([this.fromMoment(value), _.isArray(this.props.value) ? this.props.value[1] : null])
     }
   }
@@ -217,8 +213,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
     // Clear start if before
     if (_.isArray(this.props.value) && this.props.value[0] && this.fromMoment(value)! < this.props.value[0]!) {
       this.props.onChange([null, this.fromMoment(value)])
-    }
-    else {
+    } else {
       this.props.onChange([_.isArray(this.props.value) ? this.props.value[0] : null, this.fromMoment(value)])
     }
 
@@ -236,8 +231,11 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
   renderClear() {
     return (
-      <div style={{ position: "absolute", right: 10, top: 7, color: "#AAA" }} onClick={this.props.onChange.bind(null, null)}>
-        <i className="fa fa-remove"/>
+      <div
+        style={{ position: "absolute", right: 10, top: 7, color: "#AAA" }}
+        onClick={this.props.onChange.bind(null, null)}
+      >
+        <i className="fa fa-remove" />
       </div>
     )
   }
@@ -247,7 +245,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
       return <span className="text-muted">{this.props.placeholder || ""}</span>
     }
 
-    const preset = presets.find(p => p.id === this.props.value)
+    const preset = presets.find((p) => p.id === this.props.value)
     if (preset) {
       return localize(preset.name, this.props.locale)
     }
@@ -255,12 +253,15 @@ export default class DateExprComponent extends React.Component<Props, State> {
     if (Array.isArray(this.props.value)) {
       const startDate = this.toMoment(this.props.value[0])
       const endDate = this.toMoment(this.props.value[1])
-      
+
       // Add/subtract hours to work around https://github.com/moment/moment/issues/2749
       if (this.props.datetime) {
-        return (startDate ? startDate.add("hours", 3).format("ll") : "") + " - " + (endDate ? endDate.subtract("hours", 3).format("ll") : "")
-      }
-      else {
+        return (
+          (startDate ? startDate.add("hours", 3).format("ll") : "") +
+          " - " +
+          (endDate ? endDate.subtract("hours", 3).format("ll") : "")
+        )
+      } else {
         return (startDate ? startDate.format("ll") : "") + " - " + (endDate ? endDate.format("ll") : "")
       }
     }
@@ -270,9 +271,20 @@ export default class DateExprComponent extends React.Component<Props, State> {
 
   renderPresets() {
     return (
-      <div style={{ position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 }}>
+      <div
+        style={{
+          position: "absolute",
+          top: "100%",
+          left: 0,
+          zIndex: 4000,
+          padding: 5,
+          border: "solid 1px #AAA",
+          backgroundColor: "white",
+          borderRadius: 4
+        }}
+      >
         <ul className="nav nav-pills nav-stacked">
-          { presets.map(preset => {
+          {presets.map((preset) => {
             return (
               <li key={preset.id}>
                 <a style={{ padding: 5 }} onClick={this.handlePreset.bind(null, preset)}>
@@ -283,23 +295,25 @@ export default class DateExprComponent extends React.Component<Props, State> {
           })}
           <li>
             <a style={{ padding: 5 }} onClick={this.handleCustom}>
-              {localize({ 
-                _base: "en", 
-                en: "Custom Date Range...",
-                es: "Rango de fechas personalizado...."
-              }, this.props.locale)}
+              {localize(
+                {
+                  _base: "en",
+                  en: "Custom Date Range...",
+                  es: "Rango de fechas personalizado...."
+                },
+                this.props.locale
+              )}
             </a>
           </li>
         </ul>
       </div>
-      )
+    )
   }
 
   renderDropdown() {
     if (this.state.custom) {
       return this.renderCustomDropdown()
-    }
-    else {
+    } else {
       return this.renderPresets()
     }
   }
@@ -309,8 +323,19 @@ export default class DateExprComponent extends React.Component<Props, State> {
     const endDate = this.toMoment(_.isArray(this.props.value) ? this.props.value[1] : null) || undefined
 
     return (
-      <div style={{ position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  }}>
-        <div style={{ whiteSpace: "nowrap"}}>
+      <div
+        style={{
+          position: "absolute",
+          top: "100%",
+          left: 0,
+          zIndex: 4000,
+          padding: 5,
+          border: "solid 1px #AAA",
+          backgroundColor: "white",
+          borderRadius: 4
+        }}
+      >
+        <div style={{ whiteSpace: "nowrap" }}>
           <div style={{ display: "inline-block", verticalAlign: "top" }}>
             <DatePicker
               inline={true}
@@ -319,7 +344,8 @@ export default class DateExprComponent extends React.Component<Props, State> {
               startDate={startDate}
               endDate={endDate}
               showYearDropdown={true}
-              onChange={this.handleStartChange} />
+              onChange={this.handleStartChange}
+            />
           </div>
 
           <div style={{ display: "inline-block", verticalAlign: "top" }}>
@@ -330,7 +356,8 @@ export default class DateExprComponent extends React.Component<Props, State> {
               startDate={startDate}
               endDate={endDate}
               showYearDropdown={true}
-              onChange={this.handleEndChange} />
+              onChange={this.handleEndChange}
+            />
           </div>
         </div>
       </div>
@@ -344,14 +371,10 @@ export default class DateExprComponent extends React.Component<Props, State> {
           <div className="form-control" style={{ width: 220, height: 34 }} onClick={this.handleOpen}>
             {this.renderSummary()}
           </div>
-          { this.props.value && this.props.onChange ?
-            this.renderClear()
-          : null}
-          { this.state.dropdownOpen ?
-            this.renderDropdown()
-          : null}
+          {this.props.value && this.props.onChange ? this.renderClear() : null}
+          {this.state.dropdownOpen ? this.renderDropdown() : null}
         </div>
       </ClickOutHandler>
     )
   }
-}      
+}

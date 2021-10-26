@@ -1,9 +1,9 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { Expr } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { ContextVarExpr } from '../../ContextVarExpr';
-import { OrderBy } from '../../database/Database';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { Expr } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
+import { ContextVarExpr } from "../../ContextVarExpr";
+import { OrderBy } from "../../database/Database";
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
     type: "row";

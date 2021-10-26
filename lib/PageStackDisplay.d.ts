@@ -2,7 +2,7 @@ import React from "react";
 import { Page, PageStack } from "./PageStack";
 import { BlockDef } from "./widgets/blocks";
 import { BaseCtx, InstanceCtx } from "./contexts";
-import './PageStackDisplay.css';
+import "./PageStackDisplay.css";
 interface Props {
     baseCtx: BaseCtx;
     initialPage?: Page;
@@ -21,7 +21,7 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     validationRegistrations: {
         [key: string]: {
             pageIndex: number;
-            validate: (() => string | null | Promise<string | null>);
+            validate: () => string | null | Promise<string | null>;
         };
     };
     constructor(props: Props);

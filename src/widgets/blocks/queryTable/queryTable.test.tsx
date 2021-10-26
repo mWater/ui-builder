@@ -1,10 +1,10 @@
-import { QueryTableBlockDef, QueryTableBlock } from "./queryTable";
-import { ContextVar } from "../../blocks";
-import simpleSchema from "../../../__fixtures__/schema";
-import { Expr } from "mwater-expressions";
-import BlockFactory from "../../BlockFactory";
-import { InstanceCtx } from "../../../contexts";
-import { ActionLibrary } from "../../ActionLibrary";
+import { QueryTableBlockDef, QueryTableBlock } from "./queryTable"
+import { ContextVar } from "../../blocks"
+import simpleSchema from "../../../__fixtures__/schema"
+import { Expr } from "mwater-expressions"
+import BlockFactory from "../../BlockFactory"
+import { InstanceCtx } from "../../../contexts"
+import { ActionLibrary } from "../../ActionLibrary"
 
 // Outer context vars
 const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "CV1", table: "t1" }
@@ -72,7 +72,13 @@ test("gets multiple row cv value", () => {
     { type: "field", table: "t1", column: "text" },
     { type: "op", table: "t1", op: "count", exprs: [] }
   ]
-  expect(qtbMultiple.getRowContextVarValue({ e0: "xyz", e1: 4 }, exprs, schema, rowsetCV, contextVars, { type: "literal", valueType: "boolean", value: false })).toEqual({
+  expect(
+    qtbMultiple.getRowContextVarValue({ e0: "xyz", e1: 4 }, exprs, schema, rowsetCV, contextVars, {
+      type: "literal",
+      valueType: "boolean",
+      value: false
+    })
+  ).toEqual({
     type: "op",
     op: "and",
     table: "t1",

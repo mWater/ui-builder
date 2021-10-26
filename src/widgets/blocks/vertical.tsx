@@ -1,7 +1,7 @@
-import produce from 'immer'
-import * as React from 'react';
-import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock } from '../blocks'
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import produce from "immer"
+import * as React from "react"
+import { Block, BlockDef, CreateBlock, ContextVar, ChildBlock } from "../blocks"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 export interface VerticalBlockDef extends BlockDef {
   type: "vertical"
@@ -9,14 +9,18 @@ export interface VerticalBlockDef extends BlockDef {
 }
 
 export class VerticalBlock extends Block<VerticalBlockDef> {
-  get id() { return this.blockDef.id }
-
-  getChildren(contextVars: ContextVar[]): ChildBlock[] {
-    return this.blockDef.items.map(bd => ({ blockDef: bd, contextVars: contextVars }))
+  get id() {
+    return this.blockDef.id
   }
 
-  validate() { return null }
- 
+  getChildren(contextVars: ContextVar[]): ChildBlock[] {
+    return this.blockDef.items.map((bd) => ({ blockDef: bd, contextVars: contextVars }))
+  }
+
+  validate() {
+    return null
+  }
+
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     // Apply action to all children, discarding null ones
     const newItems: BlockDef[] = []
@@ -27,7 +31,9 @@ export class VerticalBlock extends Block<VerticalBlockDef> {
       }
     }
 
-    return produce(this.blockDef, draft => { draft.items = newItems })
+    return produce(this.blockDef, (draft) => {
+      draft.items = newItems
+    })
   }
 
   canonicalize(): BlockDef | null {
@@ -35,21 +41,20 @@ export class VerticalBlock extends Block<VerticalBlockDef> {
     if (this.blockDef.items.length === 0) {
       return null
     }
-    
+
     // Collapse if one item
     if (this.blockDef.items.length === 1) {
       return this.blockDef.items[0]
     }
 
     // Flatten out nested vertical blocks
-    if (this.blockDef.items.some(bd => bd.type == "vertical")) {
+    if (this.blockDef.items.some((bd) => bd.type == "vertical")) {
       // Create list of items
       let newItems: BlockDef[] = []
       for (const item of this.blockDef.items) {
         if (item.type == "vertical") {
           newItems = newItems.concat((item as VerticalBlockDef).items)
-        }
-        else {
+        } else {
           newItems.push(item)
         }
       }
@@ -65,21 +70,25 @@ export class VerticalBlock extends Block<VerticalBlockDef> {
     // Add keys
     return (
       <div style={{ paddingLeft: 5, paddingRight: 5 }}>
-        { this.blockDef.items.map((childBlockDef, index) => React.cloneElement(props.renderChildBlock(props, childBlockDef), { key: index })) }
+        {this.blockDef.items.map((childBlockDef, index) =>
+          React.cloneElement(props.renderChildBlock(props, childBlockDef), { key: index })
+        )}
       </div>
-    )      
+    )
   }
 
   renderInstance(props: InstanceCtx) {
     return (
       <div>
-        { this.blockDef.items.map((childBlockDef, index) => {
+        {this.blockDef.items.map((childBlockDef, index) => {
           const childElem = props.renderChildBlock(props, childBlockDef)
           return childElem ? React.cloneElement(childElem, { key: index }) : null
         })}
       </div>
-    )      
+    )
   }
 
-  getLabel() { return "" } 
+  getLabel() {
+    return ""
+  }
 }

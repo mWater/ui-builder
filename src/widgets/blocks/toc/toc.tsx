@@ -1,18 +1,18 @@
-import * as React from 'react'
-import * as _ from 'lodash'
-import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../../blocks'
-import { produce, original } from 'immer'
-import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions'
-import TOCDesignComp from './TOCDesignComp'
-import TOCInstanceComp from './TOCInstanceComp'
-import './toc.css'
-import { LabeledProperty, PropertyEditor, ResponsiveWidthSelector } from '../../propertyEditors'
-import { Checkbox, Select, Toggle } from 'react-library/lib/bootstrap'
-import { DesignCtx, InstanceCtx } from '../../../contexts'
-import { TextBlockDef } from '../text'
-import uuid from 'uuid'
-import { ContextVarExpr } from '../../../ContextVarExpr'
-import { EmbeddedExpr, validateEmbeddedExprs } from '../../../embeddedExprs'
+import * as React from "react"
+import * as _ from "lodash"
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from "../../blocks"
+import { produce, original } from "immer"
+import { Expr, ExprValidator, LocalizedString } from "mwater-expressions"
+import TOCDesignComp from "./TOCDesignComp"
+import TOCInstanceComp from "./TOCInstanceComp"
+import "./toc.css"
+import { LabeledProperty, PropertyEditor, ResponsiveWidthSelector } from "../../propertyEditors"
+import { Checkbox, Select, Toggle } from "react-library/lib/bootstrap"
+import { DesignCtx, InstanceCtx } from "../../../contexts"
+import { TextBlockDef } from "../text"
+import uuid from "uuid"
+import { ContextVarExpr } from "../../../ContextVarExpr"
+import { EmbeddedExpr, validateEmbeddedExprs } from "../../../embeddedExprs"
 
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
@@ -52,7 +52,7 @@ export interface TOCItem {
   title?: LocalizedString | null
 
   /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
-  titleEmbeddedExprs?: EmbeddedExpr[] 
+  titleEmbeddedExprs?: EmbeddedExpr[]
 
   /** Widget to be displayed when the item is selected */
   widgetId?: string | null
@@ -84,10 +84,13 @@ export const iterateItems = (items: TOCItem[]): TOCItem[] => {
 }
 
 /** Alter each item, allowing item to be mutated, replaced (return item or array of items) or deleted (return null) */
-export const alterItems = (items: TOCItem[], action: (item: TOCItem) => undefined | null | TOCItem | TOCItem[]): TOCItem[] => {
-  const newItems = _.flatten(_.compact(items.map(item => action(item)))) as TOCItem[]
-  
-  return produce(newItems, draft => {
+export const alterItems = (
+  items: TOCItem[],
+  action: (item: TOCItem) => undefined | null | TOCItem | TOCItem[]
+): TOCItem[] => {
+  const newItems = _.flatten(_.compact(items.map((item) => action(item)))) as TOCItem[]
+
+  return produce(newItems, (draft) => {
     for (const ni of draft) {
       ni.children = alterItems(original(ni.children) as TOCItem[], action)
     }
@@ -97,13 +100,16 @@ export const alterItems = (items: TOCItem[], action: (item: TOCItem) => undefine
 export class TOCBlock extends Block<TOCBlockDef> {
   /** Get child blocks */
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
-    // Iterate all 
-    return _.compact([this.blockDef.header, this.blockDef.footer].concat(iterateItems(this.blockDef.items).map(item => item.labelBlock || null)))
-      .map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+    // Iterate all
+    return _.compact(
+      [this.blockDef.header, this.blockDef.footer].concat(
+        iterateItems(this.blockDef.items).map((item) => item.labelBlock || null)
+      )
+    ).map((bd) => ({ blockDef: bd!, contextVars: contextVars }))
   }
 
   /** Get any context variables expressions that this block needs (not including child blocks) */
-  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] {
     const exprs: Expr[] = []
     for (const item of iterateItems(this.blockDef.items)) {
       // Add conditions
@@ -118,7 +124,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
           }
         }
       }
-    }      
+    }
 
     return _.compact(exprs)
   }
@@ -137,13 +143,13 @@ export class TOCBlock extends Block<TOCBlockDef> {
         // If mapped, check that outer context var exists
         if (tocItem.contextVarMap && tocItem.contextVarMap[innerContextVar.id]) {
           const outerContextVarId = tocItem.contextVarMap[innerContextVar.id]
-          if (!designCtx.contextVars.find(cv => cv.id == outerContextVarId)) {
+          if (!designCtx.contextVars.find((cv) => cv.id == outerContextVarId)) {
             return "Context variable not found. Please check mapping"
           }
         }
       }
     }
-    
+
     // Validate condition
     if (tocItem.condition) {
       const error = validateContextVarExpr({
@@ -164,7 +170,8 @@ export class TOCBlock extends Block<TOCBlockDef> {
       const error = validateEmbeddedExprs({
         embeddedExprs: tocItem.titleEmbeddedExprs,
         schema: designCtx.schema,
-        contextVars: designCtx.contextVars})
+        contextVars: designCtx.contextVars
+      })
       if (error) {
         return error
       }
@@ -173,7 +180,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
     return null
   }
 
-  validate(designCtx: DesignCtx) { 
+  validate(designCtx: DesignCtx) {
     // Validate all items
     for (const tocItem of iterateItems(this.blockDef.items)) {
       const error = this.validateItem(designCtx, tocItem)
@@ -181,7 +188,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
         return error
       }
     }
-    return null 
+    return null
   }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
@@ -202,7 +209,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
    */
   canonicalize(): BlockDef | null {
     // Upgrade any labels to labelBlocks
-    return produce(this.blockDef, draft => {
+    return produce(this.blockDef, (draft) => {
       for (const item of iterateItems(draft.items)) {
         if (item.label && !item.labelBlock) {
           item.labelBlock = { type: "text", text: item.label, id: uuid.v4() } as TextBlockDef
@@ -219,7 +226,7 @@ export class TOCBlock extends Block<TOCBlockDef> {
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
     return <TOCInstanceComp instanceCtx={props} blockDef={this.blockDef} createBlock={props.createBlock} />
   }
-  
+
   renderEditor(props: DesignCtx) {
     return (
       <div>
@@ -230,8 +237,8 @@ export class TOCBlock extends Block<TOCBlockDef> {
         <LabeledProperty label="Theme">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="theme">
             {(value, onChange) => (
-              <Toggle 
-                value={value || "light"} 
+              <Toggle
+                value={value || "light"}
                 onChange={onChange}
                 options={[
                   { value: "light", label: "Light" },
@@ -244,11 +251,10 @@ export class TOCBlock extends Block<TOCBlockDef> {
 
         <LabeledProperty label="Collapse Below Width">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="collapseWidth">
-            {(value, onChange) => <ResponsiveWidthSelector value={value} onChange={onChange} />}  
+            {(value, onChange) => <ResponsiveWidthSelector value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
       </div>
     )
   }
 }
-

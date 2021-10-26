@@ -1,13 +1,13 @@
-import * as React from "react";
+import * as React from "react"
 import { BlockDef } from "./blocks"
-import { DropTarget, DropTargetMonitor, ConnectDropTarget } from 'react-dnd'
+import { DropTarget, DropTargetMonitor, ConnectDropTarget } from "react-dnd"
 import "./BlockPlaceholder.css"
-import uuid = require("uuid");
+import uuid = require("uuid")
 
 interface Props {
-  isOver?: boolean;
-  connectDropTarget?: ConnectDropTarget;
-  onSet?: (blockDef: BlockDef) => void;
+  isOver?: boolean
+  connectDropTarget?: ConnectDropTarget
+  onSet?: (blockDef: BlockDef) => void
 }
 
 const blockTargetSpec = {
@@ -40,7 +40,9 @@ class BlockPlaceholder extends React.Component<Props> {
   render() {
     return this.props.connectDropTarget!(
       <div className={this.props.isOver ? "block-placeholder drop" : "block-placeholder"}>
-         <a onClick={this.handleNew}><i className="fa fa-plus"/></a>
+        <a onClick={this.handleNew}>
+          <i className="fa fa-plus" />
+        </a>
       </div>
     )
   }

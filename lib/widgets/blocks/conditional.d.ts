@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { Expr } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { Expr } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Block which only displays content if an expression is true */
 export interface ConditionalBlockDef extends BlockDef {
     type: "conditional";

@@ -1,7 +1,7 @@
 import { Expr, Schema, DataSource } from "mwater-expressions";
 import React from "react";
 import { ContextVar } from "./blocks";
-import { ContextVarExpr } from '../ContextVarExpr';
+import { ContextVarExpr } from "../ContextVarExpr";
 export interface ColumnValues {
     [columnId: string]: ContextVarExpr;
 }

@@ -1,3 +1,3 @@
-declare module 'canonical-json'
+declare module "canonical-json"
 
-declare module 'react-onclickout'
+declare module "react-onclickout"

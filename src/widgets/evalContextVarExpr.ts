@@ -1,17 +1,17 @@
-import _ from 'lodash'
-import { Expr, ExprUtils, PromiseExprEvaluator } from "mwater-expressions";
-import { getFilteredContextVarValues, InstanceCtx } from "../contexts";
-import { QueryOptions } from "../database/Database";
-import { ContextVar, createExprVariables, createExprVariableValues } from "./blocks";
+import _ from "lodash"
+import { Expr, ExprUtils, PromiseExprEvaluator } from "mwater-expressions"
+import { getFilteredContextVarValues, InstanceCtx } from "../contexts"
+import { QueryOptions } from "../database/Database"
+import { ContextVar, createExprVariables, createExprVariableValues } from "./blocks"
 
-/** 
- * Evaluate a context variable expression. 
+/**
+ * Evaluate a context variable expression.
  * contextVar does not need to be part of the context, but if it is, it will still be handled correctly
  */
 export async function evalContextVarExpr(options: {
-  contextVar: ContextVar | null, 
-  contextVarValue: any,
-  expr: Expr, 
+  contextVar: ContextVar | null
+  contextVarValue: any
+  expr: Expr
   ctx: InstanceCtx
 }) {
   const { contextVar, contextVarValue, expr, ctx } = options
@@ -23,8 +23,8 @@ export async function evalContextVarExpr(options: {
 
   // If no context variable, evaluate expression
   if (contextVar == null) {
-    return new PromiseExprEvaluator({ 
-      schema: ctx.schema, 
+    return new PromiseExprEvaluator({
+      schema: ctx.schema,
       locale: ctx.locale,
       variables: createExprVariables(ctx.contextVars),
       variableValues: createExprVariableValues(ctx.contextVars, ctx.contextVarValues)
@@ -46,11 +46,14 @@ export async function evalContextVarExpr(options: {
         value: expr
       },
       from: table,
-      where: { 
+      where: {
         type: "op",
         op: "=",
         table: table,
-        exprs: [{ type: "id", table: table }, { type: "literal", valueType: "id", idTable: table, value: contextVarValue }]
+        exprs: [
+          { type: "id", table: table },
+          { type: "literal", valueType: "id", idTable: table, value: contextVarValue }
+        ]
       }
     }
 
@@ -95,7 +98,9 @@ export async function evalContextVarExpr(options: {
         type: "op",
         table: table,
         op: "and",
-        exprs: _.compact([queryOptions.where || null].concat(_.compact(ctx.getFilters(contextVar.id).map(f => f.expr))))
+        exprs: _.compact(
+          [queryOptions.where || null].concat(_.compact(ctx.getFilters(contextVar.id).map((f) => f.expr)))
+        )
       }
       if (queryOptions.where.exprs.length === 0) {
         queryOptions.where = null

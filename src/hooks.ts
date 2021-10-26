@@ -43,4 +43,3 @@ export function usePageWidth(): number {
 
   return pageWidth
 }
-

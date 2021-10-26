@@ -1,23 +1,23 @@
-import _ from 'lodash'
+import _ from "lodash"
 import BlockWrapper from "./BlockWrapper"
 import * as React from "react"
 import { WidgetDef } from "../widgets/widgets"
 import { BlockDef, findBlockAncestry, getBlockTree, ContextVar } from "../widgets/blocks"
 import BlockPlaceholder from "../widgets/BlockPlaceholder"
 import "./WidgetDesigner.css"
-import { Select, Toggle } from 'react-library/lib/bootstrap'
-import { WidgetEditor } from "./WidgetEditor";
-import { PageStackDisplay } from "../PageStackDisplay";
-import { Page } from "../PageStack";
-import { Database } from "../database/Database";
-import { BlockPaletteEntry } from "./blockPaletteEntries";
-import ErrorBoundary from "./ErrorBoundary";
-import VirtualDatabase from "../database/VirtualDatabase";
+import { Select, Toggle } from "react-library/lib/bootstrap"
+import { WidgetEditor } from "./WidgetEditor"
+import { PageStackDisplay } from "../PageStackDisplay"
+import { Page } from "../PageStack"
+import { Database } from "../database/Database"
+import { BlockPaletteEntry } from "./blockPaletteEntries"
+import ErrorBoundary from "./ErrorBoundary"
+import VirtualDatabase from "../database/VirtualDatabase"
 import AddWizardPalette from "./AddWizardPalette"
 import ClipboardPalette from "./ClipboardPalette"
 import { BaseCtx, DesignCtx } from "../contexts"
 import { DataSource } from "mwater-expressions"
-import canonical from 'canonical-json'
+import canonical from "canonical-json"
 
 interface WidgetDesignerProps {
   baseCtx: BaseCtx
@@ -27,7 +27,10 @@ interface WidgetDesignerProps {
   blockPaletteEntries: BlockPaletteEntry[]
 }
 
-enum Mode { Design, Preview }
+enum Mode {
+  Design,
+  Preview
+}
 
 interface State {
   mode: Mode
@@ -67,7 +70,10 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return
     }
     const undoValue = _.last(this.state.undoStack)
-    this.setState({ undoStack: _.initial(this.state.undoStack), redoStack: this.state.redoStack.concat([this.props.widgetDef]) })
+    this.setState({
+      undoStack: _.initial(this.state.undoStack),
+      redoStack: this.state.redoStack.concat([this.props.widgetDef])
+    })
     this.props.onWidgetDefChange(undoValue)
   }
 
@@ -76,7 +82,10 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       return
     }
     const redoValue = _.last(this.state.redoStack)
-    this.setState({ redoStack: _.initial(this.state.redoStack), undoStack: this.state.undoStack.concat([this.props.widgetDef]) })
+    this.setState({
+      redoStack: _.initial(this.state.redoStack),
+      undoStack: this.state.undoStack.concat([this.props.widgetDef])
+    })
     this.props.onWidgetDefChange(redoValue)
   }
 
@@ -100,11 +109,15 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     this.handleWidgetDefChange({ ...this.props.widgetDef, blockDef })
   }
 
-  handleUnselect = () => { this.setState({ selectedBlockId: null }) }
+  handleUnselect = () => {
+    this.setState({ selectedBlockId: null })
+  }
 
   handleRemoveBlock = (blockId: string) => {
     const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef!)
-    this.handleBlockDefChange(block.process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === blockId) ? null : b))
+    this.handleBlockDefChange(
+      block.process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === blockId ? null : b))
+    )
   }
 
   createBlockStore() {
@@ -120,9 +133,10 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
       // Remove source block
       if (removeBlockId) {
-        newBlockDef = block.process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === removeBlockId) ? null : b)
-      }
-      else {
+        newBlockDef = block.process(this.props.baseCtx.createBlock, (b: BlockDef) =>
+          b.id === removeBlockId ? null : b
+        )
+      } else {
         newBlockDef = block.blockDef
       }
 
@@ -132,7 +146,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         return
       }
 
-      newBlockDef = this.props.baseCtx.createBlock(newBlockDef).process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === blockId) ? action(b) : b)
+      newBlockDef = this.props.baseCtx
+        .createBlock(newBlockDef)
+        .process(this.props.baseCtx.createBlock, (b: BlockDef) => (b.id === blockId ? action(b) : b))
       this.handleBlockDefChange(newBlockDef)
     }
 
@@ -151,7 +167,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       .concat(this.props.widgetDef.contextVars)
       .concat(this.props.widgetDef.privateContextVars || [])
 
-    const designCtx : DesignCtx = {
+    const designCtx: DesignCtx = {
       ...this.props.baseCtx,
       dataSource: this.props.dataSource,
       selectedId: this.state.selectedBlockId,
@@ -163,29 +179,33 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     }
 
     // Create renderChildBlock
-    const renderChildBlock = (childDesignCtx: DesignCtx, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void) => {
+    const renderChildBlock = (
+      childDesignCtx: DesignCtx,
+      childBlockDef: BlockDef | null,
+      onSet?: (blockDef: BlockDef) => void
+    ) => {
       if (childBlockDef) {
         const childBlock = this.props.baseCtx.createBlock(childBlockDef)
         const validationError = childBlock.validate(childDesignCtx)
 
         // Gets the label of the block which is displayed on hover
         const label = childBlock.getLabel()
-    
+
         return (
-          <BlockWrapper 
-            blockDef={childBlockDef} 
-            selectedBlockId={this.state.selectedBlockId} 
-            onSelect={this.handleSelect.bind(null, childBlockDef.id)} 
-            onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)} 
+          <BlockWrapper
+            blockDef={childBlockDef}
+            selectedBlockId={this.state.selectedBlockId}
+            onSelect={this.handleSelect.bind(null, childBlockDef.id)}
+            onRemove={this.handleRemoveBlock.bind(null, childBlockDef.id)}
             store={store}
             validationError={validationError}
-            label={label}>
+            label={label}
+          >
             {childBlock.renderDesign(childDesignCtx)}
           </BlockWrapper>
         )
-      }
-      else {
-        return <BlockPlaceholder onSet={onSet}/>
+      } else {
+        return <BlockPlaceholder onSet={onSet} />
       }
     }
 
@@ -198,10 +218,9 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     if (this.props.widgetDef.blockDef) {
       const block = this.props.baseCtx.createBlock(this.props.widgetDef.blockDef)
       const designCtx = this.createDesignCtx()
-    
+
       return designCtx.renderChildBlock(designCtx, block.blockDef, this.handleBlockDefChange)
-    }
-    else {
+    } else {
       // Create placeholder
       return <BlockPlaceholder onSet={this.handleBlockDefChange} />
     }
@@ -213,7 +232,12 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       const contextVars = (this.props.baseCtx.globalContextVars || [])
         .concat(this.props.widgetDef.contextVars)
         .concat(this.props.widgetDef.privateContextVars || [])
-      const selectedBlockAncestry = findBlockAncestry(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars, this.state.selectedBlockId)
+      const selectedBlockAncestry = findBlockAncestry(
+        this.props.widgetDef.blockDef,
+        this.props.baseCtx.createBlock,
+        contextVars,
+        this.state.selectedBlockId
+      )
 
       // Create props
       if (selectedBlockAncestry) {
@@ -230,9 +254,11 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
         return (
           <div key="editor" className="widget-designer-editor">
-            { validationError ? 
-              <div className="text-danger"><i className="fa fa-exclamation-circle"/> {validationError}</div> 
-            : null }
+            {validationError ? (
+              <div className="text-danger">
+                <i className="fa fa-exclamation-circle" /> {validationError}
+              </div>
+            ) : null}
             {selectedBlock.renderEditor(designCtx)}
           </div>
         )
@@ -241,12 +267,16 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     return (
       <div key="editor" className="widget-designer-editor">
-        <WidgetEditor widgetDef={this.props.widgetDef} onWidgetDefChange={this.handleWidgetDefChange} designCtx={this.createDesignCtx()}/>
+        <WidgetEditor
+          widgetDef={this.props.widgetDef}
+          onWidgetDefChange={this.handleWidgetDefChange}
+          designCtx={this.createDesignCtx()}
+        />
       </div>
     )
   }
 
-  handleSetMode = (mode: Mode) => { 
+  handleSetMode = (mode: Mode) => {
     if (!this.props.widgetDef.blockDef) {
       return
     }
@@ -256,28 +286,30 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       const contextVars = (this.props.baseCtx.globalContextVars || [])
         .concat(this.props.widgetDef.contextVars)
         .concat(this.props.widgetDef.privateContextVars || [])
-      for (const childBlock of getBlockTree(this.props.widgetDef.blockDef, this.props.baseCtx.createBlock, contextVars)) {
+      for (const childBlock of getBlockTree(
+        this.props.widgetDef.blockDef,
+        this.props.baseCtx.createBlock,
+        contextVars
+      )) {
         const block = this.props.baseCtx.createBlock(childBlock.blockDef)
-        
+
         // Use context vars for the block
         const designCtx = { ...this.createDesignCtx(), contextVars: childBlock.contextVars }
 
         if (block.validate(designCtx)) {
-           alert("Correct errors first")
-           return
-         }
+          alert("Correct errors first")
+          return
+        }
       }
     }
-    this.setState({mode})
+    this.setState({ mode })
   }
 
   renderDesign() {
     return [
-      (
-        <div key="designer" className="widget-designer-block" onClick={this.handleUnselect}>
-          {this.renderDesignBlock()}
-        </div>
-      ),
+      <div key="designer" className="widget-designer-block" onClick={this.handleUnselect}>
+        {this.renderDesignBlock()}
+      </div>,
       this.renderEditor()
     ]
   }
@@ -285,7 +317,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
   /** Render a preview of the widget in a page */
   renderPreview() {
     if (!this.props.widgetDef.blockDef) {
-      return null 
+      return null
     }
 
     let database: Database = this.props.baseCtx.database
@@ -297,7 +329,7 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
 
     // Include global context values if present
     const contextVarValues = this.props.widgetDef.contextVarPreviewValues
-    
+
     // Create normal page to display
     const page: Page = {
       type: "normal",
@@ -305,31 +337,34 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       database: database,
       widgetId: this.props.widgetDef.id
     }
-    const pageElem = <PageStackDisplay 
-      baseCtx={{ ...this.props.baseCtx, locale: this.state.locale }}
-      initialPage={page} />
+    const pageElem = (
+      <PageStackDisplay baseCtx={{ ...this.props.baseCtx, locale: this.state.locale }} initialPage={page} />
+    )
 
     return [
-      (<div key="preview" className="widget-preview-block">
-        <ErrorBoundary>
-          {pageElem}
-        </ErrorBoundary>
-      </div>),
-      (<div key="editor" className="widget-designer-editor"/>)
+      <div key="preview" className="widget-preview-block">
+        <ErrorBoundary>{pageElem}</ErrorBoundary>
+      </div>,
+      <div key="editor" className="widget-designer-editor" />
     ]
   }
 
   renderPreviewLocale() {
-    const options = (this.props.baseCtx.locales || [{ code: "en", name: "English" }]).map(l => ({ value: l.code, label: l.name }))
-    return <div style={{ display: "inline-block", marginRight: 10 }}>
-      <Select
-        options={options}
-        value={this.state.locale}
-        onChange={locale => this.setState({ locale: locale! })}
-        inline
-        size="sm"
-      />
-    </div>
+    const options = (this.props.baseCtx.locales || [{ code: "en", name: "English" }]).map((l) => ({
+      value: l.code,
+      label: l.name
+    }))
+    return (
+      <div style={{ display: "inline-block", marginRight: 10 }}>
+        <Select
+          options={options}
+          value={this.state.locale}
+          onChange={(locale) => this.setState({ locale: locale! })}
+          inline
+          size="sm"
+        />
+      </div>
+    )
   }
 
   render() {
@@ -347,37 +382,44 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
     return (
       <div className="widget-designer">
         <div className="widget-designer-header">
-          { this.state.mode == Mode.Design ? 
-            <AddWizardPalette onSelect={this.handleSelect}/> 
-          : null }
-          <div style={{float: "right"}}>
-            { this.state.mode == Mode.Design ? 
-              <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.baseCtx.createBlock}/>
-            : null }
-            { this.state.mode == Mode.Design ? 
-              <button type="button" className="btn btn-link btn-sm" onClick={this.handleUndo} disabled={this.state.undoStack.length === 0}>
-                <i className="fa fa-undo"/> Undo              
+          {this.state.mode == Mode.Design ? <AddWizardPalette onSelect={this.handleSelect} /> : null}
+          <div style={{ float: "right" }}>
+            {this.state.mode == Mode.Design ? (
+              <ClipboardPalette onSelect={this.handleSelect} createBlock={this.props.baseCtx.createBlock} />
+            ) : null}
+            {this.state.mode == Mode.Design ? (
+              <button
+                type="button"
+                className="btn btn-link btn-sm"
+                onClick={this.handleUndo}
+                disabled={this.state.undoStack.length === 0}
+              >
+                <i className="fa fa-undo" /> Undo
               </button>
-            : null }
-            { this.state.mode == Mode.Design ? 
-              <button type="button" className="btn btn-link btn-sm" onClick={this.handleRedo} disabled={this.state.redoStack.length === 0}>
-                <i className="fa fa-repeat"/> Redo
+            ) : null}
+            {this.state.mode == Mode.Design ? (
+              <button
+                type="button"
+                className="btn btn-link btn-sm"
+                onClick={this.handleRedo}
+                disabled={this.state.redoStack.length === 0}
+              >
+                <i className="fa fa-repeat" /> Redo
               </button>
-            : null }
-            { this.state.mode == Mode.Preview ? 
-              this.renderPreviewLocale()
-            : null }
-            <Toggle 
+            ) : null}
+            {this.state.mode == Mode.Preview ? this.renderPreviewLocale() : null}
+            <Toggle
               value={this.state.mode}
               options={[
-                { value: Mode.Design, label: [<i key="design" className="fa fa-pencil"/>, " Design"] }, 
-                { value: Mode.Preview, label: [<i key="design" className="fa fa-play"/>, " Preview"] }]}
+                { value: Mode.Design, label: [<i key="design" className="fa fa-pencil" />, " Design"] },
+                { value: Mode.Preview, label: [<i key="design" className="fa fa-play" />, " Preview"] }
+              ]}
               onChange={this.handleSetMode}
               size="sm"
-              />
+            />
           </div>
         </div>
-        { this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview() }
+        {this.state.mode === Mode.Design ? this.renderDesign() : this.renderPreview()}
       </div>
     )
   }

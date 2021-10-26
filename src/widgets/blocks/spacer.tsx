@@ -1,9 +1,9 @@
-import * as React from 'react';
-import LeafBlock from '../LeafBlock'
-import { BlockDef } from '../blocks'
-import { LabeledProperty, PropertyEditor } from '../propertyEditors';
-import { NumberInput } from 'react-library/lib/bootstrap';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react"
+import LeafBlock from "../LeafBlock"
+import { BlockDef } from "../blocks"
+import { LabeledProperty, PropertyEditor } from "../propertyEditors"
+import { NumberInput } from "react-library/lib/bootstrap"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 export interface SpacerBlockDef extends BlockDef {
   type: "spacer"
@@ -17,11 +17,14 @@ export interface SpacerBlockDef extends BlockDef {
 
 /** Creates a fixed size spacer to separate blocks */
 export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
-  validate() { return null }
-  
+  validate() {
+    return null
+  }
+
   renderDesign(props: DesignCtx) {
     const style: React.CSSProperties = {
-      backgroundImage: "linear-gradient(45deg, #dddddd 8.33%, #ffffff 8.33%, #ffffff 50%, #dddddd 50%, #dddddd 58.33%, #ffffff 58.33%, #ffffff 100%)",
+      backgroundImage:
+        "linear-gradient(45deg, #dddddd 8.33%, #ffffff 8.33%, #ffffff 50%, #dddddd 50%, #dddddd 58.33%, #ffffff 58.33%, #ffffff 100%)",
       backgroundSize: "8.49px 8.49px"
     }
 
@@ -31,7 +34,7 @@ export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
     if (this.blockDef.height) {
       style.height = this.blockDef.height + "em"
     }
-    return <div style={style}/>
+    return <div style={style} />
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
@@ -43,7 +46,7 @@ export class SpacerBlock extends LeafBlock<SpacerBlockDef> {
     if (this.blockDef.height) {
       style.height = this.blockDef.height + "em"
     }
-    return <div style={style}/>
+    return <div style={style} />
   }
 
   renderEditor(props: DesignCtx) {

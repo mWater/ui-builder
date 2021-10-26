@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Table with a fixed number of rows and columns */
 export interface FixedTableBlockDef extends BlockDef {
     type: "fixedTable";

@@ -1,24 +1,31 @@
-import * as React from 'react';
-import LeafBlock from '../../LeafBlock'
-import { BlockDef, Filter, ContextVar, createExprVariables } from '../../blocks'
-import { Expr, ExprValidator, Schema, ExprUtils, LocalizedString } from 'mwater-expressions';
-import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor, EmbeddedExprsEditor, OrderByArrayEditor } from '../../propertyEditors';
-import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
-import { localize } from '../../localization';
+import * as React from "react"
+import LeafBlock from "../../LeafBlock"
+import { BlockDef, Filter, ContextVar, createExprVariables } from "../../blocks"
+import { Expr, ExprValidator, Schema, ExprUtils, LocalizedString } from "mwater-expressions"
+import {
+  LabeledProperty,
+  ContextVarPropertyEditor,
+  PropertyEditor,
+  LocalizedTextPropertyEditor,
+  EmbeddedExprsEditor,
+  OrderByArrayEditor
+} from "../../propertyEditors"
+import { ExprComponent, FilterExprComponent } from "mwater-expressions-ui"
+import { localize } from "../../localization"
 import ReactSelect from "react-select"
-import EnumInstance from './EnumInstance';
-import TextInstance from './TextInstance';
-import DateExprComponent, { createDateFilterExpr, DateValue } from './DateExprComponent';
-import produce from 'immer';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
-import EnumsetInstance from './EnumsetInstance';
-import { EmbeddedExpr, validateEmbeddedExprs } from '../../../embeddedExprs';
-import { OrderBy } from '../../../database/Database';
-import { IdInstance } from './IdInstance';
-import { Toggle } from 'react-library/lib/bootstrap';
-import ListEditor from '../../ListEditor';
-import { DateFilterInstance } from './DateFilterInstance';
-import TextArrInstance from './TextArrInstance';
+import EnumInstance from "./EnumInstance"
+import TextInstance from "./TextInstance"
+import DateExprComponent, { createDateFilterExpr, DateValue } from "./DateExprComponent"
+import produce from "immer"
+import { DesignCtx, InstanceCtx } from "../../../contexts"
+import EnumsetInstance from "./EnumsetInstance"
+import { EmbeddedExpr, validateEmbeddedExprs } from "../../../embeddedExprs"
+import { OrderBy } from "../../../database/Database"
+import { IdInstance } from "./IdInstance"
+import { Toggle } from "react-library/lib/bootstrap"
+import ListEditor from "../../ListEditor"
+import { DateFilterInstance } from "./DateFilterInstance"
+import TextArrInstance from "./TextArrInstance"
 
 export interface DropdownFilterBlockDef extends BlockDef {
   type: "dropdownFilter"
@@ -41,7 +48,7 @@ export interface DropdownFilterBlockDef extends BlockDef {
   // ----------- date type options
   /** Mode for selecting date. Default is "full" */
   dateMode?: "full" | "year" | "yearmonth" | "month"
-  
+
   // ----------- id type options
   /** True to use "within" operator. Only for hierarchical tables  */
   idWithin?: boolean
@@ -59,13 +66,13 @@ export interface DropdownFilterBlockDef extends BlockDef {
   idLabelText?: LocalizedString | null
 
   /** Advanced mode: Expressions embedded in the id label text string. Referenced by {0}, {1}, etc. Context variable is ignored */
-  idLabelEmbeddedExprs?: EmbeddedExpr[] 
+  idLabelEmbeddedExprs?: EmbeddedExpr[]
 
   /** Advanced mode: Text/enum expressions to search on */
   idSearchExprs?: Expr[]
 
   /** Advanced mode: sort order of results */
-  idOrderBy?: OrderBy[] | null  
+  idOrderBy?: OrderBy[] | null
 }
 
 /** Additional rowset to be filtered */
@@ -83,7 +90,9 @@ interface ExtraFilter {
 export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   validate(options: DesignCtx) {
     // Validate rowset
-    const rowsetCV = options.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
+    const rowsetCV = options.contextVars.find(
+      (cv) => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset"
+    )
     if (!rowsetCV) {
       return "Rowset required"
     }
@@ -93,10 +102,13 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     }
 
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
-    
+
     // Validate expr
     let error
-    error = exprValidator.validateExpr(this.blockDef.filterExpr, { table: rowsetCV.table, types: ["enum", "enumset", "text", "date", "datetime", "id", "text[]"] })
+    error = exprValidator.validateExpr(this.blockDef.filterExpr, {
+      table: rowsetCV.table,
+      types: ["enum", "enumset", "text", "date", "datetime", "id", "text[]"]
+    })
     if (error) {
       return error
     }
@@ -109,7 +121,9 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     if (this.blockDef.extraFilters) {
       for (const extraFilter of this.blockDef.extraFilters) {
         // Validate rowset
-        const extraRowsetCV = options.contextVars.find(cv => cv.id === extraFilter.rowsetContextVarId && cv.type === "rowset")
+        const extraRowsetCV = options.contextVars.find(
+          (cv) => cv.id === extraFilter.rowsetContextVarId && cv.type === "rowset"
+        )
         if (!extraRowsetCV) {
           return "Rowset required"
         }
@@ -120,8 +134,8 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
         // Validate expr
         let error
-        error = exprValidator.validateExpr(extraFilter.filterExpr, { 
-          table: extraRowsetCV.table, 
+        error = exprValidator.validateExpr(extraFilter.filterExpr, {
+          table: extraRowsetCV.table,
           types: [valueType],
           idTable: valueIdTableId || undefined
         })
@@ -148,17 +162,19 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
       }
 
       if (idMode == "simple") {
-        if (!this.blockDef.idLabelExpr)  {
+        if (!this.blockDef.idLabelExpr) {
           return "Label Expression required"
         }
 
         // Validate expr
-        error = exprValidator.validateExpr(this.blockDef.idLabelExpr || null, { table: valueIdTableId, types: ["text"] })
+        error = exprValidator.validateExpr(this.blockDef.idLabelExpr || null, {
+          table: valueIdTableId,
+          types: ["text"]
+        })
         if (error) {
           return error
         }
-      }
-      else {
+      } else {
         // Complex mode
         if (!this.blockDef.idLabelText) {
           return "Label required"
@@ -197,7 +213,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           if (!searchExpr) {
             return "Search expression required"
           }
-    
+
           // Validate expr
           error = exprValidator.validateExpr(searchExpr, { table: valueIdTableId, types: ["text", "enum", "enumset"] })
           if (error) {
@@ -212,36 +228,61 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
   /** Generate a single synthetic context variable to allow embedded expressions to work in label */
   generateEmbedContextVars(idTable: string): ContextVar[] {
-    return [
-      { id: "dropdown-embed", name: "Label", table: idTable, type: "row" }
-    ]
+    return [{ id: "dropdown-embed", name: "Label", table: idTable, type: "row" }]
   }
-  
+
   /** Create a filter of the appropriate type for the value selected */
-  createFilter(rowsetContextVarId: string, filterExpr: Expr, schema: Schema, contextVars: ContextVar[], value: any): Filter {
+  createFilter(
+    rowsetContextVarId: string,
+    filterExpr: Expr,
+    schema: Schema,
+    contextVars: ContextVar[],
+    value: any
+  ): Filter {
     const exprUtils = new ExprUtils(schema, createExprVariables(contextVars))
     const valueType = exprUtils.getExprType(filterExpr)
     const valueIdTable = exprUtils.getExprIdTable(filterExpr)
-    const contextVar = contextVars.find(cv => cv.id === rowsetContextVarId)!
+    const contextVar = contextVars.find((cv) => cv.id === rowsetContextVarId)!
     const table = contextVar.table!
 
     switch (valueType) {
       case "enum":
         return {
           id: this.blockDef.id,
-          expr: value ? { type: "op", table: table, op: "=", exprs: [filterExpr!, { type: "literal", valueType: "enum", value: value }]} : null,
+          expr: value
+            ? {
+                type: "op",
+                table: table,
+                op: "=",
+                exprs: [filterExpr!, { type: "literal", valueType: "enum", value: value }]
+              }
+            : null,
           memo: value
         }
       case "enumset":
         return {
           id: this.blockDef.id,
-          expr: value ? { type: "op", table: table, op: "intersects", exprs: [filterExpr!, { type: "literal", valueType: "enumset", value: value }]} : null,
+          expr: value
+            ? {
+                type: "op",
+                table: table,
+                op: "intersects",
+                exprs: [filterExpr!, { type: "literal", valueType: "enumset", value: value }]
+              }
+            : null,
           memo: value
         }
       case "text":
         return {
           id: this.blockDef.id,
-          expr: value ? { type: "op", table: table, op: "=", exprs: [filterExpr!, { type: "literal", valueType: "text", value: value }]} : null,
+          expr: value
+            ? {
+                type: "op",
+                table: table,
+                op: "=",
+                exprs: [filterExpr!, { type: "literal", valueType: "text", value: value }]
+              }
+            : null,
           memo: value
         }
       case "date":
@@ -254,57 +295,79 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
             expr: createDateFilterExpr(table, filterExpr!, valueType == "datetime", value),
             memo: value
           }
-        }
-        else if (dateMode == "year") {
+        } else if (dateMode == "year") {
           return {
             id: this.blockDef.id,
-            expr: value ? { type: "op", table: table, op: "=", exprs: [
-              { type: "op", table: table, op: "year", exprs: [filterExpr!] }, 
-              { type: "literal", valueType: "date", value: value }]
-            } : null,
+            expr: value
+              ? {
+                  type: "op",
+                  table: table,
+                  op: "=",
+                  exprs: [
+                    { type: "op", table: table, op: "year", exprs: [filterExpr!] },
+                    { type: "literal", valueType: "date", value: value }
+                  ]
+                }
+              : null,
             memo: value
           }
-        }
-        else if (dateMode == "yearmonth") {
+        } else if (dateMode == "yearmonth") {
           return {
             id: this.blockDef.id,
-            expr: value ? { type: "op", table: table, op: "=", exprs: [
-              { type: "op", table: table, op: "yearmonth", exprs: [filterExpr!] }, 
-              { type: "literal", valueType: "date", value: value }]
-            } : null,
+            expr: value
+              ? {
+                  type: "op",
+                  table: table,
+                  op: "=",
+                  exprs: [
+                    { type: "op", table: table, op: "yearmonth", exprs: [filterExpr!] },
+                    { type: "literal", valueType: "date", value: value }
+                  ]
+                }
+              : null,
             memo: value
           }
-        }
-        else if (dateMode == "month") {
+        } else if (dateMode == "month") {
           return {
             id: this.blockDef.id,
-            expr: value ? { type: "op", table: table, op: "=", exprs: [
-              { type: "op", table: table, op: "month", exprs: [filterExpr!] }, 
-              { type: "literal", valueType: "enum", value: value }]
-            } : null,
+            expr: value
+              ? {
+                  type: "op",
+                  table: table,
+                  op: "=",
+                  exprs: [
+                    { type: "op", table: table, op: "month", exprs: [filterExpr!] },
+                    { type: "literal", valueType: "enum", value: value }
+                  ]
+                }
+              : null,
             memo: value
           }
         }
       case "id":
         return {
           id: this.blockDef.id,
-          expr: value ? { 
-            type: "op", 
-            table: table, 
-            op: this.blockDef.idWithin ? "within" : "=", 
-            exprs: [filterExpr!, { type: "literal", valueType: "id", idTable: valueIdTable!, value: value }]
-          } : null,
+          expr: value
+            ? {
+                type: "op",
+                table: table,
+                op: this.blockDef.idWithin ? "within" : "=",
+                exprs: [filterExpr!, { type: "literal", valueType: "id", idTable: valueIdTable!, value: value }]
+              }
+            : null,
           memo: value
         }
       case "text[]":
         return {
           id: this.blockDef.id,
-          expr: value ? { 
-            type: "op", 
-            table: table, 
-            op: "intersects", 
-            exprs: [filterExpr!, { type: "literal", valueType: "text[]", value: [value] }]
-          } : null,
+          expr: value
+            ? {
+                type: "op",
+                table: table,
+                op: "intersects",
+                exprs: [filterExpr!, { type: "literal", valueType: "text[]", value: [value] }]
+              }
+            : null,
           memo: value
         }
     }
@@ -313,7 +376,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   }
 
   renderDesign(props: DesignCtx) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
+    const contextVar = props.contextVars.find((cv) => cv.id === this.blockDef.rowsetContextVarId)
 
     const styles = {
       control: (base: React.CSSProperties) => ({ ...base, minWidth: 150 }),
@@ -322,7 +385,9 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     }
 
     const placeholder = localize(this.blockDef.placeholder, props.locale)
-    const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.filterExpr)
+    const valueType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(
+      this.blockDef.filterExpr
+    )
 
     const handleSetDefault = (defaultValue: any) => {
       props.store.alterBlock(this.blockDef.id, (bd) => {
@@ -338,23 +403,23 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
         const table = contextVar ? contextVar.table || "" : ""
         return (
           <div style={{ padding: 5 }}>
-            <DateExprComponent 
-              table={table} 
-              datetime={valueType === "datetime"} 
-              value={this.blockDef.defaultValue} 
-              onChange={handleSetDefault} 
+            <DateExprComponent
+              table={table}
+              datetime={valueType === "datetime"}
+              value={this.blockDef.defaultValue}
+              onChange={handleSetDefault}
               placeholder={placeholder}
-              locale={props.locale}/>
+              locale={props.locale}
+            />
           </div>
         )
-      }
-      else {
+      } else {
         return (
           <div style={{ padding: 5 }}>
             <DateFilterInstance
               mode={dateMode}
               value={this.blockDef.defaultValue}
-              onChange={handleSetDefault} 
+              onChange={handleSetDefault}
               placeholder={placeholder}
               locale={props.locale}
             />
@@ -366,38 +431,54 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     // Allow setting default for enum and enumset
     switch (valueType) {
       case "enum":
-        return <EnumInstance 
-          blockDef={this.blockDef}
-          schema={props.schema}
-          contextVars={props.contextVars}
-          value={this.blockDef.defaultValue}
-          onChange={handleSetDefault}
-          locale={props.locale} />
+        return (
+          <EnumInstance
+            blockDef={this.blockDef}
+            schema={props.schema}
+            contextVars={props.contextVars}
+            value={this.blockDef.defaultValue}
+            onChange={handleSetDefault}
+            locale={props.locale}
+          />
+        )
       case "enumset":
-        return <EnumsetInstance 
-          blockDef={this.blockDef}
-          schema={props.schema}
-          contextVars={props.contextVars}
-          value={this.blockDef.defaultValue}
-          onChange={handleSetDefault}
-          locale={props.locale} />
+        return (
+          <EnumsetInstance
+            blockDef={this.blockDef}
+            schema={props.schema}
+            contextVars={props.contextVars}
+            value={this.blockDef.defaultValue}
+            onChange={handleSetDefault}
+            locale={props.locale}
+          />
+        )
     }
 
-    return <div style={{ padding: 5 }}>
-      <ReactSelect 
-        classNamePrefix="react-select-short" 
-        styles={styles} 
-        placeholder={placeholder}
-        menuPortalTarget={document.body}
-      />
-    </div>
+    return (
+      <div style={{ padding: 5 }}>
+        <ReactSelect
+          classNamePrefix="react-select-short"
+          styles={styles}
+          placeholder={placeholder}
+          menuPortalTarget={document.body}
+        />
+      </div>
+    )
   }
 
-  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] { 
+  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] {
     const filters: Filter[] = []
     if (contextVarId == this.blockDef.rowsetContextVarId) {
       if (this.blockDef.defaultValue) {
-        filters.push(this.createFilter(this.blockDef.rowsetContextVarId, this.blockDef.filterExpr, instanceCtx.schema, instanceCtx.contextVars, this.blockDef.defaultValue))
+        filters.push(
+          this.createFilter(
+            this.blockDef.rowsetContextVarId,
+            this.blockDef.filterExpr,
+            instanceCtx.schema,
+            instanceCtx.contextVars,
+            this.blockDef.defaultValue
+          )
+        )
       }
     }
 
@@ -405,7 +486,15 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     for (const extraFilter of this.blockDef.extraFilters || []) {
       if (contextVarId == extraFilter.rowsetContextVarId) {
         if (this.blockDef.defaultValue) {
-          filters.push(this.createFilter(extraFilter.rowsetContextVarId, extraFilter.filterExpr, instanceCtx.schema, instanceCtx.contextVars, this.blockDef.defaultValue))
+          filters.push(
+            this.createFilter(
+              extraFilter.rowsetContextVarId,
+              extraFilter.filterExpr,
+              instanceCtx.schema,
+              instanceCtx.contextVars,
+              this.blockDef.defaultValue
+            )
+          )
         }
       }
     }
@@ -414,18 +503,30 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
   }
 
   renderInstance(ctx: InstanceCtx): React.ReactElement<any> {
-    const contextVar = ctx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)!
-    const filter = ctx.getFilters(this.blockDef.rowsetContextVarId!).find(f => f.id === this.blockDef.id)
+    const contextVar = ctx.contextVars.find((cv) => cv.id === this.blockDef.rowsetContextVarId)!
+    const filter = ctx.getFilters(this.blockDef.rowsetContextVarId!).find((f) => f.id === this.blockDef.id)
     const value = filter ? filter.memo : null
 
     const handleChange = (newValue: any) => {
       // Create filter
-      const newFilter = this.createFilter(this.blockDef.rowsetContextVarId!, this.blockDef.filterExpr, ctx.schema, ctx.contextVars, newValue)
+      const newFilter = this.createFilter(
+        this.blockDef.rowsetContextVarId!,
+        this.blockDef.filterExpr,
+        ctx.schema,
+        ctx.contextVars,
+        newValue
+      )
       ctx.setFilter(contextVar.id, newFilter)
 
       // Create extra filters
       for (const extraFilter of this.blockDef.extraFilters || []) {
-        const newExtraFilter = this.createFilter(extraFilter.rowsetContextVarId!, extraFilter.filterExpr, ctx.schema, ctx.contextVars, newValue)
+        const newExtraFilter = this.createFilter(
+          extraFilter.rowsetContextVarId!,
+          extraFilter.filterExpr,
+          ctx.schema,
+          ctx.contextVars,
+          newValue
+        )
         ctx.setFilter(extraFilter.rowsetContextVarId!, newExtraFilter)
       }
     }
@@ -438,86 +539,98 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
 
     switch (valueType) {
       case "enum":
-        elem = <EnumInstance 
-          blockDef={this.blockDef}
-          schema={ctx.schema}
-          contextVars={ctx.contextVars}
-          value={value}
-          onChange={handleChange}
-          locale={ctx.locale} />
+        elem = (
+          <EnumInstance
+            blockDef={this.blockDef}
+            schema={ctx.schema}
+            contextVars={ctx.contextVars}
+            value={value}
+            onChange={handleChange}
+            locale={ctx.locale}
+          />
+        )
         break
       case "enumset":
-        elem = <EnumsetInstance 
-          blockDef={this.blockDef}
-          schema={ctx.schema}
-          contextVars={ctx.contextVars}
-          value={value}
-          onChange={handleChange}
-          locale={ctx.locale} />
+        elem = (
+          <EnumsetInstance
+            blockDef={this.blockDef}
+            schema={ctx.schema}
+            contextVars={ctx.contextVars}
+            value={value}
+            onChange={handleChange}
+            locale={ctx.locale}
+          />
+        )
         break
       case "text":
-        elem = <TextInstance 
-          instanceCtx={ctx}
-          blockDef={this.blockDef}
-          schema={ctx.schema}
-          contextVars={ctx.contextVars}
-          value={value}
-          database={ctx.database}
-          onChange={handleChange}
-          locale={ctx.locale} />
+        elem = (
+          <TextInstance
+            instanceCtx={ctx}
+            blockDef={this.blockDef}
+            schema={ctx.schema}
+            contextVars={ctx.contextVars}
+            value={value}
+            database={ctx.database}
+            onChange={handleChange}
+            locale={ctx.locale}
+          />
+        )
         break
       case "date":
       case "datetime":
         const dateMode = this.blockDef.dateMode || "full"
         if (dateMode == "full") {
-          elem = <DateExprComponent 
-            datetime={valueType == "datetime"} 
-            table={contextVar.table!} 
-            value={value} 
-            onChange={handleChange} 
-            placeholder={placeholder}
-            locale={ctx.locale}
-          />
-        }
-        else {
-          elem = <DateFilterInstance
-            mode={dateMode}
-            value={value}
-            onChange={handleChange} 
-            placeholder={placeholder}
-            locale={ctx.locale}
-          />
+          elem = (
+            <DateExprComponent
+              datetime={valueType == "datetime"}
+              table={contextVar.table!}
+              value={value}
+              onChange={handleChange}
+              placeholder={placeholder}
+              locale={ctx.locale}
+            />
+          )
+        } else {
+          elem = (
+            <DateFilterInstance
+              mode={dateMode}
+              value={value}
+              onChange={handleChange}
+              placeholder={placeholder}
+              locale={ctx.locale}
+            />
+          )
         }
         break
       case "id":
-        elem = <IdInstance 
-          blockDef={this.blockDef}
-          ctx={ctx}
-          value={value}
-          onChange={handleChange}
-          locale={ctx.locale} />
+        elem = (
+          <IdInstance blockDef={this.blockDef} ctx={ctx} value={value} onChange={handleChange} locale={ctx.locale} />
+        )
         break
       case "text[]":
-        elem = <TextArrInstance 
-          instanceCtx={ctx}
-          blockDef={this.blockDef}
-          schema={ctx.schema}
-          contextVars={ctx.contextVars}
-          value={value}
-          database={ctx.database}
-          onChange={handleChange}
-          locale={ctx.locale} />
+        elem = (
+          <TextArrInstance
+            instanceCtx={ctx}
+            blockDef={this.blockDef}
+            schema={ctx.schema}
+            contextVars={ctx.contextVars}
+            value={value}
+            database={ctx.database}
+            onChange={handleChange}
+            locale={ctx.locale}
+          />
+        )
         break
       default:
-        elem = <div/>
+        elem = <div />
     }
 
     return <div style={{ padding: 5 }}>{elem}</div>
-  }    
+  }
 
   renderEditor(ctx: DesignCtx) {
     // Get rowset context variable
-    const rowsetCV = ctx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
+    const rowsetCV = ctx.contextVars.find((cv) => cv.id === this.blockDef.rowsetContextVarId)
 
     const idMode = this.blockDef.idMode || "simple"
     const exprUtils = new ExprUtils(ctx.schema, createExprVariables(ctx.contextVars))
@@ -530,41 +643,53 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     const isDateType = exprType == "date" || exprType == "datetime"
 
     const handleExprChange = (expr: Expr) => {
-      ctx.store.replaceBlock(produce(this.blockDef, (draft) => {
-        // Clear default value if expression changes
-        draft.filterExpr = expr
-        delete draft.defaultValue
-      }))
+      ctx.store.replaceBlock(
+        produce(this.blockDef, (draft) => {
+          // Clear default value if expression changes
+          draft.filterExpr = expr
+          delete draft.defaultValue
+        })
+      )
     }
 
     const handleDateModeChange = (dateMode: "full" | "year" | "yearmonth" | "month") => {
-      ctx.store.replaceBlock(produce(this.blockDef, (draft) => {
-        // Clear default value if expression changes
-        draft.dateMode = dateMode
-        delete draft.defaultValue
-      }))
+      ctx.store.replaceBlock(
+        produce(this.blockDef, (draft) => {
+          // Clear default value if expression changes
+          draft.dateMode = dateMode
+          delete draft.defaultValue
+        })
+      )
     }
 
     return (
       <div>
         <LabeledProperty label="Rowset">
           <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="rowsetContextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={ctx.contextVars} types={["rowset"]} />}
+            {(value, onChange) => (
+              <ContextVarPropertyEditor
+                value={value}
+                onChange={onChange}
+                contextVars={ctx.contextVars}
+                types={["rowset"]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
-        {rowsetCV ?
+        {rowsetCV ? (
           <LabeledProperty label="Filter expression">
-            <ExprComponent 
-              value={this.blockDef.filterExpr} 
-              schema={ctx.schema} 
-              dataSource={ctx.dataSource} 
-              onChange={handleExprChange} 
-              table={rowsetCV.table!} 
+            <ExprComponent
+              value={this.blockDef.filterExpr}
+              schema={ctx.schema}
+              dataSource={ctx.dataSource}
+              onChange={handleExprChange}
+              table={rowsetCV.table!}
               variables={createExprVariables(ctx.contextVars)}
-              types={["enum", "enumset", "text", "date", "datetime", "id", "text[]"]} />
+              types={["enum", "enumset", "text", "date", "datetime", "id", "text[]"]}
+            />
           </LabeledProperty>
-        : null}
+        ) : null}
 
         <LabeledProperty label="Placeholder">
           <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="placeholder">
@@ -572,94 +697,107 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
           </PropertyEditor>
         </LabeledProperty>
 
-        { isDateType ?
+        {isDateType ? (
           <LabeledProperty label="Mode" key="dateMode">
-            <Toggle 
-              value={this.blockDef.dateMode || "full"} 
-              onChange={handleDateModeChange} 
+            <Toggle
+              value={this.blockDef.dateMode || "full"}
+              onChange={handleDateModeChange}
               options={[
                 { value: "full", label: "Full" },
                 { value: "year", label: "Year" },
                 { value: "yearmonth", label: "Year + Month" },
                 { value: "month", label: "Month" }
-              ]} />
+              ]}
+            />
           </LabeledProperty>
-        : null }
+        ) : null}
 
-        { isIdType ?
+        {isIdType ? (
           <LabeledProperty label="Mode" key="mode">
             <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idMode">
-              {(value, onChange) => 
-                <Toggle 
-                  value={value || "simple"} 
-                  onChange={onChange} 
+              {(value, onChange) => (
+                <Toggle
+                  value={value || "simple"}
+                  onChange={onChange}
                   options={[
                     { value: "simple", label: "Simple" },
                     { value: "advanced", label: "Advanced" }
-                  ]} />
-              }
+                  ]}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { isIdTableHierarchical ?
+        ) : null}
+        {isIdTableHierarchical ? (
           <LabeledProperty label="Match Mode" key="within">
             <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idWithin">
-              {(value, onChange) => 
-                <Toggle 
-                  value={value || false} 
-                  onChange={onChange} 
+              {(value, onChange) => (
+                <Toggle
+                  value={value || false}
+                  onChange={onChange}
                   options={[
                     { value: false, label: "Exact" },
                     { value: true, label: "Is Within" }
-                  ]} />
-              }
+                  ]}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { isIdType && idMode == "simple" ?
+        ) : null}
+        {isIdType && idMode == "simple" ? (
           <LabeledProperty label="Label Expression" key="idLabelExpr">
             <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idLabelExpr">
-              {(value, onChange) => <ExprComponent 
-                value={value || null} 
-                onChange={onChange} 
-                schema={ctx.schema}
-                dataSource={ctx.dataSource}
-                types={["text"]}
-                table={idTableId!}
+              {(value, onChange) => (
+                <ExprComponent
+                  value={value || null}
+                  onChange={onChange}
+                  schema={ctx.schema}
+                  dataSource={ctx.dataSource}
+                  types={["text"]}
+                  table={idTableId!}
                 />
-              }
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { isIdType && idMode == "advanced" ?
+        ) : null}
+        {isIdType && idMode == "advanced" ? (
           <div>
             <LabeledProperty label="Label" key="idLabelText">
               <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idLabelText">
-                {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={ctx.locale} />}
+                {(value, onChange) => (
+                  <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={ctx.locale} />
+                )}
               </PropertyEditor>
             </LabeledProperty>
-            <LabeledProperty label="Embedded label expressions" help="Reference in text as {0}, {1}, etc." key="idLabelEmbeddedExprs">
+            <LabeledProperty
+              label="Embedded label expressions"
+              help="Reference in text as {0}, {1}, etc."
+              key="idLabelEmbeddedExprs"
+            >
               <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idLabelEmbeddedExprs">
                 {(value: EmbeddedExpr[] | null | undefined, onChange) => (
-                  <EmbeddedExprsEditor 
-                    value={value} 
-                    onChange={onChange} 
-                    schema={ctx.schema} 
+                  <EmbeddedExprsEditor
+                    value={value}
+                    onChange={onChange}
+                    schema={ctx.schema}
                     dataSource={ctx.dataSource}
-                    contextVars={this.generateEmbedContextVars(idTableId!)} />
+                    contextVars={this.generateEmbedContextVars(idTableId!)}
+                  />
                 )}
               </PropertyEditor>
             </LabeledProperty>
             <LabeledProperty label="Option ordering" key="idOrderBy">
               <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idOrderBy">
-                {(value, onChange) => 
-                  <OrderByArrayEditor 
-                    value={value || []} 
-                    onChange={onChange} 
-                    schema={ctx.schema} 
-                    dataSource={ctx.dataSource} 
+                {(value, onChange) => (
+                  <OrderByArrayEditor
+                    value={value || []}
+                    onChange={onChange}
+                    schema={ctx.schema}
+                    dataSource={ctx.dataSource}
                     contextVars={ctx.contextVars}
-                    table={idTableId!} /> }
+                    table={idTableId!}
+                  />
+                )}
               </PropertyEditor>
             </LabeledProperty>
             <LabeledProperty label="Search expressions" key="idSearchExprs">
@@ -671,16 +809,16 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
                   return (
                     <div>
                       <ListEditor items={value || []} onItemsChange={onItemsChange}>
-                        { (expr: Expr, onExprChange) => (
-                          <ExprComponent 
-                            value={expr} 
-                            schema={ctx.schema} 
-                            dataSource={ctx.dataSource} 
-                            onChange={onExprChange} 
-                            table={idTableId!} 
-                            types={["text", "enum", "enumset"]} 
+                        {(expr: Expr, onExprChange) => (
+                          <ExprComponent
+                            value={expr}
+                            schema={ctx.schema}
+                            dataSource={ctx.dataSource}
+                            onChange={onExprChange}
+                            table={idTableId!}
+                            types={["text", "enum", "enumset"]}
                             variables={createExprVariables(ctx.contextVars)}
-                            />
+                          />
                         )}
                       </ListEditor>
                       <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>
@@ -692,22 +830,23 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
               </PropertyEditor>
             </LabeledProperty>
           </div>
-        : null }
-        { isIdType ?
+        ) : null}
+        {isIdType ? (
           <LabeledProperty label="Filter expression for id table" key="idFilterExpr">
             <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="idFilterExpr">
-              {(value, onChange) => <FilterExprComponent 
-                value={value} 
-                onChange={onChange} 
-                schema={ctx.schema}
-                dataSource={ctx.dataSource}
-                table={idTableId!}
+              {(value, onChange) => (
+                <FilterExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={ctx.schema}
+                  dataSource={ctx.dataSource}
+                  table={idTableId!}
                 />
-              }
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { rowsetCV && this.blockDef.filterExpr ?
+        ) : null}
+        {rowsetCV && this.blockDef.filterExpr ? (
           <LabeledProperty label="Additional filters on other rowsets">
             <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="extraFilters">
               {(value, onItemsChange) => {
@@ -717,30 +856,45 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
                 return (
                   <div>
                     <ListEditor items={value || []} onItemsChange={onItemsChange}>
-                      { (extraFilter: ExtraFilter, onExtraFilterChange) => {
-                        const extraFilterCV = ctx.contextVars.find(cv => cv.id === extraFilter.rowsetContextVarId)
-                        return <div>
-                          <LabeledProperty label="Rowset">
-                            <PropertyEditor obj={extraFilter} onChange={onExtraFilterChange} property="rowsetContextVarId">
-                              {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={ctx.contextVars} types={["rowset"]} />}
-                            </PropertyEditor>
-                          </LabeledProperty>
-                  
-                          { extraFilterCV ?
-                            <LabeledProperty label="Filter expression">
-                              <PropertyEditor obj={extraFilter} onChange={onExtraFilterChange} property="filterExpr">
-                                {(value, onChange) => <ExprComponent 
-                                  value={value} 
-                                  schema={ctx.schema} 
-                                  dataSource={ctx.dataSource} 
-                                  onChange={onChange} 
-                                  table={extraFilterCV.table!} 
-                                  types={["enum", "enumset", "text", "date", "datetime", "id"]} /> 
-                                }
+                      {(extraFilter: ExtraFilter, onExtraFilterChange) => {
+                        const extraFilterCV = ctx.contextVars.find((cv) => cv.id === extraFilter.rowsetContextVarId)
+                        return (
+                          <div>
+                            <LabeledProperty label="Rowset">
+                              <PropertyEditor
+                                obj={extraFilter}
+                                onChange={onExtraFilterChange}
+                                property="rowsetContextVarId"
+                              >
+                                {(value, onChange) => (
+                                  <ContextVarPropertyEditor
+                                    value={value}
+                                    onChange={onChange}
+                                    contextVars={ctx.contextVars}
+                                    types={["rowset"]}
+                                  />
+                                )}
                               </PropertyEditor>
                             </LabeledProperty>
-                          : null}
-                        </div>                      
+
+                            {extraFilterCV ? (
+                              <LabeledProperty label="Filter expression">
+                                <PropertyEditor obj={extraFilter} onChange={onExtraFilterChange} property="filterExpr">
+                                  {(value, onChange) => (
+                                    <ExprComponent
+                                      value={value}
+                                      schema={ctx.schema}
+                                      dataSource={ctx.dataSource}
+                                      onChange={onChange}
+                                      table={extraFilterCV.table!}
+                                      types={["enum", "enumset", "text", "date", "datetime", "id"]}
+                                    />
+                                  )}
+                                </PropertyEditor>
+                              </LabeledProperty>
+                            ) : null}
+                          </div>
+                        )
                       }}
                     </ListEditor>
                     <button type="button" className="btn btn-link btn-sm" onClick={handleAddExtraFilter}>
@@ -751,7 +905,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
               }}
             </PropertyEditor>
           </LabeledProperty>
-          : null }
+        ) : null}
       </div>
     )
   }

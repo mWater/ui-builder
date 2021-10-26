@@ -1,7 +1,7 @@
 import React from "react"
 
 /** Makes a react error boundary that shows the error rather than crashing the app */
-export default class ErrorBoundary extends React.Component<{}, { error?: Error, errorInfo?: React.ErrorInfo}> {
+export default class ErrorBoundary extends React.Component<{}, { error?: Error; errorInfo?: React.ErrorInfo }> {
   constructor(props: {}) {
     super(props)
 
@@ -13,11 +13,11 @@ export default class ErrorBoundary extends React.Component<{}, { error?: Error, 
   }
 
   render() {
-    if (this.state.error)  {
+    if (this.state.error) {
       return (
         <div className="alert alert-danger">
           Error: {this.state.error.message}
-          <br/>
+          <br />
           <pre>{this.state.errorInfo!.componentStack}</pre>
         </div>
       )

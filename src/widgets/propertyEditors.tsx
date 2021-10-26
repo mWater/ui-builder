@@ -1,30 +1,46 @@
-import _ from 'lodash'
-import * as React from "react";
-import { Select } from "react-library/lib/bootstrap";
-import { ContextVar, createExprVariables } from "./blocks";
-import { ActionDef } from "./actions";
-import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, ExprUtils, AggrStatus, LiteralType } from "mwater-expressions";
-import { OrderBy } from "../database/Database";
-import ListEditor from "./ListEditor";
-import { ExprComponent } from "mwater-expressions-ui";
-import * as PropTypes from 'prop-types'
+import _ from "lodash"
+import * as React from "react"
+import { Select } from "react-library/lib/bootstrap"
+import { ContextVar, createExprVariables } from "./blocks"
+import { ActionDef } from "./actions"
+import {
+  LocalizedString,
+  Schema,
+  DataSource,
+  Expr,
+  Table,
+  EnumValue,
+  ExprUtils,
+  AggrStatus,
+  LiteralType
+} from "mwater-expressions"
+import { OrderBy } from "../database/Database"
+import ListEditor from "./ListEditor"
+import { ExprComponent } from "mwater-expressions-ui"
+import * as PropTypes from "prop-types"
 import ReactSelect from "react-select"
-import { localize } from "./localization";
-import { EmbeddedExpr } from "../embeddedExprs";
-import { DesignCtx } from "../contexts";
-import { CollapsibleComponent } from './blocks/collapsible';
-import { ContextVarExpr } from '..';
+import { localize } from "./localization"
+import { EmbeddedExpr } from "../embeddedExprs"
+import { DesignCtx } from "../contexts"
+import { CollapsibleComponent } from "./blocks/collapsible"
+import { ContextVarExpr } from ".."
 
 /* Components to build property editors. These may use bootstrap 3 as needed. */
 
 /** Labeled group */
-export const LabeledProperty: React.FC<{ label: string, help?: string, hint?: string }> = (props) => {
+export const LabeledProperty: React.FC<{ label: string; help?: string; hint?: string }> = (props) => {
   return (
     <div className="form-group">
-      <label>{props.label} { props.hint ? <span className="text-muted" style={{ fontWeight: "normal" }}> - {props.hint}</span> : null}</label>
-      <div style={{ paddingLeft: 5 }}>
-        {props.children}
-      </div>
+      <label>
+        {props.label}{" "}
+        {props.hint ? (
+          <span className="text-muted" style={{ fontWeight: "normal" }}>
+            {" "}
+            - {props.hint}
+          </span>
+        ) : null}
+      </label>
+      <div style={{ paddingLeft: 5 }}>{props.children}</div>
       <p className="help-block" style={{ marginLeft: 5 }}>
         {props.help}
       </p>
@@ -34,32 +50,30 @@ export const LabeledProperty: React.FC<{ label: string, help?: string, hint?: st
 
 /** Creates a property editor for a property */
 export class PropertyEditor<T, K extends keyof T> extends React.Component<{
-  obj: T,
-  onChange: (obj: any) => void, 
-  property: K,
+  obj: T
+  onChange: (obj: any) => void
+  property: K
   children: (value: T[K], onChange: (value: T[K]) => void) => React.ReactElement<any>
 }> {
-
   handleChange = (value: T[K]) => {
     this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
   }
 
   render() {
     const value = this.props.obj[this.props.property]
-  
+
     return this.props.children(value, this.handleChange)
   }
 }
 
-export class LocalizedTextPropertyEditor extends React.Component<{ 
-    value?: LocalizedString | null, 
-    onChange: (value: LocalizedString | null) => void, 
-    locale: string, 
-    placeholder?: string,
-    multiline?: boolean,
-    allowCR?: boolean
-   }> {
-
+export class LocalizedTextPropertyEditor extends React.Component<{
+  value?: LocalizedString | null
+  onChange: (value: LocalizedString | null) => void
+  locale: string
+  placeholder?: string
+  multiline?: boolean
+  allowCR?: boolean
+}> {
   handleChange = (e: any) => {
     const locale = this.props.locale || "en"
     let str = e.target.value
@@ -69,7 +83,7 @@ export class LocalizedTextPropertyEditor extends React.Component<{
 
     if (!str) {
       this.props.onChange(null)
-      return 
+      return
     }
 
     const value = Object.assign({}, this.props.value || {}) as LocalizedString
@@ -87,27 +101,38 @@ export class LocalizedTextPropertyEditor extends React.Component<{
       str = value[locale]
     }
 
-    return (this.props.multiline 
-      ?      
-        <textarea className="form-control" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} rows={5} />
-      :
-        <input className="form-control" type="text" value={str} onChange={this.handleChange} placeholder={this.props.placeholder} />
+    return this.props.multiline ? (
+      <textarea
+        className="form-control"
+        value={str}
+        onChange={this.handleChange}
+        placeholder={this.props.placeholder}
+        rows={5}
+      />
+    ) : (
+      <input
+        className="form-control"
+        type="text"
+        value={str}
+        onChange={this.handleChange}
+        placeholder={this.props.placeholder}
+      />
     )
   }
 }
 
 interface Option {
-  label: string,
+  label: string
   value: any
 }
 
-export class DropdownPropertyEditor extends React.Component<{ 
-    obj: object, 
-    onChange: (obj: object) => void,
-    property: string,
-    options: Option[],
-    nullLabel?: string }> {
-
+export class DropdownPropertyEditor extends React.Component<{
+  obj: object
+  onChange: (obj: object) => void
+  property: string
+  options: Option[]
+  nullLabel?: string
+}> {
   handleChange = (value: any) => {
     this.props.onChange(Object.assign({}, this.props.obj, { [this.props.property]: value }))
   }
@@ -119,7 +144,7 @@ export class DropdownPropertyEditor extends React.Component<{
       <Select
         value={value}
         onChange={this.handleChange}
-        options={this.props.options} 
+        options={this.props.options}
         nullLabel={this.props.nullLabel}
       />
     )
@@ -127,35 +152,36 @@ export class DropdownPropertyEditor extends React.Component<{
 }
 
 /** Allows selecting a context variable */
-export class ContextVarPropertyEditor extends React.Component<{ 
-  value?: string | null, 
-  onChange: (value: string | null) => void,
-  contextVars: ContextVar[],
-  types?: string[],
-  table?: string, 
+export class ContextVarPropertyEditor extends React.Component<{
+  value?: string | null
+  onChange: (value: string | null) => void
+  contextVars: ContextVar[]
+  types?: string[]
+  table?: string
   /** Makes null say something other than "Select..." */
   nullLabel?: string
   filter?: (contextVar: ContextVar) => boolean
 }> {
-
   render() {
-    let contextVars = this.props.contextVars.filter(cv => !this.props.types || this.props.types.includes(cv.type))
-    contextVars = contextVars.filter(cv => !this.props.table || this.props.table === cv.table)
+    let contextVars = this.props.contextVars.filter((cv) => !this.props.types || this.props.types.includes(cv.type))
+    contextVars = contextVars.filter((cv) => !this.props.table || this.props.table === cv.table)
     if (this.props.filter) {
       contextVars.filter(this.props.filter)
     }
 
-    return <Select
-      value={this.props.value}
-      onChange={this.props.onChange}
-      nullLabel={this.props.nullLabel ? this.props.nullLabel : "Select..."}
-      options={contextVars.map(cv => ({ label: cv.name, value: cv.id }))}
-    />
+    return (
+      <Select
+        value={this.props.value}
+        onChange={this.props.onChange}
+        nullLabel={this.props.nullLabel ? this.props.nullLabel : "Select..."}
+        options={contextVars.map((cv) => ({ label: cv.name, value: cv.id }))}
+      />
+    )
   }
 }
 
 /** Edits a context variable expression */
-export function ContextVarExprPropertyEditor(props: { 
+export function ContextVarExprPropertyEditor(props: {
   schema: Schema
   dataSource: DataSource
   contextVars: ContextVar[]
@@ -164,42 +190,54 @@ export function ContextVarExprPropertyEditor(props: {
   /** If not specified, is literal and individual */
   aggrStatuses?: AggrStatus[]
   types?: LiteralType[]
-  enumValues?: Array<{ id: string, name: LocalizedString }>
+  enumValues?: Array<{ id: string; name: LocalizedString }>
   idTable?: string
 }) {
-  const contextVar = props.contextVars.find(cv => props.contextVarExpr != null && cv.id === props.contextVarExpr.contextVarId)
+  const contextVar = props.contextVars.find(
+    (cv) => props.contextVarExpr != null && cv.id === props.contextVarExpr.contextVarId
+  )
 
   // Get all context variables up to an including one above. All context variables if null
   // This is because an outer context var expr cannot reference an inner context variable
-  const cvIndex = props.contextVars.findIndex(cv => props.contextVarExpr != null && cv.id === props.contextVarExpr.contextVarId)
-  const availContextVars = cvIndex >= 0 ? _.take(props.contextVars, cvIndex + 1)  : props.contextVars
+  const cvIndex = props.contextVars.findIndex(
+    (cv) => props.contextVarExpr != null && cv.id === props.contextVarExpr.contextVarId
+  )
+  const availContextVars = cvIndex >= 0 ? _.take(props.contextVars, cvIndex + 1) : props.contextVars
 
-  return <div style={{ border: "solid 1px #DDD", borderRadius: 5, padding: 10 }}>
-    <ContextVarPropertyEditor 
-      value={props.contextVarExpr ? props.contextVarExpr.contextVarId : null} 
-      onChange={cv => { props.onChange({ contextVarId: cv, expr: null })} }
-      nullLabel="No Row/Rowset"
-      contextVars={props.contextVars} 
-      types={["row", "rowset"]} />
+  return (
+    <div style={{ border: "solid 1px #DDD", borderRadius: 5, padding: 10 }}>
+      <ContextVarPropertyEditor
+        value={props.contextVarExpr ? props.contextVarExpr.contextVarId : null}
+        onChange={(cv) => {
+          props.onChange({ contextVarId: cv, expr: null })
+        }}
+        nullLabel="No Row/Rowset"
+        contextVars={props.contextVars}
+        types={["row", "rowset"]}
+      />
 
-    <div style={{ paddingTop: 10 }}>
-      <ExprComponent 
-        value={props.contextVarExpr ? props.contextVarExpr.expr : null} 
-        onChange={expr => { props.onChange({ contextVarId: contextVar ? contextVar.id : null, expr }) }}
-        schema={props.schema} 
-        dataSource={props.dataSource} 
-        aggrStatuses={props.aggrStatuses}
-        types={props.types}
-        variables={createExprVariables(availContextVars)}
-        table={contextVar ? contextVar.table || undefined : undefined}
-        enumValues={props.enumValues}
-        idTable={props.idTable} />
+      <div style={{ paddingTop: 10 }}>
+        <ExprComponent
+          value={props.contextVarExpr ? props.contextVarExpr.expr : null}
+          onChange={(expr) => {
+            props.onChange({ contextVarId: contextVar ? contextVar.id : null, expr })
+          }}
+          schema={props.schema}
+          dataSource={props.dataSource}
+          aggrStatuses={props.aggrStatuses}
+          types={props.types}
+          variables={createExprVariables(availContextVars)}
+          table={contextVar ? contextVar.table || undefined : undefined}
+          enumValues={props.enumValues}
+          idTable={props.idTable}
+        />
+      </div>
     </div>
-  </div>
+  )
 }
 
 /** Edits both a context variable selection and a related expression as separate props */
-export function ContextVarAndExprPropertyEditor(props: { 
+export function ContextVarAndExprPropertyEditor(props: {
   schema: Schema
   dataSource: DataSource
   contextVars: ContextVar[]
@@ -209,20 +247,24 @@ export function ContextVarAndExprPropertyEditor(props: {
   /** If not specified, is literal and individual */
   aggrStatuses?: AggrStatus[]
   types?: LiteralType[]
-  enumValues?: Array<{ id: string, name: LocalizedString }>
+  enumValues?: Array<{ id: string; name: LocalizedString }>
   idTable?: string
 }) {
-  return <ContextVarExprPropertyEditor
-    schema={props.schema}
-    dataSource={props.dataSource}
-    contextVars={props.contextVars}
-    contextVarExpr={{ contextVarId: props.contextVarId, expr: props.expr }}
-    onChange={cve => { props.onChange(cve.contextVarId, cve.expr) }}
-    aggrStatuses={props.aggrStatuses}
-    types={props.types}
-    enumValues={props.enumValues}
-    idTable={props.idTable}
-  />
+  return (
+    <ContextVarExprPropertyEditor
+      schema={props.schema}
+      dataSource={props.dataSource}
+      contextVars={props.contextVars}
+      contextVarExpr={{ contextVarId: props.contextVarId, expr: props.expr }}
+      onChange={(cve) => {
+        props.onChange(cve.contextVarId, cve.expr)
+      }}
+      aggrStatuses={props.aggrStatuses}
+      types={props.types}
+      enumValues={props.enumValues}
+      idTable={props.idTable}
+    />
+  )
 }
 
 /** Edits an action definition, allowing selection of action */
@@ -231,12 +273,10 @@ export class ActionDefEditor extends React.Component<{
   onChange: (actionDef: ActionDef | null) => void
   designCtx: DesignCtx
 }> {
-
   handleChangeAction = (type: string | null) => {
     if (type) {
       this.props.onChange(this.props.designCtx.actionLibrary.createNewActionDef(type))
-    }
-    else {
+    } else {
       this.props.onChange(null)
     }
   }
@@ -246,22 +286,23 @@ export class ActionDefEditor extends React.Component<{
 
     return (
       <div>
-        <Select 
+        <Select
           nullLabel="No Action"
           onChange={this.handleChangeAction}
           value={this.props.value ? this.props.value.type : null}
-          options={this.props.designCtx.actionLibrary.getActionTypes().map(at => ({ label: at.name, value: at.type }))}
+          options={this.props.designCtx.actionLibrary
+            .getActionTypes()
+            .map((at) => ({ label: at.name, value: at.type }))}
         />
-        { action ? 
+        {action ? (
           <CollapsibleComponent label="Details">
             <div style={{ paddingLeft: 10 }}>
               {action.renderEditor({ ...this.props.designCtx, onChange: this.props.onChange })}
             </div>
-          </CollapsibleComponent> 
-        : null }
+          </CollapsibleComponent>
+        ) : null}
       </div>
     )
-    
   }
 }
 
@@ -274,7 +315,6 @@ export class OrderByArrayEditor extends React.Component<{
   dataSource: DataSource
   contextVars: ContextVar[]
 }> {
-
   handleAddOrderByExpr = () => {
     this.props.onChange((this.props.value || []).concat([{ expr: null, dir: "asc" }]))
   }
@@ -283,8 +323,15 @@ export class OrderByArrayEditor extends React.Component<{
     return (
       <div>
         <ListEditor items={this.props.value || []} onItemsChange={this.props.onChange}>
-          { (orderBy: OrderBy, onOrderByChange) => (
-            <OrderByEditor value={orderBy} schema={this.props.schema} dataSource={this.props.dataSource} onChange={onOrderByChange} table={this.props.table} contextVars={this.props.contextVars} />
+          {(orderBy: OrderBy, onOrderByChange) => (
+            <OrderByEditor
+              value={orderBy}
+              schema={this.props.schema}
+              dataSource={this.props.dataSource}
+              onChange={onOrderByChange}
+              table={this.props.table}
+              contextVars={this.props.contextVars}
+            />
           )}
         </ListEditor>
         <button type="button" className="btn btn-link btn-sm" onClick={this.handleAddOrderByExpr}>
@@ -303,23 +350,22 @@ export class OrderByEditor extends React.Component<{
   dataSource: DataSource
   contextVars: ContextVar[]
 }> {
-
   handleExprChange = (expr: Expr) => {
     this.props.onChange({ ...this.props.value, expr: expr })
   }
 
   handleDirToggle = () => {
-    this.props.onChange({ ...this.props.value, dir: (this.props.value.dir === "asc") ? "desc" : "asc" })
+    this.props.onChange({ ...this.props.value, dir: this.props.value.dir === "asc" ? "desc" : "asc" })
   }
 
   render() {
     return (
-      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr"}}>
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr" }}>
         <a onClick={this.handleDirToggle}>
-          { this.props.value.dir === "asc" ? <i className="fa fa-arrow-up"/> : <i className="fa fa-arrow-down"/> }
+          {this.props.value.dir === "asc" ? <i className="fa fa-arrow-up" /> : <i className="fa fa-arrow-down" />}
         </a>
-        <ExprComponent 
-          schema={this.props.schema} 
+        <ExprComponent
+          schema={this.props.schema}
           dataSource={this.props.dataSource}
           types={["text", "number", "enum", "boolean", "date", "datetime"]}
           table={this.props.table}
@@ -333,11 +379,11 @@ export class OrderByEditor extends React.Component<{
 }
 
 /** Edits a d3 format */
-export class NumberFormatEditor extends React.Component<{ value: string | null, onChange: (value: string) => void }> {
+export class NumberFormatEditor extends React.Component<{ value: string | null; onChange: (value: string) => void }> {
   render() {
     return (
-      <Select 
-        value={this.props.value || ""} 
+      <Select
+        value={this.props.value || ""}
         onChange={this.props.onChange}
         options={[
           { value: ",", label: "Normal: 1,234.567" },
@@ -349,17 +395,18 @@ export class NumberFormatEditor extends React.Component<{ value: string | null, 
           { value: ".0%", label: "Percent rounded: 12%" },
           { value: ".1%", label: "Percent rounded: 12.3%" },
           { value: ".2%", label: "Percent rounded: 12.34%" }
-        ]} />
+        ]}
+      />
     )
   }
 }
 
 /** Edits a moment.js date format */
-export class DateFormatEditor extends React.Component<{ value: string | null, onChange: (value: string) => void }> {
+export class DateFormatEditor extends React.Component<{ value: string | null; onChange: (value: string) => void }> {
   render() {
     return (
-      <Select 
-        value={this.props.value || ""} 
+      <Select
+        value={this.props.value || ""}
         onChange={this.props.onChange}
         nullLabel="Short (Sep 4, 1986)"
         options={[
@@ -368,18 +415,19 @@ export class DateFormatEditor extends React.Component<{ value: string | null, on
           { value: "YYYY-MM-DD", label: "YYYY-MM-DD (1986-04-09)" },
           { value: "YYYY-MM", label: "YYYY-MM (1986-04)" },
           { value: "MMM YYYY", label: "Month Year (Apr 1986)" },
-          { value: "YYYY", label: "YYYY (1986)" },
-        ]} />
+          { value: "YYYY", label: "YYYY (1986)" }
+        ]}
+      />
     )
   }
 }
 
 /** Edits a moment.js datetime format */
-export class DatetimeFormatEditor extends React.Component<{ value: string | null, onChange: (value: string) => void }> {
+export class DatetimeFormatEditor extends React.Component<{ value: string | null; onChange: (value: string) => void }> {
   render() {
     return (
-      <Select 
-        value={this.props.value || ""} 
+      <Select
+        value={this.props.value || ""}
         onChange={this.props.onChange}
         nullLabel="Short (Sep 4, 1986 8:30 PM)"
         options={[
@@ -390,8 +438,9 @@ export class DatetimeFormatEditor extends React.Component<{ value: string | null
           { value: "YYYY-MM-DD", label: "YYYY-MM-DD (1986-04-09)" },
           { value: "YYYY-MM", label: "YYYY-MM (1986-04)" },
           { value: "MMM YYYY", label: "Month Year (Apr 1986)" },
-          { value: "YYYY", label: "YYYY (1986)" },
-        ]} />
+          { value: "YYYY", label: "YYYY (1986)" }
+        ]}
+      />
     )
   }
 }
@@ -413,9 +462,9 @@ export class TableSelect extends React.Component<{
   allowNull?: boolean
 }> {
   static contextTypes = {
-    tableSelectElementFactory: PropTypes.func  // Can be overridden by setting tableSelectElementFactory in context that takes ({ schema, value, onChange, filter, onFilterChange })
+    tableSelectElementFactory: PropTypes.func // Can be overridden by setting tableSelectElementFactory in context that takes ({ schema, value, onChange, filter, onFilterChange })
   }
-  
+
   context: TableSelectContext
 
   handleTableChange = (table: Table) => {
@@ -428,21 +477,27 @@ export class TableSelect extends React.Component<{
 
   render() {
     if (this.context.tableSelectElementFactory) {
-      return this.context.tableSelectElementFactory({ schema: this.props.schema, value: this.props.value || null, onChange: this.props.onChange })
+      return this.context.tableSelectElementFactory({
+        schema: this.props.schema,
+        value: this.props.value || null,
+        onChange: this.props.onChange
+      })
     }
-    
+
     const tables = _.sortBy(this.props.schema.getTables(), (table) => localize(table.name, this.props.locale))
 
-    return <ReactSelect 
-      value={tables.find(t => t.id === this.props.value) || null} 
-      options={tables}
-      onChange={this.handleTableChange} 
-      getOptionLabel={this.getOptionLabel}
-      getOptionValue={this.getOptionValue}
-      isClearable={this.props.allowNull}
-      menuPortalTarget={document.body}
-      styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-    />
+    return (
+      <ReactSelect
+        value={tables.find((t) => t.id === this.props.value) || null}
+        options={tables}
+        onChange={this.handleTableChange}
+        getOptionLabel={this.getOptionLabel}
+        getOptionValue={this.getOptionValue}
+        isClearable={this.props.allowNull}
+        menuPortalTarget={document.body}
+        styles={{ menuPortal: (style) => ({ ...style, zIndex: 2000 }) }}
+      />
+    )
   }
 }
 
@@ -457,31 +512,33 @@ export const EnumArrayEditor = (props: {
   // Map value to array
   let value: EnumValue[] | null = null
   if (props.value) {
-    value = _.compact((props.value || []).map((v: any) => props.enumValues.find(ev => ev.id === v)!))
+    value = _.compact((props.value || []).map((v: any) => props.enumValues.find((ev) => ev.id === v)!))
   }
 
   const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
   const getOptionValue = (ev: EnumValue) => ev.id
   const handleChange = (evs: EnumValue[] | null) => {
-    props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+    props.onChange(evs && evs.length > 0 ? evs.map((ev) => ev.id) : null)
   }
 
-  return <ReactSelect
-    value={value} 
-    onChange={handleChange}
-    options={props.enumValues}
-    placeholder={props.placeholder}
-    getOptionLabel={getOptionLabel}
-    getOptionValue={getOptionValue}
-    isClearable={true}
-    isMulti={true}
-    menuPortalTarget={document.body}
-    styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
+  return (
+    <ReactSelect
+      value={value}
+      onChange={handleChange}
+      options={props.enumValues}
+      placeholder={props.placeholder}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      isClearable={true}
+      isMulti={true}
+      menuPortalTarget={document.body}
+      styles={{ menuPortal: (style) => ({ ...style, zIndex: 2000 }) }}
     />
+  )
 }
 
 /** Edits embedded expressions. */
-export const EmbeddedExprsEditor = (props: { 
+export const EmbeddedExprsEditor = (props: {
   value?: EmbeddedExpr[] | null
   onChange: (value: EmbeddedExpr[]) => void
   schema: Schema
@@ -491,17 +548,28 @@ export const EmbeddedExprsEditor = (props: {
   const { value, onChange, schema, dataSource, contextVars } = props
 
   const handleAddEmbeddedExpr = () => {
-    const defaultContextVar = props.contextVars.find(cv => cv.type === "rowset" || cv.type === "row")
+    const defaultContextVar = props.contextVars.find((cv) => cv.type === "rowset" || cv.type === "row")
 
-    onChange((value || []).concat([{ contextVarId: defaultContextVar ? defaultContextVar.id : null, expr: null, format: null }]))
+    onChange(
+      (value || []).concat([
+        { contextVarId: defaultContextVar ? defaultContextVar.id : null, expr: null, format: null }
+      ])
+    )
   }
 
   return (
     <div>
       <ListEditor items={value || []} onItemsChange={onChange}>
-        {(item, onItemChange, index) => 
-          <EmbeddedExprEditor value={item} onChange={onItemChange} schema={schema} dataSource={dataSource} contextVars={contextVars} index={index} />
-        }
+        {(item, onItemChange, index) => (
+          <EmbeddedExprEditor
+            value={item}
+            onChange={onItemChange}
+            schema={schema}
+            dataSource={dataSource}
+            contextVars={contextVars}
+            index={index}
+          />
+        )}
       </ListEditor>
       <button type="button" className="btn btn-link btn-sm" onClick={handleAddEmbeddedExpr}>
         + Add Embedded Expression
@@ -524,11 +592,10 @@ export const EmbeddedExprEditor = (props: {
   const handleChange = (contextVarId: string | null, expr: Expr) => {
     const exprType = new ExprUtils(schema, createExprVariables(contextVars)).getExprType(props.value.expr)
     const newExprType = new ExprUtils(schema, createExprVariables(contextVars)).getExprType(expr)
-    
+
     if (newExprType !== exprType) {
       props.onChange({ ...props.value, contextVarId: contextVarId, expr: expr, format: null })
-    }
-    else {
+    } else {
       props.onChange({ ...props.value, contextVarId: contextVarId, expr: expr })
     }
   }
@@ -538,68 +605,51 @@ export const EmbeddedExprEditor = (props: {
   return (
     <div>
       <LabeledProperty label={`Expression "{${props.index}}"`}>
-        <ContextVarAndExprPropertyEditor 
+        <ContextVarAndExprPropertyEditor
           contextVarId={props.value.contextVarId}
-          expr={props.value.expr} 
-          onChange={handleChange} 
+          expr={props.value.expr}
+          onChange={handleChange}
           schema={schema}
           dataSource={dataSource}
           contextVars={contextVars}
-          aggrStatuses={["individual", "aggregate", "literal"]} />
+          aggrStatuses={["individual", "aggregate", "literal"]}
+        />
       </LabeledProperty>
 
-      { exprType === "number" ?
+      {exprType === "number" ? (
         <LabeledProperty label="Number Format">
           <PropertyEditor obj={props.value} onChange={props.onChange} property="format">
-            {(value: string, onChange) => (
-              <NumberFormatEditor
-                value={value} 
-                onChange={onChange} />
-            )}
+            {(value: string, onChange) => <NumberFormatEditor value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
-        : null
-      }
+      ) : null}
 
-      { exprType === "date" ?
+      {exprType === "date" ? (
         <LabeledProperty label="Date Format">
           <PropertyEditor obj={props.value} onChange={props.onChange} property="format">
-            {(value: string, onChange) => (
-              <DateFormatEditor
-                value={value} 
-                onChange={onChange} />
-            )}
+            {(value: string, onChange) => <DateFormatEditor value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
-        : null
-      }
+      ) : null}
 
-      { exprType === "datetime" ?
+      {exprType === "datetime" ? (
         <LabeledProperty label="Date/time Format">
           <PropertyEditor obj={props.value} onChange={props.onChange} property="format">
-            {(value: string, onChange) => (
-              <DatetimeFormatEditor
-                value={value} 
-                onChange={onChange} />
-            )}
+            {(value: string, onChange) => <DatetimeFormatEditor value={value} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
-        : null
-      }
+      ) : null}
     </div>
   )
 }
 
 /** Edits the width of a table column */
-export const TableColumnWidthEditor = (props: {
-  columnWidth: string
-  onChange: (columnWidth: string) => void
-}) => {
-  return <Select
-    value={props.columnWidth}
-    onChange={props.onChange}
-    options={
-      [
+export const TableColumnWidthEditor = (props: { columnWidth: string; onChange: (columnWidth: string) => void }) => {
+  return (
+    <Select
+      value={props.columnWidth}
+      onChange={props.onChange}
+      options={[
         { value: "auto", label: "Auto" },
         { value: "1px", label: "Small as possible" },
         { value: "16%", label: "1/6" },
@@ -617,9 +667,9 @@ export const TableColumnWidthEditor = (props: {
         { value: "300px", label: "300px" },
         { value: "400px", label: "400px" },
         { value: "500px", label: "500px" }
-      ]
-    }
-  />
+      ]}
+    />
+  )
 }
 
 /** For selecting common responsive widths */
@@ -627,18 +677,19 @@ export function ResponsiveWidthSelector(props: {
   value: number | undefined
   onChange: (value: number | undefined) => void
 }) {
-  return <Select
-    value={props.value}
-    onChange={v => props.onChange(v != null ? v : undefined)}
-    options={[
-      { value: 400, label: `< 400px (Phone)` },
-      { value: 600, label: `< 600px (Small tablet)` },
-      { value: 800, label: `< 800px (Tablet)` },
-      { value: 1000, label: `< 1000px (Laptop)` },
-      { value: 1200, label: `< 1200px (Desktop)` },
-      { value: 1600, label: `< 1600px (Wide Desktop)` }
-    ]}
-    nullLabel="None"
-  />
+  return (
+    <Select
+      value={props.value}
+      onChange={(v) => props.onChange(v != null ? v : undefined)}
+      options={[
+        { value: 400, label: `< 400px (Phone)` },
+        { value: 600, label: `< 600px (Small tablet)` },
+        { value: 800, label: `< 800px (Tablet)` },
+        { value: 1000, label: `< 1000px (Laptop)` },
+        { value: 1200, label: `< 1200px (Desktop)` },
+        { value: 1600, label: `< 1600px (Wide Desktop)` }
+      ]}
+      nullLabel="None"
+    />
+  )
 }
-

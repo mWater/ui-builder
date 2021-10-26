@@ -1,5 +1,4 @@
-import { FixedTableBlockDef, setNumRows, setNumColumns } from "./fixedTable";
-
+import { FixedTableBlockDef, setNumRows, setNumColumns } from "./fixedTable"
 
 test("adds rows", () => {
   const blockDef: FixedTableBlockDef = {
@@ -7,9 +6,7 @@ test("adds rows", () => {
     type: "fixedTable",
     numRows: 1,
     numColumns: 1,
-    rows: [
-      { cells: [{ content: { id: "b11", type: "none" }}]}
-    ]
+    rows: [{ cells: [{ content: { id: "b11", type: "none" } }] }]
   }
 
   const newBlockDef = setNumRows(blockDef, 2)
@@ -17,8 +14,8 @@ test("adds rows", () => {
   expect(newBlockDef.numRows).toBe(2)
   expect(newBlockDef.numColumns).toBe(1)
   expect(newBlockDef.rows).toEqual([
-    { cells: [{ content: { id: "b11", type: "none" }}]},
-    { cells: [{ content: null }]}
+    { cells: [{ content: { id: "b11", type: "none" } }] },
+    { cells: [{ content: null }] }
   ])
 })
 
@@ -28,19 +25,14 @@ test("removes rows", () => {
     type: "fixedTable",
     numRows: 2,
     numColumns: 1,
-    rows: [
-      { cells: [{ content: { id: "b11", type: "none" }}]},
-      { cells: [{ content: { id: "b21", type: "none" }}]}
-    ]
+    rows: [{ cells: [{ content: { id: "b11", type: "none" } }] }, { cells: [{ content: { id: "b21", type: "none" } }] }]
   }
 
   const newBlockDef = setNumRows(blockDef, 1)
 
   expect(newBlockDef.numRows).toBe(1)
   expect(newBlockDef.numColumns).toBe(1)
-  expect(newBlockDef.rows).toEqual([
-    { cells: [{ content: { id: "b11", type: "none" }}]},
-  ])
+  expect(newBlockDef.rows).toEqual([{ cells: [{ content: { id: "b11", type: "none" } }] }])
 })
 
 test("adds columns", () => {
@@ -49,18 +41,14 @@ test("adds columns", () => {
     type: "fixedTable",
     numRows: 1,
     numColumns: 1,
-    rows: [
-      { cells: [{ content: { id: "b11", type: "none" }}]}
-    ]
+    rows: [{ cells: [{ content: { id: "b11", type: "none" } }] }]
   }
 
   const newBlockDef = setNumColumns(blockDef, 2)
 
   expect(newBlockDef.numRows).toBe(1)
   expect(newBlockDef.numColumns).toBe(2)
-  expect(newBlockDef.rows).toEqual([
-    { cells: [{ content: { id: "b11", type: "none" }}, { content: null }]},
-  ])
+  expect(newBlockDef.rows).toEqual([{ cells: [{ content: { id: "b11", type: "none" } }, { content: null }] }])
 })
 
 test("removes columns", () => {
@@ -69,16 +57,12 @@ test("removes columns", () => {
     type: "fixedTable",
     numRows: 1,
     numColumns: 2,
-    rows: [
-      { cells: [{ content: { id: "b11", type: "none" }}, { content: { id: "b12", type: "none" }}]}
-    ]
+    rows: [{ cells: [{ content: { id: "b11", type: "none" } }, { content: { id: "b12", type: "none" } }] }]
   }
 
   const newBlockDef = setNumColumns(blockDef, 1)
 
   expect(newBlockDef.numRows).toBe(1)
   expect(newBlockDef.numColumns).toBe(1)
-  expect(newBlockDef.rows).toEqual([
-    { cells: [{ content: { id: "b11", type: "none" }}] }
-  ])
+  expect(newBlockDef.rows).toEqual([{ cells: [{ content: { id: "b11", type: "none" } }] }])
 })

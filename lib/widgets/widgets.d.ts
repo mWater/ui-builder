@@ -1,5 +1,5 @@
-import { BaseCtx } from '../contexts';
-import { BlockDef, ContextVar } from './blocks';
+import { BaseCtx } from "../contexts";
+import { BlockDef, ContextVar } from "./blocks";
 /** Widget is named and has a single block with a set of context variables specific to this widget */
 export interface WidgetDef {
     /** Unique id (globally) */

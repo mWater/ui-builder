@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { Expr } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { Expr } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Block which creates a new rowset context variable */
 export interface RowsetBlockDef extends BlockDef {
     type: "rowset";

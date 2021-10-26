@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import './toc.css';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
-import { ContextVarExpr } from '../../../ContextVarExpr';
-import { EmbeddedExpr } from '../../../embeddedExprs';
+import * as React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../../blocks";
+import { Expr, LocalizedString } from "mwater-expressions";
+import "./toc.css";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
+import { ContextVarExpr } from "../../../ContextVarExpr";
+import { EmbeddedExpr } from "../../../embeddedExprs";
 /** Table of contents with nested items each showing a different widget in main area */
 export interface TOCBlockDef extends BlockDef {
     type: "toc";

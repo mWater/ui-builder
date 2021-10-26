@@ -1,16 +1,16 @@
-import { ContextVar, BlockDef } from "../blocks";
-import simpleSchema from "../../__fixtures__/schema";
-import { SaveCancelBlockDef, SaveCancelBlock } from "./saveCancel";
-import { DataSource } from 'mwater-expressions';
-import { PageStack } from '../../PageStack';
-import { mount } from "enzyme";
-import React from "react";
-import VirtualDatabase from "../../database/VirtualDatabase";
-import { NullDatabase, Database } from "../../database/Database";
-import BlockFactory from "../BlockFactory";
-import { ActionLibrary } from "../ActionLibrary";
-import { InstanceCtx } from "../../contexts";
-import { TextboxBlockDef } from "./controls/textbox";
+import { ContextVar, BlockDef } from "../blocks"
+import simpleSchema from "../../__fixtures__/schema"
+import { SaveCancelBlockDef, SaveCancelBlock } from "./saveCancel"
+import { DataSource } from "mwater-expressions"
+import { PageStack } from "../../PageStack"
+import { mount } from "enzyme"
+import React from "react"
+import VirtualDatabase from "../../database/VirtualDatabase"
+import { NullDatabase, Database } from "../../database/Database"
+import BlockFactory from "../BlockFactory"
+import { ActionLibrary } from "../ActionLibrary"
+import { InstanceCtx } from "../../contexts"
+import { TextboxBlockDef } from "./controls/textbox"
 
 // Outer context vars
 const rowCV: ContextVar = { id: "cv1", type: "row", name: "", table: "t1" }
@@ -50,14 +50,16 @@ beforeEach(() => {
         const childBlock = createBlock(childBlockDef)
         return childBlock.renderInstance(props)
       }
-      return <div/>
+      return <div />
     },
     widgetLibrary: { widgets: {} },
-    registerForValidation: () => { return () => {} },
+    registerForValidation: () => {
+      return () => {}
+    },
     T: (str) => str
- }
+  }
 
- alertMessages = []
+  alertMessages = []
 })
 
 const pause = () => new Promise((resolve, reject) => setImmediate(resolve))
@@ -69,8 +71,8 @@ const saveCancelBlockDef: SaveCancelBlockDef = {
   saveLabel: { _base: "en", en: "Save" },
   cancelLabel: { _base: "en", en: "Cancel" },
   confirmDiscardMessage: { _base: "en", en: "Discard changes?" },
-  child: { 
-    type: "textbox", 
+  child: {
+    type: "textbox",
     id: "tb1",
     rowContextVarId: "cv1",
     column: "text",
@@ -81,14 +83,14 @@ const saveCancelBlockDef: SaveCancelBlockDef = {
 }
 
 test("save writes to database", async () => {
-  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef);
+  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef)
 
   // Add row to database
   const txn = database.transaction()
   const pk = await txn.addRow("t1", { text: "abc" })
   await txn.commit()
   rips.contextVarValues.cv1 = pk
-  
+
   const inst = mount(saveCancelBlock.renderInstance(rips))
 
   // Wait for load
@@ -98,7 +100,7 @@ test("save writes to database", async () => {
   expect(inst.find("input").prop("value")).toBe("abc")
 
   // Fire on change
-  inst.find("input").prop("onChange")!({ target: { value: "def" }} as any)
+  inst.find("input").prop("onChange")!({ target: { value: "def" } } as any)
 
   // Wait for load
   await pause()
@@ -107,13 +109,13 @@ test("save writes to database", async () => {
   expect(inst.find("input").prop("value")).toBe("def")
 
   // Blur
-  inst.find("input").prop("onBlur")!({ target: { value: "def" }} as any)
+  inst.find("input").prop("onBlur")!({ target: { value: "def" } } as any)
 
   // Wait for load
   await pause()
   inst.update()
-  
-  // Handle page close 
+
+  // Handle page close
   rips.pageStack.closePage = jest.fn()
 
   // Call save
@@ -122,7 +124,7 @@ test("save writes to database", async () => {
   // Wait for save
   await pause()
   inst.update()
-  
+
   expect(alertMessages.length).toBe(0)
 
   expect(database.mutations[0].type).toBe("add")
@@ -130,14 +132,14 @@ test("save writes to database", async () => {
 })
 
 test("prevent save if required blank", async () => {
-  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef);
+  const saveCancelBlock = new SaveCancelBlock(saveCancelBlockDef)
 
   // Add row to database
   const txn = database.transaction()
-  const pk = await txn.addRow("t1", { })
+  const pk = await txn.addRow("t1", {})
   await txn.commit()
   rips.contextVarValues.cv1 = pk
-  
+
   const inst = mount(saveCancelBlock.renderInstance(rips))
 
   // Wait for load
@@ -146,7 +148,7 @@ test("prevent save if required blank", async () => {
 
   expect(inst.find("input").prop("value")).toBe("")
 
-  // Handle page close 
+  // Handle page close
   const closePage = jest.fn()
   rips.pageStack.closePage = closePage
 

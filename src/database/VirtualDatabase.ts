@@ -1,7 +1,14 @@
-import { Database, QueryOptions, DatabaseChangeListener, Transaction, performEvalQuery, getWherePrimaryKey } from "./Database"
+import {
+  Database,
+  QueryOptions,
+  DatabaseChangeListener,
+  Transaction,
+  performEvalQuery,
+  getWherePrimaryKey
+} from "./Database"
 import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions"
 import _ from "lodash"
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from "uuid"
 import { ContextVar, createExprVariables, createExprVariableValues } from "../widgets/blocks"
 import { BatchingCache } from "./BatchingCache"
 
@@ -19,7 +26,10 @@ export default class VirtualDatabase implements Database {
   changeListeners: DatabaseChangeListener[]
 
   /** Cache of query results (of underlying database) to increase performance */
-  queryCache: BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>
+  queryCache: BatchingCache<
+    { query: QueryOptions; contextVars: ContextVar[]; contextVarValues: { [contextVarId: string]: any } },
+    Row[]
+  >
 
   /** Array of temporary primary keys that will be replaced by real ones when the insertions are committed */
   tempPrimaryKeys: string[]
@@ -38,50 +48,62 @@ export default class VirtualDatabase implements Database {
     this.destroyed = false
 
     // Create cache that calls underlying database
-    this.queryCache = new BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
+    this.queryCache = new BatchingCache<
+      { query: QueryOptions; contextVars: ContextVar[]; contextVarValues: { [contextVarId: string]: any } },
+      Row[]
+    >((request) => {
       return this.database.query(request.query, request.contextVars, request.contextVarValues)
     })
 
     database.addChangeListener(this.handleChange)
   }
 
-  async query(query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
+  async query(
+    query: QueryOptions,
+    contextVars: ContextVar[],
+    contextVarValues: { [contextVarId: string]: any }
+  ): Promise<Row[]> {
     const variables = createExprVariables(contextVars)
     const variableValues = createExprVariableValues(contextVars, contextVarValues)
-   
+
     const exprUtils = new ExprUtils(this.schema, variables)
-    
+
     // Pass through if no changes and not id query
     if (this.shouldPassthrough(query, exprUtils, contextVars, contextVarValues)) {
       return this.queryCache.get({ query, contextVars, contextVarValues })
     }
-    
+
     const exprEval = new PromiseExprEvaluator({ schema: this.schema, locale: this.locale, variables, variableValues })
 
     // Create rows to evaluate (just use where clause to filter)
-    const evalRows = (await this.queryEvalRows(query.from, query.where || null, contextVars, contextVarValues))
+    const evalRows = await this.queryEvalRows(query.from, query.where || null, contextVars, contextVarValues)
 
     // Perform actual query
     return performEvalQuery({ evalRows, exprUtils, exprEval, query: query })
   }
 
-  /** Determine if query should be simply sent to the underlying database. 
-   * Do if no mutations to any tables referenced *and* it is not a simple id = query which 
+  /** Determine if query should be simply sent to the underlying database.
+   * Do if no mutations to any tables referenced *and* it is not a simple id = query which
    * is best to cache *and* it doesn't reference temporary primary keys
    */
-  private shouldPassthrough(query: QueryOptions, exprUtils: ExprUtils, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
+  private shouldPassthrough(
+    query: QueryOptions,
+    exprUtils: ExprUtils,
+    contextVars: ContextVar[],
+    contextVarValues: { [contextVarId: string]: any }
+  ) {
     // Determine which tables are referenced
     let tablesReferenced = [query.from]
     for (const expr of Object.values(query.select)) {
-      tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(expr).map(f => f.table))
-    } 
-    tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(query.where || null).map(f => f.table))
+      tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(expr).map((f) => f.table))
+    }
+    tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(query.where || null).map((f) => f.table))
     for (const orderBy of query.orderBy || []) {
-      tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(orderBy.expr).map(f => f.table))
+      tablesReferenced = tablesReferenced.concat(exprUtils.getReferencedFields(orderBy.expr).map((f) => f.table))
     }
     tablesReferenced = _.uniq(tablesReferenced)
 
-    const mutatedTables = _.uniq(this.mutations.map(m => m.table))
+    const mutatedTables = _.uniq(this.mutations.map((m) => m.table))
 
     // Can't passthrough if depends on mutated table
     if (_.intersection(tablesReferenced, mutatedTables).length > 0) {
@@ -102,17 +124,24 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Test if an expression references a temporary primary key, meaning it cannot be sent to the server */
-  private doesReferenceTempPk(expr: Expr | undefined, exprUtils: ExprUtils, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }) {
+  private doesReferenceTempPk(
+    expr: Expr | undefined,
+    exprUtils: ExprUtils,
+    contextVars: ContextVar[],
+    contextVarValues: { [contextVarId: string]: any }
+  ) {
     if (!expr) {
       return false
     }
 
-    // Inline variables, since if an expression references a variable that has the value of a temporary primary key, 
+    // Inline variables, since if an expression references a variable that has the value of a temporary primary key,
     // it won't show up in the JSON unless inlined
     const inlinedExpr = exprUtils.inlineVariableValues(expr, createExprVariableValues(contextVars, contextVarValues))
-    return (JSON.stringify(inlinedExpr).match(/"pk_[0-9a-zA-Z]+_temp"/g) || []).some(m => this.tempPrimaryKeys.includes(JSON.parse(m)))
+    return (JSON.stringify(inlinedExpr).match(/"pk_[0-9a-zA-Z]+_temp"/g) || []).some((m) =>
+      this.tempPrimaryKeys.includes(JSON.parse(m))
+    )
   }
-  
+
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener) {
     this.changeListeners = _.union(this.changeListeners, [changeListener])
@@ -203,7 +232,7 @@ export default class VirtualDatabase implements Database {
     }
 
     // Don't include joins except 'n-1' and '1-1'
-    if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1" ) {
+    if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1") {
       return false
     }
 
@@ -211,7 +240,12 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Create the rows as needed by PromiseExprEvaluator for a query */
-  private async queryEvalRows(from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<PromiseExprEvaluatorRow[]> {
+  private async queryEvalRows(
+    from: string,
+    where: Expr,
+    contextVars: ContextVar[],
+    contextVarValues: { [contextVarId: string]: any }
+  ): Promise<PromiseExprEvaluatorRow[]> {
     const variables = createExprVariables(contextVars)
     const exprUtils = new ExprUtils(this.schema, variables)
 
@@ -226,17 +260,22 @@ export default class VirtualDatabase implements Database {
 
     // Alter where clause to include any rows that have been updated, as the update
     // may have altered the row in such a way as it now matches the where clause
-    const updatedIds = _.uniq(this.mutations.filter(m => m.type == "update").map(m => m.primaryKey))
+    const updatedIds = _.uniq(this.mutations.filter((m) => m.type == "update").map((m) => m.primaryKey))
     if (updatedIds.length > 0 && where) {
       queryOptions.where = {
         type: "op",
         op: "or",
         table: from,
         exprs: [
-          { type: "op", table: from, op: "= any", exprs: [
-            { type: "id", table: from },
-            { type: "literal", valueType: "id[]", idTable: from, value: updatedIds }
-          ]},
+          {
+            type: "op",
+            table: from,
+            op: "= any",
+            exprs: [
+              { type: "id", table: from },
+              { type: "literal", valueType: "id[]", idTable: from, value: updatedIds }
+            ]
+          },
           where
         ]
       }
@@ -255,34 +294,43 @@ export default class VirtualDatabase implements Database {
     // Skip if us just a query on a temporary row, which will not match anything
     if (this.tempPrimaryKeys.includes(getWherePrimaryKey(where))) {
       rows = []
-    }
-    else if (this.doesReferenceTempPk(where, exprUtils, contextVars, contextVarValues)) {
-      // This is a tricky decision, as there is a query that references a temporary primary key 
-      // and as such, rows that do not exist. This part of the query cannot be sent to the real 
+    } else if (this.doesReferenceTempPk(where, exprUtils, contextVars, contextVarValues)) {
+      // This is a tricky decision, as there is a query that references a temporary primary key
+      // and as such, rows that do not exist. This part of the query cannot be sent to the real
       // database. However, a query that had a *not* on that condition would incorrectly be missing
       // any real matching rows.
       rows = []
-    }
-    else {
-      rows = await this.queryCache.get({ query: queryOptions, contextVars: contextVars, contextVarValues: contextVarValues })
+    } else {
+      rows = await this.queryCache.get({
+        query: queryOptions,
+        contextVars: contextVars,
+        contextVarValues: contextVarValues
+      })
     }
 
     // Apply mutations
     rows = await this.mutateRows(rows, from, where, contextVars, contextVarValues)
 
     // Convert to rows as expr evaluator expects
-    return rows.map(row => this.createEvalRow(row, from, contextVars, contextVarValues))
+    return rows.map((row) => this.createEvalRow(row, from, contextVars, contextVarValues))
   }
 
   /** Replace temporary primary keys with different value */
   private replaceTempPrimaryKeys(input: any, replaceWith: (tempPk: string) => any): any {
     let json = JSON.stringify(input)
-    json = json.replace(new RegExp(/"pk_[0-9a-zA-Z]+_temp"/, "g"), (tempPkJson) => JSON.stringify(replaceWith(JSON.parse(tempPkJson))))
+    json = json.replace(new RegExp(/"pk_[0-9a-zA-Z]+_temp"/, "g"), (tempPkJson) =>
+      JSON.stringify(replaceWith(JSON.parse(tempPkJson)))
+    )
     return JSON.parse(json)
   }
 
   /** Create a single row structured for evaluation from a row in format { id: <primary key>, c_<column id>: value, ... } */
-  private createEvalRow(row: Row, from: string, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): PromiseExprEvaluatorRow {
+  private createEvalRow(
+    row: Row,
+    from: string,
+    contextVars: ContextVar[],
+    contextVarValues: { [contextVarId: string]: any }
+  ): PromiseExprEvaluatorRow {
     return {
       getPrimaryKey: () => Promise.resolve(row.id),
       getField: async (columnId: string) => {
@@ -291,16 +339,25 @@ export default class VirtualDatabase implements Database {
         // Special case is 1-n join with inverse, as they are not included in the query
         if (column.type === "join" && column.join!.type == "1-n" && column.join!.inverse) {
           // Get the rows and then extract the primary keys
-          const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: column.join!.toTable, exprs: [
-              { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
-              { type: "literal", valueType: "id", idTable: from, value: row.id }
-            ]}, contextVars, contextVarValues)
-          return Promise.all(joinRows.map(r => r.getPrimaryKey()))
+          const joinRows = await this.queryEvalRows(
+            column.join!.toTable,
+            {
+              type: "op",
+              op: "=",
+              table: column.join!.toTable,
+              exprs: [
+                { type: "field", table: column.join!.toTable, column: column.join!.inverse! },
+                { type: "literal", valueType: "id", idTable: from, value: row.id }
+              ]
+            },
+            contextVars,
+            contextVarValues
+          )
+          return Promise.all(joinRows.map((r) => r.getPrimaryKey()))
         }
 
         // Non n-1 or 1-1 joins not available
-        if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1" ) {
+        if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1") {
           console.warn(`Attempt to get join field ${columnId}`)
           return null
         }
@@ -315,20 +372,29 @@ export default class VirtualDatabase implements Database {
 
         // Inverse 1-n uses the inverse column to get rows, as these are not included in the row values
         if (column.type == "join" && column.join!.type === "1-n" && column.join!.inverse) {
-          const joinRows = await this.queryEvalRows(column.join!.toTable, {
-            type: "op", op: "=", table: idTable, exprs: [
-              { type: "field", table: idTable, column: column.join!.inverse! },
-              { type: "literal", valueType: "id", idTable: from, value: row.id }
-            ]}, contextVars, contextVarValues)
+          const joinRows = await this.queryEvalRows(
+            column.join!.toTable,
+            {
+              type: "op",
+              op: "=",
+              table: idTable,
+              exprs: [
+                { type: "field", table: idTable, column: column.join!.inverse! },
+                { type: "literal", valueType: "id", idTable: from, value: row.id }
+              ]
+            },
+            contextVars,
+            contextVarValues
+          )
           return joinRows
         }
 
         // Non n-1 or 1-1 joins not available
-        if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1" ) {
+        if (column.type == "join" && column.join!.type != "n-1" && column.join!.type != "1-1") {
           console.warn(`Attempt to get join field ${columnId}`)
           return null
         }
-        
+
         // For ones with single row
         if (column.type == "id" || column.type == "join") {
           // Short-circuit if null/undefined
@@ -336,11 +402,20 @@ export default class VirtualDatabase implements Database {
             return null
           }
 
-          const joinRows = await this.queryEvalRows(idTable, {
-            type: "op", op: "=", table: idTable, exprs: [
-              { type: "id", table: idTable },
-              { type: "literal", valueType: "id", idTable: idTable, value: row["c_" + columnId] }
-          ]}, contextVars, contextVarValues)
+          const joinRows = await this.queryEvalRows(
+            idTable,
+            {
+              type: "op",
+              op: "=",
+              table: idTable,
+              exprs: [
+                { type: "id", table: idTable },
+                { type: "literal", valueType: "id", idTable: idTable, value: row["c_" + columnId] }
+              ]
+            },
+            contextVars,
+            contextVarValues
+          )
           return joinRows[0] || null
         }
 
@@ -351,11 +426,20 @@ export default class VirtualDatabase implements Database {
             return []
           }
 
-          const joinRows = await this.queryEvalRows(idTable, {
-            type: "op", op: "= any", table: idTable, exprs: [
-              { type: "id", table: idTable },
-              { type: "literal", valueType: "id", idTable: idTable, value: row["c_" + columnId] }
-          ]}, contextVars, contextVarValues)
+          const joinRows = await this.queryEvalRows(
+            idTable,
+            {
+              type: "op",
+              op: "= any",
+              table: idTable,
+              exprs: [
+                { type: "id", table: idTable },
+                { type: "literal", valueType: "id", idTable: idTable, value: row["c_" + columnId] }
+              ]
+            },
+            contextVars,
+            contextVarValues
+          )
           return joinRows
         }
 
@@ -365,7 +449,13 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Apply all known mutations to a set of rows */
-  private async mutateRows(rows: Row[], from: string, where: Expr, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }): Promise<Row[]> {
+  private async mutateRows(
+    rows: Row[],
+    from: string,
+    where: Expr,
+    contextVars: ContextVar[],
+    contextVarValues: { [contextVarId: string]: any }
+  ): Promise<Row[]> {
     const variables = createExprVariables(contextVars)
     const variableValues = createExprVariableValues(contextVars, contextVarValues)
 
@@ -388,7 +478,7 @@ export default class VirtualDatabase implements Database {
 
       // TODO: This is O(nxm) where n is number of rows and m
       if (mutation.type === "update") {
-        for (let i = 0 ; i < rows.length ; i++) {
+        for (let i = 0; i < rows.length; i++) {
           if (rows[i].id === mutation.primaryKey) {
             const update = _.mapKeys(mutation.updates, (v, k) => "c_" + k)
             rows[i] = { ...rows[i], ...update }
@@ -397,7 +487,7 @@ export default class VirtualDatabase implements Database {
       }
 
       if (mutation.type === "remove") {
-        rows = rows.filter(row => row.id !== mutation.primaryKey)
+        rows = rows.filter((row) => row.id !== mutation.primaryKey)
       }
     }
 
@@ -420,7 +510,10 @@ export default class VirtualDatabase implements Database {
 
   private handleChange = () => {
     // Clear caches
-    this.queryCache = new BatchingCache<{ query: QueryOptions, contextVars: ContextVar[], contextVarValues: { [contextVarId: string]: any }}, Row[]>(request => {
+    this.queryCache = new BatchingCache<
+      { query: QueryOptions; contextVars: ContextVar[]; contextVarValues: { [contextVarId: string]: any } },
+      Row[]
+    >((request) => {
       return this.database.query(request.query, request.contextVars, request.contextVarValues)
     })
 
@@ -444,7 +537,7 @@ class VirtualDatabaseTransaction implements Transaction {
   addRow(table: string, values: { [column: string]: any }) {
     // Use a pattern for easy replacement
     const primaryKey = `pk_${uuid().replace(/-/g, "")}_temp`
-    
+
     // Save temporary primary key
     this.virtualDatabase.tempPrimaryKeys.push(primaryKey)
 
@@ -471,8 +564,8 @@ class VirtualDatabaseTransaction implements Transaction {
   removeRow(table: string, primaryKey: any) {
     // Remove locally if local
     if (this.virtualDatabase.tempPrimaryKeys.includes(primaryKey)) {
-      this.mutations = this.mutations.filter(m => m.primaryKey !== primaryKey)
-      this.virtualDatabase.mutations = this.virtualDatabase.mutations.filter(m => m.primaryKey !== primaryKey)
+      this.mutations = this.mutations.filter((m) => m.primaryKey !== primaryKey)
+      this.virtualDatabase.mutations = this.virtualDatabase.mutations.filter((m) => m.primaryKey !== primaryKey)
       return Promise.resolve()
     }
 
@@ -485,31 +578,28 @@ class VirtualDatabaseTransaction implements Transaction {
   }
 
   commit(): Promise<any[]> {
-    const primaryKeys: (string | number | null)[] = this.mutations.map(m => m.type == "add" ? m.primaryKey : null)
+    const primaryKeys: (string | number | null)[] = this.mutations.map((m) => (m.type == "add" ? m.primaryKey : null))
 
     // Clear mutations and transfer to main database
     for (const mutation of this.mutations) {
       if (mutation.type == "add") {
         // Add mutations are always performed
         this.virtualDatabase.mutations.push(mutation)
-      }
-      else if (mutation.type == "update") {
+      } else if (mutation.type == "update") {
         // Combine with add if present
-        const existingAdd = this.virtualDatabase.mutations.find(m => 
-          m.table == mutation.table 
-          && m.type == "add" 
-          && m.primaryKey == mutation.primaryKey) as AddMutation | undefined
+        const existingAdd = this.virtualDatabase.mutations.find(
+          (m) => m.table == mutation.table && m.type == "add" && m.primaryKey == mutation.primaryKey
+        ) as AddMutation | undefined
 
         if (existingAdd) {
-          existingAdd.values = { ...existingAdd.values, ...mutation.updates } 
+          existingAdd.values = { ...existingAdd.values, ...mutation.updates }
           continue
         }
 
         // Combine with update if present
-        const existingUpdate = this.virtualDatabase.mutations.find(m => 
-          m.table == mutation.table 
-          && m.type == "update" 
-          && m.primaryKey == mutation.primaryKey) as UpdateMutation | undefined
+        const existingUpdate = this.virtualDatabase.mutations.find(
+          (m) => m.table == mutation.table && m.type == "update" && m.primaryKey == mutation.primaryKey
+        ) as UpdateMutation | undefined
 
         if (existingUpdate) {
           existingUpdate.updates = { ...existingUpdate.updates, ...mutation.updates }
@@ -517,14 +607,12 @@ class VirtualDatabaseTransaction implements Transaction {
         }
 
         this.virtualDatabase.mutations.push(mutation)
-      }
-      else if (mutation.type == "remove") {
+      } else if (mutation.type == "remove") {
         // Remove add if present
         // Combine with add if present
-        const existingAddIndex = this.virtualDatabase.mutations.findIndex(m => 
-          m.table == mutation.table 
-          && m.type == "add" 
-          && m.primaryKey == mutation.primaryKey)
+        const existingAddIndex = this.virtualDatabase.mutations.findIndex(
+          (m) => m.table == mutation.table && m.type == "add" && m.primaryKey == mutation.primaryKey
+        )
 
         if (existingAddIndex >= 0) {
           this.virtualDatabase.mutations.splice(existingAddIndex, 1)
@@ -547,21 +635,21 @@ class VirtualDatabaseTransaction implements Transaction {
 export type Mutation = AddMutation | UpdateMutation | RemoveMutation
 
 export interface AddMutation {
-  type: "add",
-  table: string,
-  primaryKey: any,
+  type: "add"
+  table: string
+  primaryKey: any
   values: { [column: string]: any }
 }
 
 export interface UpdateMutation {
-  type: "update",
-  table: string,
-  primaryKey: any,
+  type: "update"
+  table: string
+  primaryKey: any
   updates: { [column: string]: any }
 }
 
 export interface RemoveMutation {
-  type: "remove",
-  table: string,
+  type: "remove"
+  table: string
   primaryKey: any
 }

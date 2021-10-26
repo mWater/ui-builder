@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import { ActionDef, Action } from '../actions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import _ from "lodash"
+import { ActionDef, Action } from "../actions"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 export interface BrowserBackActionDef extends ActionDef {
   type: "browserBack"
@@ -16,4 +16,3 @@ export class BrowserBackAction extends Action<BrowserBackActionDef> {
     window.history.back()
   }
 }
-

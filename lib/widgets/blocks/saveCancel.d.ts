@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { ContextVarExpr } from '../..';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
+import { ContextVarExpr } from "../..";
 export interface SaveCancelBlockDef extends BlockDef {
     type: "saveCancel";
     saveLabel: LocalizedString | null;

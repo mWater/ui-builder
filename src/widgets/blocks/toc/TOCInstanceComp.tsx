@@ -1,22 +1,22 @@
-import _ from 'lodash'
+import _ from "lodash"
 import { TOCBlockDef, iterateItems, TOCItem, TOCBlock } from "./toc"
-import { CreateBlock, createExprVariables, createExprVariableValues } from '../../blocks'
+import { CreateBlock, createExprVariables, createExprVariableValues } from "../../blocks"
 import { useState, useRef, useEffect, MouseEvent } from "react"
-import { localize } from '../../localization'
+import { localize } from "../../localization"
 import SplitPane from "./SplitPane"
 import React from "react"
 import { Page } from "../../../PageStack"
 import { PageStackDisplay } from "../../../PageStackDisplay"
 import { InstanceCtx } from "../../../contexts"
-import { ExprUtils } from 'mwater-expressions'
-import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
-import { usePageWidth } from '../../../hooks'
-import { formatEmbeddedExprString } from '../../../embeddedExprs'
+import { ExprUtils } from "mwater-expressions"
+import FillDownwardComponent from "react-library/lib/FillDownwardComponent"
+import { usePageWidth } from "../../../hooks"
+import { formatEmbeddedExprString } from "../../../embeddedExprs"
 
 /** Instance component for TOC */
-export default function TOCInstanceComp(props: { 
+export default function TOCInstanceComp(props: {
   blockDef: TOCBlockDef
-  instanceCtx: InstanceCtx 
+  instanceCtx: InstanceCtx
   createBlock: CreateBlock
 }) {
   const { blockDef, instanceCtx } = props
@@ -30,44 +30,46 @@ export default function TOCInstanceComp(props: {
   const allItems = iterateItems(blockDef.items)
 
   // Select first item with widget by default
-  const firstItem = allItems.find(item => item.widgetId)
+  const firstItem = allItems.find((item) => item.widgetId)
   const [selectedId, setSelectedId] = useState(firstItem ? firstItem.id : null)
 
   // Store collapsed state for items. If not listed, is expanded
   const [collapsedItems, setCollapsedItems] = useState(() => {
     return allItems
-      .filter(item => item.collapse == "startCollapsed" || (item.collapse == "startExpanded" && item.collapseWidth != null && pageWidth <= item.collapseWidth))
-      .map(item => item.id)
+      .filter(
+        (item) =>
+          item.collapse == "startCollapsed" ||
+          (item.collapse == "startExpanded" && item.collapseWidth != null && pageWidth <= item.collapseWidth)
+      )
+      .map((item) => item.id)
   })
 
   // When TOC selector is open in collapsed mode
   const [selectorOpen, setSelectorOpen] = useState(false)
-  
+
   /** Only toggle item */
-  function handleItemToggle(item: TOCItem, ev: MouseEvent) { 
+  function handleItemToggle(item: TOCItem, ev: MouseEvent) {
     ev.stopPropagation()
 
     // Toggle collapse
     if (item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")) {
       if (collapsedItems.includes(item.id)) {
         setCollapsedItems(_.without(collapsedItems, item.id))
-      }
-      else {
+      } else {
         setCollapsedItems(_.union(collapsedItems, [item.id]))
       }
     }
   }
 
   // Select item
-  function handleItemClick(item: TOCItem, ev: MouseEvent) { 
+  function handleItemClick(item: TOCItem, ev: MouseEvent) {
     ev.stopPropagation()
 
     // Toggle collapse
     if (item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")) {
       if (collapsedItems.includes(item.id)) {
         setCollapsedItems(_.without(collapsedItems, item.id))
-      }
-      else {
+      } else {
         setCollapsedItems(_.union(collapsedItems, [item.id]))
       }
     }
@@ -89,7 +91,7 @@ export default function TOCInstanceComp(props: {
       }
     }
 
-    setSelectedId(item.id) 
+    setSelectedId(item.id)
     setSelectorOpen(false)
   }
 
@@ -97,7 +99,7 @@ export default function TOCInstanceComp(props: {
     // Legacy support of label
     if (item.label != null) {
       return <div>{localize(item.label, instanceCtx.locale)}</div>
-    } 
+    }
     return instanceCtx.renderChildBlock(instanceCtx, item.labelBlock || null)
   }
 
@@ -113,7 +115,8 @@ export default function TOCInstanceComp(props: {
       }
     }
 
-    const collapsible = item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")
+    const collapsible =
+      item.children.length > 0 && (item.collapse == "startCollapsed" || item.collapse == "startExpanded")
 
     const labelClasses = ["toc-item-label", `toc-item-label-level${depth}`]
     if (item.id === selectedId) {
@@ -126,33 +129,47 @@ export default function TOCInstanceComp(props: {
     // Determine if collapsed
     const collapsed = collapsedItems.includes(item.id)
 
-    return <div key={item.id} className={`toc-item toc-item-level${depth}`}>
-      <div key="label" className={labelClasses.join(" ")} onClick={handleItemClick.bind(null, item)}>
-        <div key="expand" className="chevron" onClick={handleItemToggle.bind(null, item)}>
-          { collapsible ?
-            ( collapsed ? <i className="fas fa-fw fa-caret-right"/> : <i className="fas fa-fw fa-caret-down"/>)
-          : <i className="fas fa-fw fa-caret-right" style={{ visibility: "hidden" }}/> }
+    return (
+      <div key={item.id} className={`toc-item toc-item-level${depth}`}>
+        <div key="label" className={labelClasses.join(" ")} onClick={handleItemClick.bind(null, item)}>
+          <div key="expand" className="chevron" onClick={handleItemToggle.bind(null, item)}>
+            {collapsible ? (
+              collapsed ? (
+                <i className="fas fa-fw fa-caret-right" />
+              ) : (
+                <i className="fas fa-fw fa-caret-down" />
+              )
+            ) : (
+              <i className="fas fa-fw fa-caret-right" style={{ visibility: "hidden" }} />
+            )}
+          </div>
+          {renderItem(item)}
         </div>
-        { renderItem(item) }
+        {item.children.length > 0 && !collapsed ? (
+          <div key="children" className="toc-item-children">
+            {item.children.map((child, index) => renderItemTree(item.children, index, depth + 1))}
+          </div>
+        ) : null}
       </div>
-      { item.children.length > 0 && !collapsed ? 
-        <div key="children" className="toc-item-children">
-          { item.children.map((child, index) => renderItemTree(item.children, index, depth + 1)) }
-        </div>
-      : null}
-    </div>
+    )
   }
 
   function renderLeft() {
-    return <div>
-      <div key="header" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.header) }</div>
-      { blockDef.items.map((item, index) => renderItemTree(blockDef.items, index, 0)) }
-      <div key="footer" style={{ padding: 5 }}>{ instanceCtx.renderChildBlock(instanceCtx, blockDef.footer) }</div>
-    </div>
+    return (
+      <div>
+        <div key="header" style={{ padding: 5 }}>
+          {instanceCtx.renderChildBlock(instanceCtx, blockDef.header)}
+        </div>
+        {blockDef.items.map((item, index) => renderItemTree(blockDef.items, index, 0))}
+        <div key="footer" style={{ padding: 5 }}>
+          {instanceCtx.renderChildBlock(instanceCtx, blockDef.footer)}
+        </div>
+      </div>
+    )
   }
 
   // Get selected item
-  const selectedItem = iterateItems(blockDef.items).find(item => item.id === selectedId)
+  const selectedItem = iterateItems(blockDef.items).find((item) => item.id === selectedId)
   const selectedWidgetId = selectedItem ? selectedItem.widgetId : null
 
   function getTitle(item: TOCItem): string | undefined {
@@ -161,24 +178,26 @@ export default function TOCInstanceComp(props: {
     }
 
     // Get any embedded expression values
-    const exprValues = _.map(item.titleEmbeddedExprs || [], ee => instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr))
+    const exprValues = _.map(item.titleEmbeddedExprs || [], (ee) =>
+      instanceCtx.getContextVarExprValue(ee.contextVarId!, ee.expr)
+    )
 
     // Format and replace
-    let title = localize(item.title, instanceCtx.locale) 
+    let title = localize(item.title, instanceCtx.locale)
     title = formatEmbeddedExprString({
-      text: title, 
+      text: title,
       embeddedExprs: item.titleEmbeddedExprs || [],
       exprValues: exprValues,
       schema: instanceCtx.schema,
       contextVars: instanceCtx.contextVars,
-      locale: instanceCtx.locale, 
+      locale: instanceCtx.locale,
       formatLocale: instanceCtx.formatLocale
     })
-    
+
     return title
   }
-  
-  /** Render the right pane (or only pane if collapsed) 
+
+  /** Render the right pane (or only pane if collapsed)
    * @param noTitle do not render title even if item has one
    */
   function renderRight(noTitle: boolean) {
@@ -198,12 +217,12 @@ export default function TOCInstanceComp(props: {
 
       if (outerContextVarId) {
         // Look up outer context variable
-        const outerCV = instanceCtx.contextVars.find(cv => cv.id == outerContextVarId)
+        const outerCV = instanceCtx.contextVars.find((cv) => cv.id == outerContextVarId)
         if (!outerCV) {
           throw new Error("Outer context variable not found")
         }
 
-        // Get value 
+        // Get value
         let outerCVValue = instanceCtx.contextVarValues[outerCV.id]
 
         // Add filters if rowset
@@ -212,18 +231,23 @@ export default function TOCInstanceComp(props: {
             type: "op",
             op: "and",
             table: outerCV.table!,
-            exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), f => f.expr)))
+            exprs: _.compact([outerCVValue].concat(_.map(instanceCtx.getFilters(outerCV.id), (f) => f.expr)))
           }
         }
 
         // Inline variables used in rowsets as they may depend on context variables that aren't present in new page
         if (outerCV.type == "rowset") {
-          outerCVValue = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars)).inlineVariableValues(outerCVValue, createExprVariableValues(instanceCtx.contextVars, instanceCtx.contextVarValues))
+          outerCVValue = new ExprUtils(
+            instanceCtx.schema,
+            createExprVariables(instanceCtx.contextVars)
+          ).inlineVariableValues(
+            outerCVValue,
+            createExprVariableValues(instanceCtx.contextVars, instanceCtx.contextVarValues)
+          )
         }
 
         mappedContextVarValues[innerContextVar.id] = outerCVValue
-      }
-      else {
+      } else {
         mappedContextVarValues[innerContextVar.id] = null
       }
     }
@@ -232,7 +256,7 @@ export default function TOCInstanceComp(props: {
     for (const globalContextVar of props.instanceCtx.globalContextVars || []) {
       mappedContextVarValues[globalContextVar.id] = props.instanceCtx.contextVarValues[globalContextVar.id]
     }
-    
+
     const page: Page = {
       contextVarValues: mappedContextVarValues,
       database: instanceCtx.database,
@@ -242,57 +266,45 @@ export default function TOCInstanceComp(props: {
     }
 
     // Create page stack
-    return <PageStackDisplay
-      key={selectedId}
-      baseCtx={props.instanceCtx}
-      initialPage={page}
-      ref={pageStackRef}
-      />
+    return <PageStackDisplay key={selectedId} baseCtx={props.instanceCtx} initialPage={page} ref={pageStackRef} />
   }
 
   // If below minimum, use collapsed view
   if (blockDef.collapseWidth != null && pageWidth <= blockDef.collapseWidth) {
     if (selectedId == null) {
-      return <div/>
+      return <div />
     }
 
-    const selectedItem = allItems.find(item => item.id == selectedId)
+    const selectedItem = allItems.find((item) => item.id == selectedId)
     if (!selectedItem) {
-      return <div/>
+      return <div />
     }
 
     const title = getTitle(selectedItem)
 
-    return <div onClick={() => setSelectorOpen(false)}>
-      <FillDownwardComponent>
-        <div key="header">
-          <div 
-              key="selected" 
-              onClick={ev => {
+    return (
+      <div onClick={() => setSelectorOpen(false)}>
+        <FillDownwardComponent>
+          <div key="header">
+            <div
+              key="selected"
+              onClick={(ev) => {
                 ev.stopPropagation()
-                setSelectorOpen(v => !v)
-              }} 
+                setSelectorOpen((v) => !v)
+              }}
               className={`toc-select-button${selectorOpen ? " open" : ""}`}
             >
-            <i className="fa fa-bars"/>
+              <i className="fa fa-bars" />
+            </div>{" "}
+            <div className="toc-select-title">{title}</div>
+            {selectorOpen ? <div className="toc-selector">{renderLeft()}</div> : null}
           </div>
-          {" "}
-          <div className="toc-select-title">{title}</div>
-          { selectorOpen ?
-            <div className="toc-selector">
-              { renderLeft() }
-            </div>
-          : null }
-        </div>
-        { renderRight(true) }
-      </FillDownwardComponent>
-    </div>
+          {renderRight(true)}
+        </FillDownwardComponent>
+      </div>
+    )
   }
 
   // Render overall structure
-  return <SplitPane
-    left={renderLeft()}
-    right={renderRight(false)}
-    theme={blockDef.theme || "light"}
-  />
+  return <SplitPane left={renderLeft()} right={renderRight(false)} theme={blockDef.theme || "light"} />
 }

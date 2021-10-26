@@ -1,8 +1,8 @@
-import * as React from 'react';
-import LeafBlock from '../LeafBlock';
-import { BlockDef, Filter, ContextVar } from '../blocks';
-import { Expr } from 'mwater-expressions';
-import { InstanceCtx, DesignCtx } from '../../contexts';
+import * as React from "react";
+import LeafBlock from "../LeafBlock";
+import { BlockDef, Filter, ContextVar } from "../blocks";
+import { Expr } from "mwater-expressions";
+import { InstanceCtx, DesignCtx } from "../../contexts";
 /** Block which contains a widget */
 export interface WidgetBlockDef extends BlockDef {
     type: "widget";

@@ -1,15 +1,12 @@
 import { HorizontalBlock, HorizontalBlockDef } from "./horizontal"
 import { TextBlockDef } from "./text"
 
-
 it("canonicalizes single item", () => {
   const hbd: HorizontalBlockDef = {
     type: "horizontal",
     id: "a",
-    items: [
-      { id: "b", type: "text", text: null } as TextBlockDef
-    ]
-  } 
+    items: [{ id: "b", type: "text", text: null } as TextBlockDef]
+  }
 
   const hbd2 = new HorizontalBlock(hbd).canonicalize()
 
@@ -22,13 +19,17 @@ it("canonicalizes nested items", () => {
     type: "horizontal",
     id: "a",
     items: [
-      { type: "horizontal", id: "h1", items: [
-        { id: "b", type: "text", text: null } as TextBlockDef,
-        { id: "c", type: "text", text: null } as TextBlockDef
-      ]} as HorizontalBlockDef,
+      {
+        type: "horizontal",
+        id: "h1",
+        items: [
+          { id: "b", type: "text", text: null } as TextBlockDef,
+          { id: "c", type: "text", text: null } as TextBlockDef
+        ]
+      } as HorizontalBlockDef,
       { id: "d", type: "text", text: null } as TextBlockDef
     ]
-  } 
+  }
 
   const hbd2 = new HorizontalBlock(hbd).canonicalize()
 
@@ -52,7 +53,7 @@ it("canonicalizes good item as self", () => {
       { id: "b", type: "text", text: null } as TextBlockDef,
       { id: "c", type: "text", text: null } as TextBlockDef
     ]
-  } 
+  }
 
   const hbd2 = new HorizontalBlock(hbd).canonicalize()
 

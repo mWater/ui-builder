@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Block which allows selecting a single date and injects it as a context variable */
 export interface DateInjectBlockDef extends BlockDef {
     type: "dateInject";

@@ -1,4 +1,4 @@
-import { BlockDef, Block } from './blocks';
+import { BlockDef, Block } from "./blocks";
 export default class BlockFactory {
     customBlocks: {
         [type: string]: (blockDef: BlockDef) => Block<BlockDef>;

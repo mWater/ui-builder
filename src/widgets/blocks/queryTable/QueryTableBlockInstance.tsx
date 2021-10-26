@@ -1,11 +1,11 @@
-import * as React from "react";
-import { getFixedWidth, QueryTableBlock } from "./queryTable";
-import { Row, Expr, IdExpr, PromiseExprEvaluator } from "mwater-expressions";
-import { QueryOptions } from "../../../database/Database";
-import * as _ from "lodash";
-import { localize } from "../../localization";
-import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts";
-import { BlockDef, createExprVariables, createExprVariableValues } from "../../blocks";
+import * as React from "react"
+import { getFixedWidth, QueryTableBlock } from "./queryTable"
+import { Row, Expr, IdExpr, PromiseExprEvaluator } from "mwater-expressions"
+import { QueryOptions } from "../../../database/Database"
+import * as _ from "lodash"
+import { localize } from "../../localization"
+import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts"
+import { BlockDef, createExprVariables, createExprVariableValues } from "../../blocks"
 
 interface Props {
   block: QueryTableBlock
@@ -33,7 +33,7 @@ interface State {
 /** Instance of a query table */
 export default class QueryTableBlockInstance extends React.Component<Props, State> {
   /** Current query options to determine if refresh needed */
-  queryOptions?: QueryOptions 
+  queryOptions?: QueryOptions
 
   constructor(props: Props) {
     super(props)
@@ -43,14 +43,19 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     let columnOrderDir: "asc" | "desc" = "asc"
 
     const blockDef = this.props.block.blockDef
-    for (let colIndex = 0 ; colIndex < blockDef.contents.length ; colIndex++) {
-      if (blockDef.columnInfos && blockDef.columnInfos[colIndex] && blockDef.columnInfos[colIndex]!.orderExpr && blockDef.columnInfos[colIndex]!.initialOrderDir) {
+    for (let colIndex = 0; colIndex < blockDef.contents.length; colIndex++) {
+      if (
+        blockDef.columnInfos &&
+        blockDef.columnInfos[colIndex] &&
+        blockDef.columnInfos[colIndex]!.orderExpr &&
+        blockDef.columnInfos[colIndex]!.initialOrderDir
+      ) {
         columnOrderIndex = colIndex
         columnOrderDir = blockDef.columnInfos[colIndex]!.initialOrderDir!
       }
     }
-    
-    this.state = { 
+
+    this.state = {
       refreshing: false,
       columnOrderIndex,
       columnOrderDir,
@@ -67,7 +72,10 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
   componentDidUpdate(prevProps: Props) {
     // Redo query if changed
     const newQueryOptions = this.createQuery()
-    if (!_.isEqual(newQueryOptions, this.queryOptions) || !_.isEqual(this.props.instanceCtx.contextVarValues, prevProps.instanceCtx.contextVarValues)) {
+    if (
+      !_.isEqual(newQueryOptions, this.queryOptions) ||
+      !_.isEqual(this.props.instanceCtx.contextVarValues, prevProps.instanceCtx.contextVarValues)
+    ) {
       this.performQuery()
     }
   }
@@ -90,7 +98,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const block = this.props.block
 
     // Get expressions
-    const rowsetCV = rips.contextVars.find(cv => cv.id === block.blockDef.rowsetContextVarId)!
+    const rowsetCV = rips.contextVars.find((cv) => cv.id === block.blockDef.rowsetContextVarId)!
     const rowExprs = block.getRowExprs(this.props.instanceCtx.contextVars, this.props.instanceCtx)
     const rowsetCVValue = rips.contextVarValues[rowsetCV.id]
 
@@ -99,7 +107,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       type: "op",
       op: "and",
       table: rowsetCV.table!,
-      exprs: _.compact([rowsetCVValue].concat(_.map(rips.getFilters(rowsetCV.id), f => f.expr)))
+      exprs: _.compact([rowsetCVValue].concat(_.map(rips.getFilters(rowsetCV.id), (f) => f.expr)))
     }
 
     // Add own where
@@ -118,9 +126,12 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     // Add column ordering if present
     if (this.state.columnOrderIndex != null) {
-      queryOptions.orderBy!.push({ expr: block.blockDef.columnInfos![this.state.columnOrderIndex]!.orderExpr, dir: this.state.columnOrderDir })
+      queryOptions.orderBy!.push({
+        expr: block.blockDef.columnInfos![this.state.columnOrderIndex]!.orderExpr,
+        dir: this.state.columnOrderDir
+      })
     }
-    
+
     // Add order by
     if (block.blockDef.orderBy) {
       queryOptions.orderBy = queryOptions.orderBy!.concat(block.blockDef.orderBy)
@@ -163,28 +174,33 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     // Mark as refreshing
     this.setState({ refreshing: true })
 
-    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx)).then(rows => {
-      // Check if still relevant
-      if (_.isEqual(queryOptions, this.createQuery())) {
-        // Take limit of rows
-        const limitedRows = this.state.limit != null ? _.take(rows, this.state.limit) : rows
-        this.setState({ 
-          rows: limitedRows, 
-          refreshing: false, 
-          // If soft limit and more available, show that
-          moreRowsAvail: (this.props.block.blockDef.limitType || "soft") == "soft" && rows.length > limitedRows.length 
-        })
-      }
-    }).catch(error => {
-      this.setState({ error: error })
-    })
+    this.props.instanceCtx.database
+      .query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx))
+      .then((rows) => {
+        // Check if still relevant
+        if (_.isEqual(queryOptions, this.createQuery())) {
+          // Take limit of rows
+          const limitedRows = this.state.limit != null ? _.take(rows, this.state.limit) : rows
+          this.setState({
+            rows: limitedRows,
+            refreshing: false,
+            // If soft limit and more available, show that
+            moreRowsAvail: (this.props.block.blockDef.limitType || "soft") == "soft" && rows.length > limitedRows.length
+          })
+        }
+      })
+      .catch((error) => {
+        this.setState({ error: error })
+      })
   }
 
   createRowInstanceCtx(rowIndex: number): InstanceCtx {
     const rips = this.props.instanceCtx
 
     // Row context variable
-    const rowsetCV = this.props.instanceCtx.contextVars.find(cv => cv.id === this.props.block.blockDef.rowsetContextVarId)!
+    const rowsetCV = this.props.instanceCtx.contextVars.find(
+      (cv) => cv.id === this.props.block.blockDef.rowsetContextVarId
+    )!
     const rowcv = this.props.block.createRowContextVar(rowsetCV!)
 
     // TODO move out of here to be faster
@@ -193,16 +209,18 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const innerContextVars = rips.contextVars.concat(rowcv)
 
     // Row context variable value
-    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, 
-      this.props.instanceCtx.schema, 
-      rowsetCV, 
+    const cvvalue = this.props.block.getRowContextVarValue(
+      this.state.rows![rowIndex],
+      rowExprs,
+      this.props.instanceCtx.schema,
+      rowsetCV,
       innerContextVars,
       getFilteredContextVarValues(this.props.instanceCtx)[rowsetCV.id]
     )
 
     const innerContextVarValues = { ...rips.contextVarValues, [rowcv.id]: cvvalue }
     return {
-      ...rips, 
+      ...rips,
       contextVars: innerContextVars,
       contextVarValues: innerContextVarValues,
       getContextVarExprValue: (cvid, expr) => {
@@ -213,8 +231,8 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
         // If no context variable, evaluate expression
         if (cvid == null) {
-          return new PromiseExprEvaluator({ 
-            schema: rips.schema, 
+          return new PromiseExprEvaluator({
+            schema: rips.schema,
             locale: rips.locale,
             variables: createExprVariables(innerContextVars),
             variableValues: createExprVariableValues(innerContextVars, innerContextVarValues)
@@ -224,9 +242,9 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
         if (cvid !== rowcv.id) {
           return rips.getContextVarExprValue(cvid, expr)
         }
-        
+
         // Look up expression
-        const exprIndex = rowExprs.findIndex(rowExpr => _.isEqual(expr, rowExpr))
+        const exprIndex = rowExprs.findIndex((rowExpr) => _.isEqual(expr, rowExpr))
         return this.state.rows![rowIndex]["e" + exprIndex]
       },
       getFilters: (cvid) => {
@@ -275,14 +293,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
     return (
       <tr key={rowKey} style={rowStyle}>
-        { this.props.block.blockDef.contents.map((b, colIndex) => {
+        {this.props.block.blockDef.contents.map((b, colIndex) => {
           return (
             <td key={colIndex} onClick={handleRowClick} style={{ verticalAlign: getColumnVerticalAlign(colIndex) }}>
               {rowRIProps.renderChildBlock(rowRIProps, b)}
             </td>
           )
         })}
-     </tr>
+      </tr>
     )
   }
 
@@ -294,16 +312,18 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
           <td key="error" colSpan={this.props.block.blockDef.contents.length}>
             <div className="alert alert-danger">Error loading data</div>
           </td>
-        </tr>)
+        </tr>
+      )
     }
 
     if (!this.state.rows) {
       return (
         <tr key="spin">
           <td key="spin" colSpan={this.props.block.blockDef.contents.length}>
-            <i className="fa fa-spinner fa-spin"/>
+            <i className="fa fa-spinner fa-spin" />
           </td>
-        </tr>)
+        </tr>
+      )
     }
 
     if (this.state.rows.length === 0 && this.props.block.blockDef.noRowsMessage) {
@@ -335,31 +355,39 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
 
         if (currentOrder == "asc") {
           this.setState({ columnOrderDir: "desc" })
-        }
-        else if (currentOrder == "desc") {
+        } else if (currentOrder == "desc") {
           this.setState({ columnOrderIndex: null })
-        }
-        else { 
+        } else {
           this.setState({ columnOrderDir: "asc", columnOrderIndex: index })
         }
       }
 
-      // If not sorted 
+      // If not sorted
       if (this.state.columnOrderIndex != index) {
-        return <div key="order" style={{ float: "right", color: "#CCC", cursor: "pointer" }} onClick={handleOrderClick}>
-          <i className="fa fa-sort fa-fw"/>
-        </div>
+        return (
+          <div key="order" style={{ float: "right", color: "#CCC", cursor: "pointer" }} onClick={handleOrderClick}>
+            <i className="fa fa-sort fa-fw" />
+          </div>
+        )
       }
 
-      return <div key="order" style={{ float: "right", cursor: "pointer" }} onClick={handleOrderClick}>
-        { this.state.columnOrderDir == "asc" ? <i className="fa fa-sort-asc fa-fw"/> : <i className="fa fa-sort-desc fa-fw"/> }
-      </div>
+      return (
+        <div key="order" style={{ float: "right", cursor: "pointer" }} onClick={handleOrderClick}>
+          {this.state.columnOrderDir == "asc" ? (
+            <i className="fa fa-sort-asc fa-fw" />
+          ) : (
+            <i className="fa fa-sort-desc fa-fw" />
+          )}
+        </div>
+      )
     }
-    
-    return <th key={index}>
-      { renderOrder() }      
-      {riProps.renderChildBlock(riProps, header)}
-    </th>
+
+    return (
+      <th key={index}>
+        {renderOrder()}
+        {riProps.renderChildBlock(riProps, header)}
+      </th>
+    )
   }
 
   /** Render the show more rows at bottom */
@@ -368,11 +396,15 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       return null
     }
 
-    return <tr key="showMore">
-      <td colSpan={this.props.block.blockDef.contents.length}>
-        <a style={{ cursor: "pointer" }} onClick={this.handleShowMore}>{this.props.instanceCtx.T("Show more...")}</a>
-      </td>
-    </tr>
+    return (
+      <tr key="showMore">
+        <td colSpan={this.props.block.blockDef.contents.length}>
+          <a style={{ cursor: "pointer" }} onClick={this.handleShowMore}>
+            {this.props.instanceCtx.T("Show more...")}
+          </a>
+        </td>
+      </tr>
+    )
   }
 
   render() {
@@ -381,7 +413,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
     const divStyle: React.CSSProperties = {}
 
     const tableStyle: React.CSSProperties = {
-      marginTop: 5,
+      marginTop: 5
     }
 
     if (getFixedWidth(this.props.block.blockDef)) {
@@ -427,30 +459,30 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
               // Determine width
               const columnInfos = blockDef.columnInfos
               const width = columnInfos && columnInfos[colIndex] ? columnInfos[colIndex]!.columnWidth || "auto" : "auto"
-              return <col key={colIndex} style={{ width: width }}/>
+              return <col key={colIndex} style={{ width: width }} />
             })}
           </colgroup>
-          { !blockDef.hideHeaders ? 
-          <thead>
-            <tr key="header">
-              { blockDef.headers.map((b, index) => this.renderHeader(b, index)) }
-            </tr>
-          </thead>
-          : null }
+          {!blockDef.hideHeaders ? (
+            <thead>
+              <tr key="header">{blockDef.headers.map((b, index) => this.renderHeader(b, index))}</tr>
+            </thead>
+          ) : null}
           <tbody>
             {this.renderRows()}
             {this.renderShowMore()}
           </tbody>
-          { blockDef.footers ?
-          <tfoot>
-            <tr>
-              { blockDef.footers.map((b, index) => <td key={index}>{this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, b)}</td>)}
-            </tr>
-          </tfoot>
-          : null}
+          {blockDef.footers ? (
+            <tfoot>
+              <tr>
+                {blockDef.footers.map((b, index) => (
+                  <td key={index}>{this.props.instanceCtx.renderChildBlock(this.props.instanceCtx, b)}</td>
+                ))}
+              </tr>
+            </tfoot>
+          ) : null}
         </table>
       </div>
-    )  
+    )
   }
 }
 

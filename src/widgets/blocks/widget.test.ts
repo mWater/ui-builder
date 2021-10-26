@@ -1,37 +1,35 @@
-import { WidgetBlock, WidgetBlockDef, mapObjectTree } from './widget'
-import { ContextVar, Filter, CreateBlock } from '../blocks';
-import { WidgetDef } from '../widgets';
-import { Database } from '../../database/Database';
-import { Schema, DataSource, Expr } from 'mwater-expressions';
-import { ActionLibrary } from '../ActionLibrary';
-import { PageStack } from '../../PageStack';
-import { WidgetLibrary } from '../../designer/widgetLibrary';
-import BlockFactory from '../BlockFactory';
-import { ExpressionBlockDef } from './expression';
-import produce from 'immer';
-import { InstanceCtx } from '../../contexts';
-import { shallow } from 'enzyme';
+import { WidgetBlock, WidgetBlockDef, mapObjectTree } from "./widget"
+import { ContextVar, Filter, CreateBlock } from "../blocks"
+import { WidgetDef } from "../widgets"
+import { Database } from "../../database/Database"
+import { Schema, DataSource, Expr } from "mwater-expressions"
+import { ActionLibrary } from "../ActionLibrary"
+import { PageStack } from "../../PageStack"
+import { WidgetLibrary } from "../../designer/widgetLibrary"
+import BlockFactory from "../BlockFactory"
+import { ExpressionBlockDef } from "./expression"
+import produce from "immer"
+import { InstanceCtx } from "../../contexts"
+import { shallow } from "enzyme"
 
-const innerBlockDef: ExpressionBlockDef = { 
-  type: "expression", 
-  id: "exp1", 
-  contextVarId: "b1", 
-  expr: { type: "field", table: "t1", column: "text" }, 
-  format: null 
+const innerBlockDef: ExpressionBlockDef = {
+  type: "expression",
+  id: "exp1",
+  contextVarId: "b1",
+  expr: { type: "field", table: "t1", column: "text" },
+  format: null
 }
 
-const widgetDef : WidgetDef = {
+const widgetDef: WidgetDef = {
   id: "w1",
   name: "W1",
   description: "",
   blockDef: innerBlockDef,
-  contextVars: [
-    { id: "b1", name: "B1", type: "row", table: "t1" },
-  ],
+  contextVars: [{ id: "b1", name: "B1", type: "row", table: "t1" }],
   contextVarPreviewValues: {}
 }
 
-const blockDef : WidgetBlockDef = {
+const blockDef: WidgetBlockDef = {
   id: "a",
   type: "widget",
   widgetId: "w1",
@@ -42,11 +40,11 @@ const blockDef : WidgetBlockDef = {
 
 const widgetLibrary: WidgetLibrary = {
   widgets: {
-    "w1": widgetDef
+    w1: widgetDef
   }
 }
 
-const contextVars : ContextVar[] = [
+const contextVars: ContextVar[] = [
   { id: "a1", name: "A1", type: "text" },
   { id: "a2", name: "A2", type: "text" }
 ]
@@ -57,28 +55,30 @@ describe("getContextVarExprs", () => {
     const widgetBlock = new WidgetBlock(blockDef)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary, createBlock: createBlock } as InstanceCtx)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], {
+      widgetLibrary: widgetLibrary,
+      createBlock: createBlock
+    } as InstanceCtx)
 
-    expect(exprs).toEqual([
-      { type: "field", table: "t1", column: "text" }
-    ])
+    expect(exprs).toEqual([{ type: "field", table: "t1", column: "text" }])
   })
 
   test("gathers from inner widget and maps variables too", () => {
     // Alter widget block to have variable in expression
     const widgetLibrary2 = produce(widgetLibrary, (draft) => {
-      ((draft.widgets.w1!.blockDef!) as any).expr = { type: "variable", variableId: "b1" }
+      ;(draft.widgets.w1!.blockDef! as any).expr = { type: "variable", variableId: "b1" }
     })
 
     const createBlock = new BlockFactory().createBlock
     const widgetBlock = new WidgetBlock(blockDef)
 
     // Get expressions
-    const exprs = widgetBlock.getContextVarExprs(contextVars[0], { widgetLibrary: widgetLibrary2, createBlock: createBlock } as InstanceCtx)
+    const exprs = widgetBlock.getContextVarExprs(contextVars[0], {
+      widgetLibrary: widgetLibrary2,
+      createBlock: createBlock
+    } as InstanceCtx)
 
-    expect(exprs).toEqual([
-      { type: "variable", variableId: "a1" }
-    ])
+    expect(exprs).toEqual([{ type: "variable", variableId: "a1" }])
   })
 })
 
@@ -90,22 +90,26 @@ describe("getInitialFilters", () => {
     const innerBlock = {
       getInitialFilters: jest.fn()
     }
-  
+
     // Return inner block
     createBlock.mockReset()
     createBlock.mockReturnValueOnce(innerBlock)
     innerBlock.getInitialFilters.mockReturnValue([{ id: "f1", memo: "m", expr: {} as Expr }])
 
-    const filters = widgetBlock.getInitialFilters("a1", { widgetLibrary: widgetLibrary, contextVars: [] as ContextVar[], createBlock: createBlock as CreateBlock } as InstanceCtx)
+    const filters = widgetBlock.getInitialFilters("a1", {
+      widgetLibrary: widgetLibrary,
+      contextVars: [] as ContextVar[],
+      createBlock: createBlock as CreateBlock
+    } as InstanceCtx)
     expect(filters).toEqual([{ id: "f1", memo: "m", expr: {} as Expr }])
     expect(innerBlock.getInitialFilters.mock.calls[0][0]).toBe("b1")
   })
 })
 
 describe("renderInstance", () => {
-  let instanceCtx : InstanceCtx
-  let innerInstanceCtx : InstanceCtx
- 
+  let instanceCtx: InstanceCtx
+  let innerInstanceCtx: InstanceCtx
+
   // Render instance
   beforeEach((done) => {
     const createBlock = jest.fn()
@@ -117,19 +121,19 @@ describe("renderInstance", () => {
         done()
       }
     }
-  
+
     // Return inner block
     createBlock.mockReturnValueOnce(innerBlock)
-  
+
     instanceCtx = {
       createBlock: createBlock,
       locale: "en",
       database: {} as Database,
       schema: {} as Schema,
       dataSource: {} as DataSource,
-      contextVars: contextVars, 
+      contextVars: contextVars,
       actionLibrary: {} as ActionLibrary,
-      widgetLibrary: { widgets: { w1: widgetDef }},
+      widgetLibrary: { widgets: { w1: widgetDef } },
       pageStack: {} as PageStack,
       contextVarValues: { a1: "a1" },
       getContextVarExprValue: jest.fn(),
@@ -137,7 +141,9 @@ describe("renderInstance", () => {
       setFilter: jest.fn(),
       getFilters: jest.fn(),
       renderChildBlock: jest.fn(),
-      registerForValidation: () => { return () => {} },
+      registerForValidation: () => {
+        return () => {}
+      },
       T: (str) => str
     }
     const x = shallow(widgetBlock.renderInstance(instanceCtx))
@@ -150,7 +156,7 @@ describe("renderInstance", () => {
   test("contextVarValues maps", () => {
     expect(innerInstanceCtx.contextVarValues.b1).toBe("a1")
   })
-  
+
   test("getContextVarExprValue maps variables", () => {
     const outerGetContextVarExprValue = jest.fn()
     instanceCtx.getContextVarExprValue = outerGetContextVarExprValue
@@ -173,7 +179,6 @@ describe("renderInstance", () => {
   })
 })
 
-
 describe("mapObjectTree", () => {
   test("deep mapping", () => {
     const obj = {
@@ -181,9 +186,11 @@ describe("mapObjectTree", () => {
       y: [{ foo: 1 }]
     }
 
-    expect(mapObjectTree(obj, (input) => {
-      return (input.foo) ? { foo: 2 } : input
-    })).toEqual({
+    expect(
+      mapObjectTree(obj, (input) => {
+        return input.foo ? { foo: 2 } : input
+      })
+    ).toEqual({
       x: 1,
       y: [{ foo: 2 }]
     })

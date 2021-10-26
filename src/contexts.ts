@@ -1,13 +1,13 @@
-import _ from 'lodash'
-import { ActionLibrary } from "./widgets/ActionLibrary";
-import { WidgetLibrary } from "./designer/widgetLibrary";
-import { DataSource, Schema, Expr } from "mwater-expressions";
-import { CreateBlock, ContextVar, BlockStore, Filter, BlockDef } from "./widgets/blocks";
-import { Database } from "./database/Database";
-import { PageStack } from "./PageStack";
-import { BlockPaletteEntry } from "./designer/blockPaletteEntries";
-import { FormatLocaleObject } from "d3-format";
-import { LocalizeString } from 'ez-localize'
+import _ from "lodash"
+import { ActionLibrary } from "./widgets/ActionLibrary"
+import { WidgetLibrary } from "./designer/widgetLibrary"
+import { DataSource, Schema, Expr } from "mwater-expressions"
+import { CreateBlock, ContextVar, BlockStore, Filter, BlockDef } from "./widgets/blocks"
+import { Database } from "./database/Database"
+import { PageStack } from "./PageStack"
+import { BlockPaletteEntry } from "./designer/blockPaletteEntries"
+import { FormatLocaleObject } from "d3-format"
+import { LocalizeString } from "ez-localize"
 
 /** Base context that all UI Builder needs */
 export interface BaseCtx {
@@ -39,7 +39,7 @@ export interface BaseCtx {
   formatLocale?: FormatLocaleObject
 
   /** Global context variables that are passed to all blocks */
-  globalContextVars?: ContextVar[] 
+  globalContextVars?: ContextVar[]
 
   /** All available locales (for preview purposes) */
   locales?: Locale[]
@@ -56,7 +56,7 @@ export interface Locale {
 /** Context that all design-mode operations need */
 export interface DesignCtx extends BaseCtx {
   dataSource: DataSource
-  
+
   /** All context variables present, including global ones */
   contextVars: ContextVar[]
 
@@ -66,10 +66,14 @@ export interface DesignCtx extends BaseCtx {
   blockPaletteEntries: BlockPaletteEntry[]
 
   /** Selected block id as some blocks may display differently when selected */
-  selectedId: string | null,
+  selectedId: string | null
 
   /** All sub-block elements must rendered using this function. onSet will be called only when transitioning from null to a value */
-  renderChildBlock(designCtx: DesignCtx, childBlockDef: BlockDef | null, onSet?: (blockDef: BlockDef) => void): React.ReactElement<any>
+  renderChildBlock(
+    designCtx: DesignCtx,
+    childBlockDef: BlockDef | null,
+    onSet?: (blockDef: BlockDef) => void
+  ): React.ReactElement<any>
 }
 
 /** Context that all operations on an instance of a block need */
@@ -107,7 +111,7 @@ export interface InstanceCtx extends BaseCtx {
    * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show alert
    * isFirstError is true if first block to potentially fail validation. This allows the block to scroll into view on error
    */
-  registerForValidation(validate: (isFirstError: boolean) => string | null | Promise<string | null>): (() => void)
+  registerForValidation(validate: (isFirstError: boolean) => string | null | Promise<string | null>): () => void
 }
 
 /** Gets context variables with filters baked into rowsets. Use for all queries, as that may depend on rowset filters */
@@ -121,19 +125,18 @@ export function getFilteredContextVarValues(instanceCtx: InstanceCtx): { [contex
         type: "op",
         op: "and",
         table: cv.table!,
-        exprs: _.compact([instanceCtx.contextVarValues[cv.id]].concat(_.map(instanceCtx.getFilters(cv.id), f => f.expr)))
+        exprs: _.compact(
+          [instanceCtx.contextVarValues[cv.id]].concat(_.map(instanceCtx.getFilters(cv.id), (f) => f.expr))
+        )
       }
       if (expr.exprs.length == 1) {
         results[cv.id] = expr.exprs[0]
-      }
-      else if (expr.exprs.length == 0) {
+      } else if (expr.exprs.length == 0) {
         results[cv.id] = null
-      }
-      else {
+      } else {
         results[cv.id] = expr
       }
-    }
-    else {
+    } else {
       results[cv.id] = instanceCtx.contextVarValues[cv.id]
     }
   }

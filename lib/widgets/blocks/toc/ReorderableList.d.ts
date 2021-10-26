@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
-export { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
+export { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 /** List which provides drag and drop reordering */
 export declare function ReorderableList<T>(props: {
     items: T[];

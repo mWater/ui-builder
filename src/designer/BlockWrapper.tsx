@@ -1,30 +1,37 @@
 import * as React from "react"
 import { BlockDef, DropSide, BlockStore, dropBlock } from "../widgets/blocks"
-import { DragSource, DropTarget, DropTargetMonitor, ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd'
+import {
+  DragSource,
+  DropTarget,
+  DropTargetMonitor,
+  ConnectDragSource,
+  ConnectDropTarget,
+  ConnectDragPreview
+} from "react-dnd"
 import "./BlockWrapper.css"
-import { DragDropMonitor } from "dnd-core";
-import * as ReactDOM from "react-dom";
+import { DragDropMonitor } from "dnd-core"
+import * as ReactDOM from "react-dom"
 
 interface Props {
-  blockDef: BlockDef;
-  selectedBlockId: string | null;
-  store: BlockStore;
-  validationError: string | null;
+  blockDef: BlockDef
+  selectedBlockId: string | null
+  store: BlockStore
+  validationError: string | null
 
   /** Injected by react-dnd */
-  isOver?: boolean;
+  isOver?: boolean
   /** Injected by react-dnd */
-  connectDragSource?: ConnectDragSource;
+  connectDragSource?: ConnectDragSource
   /** Injected by react-dnd */
-  connectDropTarget?: ConnectDropTarget;
+  connectDropTarget?: ConnectDropTarget
   /** Injected by react-dnd */
-  connectDragPreview?: ConnectDragPreview;
+  connectDragPreview?: ConnectDragPreview
 
   /** Wrapper label */
   label?: string
 
-  onSelect(): void;
-  onRemove(): void;
+  onSelect(): void
+  onRemove(): void
 }
 
 interface State {
@@ -39,7 +46,7 @@ const blockSourceSpec = {
   },
 
   isDragging(props: Props, monitor: DragDropMonitor) {
-    return monitor.getItem().blockDef && (props.blockDef.id === monitor.getItem().blockDef.id)
+    return monitor.getItem().blockDef && props.blockDef.id === monitor.getItem().blockDef.id
   }
 }
 
@@ -64,10 +71,10 @@ const blockTargetSpec = {
     if (!monitor.getItem().blockDef) {
       return false
     }
-    
+
     const hoveringId = monitor.getItem().blockDef.id
     const myId = props.blockDef.id
-    return (hoveringId !== myId)
+    return hoveringId !== myId
   },
   drop(props: Props, monitor: DropTargetMonitor, component: any) {
     if (monitor.didDrop()) {
@@ -104,19 +111,20 @@ function getDropSide(monitor: DropTargetMonitor, component: any) {
   const fractionX = hoverClientX / (hoverBoundingRect.right - hoverBoundingRect.left)
   const fractionY = hoverClientY / (hoverBoundingRect.bottom - hoverBoundingRect.top)
 
-  if (fractionX > fractionY) { // top or right
-    if ((1 - fractionX) > fractionY) { // top or left
+  if (fractionX > fractionY) {
+    // top or right
+    if (1 - fractionX > fractionY) {
+      // top or left
       return DropSide.top
-    }
-    else {
+    } else {
       return DropSide.right
     }
-  }
-  else { // bottom or left
-    if ((1 - fractionX) > fractionY) { // top or left
+  } else {
+    // bottom or left
+    if (1 - fractionX > fractionY) {
+      // top or left
       return DropSide.left
-    }
-    else {
+    } else {
       return DropSide.bottom
     }
   }
@@ -124,7 +132,7 @@ function getDropSide(monitor: DropTargetMonitor, component: any) {
 
 /** Wraps a block in a draggable control with an x to remove */
 class BlockWrapper extends React.Component<Props, State> {
-  constructor(props:Props) {
+  constructor(props: Props) {
     super(props)
     this.state = { hoverSide: null }
   }
@@ -132,12 +140,12 @@ class BlockWrapper extends React.Component<Props, State> {
   handleClick = (ev: React.MouseEvent) => {
     ev.stopPropagation()
     this.props.onSelect()
-  } 
+  }
 
   renderHover() {
     const lineStyle = {} as React.CSSProperties
-    lineStyle.position = "absolute" 
-    
+    lineStyle.position = "absolute"
+
     if (this.props.isOver) {
       switch (this.state.hoverSide) {
         case DropSide.left:
@@ -166,9 +174,8 @@ class BlockWrapper extends React.Component<Props, State> {
           break
       }
 
-      return <div style={lineStyle}/>
-    }
-    else {
+      return <div style={lineStyle} />
+    } else {
       return null
     }
   }
@@ -179,21 +186,22 @@ class BlockWrapper extends React.Component<Props, State> {
     let className = "block-wrapper"
     if (this.props.validationError) {
       className += " validation-error"
-    }
-    else if (selected) {
+    } else if (selected) {
       className += " selected"
     }
 
-    return (
-      this.props.connectDragSource!(
-        this.props.connectDropTarget!(
-          <div onClick={this.handleClick} className={className}>
-            { this.props.label ? <div className="block-wrapper-label">{this.props.label}</div> : null }
-            {selected ? <span className="delete-block" onClick={this.props.onRemove}><i className="fa fa-remove"/></span> : null}
-            {this.renderHover()}
-            {this.props.children}
-          </div>
-        )
+    return this.props.connectDragSource!(
+      this.props.connectDropTarget!(
+        <div onClick={this.handleClick} className={className}>
+          {this.props.label ? <div className="block-wrapper-label">{this.props.label}</div> : null}
+          {selected ? (
+            <span className="delete-block" onClick={this.props.onRemove}>
+              <i className="fa fa-remove" />
+            </span>
+          ) : null}
+          {this.renderHover()}
+          {this.props.children}
+        </div>
       )
     )
   }

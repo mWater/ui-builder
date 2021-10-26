@@ -1,5 +1,5 @@
 import { DropdownFilterBlockDef } from "./dropdownFilter";
-import { InstanceCtx } from '../../../contexts';
+import { InstanceCtx } from "../../../contexts";
 /** Dropdown filter that is an id */
 export declare const IdInstance: (props: {
     blockDef: DropdownFilterBlockDef;

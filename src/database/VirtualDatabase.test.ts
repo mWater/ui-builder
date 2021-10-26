@@ -1,9 +1,9 @@
-import VirtualDatabase from "./VirtualDatabase";
-import mockDatabase from "../__fixtures__/mockDatabase";
-import simpleSchema from "../__fixtures__/schema";
-import { QueryOptions } from "./Database";
-import { Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions";
-import * as _ from "lodash";
+import VirtualDatabase from "./VirtualDatabase"
+import mockDatabase from "../__fixtures__/mockDatabase"
+import simpleSchema from "../__fixtures__/schema"
+import { QueryOptions } from "./Database"
+import { Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow } from "mwater-expressions"
+import * as _ from "lodash"
 
 const schema = simpleSchema()
 let db: any
@@ -33,15 +33,24 @@ const preventPassthrough = () => {
 }
 
 test("shouldIncludeColumn includes regular columns and joins without inverse", () => {
-  expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" }})).toBe(true)
-  expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" }, expr: { type: "literal", valueType: "text", value: "xyz"}})).toBe(false)
+  expect(vdb.shouldIncludeColumn({ id: "text", type: "text", name: { _base: "en" } })).toBe(true)
+  expect(
+    vdb.shouldIncludeColumn({
+      id: "text",
+      type: "text",
+      name: { _base: "en" },
+      expr: { type: "literal", valueType: "text", value: "xyz" }
+    })
+  ).toBe(false)
   expect(vdb.shouldIncludeColumn(schema.getColumn("t1", "1-2")!)).toBe(false)
   expect(vdb.shouldIncludeColumn(schema.getColumn("t2", "id1")!)).toBe(true)
 })
 
 test("trigger change if underlying database changed", () => {
   let changed = false
-  vdb.addChangeListener(() => { changed = true })
+  vdb.addChangeListener(() => {
+    changed = true
+  })
 
   // Fire change
   db.addChangeListener.mock.calls[0][0]()
@@ -50,18 +59,22 @@ test("trigger change if underlying database changed", () => {
 })
 
 test("queries with where clause and included columns", async () => {
-  (db.query as jest.Mock).mockResolvedValue([])
-  preventPassthrough()    // Test how queries are transformed by preventing passthrough
+  ;(db.query as jest.Mock).mockResolvedValue([])
+  preventPassthrough() // Test how queries are transformed by preventing passthrough
 
-  await vdb.query({
-    select: {
-      x: { type: "field", table: "t2", column: "text" }
+  await vdb.query(
+    {
+      select: {
+        x: { type: "field", table: "t2", column: "text" }
+      },
+      from: "t2",
+      where: t2Where,
+      orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: "desc" }],
+      limit: 10
     },
-    from: "t2",
-    where: t2Where,
-    orderBy: [{ expr: { type: "field", table: "t2", column: "text" }, dir: "desc" }],
-    limit: 10
-  }, [], {})
+    [],
+    {}
+  )
 
   expect(db.query.mock.calls[0][0]).toEqual({
     select: {
@@ -83,7 +96,7 @@ describe("select, order, limit", () => {
       // Get rows
       let rows: any[]
       rows = rawRowsByTable[qo.from]
-      
+
       // Filter rows by where
       if (qo.where) {
         const exprEval = new PromiseExprEvaluator({ schema })
@@ -102,7 +115,7 @@ describe("select, order, limit", () => {
       }
 
       // Prepend c_ to non-id columns
-      rows = rows.map((row: any) => _.mapKeys(row, (v, k: string) => k === "id" ? "id" : "c_" + k))
+      rows = rows.map((row: any) => _.mapKeys(row, (v, k: string) => (k === "id" ? "id" : "c_" + k)))
 
       return rows
     }) as any
@@ -112,35 +125,38 @@ describe("select, order, limit", () => {
   }
 
   test("simple query", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "field", table: "t1", column: "text" }},
+      select: { x: { type: "field", table: "t1", column: "text" } },
       from: "t1"
     }
 
     const rows = await performQuery({ t1: [{ id: 1, text: "abc" }] }, qopts)
-    expect(rows).toEqual([
-      { x: "abc" }
-    ])
+    expect(rows).toEqual([{ x: "abc" }])
   })
 
   test("aggr count expr", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { 
+      select: {
         x: { type: "field", table: "t1", column: "text" },
         y: { type: "op", table: "t1", op: "count", exprs: [] }
       },
       from: "t1"
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1, text: "abc" },
-      { id: 2, text: "abc" },
-      { id: 3, text: "def" }
-    ] }, qopts)
+    const rows = await performQuery(
+      {
+        t1: [
+          { id: 1, text: "abc" },
+          { id: 2, text: "abc" },
+          { id: 3, text: "def" }
+        ]
+      },
+      qopts
+    )
 
     expect(rows).toEqual([
       { x: "abc", y: 2 },
@@ -149,10 +165,10 @@ describe("select, order, limit", () => {
   })
 
   test("count empty", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { 
+      select: {
         x: { type: "op", table: "t1", op: "count", exprs: [] }
       },
       from: "t1"
@@ -160,177 +176,179 @@ describe("select, order, limit", () => {
 
     const rows = await performQuery({ t1: [] }, qopts)
 
-    expect(rows).toEqual([
-      { x: 0 },
-    ])
+    expect(rows).toEqual([{ x: 0 }])
   })
 
   test("orderby query with limit", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "field", table: "t1", column: "text" }},
+      select: { x: { type: "field", table: "t1", column: "text" } },
       from: "t1",
       orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }],
       limit: 2
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1, text: "a", number: 1 },
-      { id: 2, text: "b", number: 2 },
-      { id: 3, text: "c", number: 3 }
-    ] }, qopts)
-    expect(rows).toEqual([
-      { x: "c" },
-      { x: "b" }
-    ])
+    const rows = await performQuery(
+      {
+        t1: [
+          { id: 1, text: "a", number: 1 },
+          { id: 2, text: "b", number: 2 },
+          { id: 3, text: "c", number: 3 }
+        ]
+      },
+      qopts
+    )
+    expect(rows).toEqual([{ x: "c" }, { x: "b" }])
   })
 
   test("orderby query with capitalization", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "id", table: "t1" }},
+      select: { x: { type: "id", table: "t1" } },
       from: "t1",
       orderBy: [
         { expr: { type: "field", table: "t1", column: "text" }, dir: "asc" },
         { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
-      ],
+      ]
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1, text: "a", number: 1 },
-      { id: 2, text: "a", number: 2 },
-      { id: 3, text: "b", number: 3 },
-      { id: 4, text: "A", number: 4 }
-    ] }, qopts)
+    const rows = await performQuery(
+      {
+        t1: [
+          { id: 1, text: "a", number: 1 },
+          { id: 2, text: "a", number: 2 },
+          { id: 3, text: "b", number: 3 },
+          { id: 4, text: "A", number: 4 }
+        ]
+      },
+      qopts
+    )
 
-    expect(rows).toEqual([
-      { x: 2 },
-      { x: 1 },
-      { x: 4 },
-      { x: 3 }
-    ])
+    expect(rows).toEqual([{ x: 2 }, { x: 1 }, { x: 4 }, { x: 3 }])
   })
 
   test("orderby query with nulls", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "id", table: "t1" }},
+      select: { x: { type: "id", table: "t1" } },
       from: "t1",
       orderBy: [
         { expr: { type: "field", table: "t1", column: "text" }, dir: "asc" },
         { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
-      ],
+      ]
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1, text: "a", number: 1 },
-      { id: 2, text: null, number: 2 },
-      { id: 3, text: "b", number: 3 },
-      { id: 4, text: "z", number: 4 }
-    ] }, qopts)
+    const rows = await performQuery(
+      {
+        t1: [
+          { id: 1, text: "a", number: 1 },
+          { id: 2, text: null, number: 2 },
+          { id: 3, text: "b", number: 3 },
+          { id: 4, text: "z", number: 4 }
+        ]
+      },
+      qopts
+    )
 
-    expect(rows).toEqual([
-      { x: 1 },
-      { x: 3 },
-      { x: 4 },
-      { x: 2 }
-    ])
+    expect(rows).toEqual([{ x: 1 }, { x: 3 }, { x: 4 }, { x: 2 }])
   })
 
   test("orderby query with numbers", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "id", table: "t1" }},
+      select: { x: { type: "id", table: "t1" } },
       from: "t1",
-      orderBy: [
-        { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
-      ],
+      orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }]
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1, number: 1 },
-      { id: 2, number: 2 },
-      { id: 3, number: 3 },
-      { id: 4, number: 11 }
-    ] }, qopts)
+    const rows = await performQuery(
+      {
+        t1: [
+          { id: 1, number: 1 },
+          { id: 2, number: 2 },
+          { id: 3, number: 3 },
+          { id: 4, number: 11 }
+        ]
+      },
+      qopts
+    )
 
-    expect(rows).toEqual([
-      { x: 4 },
-      { x: 3 },
-      { x: 2 },
-      { x: 1 }
-    ])
+    expect(rows).toEqual([{ x: 4 }, { x: 3 }, { x: 2 }, { x: 1 }])
   })
 
   test("id join", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "field", table: "t2", column: "id1" }},
+      select: { x: { type: "field", table: "t2", column: "id1" } },
       from: "t2"
     }
 
-    const rows = await performQuery({ t1: [
-      { id: "a", text: "a", number: 1 }
-    ], t2: [
-      { id: 1, text: "a", number: 1, "id1": "a" }
-    ] }, qopts)
+    const rows = await performQuery(
+      { t1: [{ id: "a", text: "a", number: 1 }], t2: [{ id: 1, text: "a", number: 1, id1: "a" }] },
+      qopts
+    )
 
-    expect(rows).toEqual([
-      { x: "a" }
-    ])
+    expect(rows).toEqual([{ x: "a" }])
   })
 
   test("n-1 scalar", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "scalar", joins: ["id1"], table: "t2", expr: { type: "field", table: "t1", column: "text" } } },
+      select: {
+        x: { type: "scalar", joins: ["id1"], table: "t2", expr: { type: "field", table: "t1", column: "text" } }
+      },
       from: "t2"
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1, text: "abc" }
-    ], t2: [
-      { id: 101, "id1": 1 }
-    ] }, qopts)
-    expect(rows).toEqual([
-      { x: "abc" }
-    ])
+    const rows = await performQuery({ t1: [{ id: 1, text: "abc" }], t2: [{ id: 101, id1: 1 }] }, qopts)
+    expect(rows).toEqual([{ x: "abc" }])
   })
 
   test("1-n scalar", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "scalar", joins: ["1-2"], table: "t1", expr: {
-        type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t2", column: "number" }] } } },
+      select: {
+        x: {
+          type: "scalar",
+          joins: ["1-2"],
+          table: "t1",
+          expr: {
+            type: "op",
+            op: "sum",
+            table: "t1",
+            exprs: [{ type: "field", table: "t2", column: "number" }]
+          }
+        }
+      },
       from: "t1"
     }
 
-    const rows = await performQuery({ t1: [
-      { id: 1 },
-      { id: 2 }
-    ], t2: [
-      { id: 101, "id1": 1, number: 1 },
-      { id: 102, "id1": 1, number: 2 },
-      { id: 103, "id1": 2, number: 4 }
-    ]}, qopts)
-    expect(rows).toEqual([
-      { x: 3 },
-      { x: 4 }
-    ])
+    const rows = await performQuery(
+      {
+        t1: [{ id: 1 }, { id: 2 }],
+        t2: [
+          { id: 101, id1: 1, number: 1 },
+          { id: 102, id1: 1, number: 2 },
+          { id: 103, id1: 2, number: 4 }
+        ]
+      },
+      qopts
+    )
+    expect(rows).toEqual([{ x: 3 }, { x: 4 }])
   })
 
   test("caches backend queries", async () => {
-    preventPassthrough()    // Test how queries are transformed by preventing passthrough
+    preventPassthrough() // Test how queries are transformed by preventing passthrough
 
     const qopts: QueryOptions = {
-      select: { x: { type: "field", table: "t1", column: "text" }},
+      select: { x: { type: "field", table: "t1", column: "text" } },
       from: "t1"
     }
 
@@ -345,12 +363,17 @@ describe("select, order, limit", () => {
     await tx.commit()
 
     const qopts: QueryOptions = {
-      select: { x: { type: "field", table: "t1", column: "text" }},
+      select: { x: { type: "field", table: "t1", column: "text" } },
       from: "t1",
-      where: { type: "op", table: "t1", op: "=", exprs: [
-        { type: "id", table: "t1" }, 
-        { type: "literal", valueType: "id", value: pk }
-      ]}
+      where: {
+        type: "op",
+        table: "t1",
+        op: "=",
+        exprs: [
+          { type: "id", table: "t1" },
+          { type: "literal", valueType: "id", value: pk }
+        ]
+      }
     }
 
     // Should not crash as doesn't pass along
@@ -362,34 +385,31 @@ describe("select, order, limit", () => {
     const qopts: QueryOptions = {
       select: { x: numberField },
       from: "t1",
-      where: { type: "op", op: ">", table: "t1", exprs: [
-        numberField,
-        { type: "literal", valueType: "number", value: 3 }
-      ]},
+      where: {
+        type: "op",
+        op: ">",
+        table: "t1",
+        exprs: [numberField, { type: "literal", valueType: "number", value: 3 }]
+      },
       orderBy: [{ expr: numberField, dir: "asc" }]
     }
 
     test("waits until transaction committed", async () => {
-      preventPassthrough()    // Test how queries are transformed by preventing passthrough
+      preventPassthrough() // Test how queries are transformed by preventing passthrough
 
       vdb.transaction().addRow("t1", { number: 6 })
-  
+
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 5 }
-      ])
+      expect(rows).toEqual([{ x: 5 }])
     })
 
     test("insert relevant row", async () => {
       const txn = vdb.transaction()
       await txn.addRow("t1", { number: 6 })
       await txn.commit()
-  
+
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 5 },
-        { x: 6 }
-      ])
+      expect(rows).toEqual([{ x: 5 }, { x: 6 }])
     })
 
     test("insert irrelevant rows", async () => {
@@ -397,57 +417,77 @@ describe("select, order, limit", () => {
       await txn.addRow("t1", { number: 1 })
       await txn.addRow("t2", { number: 6 })
       await txn.commit()
-  
+
       const rows = await performQuery({ t1: [{ id: 1, number: 5 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 5 }
-      ])
+      expect(rows).toEqual([{ x: 5 }])
     })
 
     test("update relevant row", async () => {
       const txn = vdb.transaction()
       txn.updateRow("t1", 1, { number: 7 })
       txn.commit()
-  
-      const rows = await performQuery({ t1: [{ id: 1, number: 5 }, { id: 2, number: 6 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 6 },
-        { x: 7 }
-      ])
+
+      const rows = await performQuery(
+        {
+          t1: [
+            { id: 1, number: 5 },
+            { id: 2, number: 6 }
+          ]
+        },
+        qopts
+      )
+      expect(rows).toEqual([{ x: 6 }, { x: 7 }])
     })
 
     test("update relevant row to become irrelevant", async () => {
       const txn = vdb.transaction()
       txn.updateRow("t1", 1, { number: 2 })
       txn.commit()
-  
-      const rows = await performQuery({ t1: [{ id: 1, number: 5 }, { id: 2, number: 6 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 6 }
-      ])
+
+      const rows = await performQuery(
+        {
+          t1: [
+            { id: 1, number: 5 },
+            { id: 2, number: 6 }
+          ]
+        },
+        qopts
+      )
+      expect(rows).toEqual([{ x: 6 }])
     })
 
     test("update irrelevant row to become relevant", async () => {
       const txn = vdb.transaction()
       txn.updateRow("t1", 1, { number: 7 })
       txn.commit()
-  
-      const rows = await performQuery({ t1: [{ id: 1, number: 2 }, { id: 2, number: 6 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 6 },
-        { x: 7 }
-      ])
+
+      const rows = await performQuery(
+        {
+          t1: [
+            { id: 1, number: 2 },
+            { id: 2, number: 6 }
+          ]
+        },
+        qopts
+      )
+      expect(rows).toEqual([{ x: 6 }, { x: 7 }])
     })
 
     test("remove relevant row", async () => {
       const txn = vdb.transaction()
       txn.removeRow("t1", 1)
       txn.commit()
-  
-      const rows = await performQuery({ t1: [{ id: 1, number: 5 }, { id: 2, number: 6 }] }, qopts)
-      expect(rows).toEqual([
-        { x: 6 }
-      ])
+
+      const rows = await performQuery(
+        {
+          t1: [
+            { id: 1, number: 5 },
+            { id: 2, number: 6 }
+          ]
+        },
+        qopts
+      )
+      expect(rows).toEqual([{ x: 6 }])
     })
 
     test("notifies change listener", async () => {
@@ -474,9 +514,9 @@ describe("select, order, limit", () => {
         updateRow: jest.fn(),
         removeRow: jest.fn(),
         commit: jest.fn()
-      };
+      }
 
-      (db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+      ;(db.transaction as jest.Mock).mockReturnValue(mockTransaction)
 
       // Commit to underlying database
       await vdb.commit()
@@ -493,12 +533,14 @@ describe("select, order, limit", () => {
       await txn.updateRow("t1", pk, { number: 2 })
       await txn.commit()
 
-      expect(vdb.mutations).toEqual([{
-        type: "add",
-        table: "t1",
-        primaryKey: pk,
-        values: { number: 2 }
-      }])
+      expect(vdb.mutations).toEqual([
+        {
+          type: "add",
+          table: "t1",
+          primaryKey: pk,
+          values: { number: 2 }
+        }
+      ])
     })
 
     test("shortcuts updating row", async () => {
@@ -507,12 +549,14 @@ describe("select, order, limit", () => {
       await txn.updateRow("t1", 1, { number: 3 })
       await txn.commit()
 
-      expect(vdb.mutations).toEqual([{
-        type: "update",
-        table: "t1",
-        primaryKey: 1,
-        updates: { number: 3 }
-      }])
+      expect(vdb.mutations).toEqual([
+        {
+          type: "update",
+          table: "t1",
+          primaryKey: 1,
+          updates: { number: 3 }
+        }
+      ])
     })
 
     test("shortcuts removing inserted row", async () => {
@@ -523,7 +567,6 @@ describe("select, order, limit", () => {
 
       expect(vdb.mutations).toEqual([])
     })
-
 
     test("substitutes temporary primary keys", async () => {
       // Create changes
@@ -539,8 +582,8 @@ describe("select, order, limit", () => {
         updateRow: jest.fn(),
         removeRow: jest.fn(),
         commit: jest.fn()
-      };
-      (db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+      }
+      ;(db.transaction as jest.Mock).mockReturnValue(mockTransaction)
 
       // Mock return pks
       mockTransaction.addRow.mockResolvedValueOnce("PKA")
@@ -567,8 +610,8 @@ describe("select, order, limit", () => {
         updateRow: jest.fn(),
         removeRow: jest.fn(),
         commit: jest.fn()
-      };
-      (db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+      }
+      ;(db.transaction as jest.Mock).mockReturnValue(mockTransaction)
 
       // Commit to underlying database
       await vdb.commit()

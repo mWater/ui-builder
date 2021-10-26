@@ -1,12 +1,12 @@
-import * as React from 'react';
-import LeafBlock from '../LeafBlock'
-import { BlockDef } from '../blocks'
-import { LabeledProperty, PropertyEditor, ActionDefEditor } from '../propertyEditors';
-import { TextInput, Select, Toggle } from 'react-library/lib/bootstrap';
-import { ActionDef } from '../actions';
-import produce from 'immer';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import './image.css'
+import * as React from "react"
+import LeafBlock from "../LeafBlock"
+import { BlockDef } from "../blocks"
+import { LabeledProperty, PropertyEditor, ActionDefEditor } from "../propertyEditors"
+import { TextInput, Select, Toggle } from "react-library/lib/bootstrap"
+import { ActionDef } from "../actions"
+import produce from "immer"
+import { DesignCtx, InstanceCtx } from "../../contexts"
+import "./image.css"
 
 export interface ImageBlockDef extends BlockDef {
   type: "image"
@@ -33,7 +33,7 @@ export interface ImageBlockDef extends BlockDef {
 
 /** Simple static image block */
 export class ImageBlock extends LeafBlock<ImageBlockDef> {
-  validate(designCtx: DesignCtx) { 
+  validate(designCtx: DesignCtx) {
     if (!this.blockDef.url) {
       return "URL required"
     }
@@ -49,27 +49,26 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
         return error
       }
     }
-    return null 
+    return null
   }
 
   renderImage(locale: string, handleClick?: () => void) {
     if (!this.blockDef.url) {
-      return <i className="fa fa-picture-o"/>
+      return <i className="fa fa-picture-o" />
     }
 
     var url
     if (this.blockDef.localizedUrls && this.blockDef.localizedUrls[locale]) {
       url = this.blockDef.localizedUrls[locale]
-    }
-    else {
+    } else {
       url = this.blockDef.url
     }
-    
+
     const sizeMode = this.blockDef.sizeMode || "normal"
 
     return (
       <div onClick={handleClick} className={`image-block-div-${sizeMode}`} style={{ textAlign: this.blockDef.align }}>
-        <img src={url}  className={`image-block-img-${sizeMode}`} />
+        <img src={url} className={`image-block-img-${sizeMode}`} />
       </div>
     )
   }
@@ -92,20 +91,7 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
   }
 
   renderEditor(props: DesignCtx) {
-    const locales = [
-      "en",
-      "fr",
-      "es",
-      "pt",
-      "sw",
-      "tet",
-      "id",
-      "ht",
-      "my",
-      "km",
-      "bn",
-      "am"
-    ]
+    const locales = ["en", "fr", "es", "pt", "sw", "tet", "id", "ht", "my", "km", "bn", "am"]
     const localizedUrls = this.blockDef.localizedUrls || {}
 
     return (
@@ -118,63 +104,65 @@ export class ImageBlock extends LeafBlock<ImageBlockDef> {
 
         <LabeledProperty label="Size Mode">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="sizeMode">
-            {(value, onChange) => 
-              <Select value={value || "normal"} onChange={onChange}
-              options={[
-                { value: "normal", label: "Normal"},
-                { value: "fullwidth", label: "Full width"},
-                { value: "banner", label: "Banner (deprecated)"}
-              ]}/> }
+            {(value, onChange) => (
+              <Select
+                value={value || "normal"}
+                onChange={onChange}
+                options={[
+                  { value: "normal", label: "Normal" },
+                  { value: "fullwidth", label: "Full width" },
+                  { value: "banner", label: "Banner (deprecated)" }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Alignment">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
-            {(value, onChange) => 
-              <Toggle 
-                value={value || "left"} 
-                onChange={onChange} 
+            {(value, onChange) => (
+              <Toggle
+                value={value || "left"}
+                onChange={onChange}
                 options={[
-                  { value: "left", label: <i className="fa fa-align-left"/> },
-                  { value: "center", label: <i className="fa fa-align-center"/> },
-                  { value: "right", label: <i className="fa fa-align-right"/> },
-                ]} />
-            }
+                  { value: "left", label: <i className="fa fa-align-left" /> },
+                  { value: "center", label: <i className="fa fa-align-center" /> },
+                  { value: "right", label: <i className="fa fa-align-right" /> }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="When image clicked">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="clickActionDef">
-            {(value, onChange) => (
-              <ActionDefEditor 
-                value={value} 
-                onChange={onChange} 
-                designCtx={props} />
-            )}
+            {(value, onChange) => <ActionDefEditor value={value} onChange={onChange} designCtx={props} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Locale-specific URL overrides">
-        { locales.map(locale => {
-          const onChange = (url: string | null) => {
-            props.store.replaceBlock(produce(this.blockDef, bd => {
-              if (url) {
-                bd.localizedUrls = bd.localizedUrls || {}
-                bd.localizedUrls[locale] = url
-              }
-              else {
-                bd.localizedUrls = bd.localizedUrls || {}
-                delete bd.localizedUrls[locale]
-              }
-            }))
-          }
-          return <LabeledProperty label={locale}>
-            <TextInput value={localizedUrls[locale]} onChange={onChange} emptyNull />
-          </LabeledProperty>
-        })}
-      </LabeledProperty>
-
-    </div>
+          {locales.map((locale) => {
+            const onChange = (url: string | null) => {
+              props.store.replaceBlock(
+                produce(this.blockDef, (bd) => {
+                  if (url) {
+                    bd.localizedUrls = bd.localizedUrls || {}
+                    bd.localizedUrls[locale] = url
+                  } else {
+                    bd.localizedUrls = bd.localizedUrls || {}
+                    delete bd.localizedUrls[locale]
+                  }
+                })
+              )
+            }
+            return (
+              <LabeledProperty label={locale}>
+                <TextInput value={localizedUrls[locale]} onChange={onChange} emptyNull />
+              </LabeledProperty>
+            )
+          })}
+        </LabeledProperty>
+      </div>
     )
   }
 }

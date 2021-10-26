@@ -3,7 +3,7 @@ import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema } from "mwater-expressions";
 import { ContextVar } from "../../blocks";
 import { Database } from "../../../database/Database";
-import { InstanceCtx } from '../../../contexts';
+import { InstanceCtx } from "../../../contexts";
 /** Dropdown filter that is a text[]. Should search in database for matches, returning value to match */
 export default class TextArrInstance extends React.Component<{
     blockDef: DropdownFilterBlockDef;

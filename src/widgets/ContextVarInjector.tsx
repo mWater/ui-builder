@@ -1,10 +1,10 @@
-import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables, createExprVariableValues } from "./blocks";
-import * as React from "react";
-import { Expr, ExprUtils, Schema, Variable, PromiseExprEvaluator } from "mwater-expressions";
-import { QueryOptions, Database } from "../database/Database";
-import canonical from 'canonical-json'
-import _ from "lodash";
-import { InstanceCtx, getFilteredContextVarValues } from "../contexts";
+import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables, createExprVariableValues } from "./blocks"
+import * as React from "react"
+import { Expr, ExprUtils, Schema, Variable, PromiseExprEvaluator } from "mwater-expressions"
+import { QueryOptions, Database } from "../database/Database"
+import canonical from "canonical-json"
+import _ from "lodash"
+import { InstanceCtx, getFilteredContextVarValues } from "../contexts"
 
 interface Props {
   injectedContextVar: ContextVar
@@ -28,7 +28,7 @@ interface State {
   filteredContextVarValues: { [contextVarId: string]: any }
 }
 
-/** Injects one context variable into the inner render instance props. 
+/** Injects one context variable into the inner render instance props.
  * Holds state of the filters that are applied to rowset-type context vars
  * Computes values of expressions for row and rowset types
  */
@@ -60,10 +60,11 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props, prevState: State) {
     // If value change, filters change, or any context var values changes, refresh
     // TODO context var value changes are only relevant if referenced as a variable. Could be optimized
-    if (!_.isEqual(prevProps.value, this.props.value) 
-      || !_.isEqual(prevState.filters, this.state.filters)
-      || !_.isEqual(getFilteredContextVarValues(this.createInnerProps()), this.state.filteredContextVarValues)
-      ) {
+    if (
+      !_.isEqual(prevProps.value, this.props.value) ||
+      !_.isEqual(prevState.filters, this.state.filters) ||
+      !_.isEqual(getFilteredContextVarValues(this.createInnerProps()), this.state.filteredContextVarValues)
+    ) {
       this.performQueries()
     }
   }
@@ -81,16 +82,19 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     const queryOptions: QueryOptions = {
       select: {},
       from: table,
-      where: { 
+      where: {
         type: "op",
         op: "=",
         table: table,
-        exprs: [{ type: "id", table: table }, { type: "literal", valueType: "id", idTable: table, value: this.props.value }]
+        exprs: [
+          { type: "id", table: table },
+          { type: "literal", valueType: "id", idTable: table, value: this.props.value }
+        ]
       }
     }
 
     // Add expressions as selects
-    for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
+    for (let i = 0; i < this.props.contextVarExprs!.length; i++) {
       queryOptions.select["e" + i] = this.props.contextVarExprs![i]
     }
 
@@ -108,10 +112,12 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
     // Add expressions as selects (only if aggregate for rowset)
     const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
-    const aggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
+    const aggrExpressions = this.props.contextVarExprs!.filter(
+      (expr) => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal"
+    )
 
     // Add expressions as selects
-    for (let i = 0 ; i < aggrExpressions.length ; i++) {
+    for (let i = 0; i < aggrExpressions.length; i++) {
       queryOptions.select["e" + i] = aggrExpressions[i]
     }
 
@@ -121,7 +127,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         type: "op",
         table: table,
         op: "and",
-        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map(f => f.expr))))
+        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map((f) => f.expr))))
       }
       if (queryOptions.where.exprs.length === 0) {
         queryOptions.where = null
@@ -149,7 +155,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         type: "op",
         table: table,
         op: "and",
-        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map(f => f.expr))))
+        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map((f) => f.expr))))
       }
       if (queryOptions.where.exprs.length === 0) {
         queryOptions.where = null
@@ -176,7 +182,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
     this.setState({ refreshing: true, filteredContextVarValues: variableValues })
 
-    // Query database if row 
+    // Query database if row
     if (this.props.injectedContextVar.type === "row") {
       // Special case of null row value
       if (this.props.value == null) {
@@ -210,10 +216,9 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
         if (rows.length === 0) {
           this.setState({ exprValues: {} })
-        }
-        else {
+        } else {
           const exprValues = {}
-          for (let i = 0 ; i < this.props.contextVarExprs!.length ; i++) {
+          for (let i = 0; i < this.props.contextVarExprs!.length; i++) {
             exprValues[canonical(this.props.contextVarExprs![i])] = rows[0]["e" + i]
           }
           this.setState({ exprValues })
@@ -228,25 +233,32 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     if (this.props.injectedContextVar.type === "rowset") {
       this.setState({ refreshing: true })
       const table: string = this.props.injectedContextVar.table!
-      
+
       // Perform query
       const queryAggrOptions = this.createRowsetAggrQueryOptions(table, variables)
       try {
         const exprUtils = new ExprUtils(this.props.instanceCtx.schema, variables)
-        const aggrExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal")
-        const individualExpressions = this.props.contextVarExprs!.filter(expr => exprUtils.getExprAggrStatus(expr) === "individual")
+        const aggrExpressions = this.props.contextVarExprs!.filter(
+          (expr) => exprUtils.getExprAggrStatus(expr) === "aggregate" || exprUtils.getExprAggrStatus(expr) === "literal"
+        )
+        const individualExpressions = this.props.contextVarExprs!.filter(
+          (expr) => exprUtils.getExprAggrStatus(expr) === "individual"
+        )
 
         const exprValues = {}
 
         // Perform one big query for all non-individual
-        const aggrRows = await this.props.instanceCtx.database.query(queryAggrOptions, innerProps.contextVars, getFilteredContextVarValues(innerProps))
+        const aggrRows = await this.props.instanceCtx.database.query(
+          queryAggrOptions,
+          innerProps.contextVars,
+          getFilteredContextVarValues(innerProps)
+        )
         if (aggrRows.length > 0) {
-          for (let i = 0 ; i < aggrExpressions.length ; i++) {
+          for (let i = 0; i < aggrExpressions.length; i++) {
             exprValues[canonical(aggrExpressions[i])] = aggrRows[0]["e" + i]
           }
-        }
-        else {
-          for (let i = 0 ; i < aggrExpressions.length ; i++) {
+        } else {
+          for (let i = 0; i < aggrExpressions.length; i++) {
             exprValues[canonical(aggrExpressions[i])] = null
           }
         }
@@ -254,11 +266,14 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         // Perform individual queries for individual expressions
         for (const individualExpression of individualExpressions) {
           const queryIndividualOptions = this.createRowsetIndividualQueryOptions(table, variables, individualExpression)
-          const individualRows = await this.props.instanceCtx.database.query(queryIndividualOptions, innerProps.contextVars, getFilteredContextVarValues(innerProps))
+          const individualRows = await this.props.instanceCtx.database.query(
+            queryIndividualOptions,
+            innerProps.contextVars,
+            getFilteredContextVarValues(innerProps)
+          )
           if (individualRows.length == 1) {
             exprValues[canonical(individualExpression)] = individualRows[0].value
-          }
-          else {
+          } else {
             exprValues[canonical(individualExpression)] = null
           }
         }
@@ -277,7 +292,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
         if (this.unmounted) {
           return
         }
-        
+
         // Save values
         this.setState({ exprValues })
       } catch (error) {
@@ -312,8 +327,8 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
         // If no context variable, evaluate expression
         if (contextVarId == null) {
-          return new PromiseExprEvaluator({ 
-            schema: outer.schema, 
+          return new PromiseExprEvaluator({
+            schema: outer.schema,
             locale: outer.locale,
             variables: createExprVariables(contextVars),
             variableValues: createExprVariableValues(contextVars, contextVarValues)
@@ -322,35 +337,32 @@ export default class ContextVarInjector extends React.Component<Props, State> {
 
         if (contextVarId === this.props.injectedContextVar.id) {
           return this.state.exprValues[canonical(expr)]
-        }
-        else {
+        } else {
           return outer.getContextVarExprValue(contextVarId, expr)
         }
       },
       setFilter: (contextVarId, filter) => {
         if (contextVarId === this.props.injectedContextVar.id) {
           // Remove existing with same id
-          const filters = this.state.filters.filter(f => f.id !== filter.id)
+          const filters = this.state.filters.filter((f) => f.id !== filter.id)
           filters.push(filter)
           return this.setState({ filters })
-        }
-        else {
+        } else {
           return outer.setFilter(contextVarId, filter)
         }
       },
       getFilters: (contextVarId) => {
         if (contextVarId === this.props.injectedContextVar.id) {
           return this.state.filters
-        }
-        else {
+        } else {
           return outer.getFilters(contextVarId)
         }
-      },
+      }
     }
 
     return innerProps
   }
-  
+
   render() {
     if (this.state.error) {
       // TODO localize

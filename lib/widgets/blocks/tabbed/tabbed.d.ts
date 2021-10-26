@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
-import { LocalizedString } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../../blocks";
+import { LocalizedString } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
 export interface TabbedBlockTab {
     /** Unique id for tab */
     id: string;

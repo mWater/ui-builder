@@ -1,16 +1,16 @@
-import produce from 'immer'
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
-import * as _ from 'lodash';
-import { LabeledProperty, PropertyEditor, ResponsiveWidthSelector } from '../propertyEditors';
-import { Checkbox, Select } from 'react-library/lib/bootstrap';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import produce from "immer"
+import * as React from "react"
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks"
+import * as _ from "lodash"
+import { LabeledProperty, PropertyEditor, ResponsiveWidthSelector } from "../propertyEditors"
+import { Checkbox, Select } from "react-library/lib/bootstrap"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 export interface CollapsibleBlockDef extends BlockDef {
   type: "collapsible"
   label: BlockDef | null
   content: BlockDef | null
-  
+
   /** True if collapsible section is initially collapsed */
   initialCollapsed?: boolean
 
@@ -20,15 +20,20 @@ export interface CollapsibleBlockDef extends BlockDef {
 
 export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
-    return _.compact([this.blockDef.label, this.blockDef.content]).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+    return _.compact([this.blockDef.label, this.blockDef.content]).map((bd) => ({
+      blockDef: bd!,
+      contextVars: contextVars
+    }))
   }
 
-  validate() { return null }
- 
+  validate() {
+    return null
+  }
+
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     const label = action(this.blockDef.label)
     const content = action(this.blockDef.content)
-    return produce(this.blockDef, draft => {
+    return produce(this.blockDef, (draft) => {
       draft.label = label
       draft.content = content
     })
@@ -37,17 +42,25 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
   renderDesign(props: DesignCtx) {
     // Allow dropping
     const handleSetLabel = (blockDef: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: CollapsibleBlockDef) => { 
-        b.label = blockDef 
-        return b
-      }), blockDef.id)
+      props.store.alterBlock(
+        this.id,
+        produce((b: CollapsibleBlockDef) => {
+          b.label = blockDef
+          return b
+        }),
+        blockDef.id
+      )
     }
 
     const handleSetContent = (blockDef: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: CollapsibleBlockDef) => { 
-        b.content = blockDef 
-        return b
-      }), blockDef.id)
+      props.store.alterBlock(
+        this.id,
+        produce((b: CollapsibleBlockDef) => {
+          b.content = blockDef
+          return b
+        }),
+        blockDef.id
+      )
     }
 
     const labelNode = props.renderChildBlock(props, this.blockDef.label, handleSetLabel)
@@ -62,15 +75,15 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
     )
   }
 
-  renderInstance(props: InstanceCtx) { 
-    const labelNode = this.blockDef.label ?
-      props.createBlock(this.blockDef.label).renderInstance(props) : null
+  renderInstance(props: InstanceCtx) {
+    const labelNode = this.blockDef.label ? props.createBlock(this.blockDef.label).renderInstance(props) : null
 
-    const contentNode = this.blockDef.content ?
-      props.createBlock(this.blockDef.content).renderInstance(props) : null
+    const contentNode = this.blockDef.content ? props.createBlock(this.blockDef.content).renderInstance(props) : null
 
     // Determine if initially collapsed
-    const initialCollapsed = this.blockDef.initialCollapsed || (this.blockDef.collapseWidth != null && window.innerWidth <= this.blockDef.collapseWidth)
+    const initialCollapsed =
+      this.blockDef.initialCollapsed ||
+      (this.blockDef.collapseWidth != null && window.innerWidth <= this.blockDef.collapseWidth)
 
     return (
       <div style={{ paddingTop: 5, paddingBottom: 5 }}>
@@ -85,7 +98,11 @@ export class CollapsibleBlock extends Block<CollapsibleBlockDef> {
     return (
       <div>
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="initialCollapsed">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Initially Collapsed</Checkbox>}
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Initially Collapsed
+            </Checkbox>
+          )}
         </PropertyEditor>
 
         <LabeledProperty label="Collapse Below Width">
@@ -122,18 +139,22 @@ export class CollapsibleComponent extends React.Component<Props, { collapsed: bo
   }
 
   render() {
-    return <div>
-      <table style={{width: "100%"}}>
-        <tbody>
-          <tr key="float" onClick={this.handleToggle} style={{ cursor: "pointer" }}>
-            <td key="left" style={{ verticalAlign: "middle", paddingRight: 5, fontSize: 18, color: "#3bd" }}>
-              { this.state.collapsed ? <i className="fa fa-caret-right"/> : <i className="fa fa-caret-down"/> }
-            </td>
-            <td key="main" style={{ width: "100%", verticalAlign: "middle" }}>{this.props.label}</td>
-          </tr>
-        </tbody>      
-      </table>
-      { !this.state.collapsed ? this.props.children : null}
-    </div>
+    return (
+      <div>
+        <table style={{ width: "100%" }}>
+          <tbody>
+            <tr key="float" onClick={this.handleToggle} style={{ cursor: "pointer" }}>
+              <td key="left" style={{ verticalAlign: "middle", paddingRight: 5, fontSize: 18, color: "#3bd" }}>
+                {this.state.collapsed ? <i className="fa fa-caret-right" /> : <i className="fa fa-caret-down" />}
+              </td>
+              <td key="main" style={{ width: "100%", verticalAlign: "middle" }}>
+                {this.props.label}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        {!this.state.collapsed ? this.props.children : null}
+      </div>
+    )
   }
 }

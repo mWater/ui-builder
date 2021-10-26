@@ -1,10 +1,10 @@
-import canonical from 'canonical-json'
+import canonical from "canonical-json"
 
 /** Cache that batches multiple identical requests to avoid repeating the same
  * query over and over while the first request is in progress
  */
 export class BatchingCache<R, V> {
-  cache: { [key: string] : BatchingCacheEntry<R, V> }
+  cache: { [key: string]: BatchingCacheEntry<R, V> }
   process: (request: R) => Promise<V>
 
   constructor(process: (request: R) => Promise<V>) {
@@ -39,24 +39,26 @@ export class BatchingCache<R, V> {
       this.cache[key] = entry
 
       // Perform actual process
-      this.process(request).then((value) => {
-        // Mark completed
-        entry.status = "complete"
-        entry.value = value
+      this.process(request)
+        .then((value) => {
+          // Mark completed
+          entry.status = "complete"
+          entry.value = value
 
-        // Resolve all promises
-        for (const promise of entry.promises) {
-          promise.resolve(value)
-        }
-      }).catch((err) => {
-        // Remove from cache
-        delete this.cache[key]
+          // Resolve all promises
+          for (const promise of entry.promises) {
+            promise.resolve(value)
+          }
+        })
+        .catch((err) => {
+          // Remove from cache
+          delete this.cache[key]
 
-        // Reject all promises
-        for (const promise of entry.promises) {
-          promise.reject(err)
-        }
-      })
+          // Reject all promises
+          for (const promise of entry.promises) {
+            promise.reject(err)
+          }
+        })
     })
   }
 }
@@ -65,5 +67,5 @@ interface BatchingCacheEntry<R, V> {
   request: R
   status: "pending" | "complete"
   value?: V
-  promises: { resolve: (v: V) => void, reject: (error: any) => void }[]
+  promises: { resolve: (v: V) => void; reject: (error: any) => void }[]
 }

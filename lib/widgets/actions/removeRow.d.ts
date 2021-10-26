@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { InstanceCtx, DesignCtx } from '../../contexts';
+import { ActionDef, Action, RenderActionEditorProps } from "../actions";
+import { InstanceCtx, DesignCtx } from "../../contexts";
 export interface RemoveRowActionDef extends ActionDef {
     type: "removeRow";
     /** Context variable (row) to remove */

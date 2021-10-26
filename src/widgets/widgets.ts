@@ -1,32 +1,32 @@
-import { BaseCtx, DesignCtx } from '../contexts';
-import { validateContextVarValue } from '../contextVarValues';
-import { BlockDef, ContextVar, getBlockTree, NullBlockStore } from './blocks';
+import { BaseCtx, DesignCtx } from "../contexts"
+import { validateContextVarValue } from "../contextVarValues"
+import { BlockDef, ContextVar, getBlockTree, NullBlockStore } from "./blocks"
 
 /** Widget is named and has a single block with a set of context variables specific to this widget */
 export interface WidgetDef {
   /** Unique id (globally) */
-  id: string 
+  id: string
 
   /** Name of the widget */
-  name: string 
+  name: string
 
   /** Description of the widget */
-  description: string 
+  description: string
 
   /** Optional grouping of this widget */
   group?: string
 
   /** Block that it displays */
-  blockDef: BlockDef | null 
-    
+  blockDef: BlockDef | null
+
   /** Context variables that act as arguments that will be passed to inner block */
-  contextVars: ContextVar[] 
+  contextVars: ContextVar[]
 
   /** Preview values of context variables. Used only in designer for preview */
   contextVarPreviewValues: { [contextVarId: string]: any }
 
   /** Context variables that are created for this widget and are not passed in. */
-  privateContextVars?: ContextVar[] 
+  privateContextVars?: ContextVar[]
 
   /** Values of private context variables */
   privateContextVarValues?: { [contextVarId: string]: any }
@@ -50,7 +50,12 @@ export function validateWidget(widgetDef: WidgetDef, ctx: BaseCtx, includeChildr
 
   // Validate context var values
   for (const cv of widgetDef.contextVars) {
-    const error = validateContextVarValue(ctx.schema, cv, globalContextVars.concat(widgetDef.contextVars), widgetDef.contextVarPreviewValues[cv.id])
+    const error = validateContextVarValue(
+      ctx.schema,
+      cv,
+      globalContextVars.concat(widgetDef.contextVars),
+      widgetDef.contextVarPreviewValues[cv.id]
+    )
     if (error) {
       return error
     }
@@ -59,7 +64,12 @@ export function validateWidget(widgetDef: WidgetDef, ctx: BaseCtx, includeChildr
   // Validate private context var values
   const privateContextVars = widgetDef.privateContextVars || []
   for (const cv of privateContextVars) {
-    const error = validateContextVarValue(ctx.schema, cv, globalContextVars.concat(widgetDef.contextVars.concat(privateContextVars)), (widgetDef.privateContextVarValues || {})[cv.id])
+    const error = validateContextVarValue(
+      ctx.schema,
+      cv,
+      globalContextVars.concat(widgetDef.contextVars.concat(privateContextVars)),
+      (widgetDef.privateContextVarValues || {})[cv.id]
+    )
     if (error) {
       return error
     }
@@ -79,16 +89,18 @@ export function validateWidget(widgetDef: WidgetDef, ctx: BaseCtx, includeChildr
         store: new NullBlockStore(),
         blockPaletteEntries: [],
         selectedId: null,
-        renderChildBlock: () => { throw new Error("Not implemented") }
+        renderChildBlock: () => {
+          throw new Error("Not implemented")
+        }
       }
 
       const error = block.validate(blockDesignCtx)
-       
+
       if (error) {
         return error
       }
     }
   }
-  
+
   return null
 }

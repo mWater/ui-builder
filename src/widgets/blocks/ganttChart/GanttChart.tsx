@@ -1,18 +1,25 @@
-import produce from 'immer'
-import * as React from 'react'
-import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from '../../blocks'
-import { DesignCtx, InstanceCtx } from '../../../contexts'
-import LeafBlock from '../../LeafBlock'
-import { GanttChart } from 'react-library/lib/GanttChart'
-import { Expr, ExprValidator, LocalizedString } from 'mwater-expressions'
-import { ActionDefEditor, ContextVarPropertyEditor, EmbeddedExprsEditor, LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor } from '../../propertyEditors'
-import { ExprComponent } from 'mwater-expressions-ui'
-import { localize } from '../../localization'
-import { Checkbox, Select, TextInput } from 'react-library/lib/bootstrap'
-import DatePicker from 'react-datepicker'
-import moment from 'moment'
-import { GanttChartInstance } from './GanttChartInstance'
-import { ActionDef } from '../../actions'
+import produce from "immer"
+import * as React from "react"
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables } from "../../blocks"
+import { DesignCtx, InstanceCtx } from "../../../contexts"
+import LeafBlock from "../../LeafBlock"
+import { GanttChart } from "react-library/lib/GanttChart"
+import { Expr, ExprValidator, LocalizedString } from "mwater-expressions"
+import {
+  ActionDefEditor,
+  ContextVarPropertyEditor,
+  EmbeddedExprsEditor,
+  LabeledProperty,
+  LocalizedTextPropertyEditor,
+  PropertyEditor
+} from "../../propertyEditors"
+import { ExprComponent } from "mwater-expressions-ui"
+import { localize } from "../../localization"
+import { Checkbox, Select, TextInput } from "react-library/lib/bootstrap"
+import DatePicker from "react-datepicker"
+import moment from "moment"
+import { GanttChartInstance } from "./GanttChartInstance"
+import { ActionDef } from "../../actions"
 
 /** Gantt chart */
 export interface GanttChartBlockDef extends BlockDef {
@@ -71,16 +78,18 @@ export interface GanttChartBlockDef extends BlockDef {
 }
 
 export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
-  validate(designCtx: DesignCtx) { 
+  validate(designCtx: DesignCtx) {
     // Validate rowset
-    const rowsetCV = designCtx.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset")
+    const rowsetCV = designCtx.contextVars.find(
+      (cv) => cv.id === this.blockDef.rowsetContextVarId && cv.type === "rowset"
+    )
     if (!rowsetCV) {
       return "Rowset required"
     }
 
     const exprValidator = new ExprValidator(designCtx.schema, createExprVariables(designCtx.contextVars))
     let error: string | null
-    
+
     // Validate filter
     error = exprValidator.validateExpr(this.blockDef.filter, { table: rowsetCV.table, types: ["boolean"] })
     if (error) {
@@ -88,17 +97,23 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
     }
 
     // Validate rowStartDateExpr
-    error = exprValidator.validateExpr(this.blockDef.rowStartDateExpr, { table: rowsetCV.table, types: ["date", "datetime"] })
+    error = exprValidator.validateExpr(this.blockDef.rowStartDateExpr, {
+      table: rowsetCV.table,
+      types: ["date", "datetime"]
+    })
     if (error) {
       return error
     }
-    
+
     // Validate rowEndDateExpr
-    error = exprValidator.validateExpr(this.blockDef.rowEndDateExpr, { table: rowsetCV.table, types: ["date", "datetime"] })
+    error = exprValidator.validateExpr(this.blockDef.rowEndDateExpr, {
+      table: rowsetCV.table,
+      types: ["date", "datetime"]
+    })
     if (error) {
       return error
     }
-    
+
     // Validate rowLabelExpr
     error = exprValidator.validateExpr(this.blockDef.rowLabelExpr, { table: rowsetCV.table, types: ["text"] })
     if (error) {
@@ -111,8 +126,7 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
       if (!col) {
         return "Order column not found"
       }
-    }
-    else {
+    } else {
       return "Order column required"
     }
 
@@ -141,10 +155,13 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
 
     if (this.blockDef.addRowAction) {
       const action = designCtx.actionLibrary.createAction(this.blockDef.addRowAction)
-      error = action.validate({ ...designCtx, contextVars: designCtx.contextVars.concat([
-        this.createAddRowOrderContextVar(rowsetCV),
-        this.createAddRowParentContextVar(rowsetCV),
-       ]) })
+      error = action.validate({
+        ...designCtx,
+        contextVars: designCtx.contextVars.concat([
+          this.createAddRowOrderContextVar(rowsetCV),
+          this.createAddRowParentContextVar(rowsetCV)
+        ])
+      })
       if (error) {
         return error
       }
@@ -167,20 +184,23 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
   createAddRowParentContextVar(rowsetCV: ContextVar): ContextVar {
     return { id: this.blockDef.id + "_add_parent", name: `Parent of new GANTT row`, type: "row", table: rowsetCV.table }
   }
-  
+
   renderDesign(ctx: DesignCtx) {
-    const barColor = this.blockDef.barColor || "#68cdee" 
-    const milestoneColor = this.blockDef.milestoneColor || "#68cdee" 
-    
-    return <GanttChart
-      rows={[
-        { color: barColor, level: 0, startDate: "2020-01-14", endDate: "2020-05-23", label: "Activity 1" },
-        { color: barColor, level: 1, startDate: "2020-02-14", endDate: "2020-06-23", label: "Activity 2" },
-        { color: milestoneColor, level: 2, startDate: "2020-04-12", endDate: null, label: "Activity 3" }
-      ]}
-      startDate="2020-01-01"
-      endDate="2020-07-01"
-      T={ctx.T} />
+    const barColor = this.blockDef.barColor || "#68cdee"
+    const milestoneColor = this.blockDef.milestoneColor || "#68cdee"
+
+    return (
+      <GanttChart
+        rows={[
+          { color: barColor, level: 0, startDate: "2020-01-14", endDate: "2020-05-23", label: "Activity 1" },
+          { color: barColor, level: 1, startDate: "2020-02-14", endDate: "2020-06-23", label: "Activity 2" },
+          { color: milestoneColor, level: 2, startDate: "2020-04-12", endDate: null, label: "Activity 3" }
+        ]}
+        startDate="2020-01-01"
+        endDate="2020-07-01"
+        T={ctx.T}
+      />
+    )
   }
 
   renderInstance(ctx: InstanceCtx) {
@@ -189,7 +209,7 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
 
   renderEditor(props: DesignCtx) {
     // Get rowset context variable
-    const rowsetCV = props.contextVars.find(cv => cv.id === this.blockDef.rowsetContextVarId)
+    const rowsetCV = props.contextVars.find((cv) => cv.id === this.blockDef.rowsetContextVarId)
 
     const rowCV = rowsetCV ? this.createRowContextVar(rowsetCV) : null
 
@@ -197,218 +217,235 @@ export class GanttChartBlock extends LeafBlock<GanttChartBlockDef> {
       <div>
         <LabeledProperty label="Rowset">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowsetContextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
+            {(value, onChange) => (
+              <ContextVarPropertyEditor
+                value={value}
+                onChange={onChange}
+                contextVars={props.contextVars}
+                types={["rowset"]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
-        { rowsetCV ?
+        {rowsetCV ? (
           <LabeledProperty label="Label">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowLabelExpr">
               {(value: Expr, onChange) => (
-                  <ExprComponent 
-                    value={value} 
-                    onChange={onChange} 
-                    schema={props.schema} 
-                    dataSource={props.dataSource} 
-                    types={["text"]}
-                    variables={createExprVariables(props.contextVars)}
-                    table={rowsetCV!.table!}/>
-                )}
+                <ExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  types={["text"]}
+                  variables={createExprVariables(props.contextVars)}
+                  table={rowsetCV!.table!}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
+        ) : null}
 
-        { rowsetCV ?
+        {rowsetCV ? (
           <LabeledProperty label="Start Date of Rows">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowStartDateExpr">
               {(value: Expr, onChange) => (
-                  <ExprComponent 
-                    value={value} 
-                    onChange={onChange} 
-                    schema={props.schema} 
-                    dataSource={props.dataSource} 
-                    types={["date", "datetime"]}
-                    variables={createExprVariables(props.contextVars)}
-                    table={rowsetCV!.table!}/>
-                )}
+                <ExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  types={["date", "datetime"]}
+                  variables={createExprVariables(props.contextVars)}
+                  table={rowsetCV!.table!}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
+        ) : null}
 
-        { rowsetCV ?
+        {rowsetCV ? (
           <LabeledProperty label="End Date of Rows">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowEndDateExpr">
               {(value: Expr, onChange) => (
-                  <ExprComponent 
-                    value={value} 
-                    onChange={onChange} 
-                    schema={props.schema} 
-                    dataSource={props.dataSource} 
-                    types={["date", "datetime"]}
-                    variables={createExprVariables(props.contextVars)}
-                    table={rowsetCV!.table!}/>
-                )}
+                <ExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  types={["date", "datetime"]}
+                  variables={createExprVariables(props.contextVars)}
+                  table={rowsetCV!.table!}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
+        ) : null}
 
-        { rowsetCV ?
+        {rowsetCV ? (
           <LabeledProperty label="Filter">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
               {(value: Expr, onChange) => (
-                  <ExprComponent 
-                    value={value} 
-                    onChange={onChange} 
-                    schema={props.schema} 
-                    dataSource={props.dataSource} 
-                    types={["boolean"]}
-                    variables={createExprVariables(props.contextVars)}
-                    table={rowsetCV!.table!}/>
-                )}
+                <ExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  types={["boolean"]}
+                  variables={createExprVariables(props.contextVars)}
+                  table={rowsetCV!.table!}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
+        ) : null}
 
-      { rowsetCV ?
-        <LabeledProperty label="Order By Column">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowOrderColumn">
-            {(value, onChange) => {
-              const columnOptions = props.schema.getColumns(rowsetCV.table!)
-                .filter(c => c.type == "date" || c.type == "datetime" || c.type == "number")
-                .map(c => ({ value: c.id, label: localize(c.name) }))
-              return <Select value={value} onChange={onChange} nullLabel="Select column" options={columnOptions}/>
-            }}
-          </PropertyEditor>
-        </LabeledProperty>
-        : null }
+        {rowsetCV ? (
+          <LabeledProperty label="Order By Column">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowOrderColumn">
+              {(value, onChange) => {
+                const columnOptions = props.schema
+                  .getColumns(rowsetCV.table!)
+                  .filter((c) => c.type == "date" || c.type == "datetime" || c.type == "number")
+                  .map((c) => ({ value: c.id, label: localize(c.name) }))
+                return <Select value={value} onChange={onChange} nullLabel="Select column" options={columnOptions} />
+              }}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
 
-      { rowsetCV ?
-        <LabeledProperty label="Parent Column" hint="Optional column to make hierarchical">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowParentColumn">
-            {(value, onChange) => {
-              const columnOptions = props.schema.getColumns(rowsetCV.table!)
-                .filter(c => c.type == "id" && c.idTable == rowsetCV.table)
-                .map(c => ({ value: c.id, label: localize(c.name) }))
-              return <Select value={value} onChange={onChange} nullLabel="None" options={columnOptions}/>
-            }}
-          </PropertyEditor>
-        </LabeledProperty>
-        : null }
+        {rowsetCV ? (
+          <LabeledProperty label="Parent Column" hint="Optional column to make hierarchical">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowParentColumn">
+              {(value, onChange) => {
+                const columnOptions = props.schema
+                  .getColumns(rowsetCV.table!)
+                  .filter((c) => c.type == "id" && c.idTable == rowsetCV.table)
+                  .map((c) => ({ value: c.id, label: localize(c.name) }))
+                return <Select value={value} onChange={onChange} nullLabel="None" options={columnOptions} />
+              }}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
 
-      <LabeledProperty label="Override Start Date">
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="startDate">
-          {(value: string | null, onChange) => (
-            <DatePicker
-              selected={value ? moment(value, "YYYY-MM-DD") : null}
-              onChange={(momentDate) => { onChange(momentDate!.format("YYYY-MM-DD")) }}
-              dateFormat="ll"
-              isClearable={true}
-              className="form-control"
-            />
-          )}
-        </PropertyEditor>
-      </LabeledProperty>
-
-      <LabeledProperty label="Override End Date">
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="endDate">
-          {(value: string | null, onChange) => (
-            <DatePicker
-              selected={value ? moment(value, "YYYY-MM-DD") : null}
-              onChange={(momentDate) => { onChange(momentDate!.format("YYYY-MM-DD")) }}
-              dateFormat="ll"
-              isClearable={true}
-              className="form-control"
-            />
-          )}
-        </PropertyEditor>
-      </LabeledProperty>
-
-      <LabeledProperty label="Bar color" hint="CSS format">
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="barColor">
-          {(value: string | null, onChange) => (
-            <TextInput
-              value={value}
-              onChange={onChange}
-              emptyNull={true}
-              placeholder="#68cdee"
-            />
-          )}
-        </PropertyEditor>
-      </LabeledProperty>
-
-      <LabeledProperty label="Milestone color" hint="CSS format">
-        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="milestoneColor">
-          {(value: string | null, onChange) => (
-            <TextInput
-              value={value}
-              onChange={onChange}
-              emptyNull={true}
-              placeholder="#68cdee"
-            />
-          )}
-        </PropertyEditor>
-      </LabeledProperty>
-
-      <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="autoNumberRows">
-        {(value: boolean | undefined, onChange) => (
-          <Checkbox
-            value={value}
-            onChange={onChange}
-          >Autonumber Rows</Checkbox>
-        )}
-      </PropertyEditor>
-
-      { rowCV ? 
-        <LabeledProperty label="When row clicked">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowClickAction">
-            {(value, onChange) => (
-              <ActionDefEditor 
-                value={value} 
-                onChange={onChange} 
-                designCtx={{ ...props, contextVars: props.contextVars.concat(rowCV) }} />
+        <LabeledProperty label="Override Start Date">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="startDate">
+            {(value: string | null, onChange) => (
+              <DatePicker
+                selected={value ? moment(value, "YYYY-MM-DD") : null}
+                onChange={(momentDate) => {
+                  onChange(momentDate!.format("YYYY-MM-DD"))
+                }}
+                dateFormat="ll"
+                isClearable={true}
+                className="form-control"
+              />
             )}
           </PropertyEditor>
         </LabeledProperty>
-      : null } 
 
-      { rowCV && rowsetCV ? 
-        <LabeledProperty label="When row added">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="addRowAction">
-            {(value, onChange) => (
-              <ActionDefEditor 
-                value={value} 
-                onChange={onChange} 
-                designCtx={{ ...props, contextVars: props.contextVars.concat([this.createAddRowOrderContextVar(rowsetCV), this.createAddRowParentContextVar(rowsetCV)]) }} />
+        <LabeledProperty label="Override End Date">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="endDate">
+            {(value: string | null, onChange) => (
+              <DatePicker
+                selected={value ? moment(value, "YYYY-MM-DD") : null}
+                onChange={(momentDate) => {
+                  onChange(momentDate!.format("YYYY-MM-DD"))
+                }}
+                dateFormat="ll"
+                isClearable={true}
+                className="form-control"
+              />
             )}
           </PropertyEditor>
         </LabeledProperty>
-      : null } 
 
-      { this.blockDef.addRowAction ?
-        <LabeledProperty label="Add row link text">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="addRowLabel">
-            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+        <LabeledProperty label="Bar color" hint="CSS format">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="barColor">
+            {(value: string | null, onChange) => (
+              <TextInput value={value} onChange={onChange} emptyNull={true} placeholder="#68cdee" />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-      : null }
 
-      <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="allowRemove">
-        {(value: boolean | undefined, onChange) => (
-          <Checkbox
-            value={value}
-            onChange={onChange}
-          >Allow removing rows</Checkbox>
-        )}
-      </PropertyEditor>
-
-      { this.blockDef.allowRemove ?
-        <LabeledProperty label="Remove confirm message">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removeConfirmMessage">
-            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+        <LabeledProperty label="Milestone color" hint="CSS format">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="milestoneColor">
+            {(value: string | null, onChange) => (
+              <TextInput value={value} onChange={onChange} emptyNull={true} placeholder="#68cdee" />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-      : null}
 
-    </div>)
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="autoNumberRows">
+          {(value: boolean | undefined, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Autonumber Rows
+            </Checkbox>
+          )}
+        </PropertyEditor>
+
+        {rowCV ? (
+          <LabeledProperty label="When row clicked">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowClickAction">
+              {(value, onChange) => (
+                <ActionDefEditor
+                  value={value}
+                  onChange={onChange}
+                  designCtx={{ ...props, contextVars: props.contextVars.concat(rowCV) }}
+                />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
+
+        {rowCV && rowsetCV ? (
+          <LabeledProperty label="When row added">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="addRowAction">
+              {(value, onChange) => (
+                <ActionDefEditor
+                  value={value}
+                  onChange={onChange}
+                  designCtx={{
+                    ...props,
+                    contextVars: props.contextVars.concat([
+                      this.createAddRowOrderContextVar(rowsetCV),
+                      this.createAddRowParentContextVar(rowsetCV)
+                    ])
+                  }}
+                />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
+
+        {this.blockDef.addRowAction ? (
+          <LabeledProperty label="Add row link text">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="addRowLabel">
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
+
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="allowRemove">
+          {(value: boolean | undefined, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Allow removing rows
+            </Checkbox>
+          )}
+        </PropertyEditor>
+
+        {this.blockDef.allowRemove ? (
+          <LabeledProperty label="Remove confirm message">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="removeConfirmMessage">
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
+      </div>
+    )
   }
 }

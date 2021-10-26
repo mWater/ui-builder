@@ -9,7 +9,7 @@ export const DateFilterInstance = (props: {
   placeholder: string
   locale: string
 }) => {
-  let options: { value: string, label: string }[] = []
+  let options: { value: string; label: string }[] = []
 
   const months = [
     { value: "01", label: "January" },
@@ -28,18 +28,16 @@ export const DateFilterInstance = (props: {
 
   if (props.mode == "month") {
     options = months
-  }
-  else if (props.mode == "year") {
+  } else if (props.mode == "year") {
     const year = new Date().getFullYear()
-    for (let y = year ; y >= year - 10 ; y--) {
-      options.push({ value: `${y}-01-01`, label: `${y}`})
+    for (let y = year; y >= year - 10; y--) {
+      options.push({ value: `${y}-01-01`, label: `${y}` })
     }
-  }
-  else if (props.mode == "yearmonth") {
+  } else if (props.mode == "yearmonth") {
     const year = new Date().getFullYear()
-    for (let y = year ; y >= year - 10 ; y--) {
-      for (let m = (y == year) ? new Date().getMonth() : 11 ; m >= 0 ; m--) {
-        options.push({ value: `${y}-${months[m].value}-01`, label: `${months[m].label} ${y}`})
+    for (let y = year; y >= year - 10; y--) {
+      for (let m = y == year ? new Date().getMonth() : 11; m >= 0; m--) {
+        options.push({ value: `${y}-${months[m].value}-01`, label: `${months[m].label} ${y}` })
       }
     }
   }
@@ -49,20 +47,22 @@ export const DateFilterInstance = (props: {
     menuPortal: (style: CSSProperties) => ({ ...style, zIndex: 2000 })
   }
 
-  const handleChange = (ev: { value: string, label: string } | null) => props.onChange(ev ? ev.value : null)
+  const handleChange = (ev: { value: string; label: string } | null) => props.onChange(ev ? ev.value : null)
 
   // Find option
-  const option = options.find(opt => opt.value == props.value)
+  const option = options.find((opt) => opt.value == props.value)
 
-  return <ReactSelect
-    value={option} 
-    onChange={handleChange}
-    options={options}
-    placeholder={props.placeholder}
-    isClearable={true}
-    styles={styles}
-    closeMenuOnScroll={true}
-    menuPortalTarget={document.body}
-    classNamePrefix="react-select-short" 
-  />
+  return (
+    <ReactSelect
+      value={option}
+      onChange={handleChange}
+      options={options}
+      placeholder={props.placeholder}
+      isClearable={true}
+      styles={styles}
+      closeMenuOnScroll={true}
+      menuPortalTarget={document.body}
+      classNamePrefix="react-select-short"
+    />
+  )
 }

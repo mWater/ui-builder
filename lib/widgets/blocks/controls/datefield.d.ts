@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, LocalizedString } from 'mwater-expressions';
-import { DesignCtx } from '../../../contexts';
+import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBlock";
+import { Column, LocalizedString } from "mwater-expressions";
+import { DesignCtx } from "../../../contexts";
 export interface DatefieldBlockDef extends ControlBlockDef {
     type: "datefield";
     placeholder: LocalizedString | null;

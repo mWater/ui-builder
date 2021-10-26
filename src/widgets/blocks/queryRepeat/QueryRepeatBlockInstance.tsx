@@ -1,11 +1,11 @@
-import * as React from "react";
-import { QueryRepeatBlock } from "./queryRepeat";
-import { Row, Expr, IdExpr, PromiseExprEvaluator } from "mwater-expressions";
-import { QueryOptions } from "../../../database/Database";
-import _ from "lodash";
-import { localize } from "../../localization";
-import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts";
-import { createExprVariables, createExprVariableValues } from "../../blocks";
+import * as React from "react"
+import { QueryRepeatBlock } from "./queryRepeat"
+import { Row, Expr, IdExpr, PromiseExprEvaluator } from "mwater-expressions"
+import { QueryOptions } from "../../../database/Database"
+import _ from "lodash"
+import { localize } from "../../localization"
+import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts"
+import { createExprVariables, createExprVariableValues } from "../../blocks"
 
 interface Props {
   block: QueryRepeatBlock
@@ -21,7 +21,7 @@ interface State {
 /** Instance of a query table */
 export default class QueryRepeatBlockInstance extends React.Component<Props, State> {
   /** Current query options to determine if refresh needed */
-  queryOptions?: QueryOptions 
+  queryOptions?: QueryOptions
 
   constructor(props: Props) {
     super(props)
@@ -37,7 +37,10 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
   componentDidUpdate(prevProps: Props) {
     // Redo query if changed
     const newQueryOptions = this.createQuery()
-    if (!_.isEqual(newQueryOptions, this.queryOptions) || !_.isEqual(this.props.instanceCtx.contextVarValues, prevProps.instanceCtx.contextVarValues)) {
+    if (
+      !_.isEqual(newQueryOptions, this.queryOptions) ||
+      !_.isEqual(this.props.instanceCtx.contextVarValues, prevProps.instanceCtx.contextVarValues)
+    ) {
       this.performQuery()
     }
   }
@@ -56,7 +59,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     const block = this.props.block
 
     // Get expressions
-    const rowsetCV = rips.contextVars.find(cv => cv.id === block.blockDef.rowsetContextVarId)!
+    const rowsetCV = rips.contextVars.find((cv) => cv.id === block.blockDef.rowsetContextVarId)!
     const rowExprs = block.getRowExprs(this.props.instanceCtx.contextVars, this.props.instanceCtx)
     const rowsetCVValue = rips.contextVarValues[rowsetCV.id]
 
@@ -65,7 +68,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
       type: "op",
       op: "and",
       table: rowsetCV.table!,
-      exprs: _.compact([rowsetCVValue].concat(_.map(rips.getFilters(rowsetCV.id), f => f.expr)))
+      exprs: _.compact([rowsetCVValue].concat(_.map(rips.getFilters(rowsetCV.id), (f) => f.expr)))
     }
 
     // Add own where
@@ -80,7 +83,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
       orderBy: [],
       limit: block.blockDef.limit
     }
-    
+
     // Add order by
     if (block.blockDef.orderBy) {
       queryOptions.orderBy = queryOptions.orderBy!.concat(block.blockDef.orderBy)
@@ -113,22 +116,27 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
 
     // Mark as refreshing
     this.setState({ refreshing: true })
-    
-    this.props.instanceCtx.database.query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx)).then(rows => {
-      // Check if still relevant
-      if (_.isEqual(queryOptions, this.createQuery())) {
-        this.setState({ rows, refreshing: false })
-      }
-    }).catch(error => {
-      this.setState({ error: error })
-    })
+
+    this.props.instanceCtx.database
+      .query(queryOptions, this.props.instanceCtx.contextVars, getFilteredContextVarValues(this.props.instanceCtx))
+      .then((rows) => {
+        // Check if still relevant
+        if (_.isEqual(queryOptions, this.createQuery())) {
+          this.setState({ rows, refreshing: false })
+        }
+      })
+      .catch((error) => {
+        this.setState({ error: error })
+      })
   }
 
   createRowInstanceCtx(rowIndex: number): InstanceCtx {
     const rips = this.props.instanceCtx
 
     // Row context variable
-    const rowsetCV = this.props.instanceCtx.contextVars.find(cv => cv.id === this.props.block.blockDef.rowsetContextVarId)!
+    const rowsetCV = this.props.instanceCtx.contextVars.find(
+      (cv) => cv.id === this.props.block.blockDef.rowsetContextVarId
+    )!
     const rowcv = this.props.block.createRowContextVar(rowsetCV!)
 
     // TODO move out of here to be faster
@@ -137,11 +145,17 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     const innerContextVars = rips.contextVars.concat(rowcv)
 
     // Row context variable value
-    const cvvalue = this.props.block.getRowContextVarValue(this.state.rows![rowIndex], rowExprs, this.props.instanceCtx.schema, rowsetCV, innerContextVars)
+    const cvvalue = this.props.block.getRowContextVarValue(
+      this.state.rows![rowIndex],
+      rowExprs,
+      this.props.instanceCtx.schema,
+      rowsetCV,
+      innerContextVars
+    )
 
     const innerContextVarValues = { ...rips.contextVarValues, [rowcv.id]: cvvalue }
     return {
-      ...rips, 
+      ...rips,
       contextVars: innerContextVars,
       contextVarValues: innerContextVarValues,
       getContextVarExprValue: (cvid, expr) => {
@@ -152,8 +166,8 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
 
         // If no context variable, evaluate expression
         if (cvid == null) {
-          return new PromiseExprEvaluator({ 
-            schema: rips.schema, 
+          return new PromiseExprEvaluator({
+            schema: rips.schema,
             locale: rips.locale,
             variables: createExprVariables(innerContextVars),
             variableValues: createExprVariableValues(innerContextVars, innerContextVarValues)
@@ -164,7 +178,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
           return rips.getContextVarExprValue(cvid, expr)
         }
         // Look up expression
-        const exprIndex = rowExprs.findIndex(rowExpr => _.isEqual(expr, rowExpr))
+        const exprIndex = rowExprs.findIndex((rowExpr) => _.isEqual(expr, rowExpr))
         return this.state.rows![rowIndex]["e" + exprIndex]
       }
     }
@@ -175,29 +189,32 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
       case "none":
         return null
       case "page_break":
-        return <div className="page-break"/>
+        return <div className="page-break" />
       case "solid_line":
-        return <hr/>
+        return <hr />
     }
   }
 
   renderRow(row: Row, rowIndex: number) {
     const orientation = this.props.block.blockDef.orientation || "vertical"
-    const horizontalSpacing = this.props.block.blockDef.horizontalSpacing != null ? this.props.block.blockDef.horizontalSpacing : 5
+    const horizontalSpacing =
+      this.props.block.blockDef.horizontalSpacing != null ? this.props.block.blockDef.horizontalSpacing : 5
 
     const rowRIProps = this.createRowInstanceCtx(rowIndex)
 
     if (orientation == "vertical") {
       return (
         <div key={row.id}>
-          { rowIndex > 0 ? this.renderSeparator() : null }
+          {rowIndex > 0 ? this.renderSeparator() : null}
           {rowRIProps.renderChildBlock(rowRIProps, this.props.block.blockDef.content)}
         </div>
       )
-    }
-    else {
+    } else {
       return (
-        <div key={row.id} style={{ display: "inline-block", verticalAlign: "top", marginLeft: rowIndex > 0 ? horizontalSpacing : 0 }}>
+        <div
+          key={row.id}
+          style={{ display: "inline-block", verticalAlign: "top", marginLeft: rowIndex > 0 ? horizontalSpacing : 0 }}
+        >
           {rowRIProps.renderChildBlock(rowRIProps, this.props.block.blockDef.content)}
         </div>
       )
@@ -211,15 +228,19 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
     }
 
     if (!this.state.rows) {
-      return <div style={{ textAlign: "center", fontSize: 20 }}>
-        <i className="fa fa-spinner fa-spin"/>
-      </div>
+      return (
+        <div style={{ textAlign: "center", fontSize: 20 }}>
+          <i className="fa fa-spinner fa-spin" />
+        </div>
+      )
     }
 
     if (this.state.rows.length === 0 && this.props.block.blockDef.noRowsMessage) {
-      return <div style={{ fontStyle: "italic" }}>
-        {localize(this.props.block.blockDef.noRowsMessage, this.props.instanceCtx.locale)}
-      </div>
+      return (
+        <div style={{ fontStyle: "italic" }}>
+          {localize(this.props.block.blockDef.noRowsMessage, this.props.instanceCtx.locale)}
+        </div>
+      )
     }
 
     return this.state.rows.map((row, rowIndex) => this.renderRow(row, rowIndex))
@@ -237,11 +258,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
       style.opacity = 0.6
     }
 
-    return (
-      <div>
-        {this.renderRows()}
-      </div>
-    )  
+    return <div>{this.renderRows()}</div>
   }
 }
 

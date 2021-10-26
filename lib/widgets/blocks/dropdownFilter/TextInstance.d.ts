@@ -3,7 +3,7 @@ import { DropdownFilterBlockDef } from "./dropdownFilter";
 import { Schema } from "mwater-expressions";
 import { ContextVar } from "../../blocks";
 import { Database } from "../../../database/Database";
-import { InstanceCtx } from '../../../contexts';
+import { InstanceCtx } from "../../../contexts";
 /** Dropdown filter that is a text string. Should search in database for matches */
 export default function TextInstance(props: {
     blockDef: DropdownFilterBlockDef;

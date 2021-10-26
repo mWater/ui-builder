@@ -1,8 +1,8 @@
-import React from 'react';
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LocalizedString, Expr } from 'mwater-expressions';
-import { EmbeddedExpr } from '../../embeddedExprs';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import React from "react";
+import { ActionDef, Action, RenderActionEditorProps } from "../actions";
+import { LocalizedString, Expr } from "mwater-expressions";
+import { EmbeddedExpr } from "../../embeddedExprs";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Direct reference to another context variable */
 interface RefValue {
     type: "ref";

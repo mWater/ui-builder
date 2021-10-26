@@ -1,10 +1,10 @@
-import * as React from 'react';
-import * as _ from 'lodash';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
-import { LabeledProperty, PropertyEditor, TableColumnWidthEditor } from '../propertyEditors';
-import { NumberInput, Select, Toggle } from 'react-library/lib/bootstrap';
-import produce from 'immer';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react"
+import * as _ from "lodash"
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks"
+import { LabeledProperty, PropertyEditor, TableColumnWidthEditor } from "../propertyEditors"
+import { NumberInput, Select, Toggle } from "react-library/lib/bootstrap"
+import produce from "immer"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 /** Table with a fixed number of rows and columns */
 export interface FixedTableBlockDef extends BlockDef {
@@ -48,10 +48,15 @@ interface FixedTableColumnDef {
 export class FixedTableBlock extends Block<FixedTableBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get for all cells
-    return _.compact(_.flatten(this.blockDef.rows.map(r => r.cells.map(c => c.content)))).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+    return _.compact(_.flatten(this.blockDef.rows.map((r) => r.cells.map((c) => c.content)))).map((bd) => ({
+      blockDef: bd!,
+      contextVars: contextVars
+    }))
   }
 
-  validate() { return null }
+  validate() {
+    return null
+  }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, (draft: FixedTableBlockDef) => {
@@ -67,9 +72,13 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
   renderDesign(props: DesignCtx) {
     // Handle setting of a cell contents
     const handleSet = (rowIndex: number, columnIndex: number, content: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: FixedTableBlockDef) => { 
-        b.rows[rowIndex].cells[columnIndex].content = content
-      }), content.id)
+      props.store.alterBlock(
+        this.id,
+        produce((b: FixedTableBlockDef) => {
+          b.rows[rowIndex].cells[columnIndex].content = content
+        }),
+        content.id
+      )
     }
 
     let className = "table"
@@ -91,17 +100,21 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
     return (
       <table className={className}>
         <colgroup>
-          { _.range(this.blockDef.numColumns).map((colIndex) => {
+          {_.range(this.blockDef.numColumns).map((colIndex) => {
             // Determine width
             const columns = this.blockDef.columns
             const width = columns && columns[colIndex] ? columns[colIndex]!.columnWidth : "auto"
-            return <col key={colIndex} style={{ width: width }}/>
+            return <col key={colIndex} style={{ width: width }} />
           })}
         </colgroup>
         <tbody>
-          { this.blockDef.rows.map((row, rowIndex) => (
+          {this.blockDef.rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
-              { row.cells.map((cell, columnIndex) => <td key={columnIndex}>{props.renderChildBlock(props, cell.content, handleSet.bind(null, rowIndex, columnIndex))}</td>) } 
+              {row.cells.map((cell, columnIndex) => (
+                <td key={columnIndex}>
+                  {props.renderChildBlock(props, cell.content, handleSet.bind(null, rowIndex, columnIndex))}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -129,17 +142,19 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
     return (
       <table className={className}>
         <colgroup>
-          { _.range(this.blockDef.numColumns).map((colIndex) => {
+          {_.range(this.blockDef.numColumns).map((colIndex) => {
             // Determine width
             const columns = this.blockDef.columns
             const width = columns && columns[colIndex] ? columns[colIndex]!.columnWidth : "auto"
-            return <col key={colIndex} style={{ width: width }}/>
+            return <col key={colIndex} style={{ width: width }} />
           })}
         </colgroup>
         <tbody>
-          { this.blockDef.rows.map((row, rowIndex) => (
+          {this.blockDef.rows.map((row, rowIndex) => (
             <tr key={rowIndex}>
-              { row.cells.map((cell, columnIndex) => <td key={columnIndex}>{props.renderChildBlock(props, cell.content)}</td>) } 
+              {row.cells.map((cell, columnIndex) => (
+                <td key={columnIndex}>{props.renderChildBlock(props, cell.content)}</td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -165,38 +180,52 @@ export class FixedTableBlock extends Block<FixedTableBlockDef> {
     return (
       <div>
         <LabeledProperty label="Number of Rows">
-          <NumberInput value={this.blockDef.numRows} onChange={handleNumRowsChange} decimal={false}/>
+          <NumberInput value={this.blockDef.numRows} onChange={handleNumRowsChange} decimal={false} />
         </LabeledProperty>
 
         <LabeledProperty label="Number of Columns">
-          <NumberInput value={this.blockDef.numColumns} onChange={handleNumColumnsChange} decimal={false}/>
+          <NumberInput value={this.blockDef.numColumns} onChange={handleNumColumnsChange} decimal={false} />
         </LabeledProperty>
 
         <LabeledProperty label="Borders">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="borders">
-            {(value, onChange) => <Toggle 
-              value={value || "horizontal"} 
-              onChange={onChange} 
-              options={[{ value: "none", label: "None" }, { value: "horizontal", label: "Horizontal" }, { value: "all", label: "All" }]} />}
+            {(value, onChange) => (
+              <Toggle
+                value={value || "horizontal"}
+                onChange={onChange}
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "horizontal", label: "Horizontal" },
+                  { value: "all", label: "All" }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Padding">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="padding">
-            {(value, onChange) => <Toggle value={value || "normal"} onChange={onChange} options={[{ value: "normal", label: "Normal" }, { value: "compact", label: "Compact" }]} />}
+            {(value, onChange) => (
+              <Toggle
+                value={value || "normal"}
+                onChange={onChange}
+                options={[
+                  { value: "normal", label: "Normal" },
+                  { value: "compact", label: "Compact" }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="Columns">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="columns">
-            {(value, onChange) => <ColumnsEditor
-              value={value}
-              onChange={onChange}
-              numColumns={this.blockDef.numColumns}
-              /> }
+            {(value, onChange) => (
+              <ColumnsEditor value={value} onChange={onChange} numColumns={this.blockDef.numColumns} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-     </div>
+      </div>
     )
   }
 }
@@ -206,7 +235,7 @@ export function setNumRows(blockDef: FixedTableBlockDef, numRows: number): Fixed
   return produce(blockDef, (d: FixedTableBlockDef) => {
     // Add rows
     if (numRows > blockDef.numRows) {
-      for (let i = 0; i < numRows - blockDef.numRows ; i++) {
+      for (let i = 0; i < numRows - blockDef.numRows; i++) {
         d.rows.push({ cells: _.range(blockDef.numColumns).map(() => ({ content: null })) })
       }
     }
@@ -225,20 +254,20 @@ export function setNumColumns(blockDef: FixedTableBlockDef, numColumns: number):
   return produce(blockDef, (d: FixedTableBlockDef) => {
     // Create columns if they don't exist
     if (!d.columns) {
-      d.columns = _.range(blockDef.numColumns).map(c => ({ columnWidth: "auto" }))
+      d.columns = _.range(blockDef.numColumns).map((c) => ({ columnWidth: "auto" }))
     }
 
     // Add columns
     if (numColumns > blockDef.numColumns) {
       // Add to each row
       for (const row of d.rows) {
-        for (let i = 0; i < numColumns - blockDef.numColumns ; i++) {
+        for (let i = 0; i < numColumns - blockDef.numColumns; i++) {
           row.cells.push({ content: null })
         }
       }
 
       // Add to columns
-      for (let i = 0; i < numColumns - blockDef.numColumns ; i++) {
+      for (let i = 0; i < numColumns - blockDef.numColumns; i++) {
         d.columns.push({ columnWidth: "auto" })
       }
     }
@@ -256,29 +285,35 @@ export function setNumColumns(blockDef: FixedTableBlockDef, numColumns: number):
 }
 
 /** Edits column info */
-const ColumnsEditor = (props: { 
+const ColumnsEditor = (props: {
   value?: Array<FixedTableColumnDef>
-  onChange: (value: Array<FixedTableColumnDef>) => void 
+  onChange: (value: Array<FixedTableColumnDef>) => void
   numColumns: number
 }) => {
   const handleColumnWidthChange = (colIndex: number, columnWidth: string) => {
-    props.onChange(produce(props.value || [], draft => {
-      // Make sure exists
-      draft[colIndex] = draft[colIndex] || { columnWidth: "auto" }
-      draft[colIndex]!.columnWidth = columnWidth
-    }))
+    props.onChange(
+      produce(props.value || [], (draft) => {
+        // Make sure exists
+        draft[colIndex] = draft[colIndex] || { columnWidth: "auto" }
+        draft[colIndex]!.columnWidth = columnWidth
+      })
+    )
   }
 
-  return <ul className="list-group">
-    { _.map(_.range(props.numColumns), colIndex => {
-      return <li className="list-group-item" key={colIndex}>
-        <LabeledProperty label="Width" key="width">
-          <TableColumnWidthEditor
-            columnWidth={props.value && props.value[colIndex] ? props.value[colIndex]!.columnWidth : "auto" }
-            onChange={handleColumnWidthChange.bind(null, colIndex)}
-          />
-        </LabeledProperty>
-      </li>
-    })}
-  </ul>
+  return (
+    <ul className="list-group">
+      {_.map(_.range(props.numColumns), (colIndex) => {
+        return (
+          <li className="list-group-item" key={colIndex}>
+            <LabeledProperty label="Width" key="width">
+              <TableColumnWidthEditor
+                columnWidth={props.value && props.value[colIndex] ? props.value[colIndex]!.columnWidth : "auto"}
+                onChange={handleColumnWidthChange.bind(null, colIndex)}
+              />
+            </LabeledProperty>
+          </li>
+        )
+      })}
+    </ul>
+  )
 }

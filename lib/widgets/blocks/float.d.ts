@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Floats some content either right or left of main content */
 export interface FloatBlockDef extends BlockDef {
     type: "float";

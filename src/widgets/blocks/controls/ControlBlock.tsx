@@ -1,18 +1,25 @@
-import { BlockDef, ContextVar, Filter } from "../../blocks";
-import LeafBlock from "../../LeafBlock";
+import { BlockDef, ContextVar, Filter } from "../../blocks"
+import LeafBlock from "../../LeafBlock"
 import React, { useEffect, useRef, useState } from "react"
-import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor, LocalizedTextPropertyEditor, ContextVarAndExprPropertyEditor, ContextVarExprPropertyEditor } from "../../propertyEditors";
-import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions";
-import { Select, Checkbox } from "react-library/lib/bootstrap";
-import { localize } from "../../localization";
-import { Database } from "../../../database/Database";
-import { DataSourceDatabase } from "../../../database/DataSourceDatabase";
-import { DesignCtx, InstanceCtx } from "../../../contexts";
-import { FormatLocaleObject } from "d3-format";
-import { getScrollParent } from "../../scrolling";
-import { ContextVarExpr } from "../../../ContextVarExpr";
-import { CollapsibleComponent } from "../collapsible";
-import { useStabilizeFunction, useStabilizeValue } from "../../../hooks";
+import {
+  LabeledProperty,
+  PropertyEditor,
+  ContextVarPropertyEditor,
+  LocalizedTextPropertyEditor,
+  ContextVarAndExprPropertyEditor,
+  ContextVarExprPropertyEditor
+} from "../../propertyEditors"
+import { Expr, Column, Schema, DataSource, LocalizedString } from "mwater-expressions"
+import { Select, Checkbox } from "react-library/lib/bootstrap"
+import { localize } from "../../localization"
+import { Database } from "../../../database/Database"
+import { DataSourceDatabase } from "../../../database/DataSourceDatabase"
+import { DesignCtx, InstanceCtx } from "../../../contexts"
+import { FormatLocaleObject } from "d3-format"
+import { getScrollParent } from "../../scrolling"
+import { ContextVarExpr } from "../../../ContextVarExpr"
+import { CollapsibleComponent } from "../collapsible"
+import { useStabilizeFunction, useStabilizeValue } from "../../../hooks"
 
 /** Definition for a control which is a widget that edits a single column */
 export interface ControlBlockDef extends BlockDef {
@@ -71,7 +78,6 @@ export interface RenderControlProps {
 
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
-
   abstract renderControl(props: RenderControlProps): React.ReactElement<any>
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
@@ -84,10 +90,12 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
 
   renderDesign(designCtx: DesignCtx) {
     const renderControlProps: RenderControlProps = {
-      value: null, 
+      value: null,
       rowId: null,
-      rowContextVar: designCtx.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId),
-      onChange: () => { return }, 
+      rowContextVar: designCtx.contextVars.find((cv) => cv.id === this.blockDef.rowContextVarId),
+      onChange: () => {
+        return
+      },
       locale: designCtx.locale,
       database: new DataSourceDatabase(designCtx.schema, designCtx.dataSource),
       schema: designCtx.schema,
@@ -100,12 +108,12 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       saving: false,
       designMode: true
     }
-    
+
     return this.renderControl(renderControlProps)
   }
 
   renderInstance(props: InstanceCtx) {
-    return <ControlInstance instanceCtx={props} block={this}/>      
+    return <ControlInstance instanceCtx={props} block={this} />
   }
 
   /** Allow subclasses to clear/update other fields on the column changing */
@@ -115,7 +123,7 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   }
 
   renderEditor(props: DesignCtx) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
+    const contextVar = props.contextVars.find((cv) => cv.id === this.blockDef.rowContextVarId)
 
     const handleColumnChanged = (blockDef: T) => {
       props.store.replaceBlock(this.processColumnChanged(blockDef))
@@ -125,38 +133,52 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       <div>
         <LabeledProperty label="Context Variable">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="rowContextVarId">
-            {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["row"]} />}
+            {(value, onChange) => (
+              <ContextVarPropertyEditor
+                value={value}
+                onChange={onChange}
+                contextVars={props.contextVars}
+                types={["row"]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
-        { contextVar ?
+        {contextVar ? (
           <LabeledProperty label="Column">
             <PropertyEditor obj={this.blockDef} onChange={handleColumnChanged} property="column">
               {(value, onChange) => {
-                const columnOptions = props.schema.getColumns(contextVar.table!)
-                  .filter(c => this.filterColumn(c))
-                  .map(c => ({ value: c.id, label: localize(c.name) }))
-                return <Select value={value} onChange={onChange} nullLabel="Select column" options={columnOptions}/>
+                const columnOptions = props.schema
+                  .getColumns(contextVar.table!)
+                  .filter((c) => this.filterColumn(c))
+                  .map((c) => ({ value: c.id, label: localize(c.name) }))
+                return <Select value={value} onChange={onChange} nullLabel="Select column" options={columnOptions} />
               }}
             </PropertyEditor>
           </LabeledProperty>
-          : null }
+        ) : null}
 
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="required">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Required</Checkbox>}
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Required
+            </Checkbox>
+          )}
         </PropertyEditor>
 
-        { this.blockDef.required ?
+        {this.blockDef.required ? (
           <LabeledProperty label="Required Message">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="requiredMessage">
-              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
+        ) : null}
 
         {this.renderControlEditor(props)}
 
-        <br/>
+        <br />
 
         <CollapsibleComponent label="Optional Readonly Expression" initialCollapsed>
           <LabeledProperty label="Readonly" hint="optional expression that makes read-only if true">
@@ -168,7 +190,8 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
                   contextVars={props.contextVars}
                   contextVarExpr={value}
                   onChange={onChange}
-                  types={["boolean"]} />
+                  types={["boolean"]}
+                />
               )}
             </PropertyEditor>
           </LabeledProperty>
@@ -177,11 +200,11 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
     )
   }
 
-  getContextVarExprs(contextVar: ContextVar): Expr[] { 
+  getContextVarExprs(contextVar: ContextVar): Expr[] {
     const exprs: Expr[] = []
 
     if (this.blockDef.rowContextVarId && this.blockDef.rowContextVarId === contextVar.id && this.blockDef.column) {
-      exprs.push({ type: "id", table: contextVar.table!})
+      exprs.push({ type: "id", table: contextVar.table! })
       exprs.push({ type: "field", table: contextVar.table!, column: this.blockDef.column })
     }
 
@@ -195,11 +218,11 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
   validate(options: DesignCtx): string | null {
     // Validate row
-    const rowCV = options.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId && cv.type === "row")
+    const rowCV = options.contextVars.find((cv) => cv.id === this.blockDef.rowContextVarId && cv.type === "row")
     if (!rowCV) {
       return "Row required"
     }
-    
+
     if (!this.blockDef.column || !options.schema.getColumn(rowCV.table!, this.blockDef.column)) {
       return "Column required"
     }
@@ -226,23 +249,24 @@ interface State {
 }
 
 /** Instance of the control that does optimistic value changes */
-function ControlInstance(props: {
-  block: ControlBlock<ControlBlockDef>
-  instanceCtx: InstanceCtx
-}) {
+function ControlInstance(props: { block: ControlBlock<ControlBlockDef>; instanceCtx: InstanceCtx }) {
   const { block, instanceCtx } = props
   const blockDef = props.block.blockDef
-  
+
   const controlRef = useRef<HTMLDivElement>(null)
 
   const [saving, setSaving] = useState(false)
   const [requiredError, setRequiredError] = useState<string | null>(null)
 
   function getValue() {
-    const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const contextVar = instanceCtx.contextVars.find((cv) => cv.id === blockDef.rowContextVarId)!
 
     // Get current value
-    return instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "field", table: contextVar!.table!, column: blockDef.column! })
+    return instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, {
+      type: "field",
+      table: contextVar!.table!,
+      column: blockDef.column!
+    })
   }
 
   const value = getValue()
@@ -267,12 +291,10 @@ function ControlInstance(props: {
 
         // Add some padding
         const scrollParent = getScrollParent(controlRef.current)
-        if (scrollParent)
-          scrollParent.scrollBy(0, -30)
+        if (scrollParent) scrollParent.scrollBy(0, -30)
       }
       return ""
-    }
-    else {
+    } else {
       setRequiredError(null)
       return null
     }
@@ -290,7 +312,7 @@ function ControlInstance(props: {
     // Optimistically update local value
     setLocalValue(newValue)
 
-    const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+    const contextVar = instanceCtx.contextVars.find((cv) => cv.id === blockDef.rowContextVarId)!
     const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
     // Update database
@@ -309,13 +331,15 @@ function ControlInstance(props: {
     } finally {
       setSaving(false)
     }
-    return    
+    return
   })
 
-  const contextVar = instanceCtx.contextVars.find(cv => cv.id === blockDef.rowContextVarId)!
+  const contextVar = instanceCtx.contextVars.find((cv) => cv.id === blockDef.rowContextVarId)!
   const id = instanceCtx.getContextVarExprValue(blockDef.rowContextVarId!, { type: "id", table: contextVar!.table! })
 
-  const readonly = blockDef.readonlyExpr ? instanceCtx.getContextVarExprValue(blockDef.readonlyExpr.contextVarId, blockDef.readonlyExpr.expr) : false
+  const readonly = blockDef.readonlyExpr
+    ? instanceCtx.getContextVarExprValue(blockDef.readonlyExpr.contextVarId, blockDef.readonlyExpr.expr)
+    : false
 
   const renderControlProps: RenderControlProps = {
     value: stableValue,
@@ -334,24 +358,24 @@ function ControlInstance(props: {
     designMode: false
   }
 
-  const style: React.CSSProperties = {
-  }
+  const style: React.CSSProperties = {}
 
   // Add red border if required
   if (requiredError != null) {
-    style.border = "1px solid rgb(169, 68, 66)",
-    style.padding = 3
+    ;(style.border = "1px solid rgb(169, 68, 66)"), (style.padding = 3)
     style.backgroundColor = "rgb(169, 68, 66)"
   }
 
   return (
     <div>
       <div style={style} ref={controlRef} key="control">
-        { block.renderControl(renderControlProps) }
+        {block.renderControl(renderControlProps)}
       </div>
-      { requiredError ? 
-        <div key="error" className="text-danger">{requiredError}</div>
-      : null}
+      {requiredError ? (
+        <div key="error" className="text-danger">
+          {requiredError}
+        </div>
+      ) : null}
     </div>
   )
 }

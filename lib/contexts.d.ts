@@ -7,7 +7,7 @@ import { Database } from "./database/Database";
 import { PageStack } from "./PageStack";
 import { BlockPaletteEntry } from "./designer/blockPaletteEntries";
 import { FormatLocaleObject } from "d3-format";
-import { LocalizeString } from 'ez-localize';
+import { LocalizeString } from "ez-localize";
 /** Base context that all UI Builder needs */
 export interface BaseCtx {
     /** locale to use (e.g. "en") */
@@ -81,7 +81,7 @@ export interface InstanceCtx extends BaseCtx {
      * The function that is passed to registerForValidation must return null if correct, message if not. Empty message ("") blocks but does not show alert
      * isFirstError is true if first block to potentially fail validation. This allows the block to scroll into view on error
      */
-    registerForValidation(validate: (isFirstError: boolean) => string | null | Promise<string | null>): (() => void);
+    registerForValidation(validate: (isFirstError: boolean) => string | null | Promise<string | null>): () => void;
 }
 /** Gets context variables with filters baked into rowsets. Use for all queries, as that may depend on rowset filters */
 export declare function getFilteredContextVarValues(instanceCtx: InstanceCtx): {

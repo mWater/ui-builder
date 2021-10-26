@@ -1,11 +1,11 @@
-import React from 'react';
-import _ from 'lodash'
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { LabeledProperty, PropertyEditor, EmbeddedExprsEditor } from '../propertyEditors';
-import { TextInput, Checkbox } from 'react-library/lib/bootstrap';
-import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../embeddedExprs';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { evalContextVarExpr } from '../evalContextVarExpr';
+import React from "react"
+import _ from "lodash"
+import { ActionDef, Action, RenderActionEditorProps } from "../actions"
+import { LabeledProperty, PropertyEditor, EmbeddedExprsEditor } from "../propertyEditors"
+import { TextInput, Checkbox } from "react-library/lib/bootstrap"
+import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from "../../embeddedExprs"
+import { DesignCtx, InstanceCtx } from "../../contexts"
+import { evalContextVarExpr } from "../evalContextVarExpr"
 
 export interface GotoUrlActionDef extends ActionDef {
   type: "gotoUrl"
@@ -15,7 +15,7 @@ export interface GotoUrlActionDef extends ActionDef {
   newTab?: boolean
 
   /** Expression embedded in the url string. Referenced by {0}, {1}, etc. */
-  urlEmbeddedExprs?: EmbeddedExpr[] 
+  urlEmbeddedExprs?: EmbeddedExpr[]
 }
 
 /** Opens a URL optionally in a new tab */
@@ -30,7 +30,8 @@ export class GotoUrlAction extends Action<GotoUrlActionDef> {
     const err = validateEmbeddedExprs({
       embeddedExprs: this.actionDef.urlEmbeddedExprs || [],
       schema: designCtx.schema,
-      contextVars: designCtx.contextVars})
+      contextVars: designCtx.contextVars
+    })
     if (err) {
       return err
     }
@@ -44,27 +45,30 @@ export class GotoUrlAction extends Action<GotoUrlActionDef> {
       <div>
         <LabeledProperty label="URL">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="url">
-            {(value, onChange) => 
-              <TextInput value={value || null} onChange={onChange}/>
-            }
+            {(value, onChange) => <TextInput value={value || null} onChange={onChange} />}
           </PropertyEditor>
         </LabeledProperty>
 
         <LabeledProperty label="URL embedded expressions" help="Reference in text as {0}, {1}, etc.">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="urlEmbeddedExprs">
             {(value: EmbeddedExpr[] | null | undefined, onChange) => (
-              <EmbeddedExprsEditor 
-                value={value} 
-                onChange={onChange} 
-                schema={props.schema} 
+              <EmbeddedExprsEditor
+                value={value}
+                onChange={onChange}
+                schema={props.schema}
                 dataSource={props.dataSource}
-                contextVars={props.contextVars} />
+                contextVars={props.contextVars}
+              />
             )}
           </PropertyEditor>
         </LabeledProperty>
 
         <PropertyEditor obj={this.actionDef} onChange={onChange} property="newTab">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Open in new tab</Checkbox>}
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Open in new tab
+            </Checkbox>
+          )}
         </PropertyEditor>
       </div>
     )
@@ -76,26 +80,28 @@ export class GotoUrlAction extends Action<GotoUrlActionDef> {
     // Get any embedded expression values
     const exprValues: any[] = []
     for (const ee of this.actionDef.urlEmbeddedExprs || []) {
-      const contextVar = ee.contextVarId ? instanceCtx.contextVars.find(cv => cv.id == ee.contextVarId)! : null
-      exprValues.push(await evalContextVarExpr({ 
-        contextVar,
-        contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
-        ctx: instanceCtx,
-        expr: ee.expr }))
+      const contextVar = ee.contextVarId ? instanceCtx.contextVars.find((cv) => cv.id == ee.contextVarId)! : null
+      exprValues.push(
+        await evalContextVarExpr({
+          contextVar,
+          contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
+          ctx: instanceCtx,
+          expr: ee.expr
+        })
+      )
     }
 
     // Format and replace
     url = formatEmbeddedExprString({
-      text: url, 
+      text: url,
       embeddedExprs: this.actionDef.urlEmbeddedExprs || [],
       exprValues: exprValues,
       schema: instanceCtx.schema,
       contextVars: instanceCtx.contextVars,
-      locale: instanceCtx.locale, 
+      locale: instanceCtx.locale,
       formatLocale: instanceCtx.formatLocale
     })
 
     window.open(url, this.actionDef.newTab ? "_blank" : "_self")
   }
 }
-

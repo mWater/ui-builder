@@ -1,7 +1,7 @@
-import React from 'react';
-import _ from 'lodash'
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import React from "react"
+import _ from "lodash"
+import { ActionDef, Action, RenderActionEditorProps } from "../actions"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 export interface RefreshDataActionDef extends ActionDef {
   type: "refreshData"
@@ -14,7 +14,7 @@ export class RefreshDataAction extends Action<RefreshDataActionDef> {
   }
 
   renderEditor(props: RenderActionEditorProps) {
-    return <div/>
+    return <div />
   }
 
   async performAction(instanceCtx: InstanceCtx): Promise<void> {
@@ -22,4 +22,3 @@ export class RefreshDataAction extends Action<RefreshDataActionDef> {
     instanceCtx.database.refresh()
   }
 }
-
