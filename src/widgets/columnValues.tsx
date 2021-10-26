@@ -107,7 +107,7 @@ export class ColumnValuesEditor extends React.Component<{
     // Render list of existing ones in order
     return (
       <div>
-        <table className="table table-bordered table-condensed">
+        <table className="table table-bordered table-sm">
           <tbody>
             {Object.keys(this.props.value)
               .sort()

@@ -149,7 +149,7 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
                   options={[
                     { value: "normal", label: "Default" },
                     { value: "small", label: "Small" },
-                    { value: "extrasmall", label: "Extra-small" },
+                    { value: "extrasmall", label: "Extra-small (deprecated!)" },
                     { value: "large", label: "Large" }
                   ]}
                 />
@@ -279,7 +279,7 @@ function ButtonComponent(props: {
   if (blockDef.style == "plainlink") {
     return (
       <div>
-        <a onClick={props.onClick} style={{ cursor: "pointer" }}>
+        <a className="link-plain" onClick={props.onClick}>
           {icon}
           {icon && label ? "\u00A0" : null}
           {label}
@@ -295,8 +295,9 @@ function ButtonComponent(props: {
     case "small":
       className += ` btn-sm`
       break
+    // DEPRECATED
     case "extrasmall":
-      className += ` btn-xs`
+      className += ` btn-sm`
       break
     case "large":
       className += ` btn-lg`

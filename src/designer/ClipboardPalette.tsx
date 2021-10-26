@@ -60,7 +60,7 @@ const blockTargetSpec: DropTargetSpec<Props> = {
 /** Button that can be dragged or dropped to access the clipboard */
 class ClipboardPalette extends React.Component<Props> {
   render() {
-    const className = this.props.isOver ? "btn btn-primary btn-sm active" : "btn btn-default btn-sm active"
+    const className = this.props.isOver ? "btn btn-primary btn-sm active" : "btn btn-outline-primary btn-sm"
     return this.props.connectDropTarget!(
       this.props.connectDragSource!(
         <button type="button" className={className} style={{ cursor: "move" }}>

@@ -145,7 +145,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           </PropertyEditor>
         </LabeledProperty>
         {/* <LabeledProperty label="Widget ID" hint="Advanced">
-        <input type="text" value={this.props.widgetDef.id} className="form-control input-sm" onFocus={ev => { ev.target.select() }}/>
+        <input type="text" value={this.props.widgetDef.id} className="form-control form-control-sm" onFocus={ev => { ev.target.select() }}/>
       </LabeledProperty> */}
       </div>
     )

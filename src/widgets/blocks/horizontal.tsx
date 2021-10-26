@@ -305,7 +305,7 @@ function ColumnWidthEditor(props: { label: string; columnWidth: string; onChange
   return (
     <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", alignItems: "center", columnGap: 5 }}>
       <div>{props.label}</div>
-      <select className="form-control" value={props.columnWidth} onChange={(ev) => props.onChange(ev.target.value)}>
+      <select className="form-select" value={props.columnWidth} onChange={(ev) => props.onChange(ev.target.value)}>
         <optgroup label="Responsive">
           <option value="auto">Automatic</option>
           <option value="min-content">Small as possible</option>

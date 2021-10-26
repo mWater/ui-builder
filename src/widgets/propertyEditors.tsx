@@ -30,7 +30,7 @@ import { ContextVarExpr } from ".."
 /** Labeled group */
 export const LabeledProperty: React.FC<{ label: string; help?: string; hint?: string }> = (props) => {
   return (
-    <div className="form-group">
+    <div className="mb-3">
       <label>
         {props.label}{" "}
         {props.hint ? (
@@ -41,9 +41,9 @@ export const LabeledProperty: React.FC<{ label: string; help?: string; hint?: st
         ) : null}
       </label>
       <div style={{ paddingLeft: 5 }}>{props.children}</div>
-      <p className="help-block" style={{ marginLeft: 5 }}>
+      <div className="form-text text-muted" style={{ marginLeft: 5 }}>
         {props.help}
-      </p>
+      </div>
     </div>
   )
 }
@@ -361,7 +361,7 @@ export class OrderByEditor extends React.Component<{
   render() {
     return (
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr" }}>
-        <a onClick={this.handleDirToggle}>
+        <a className="link-plain" onClick={this.handleDirToggle}>
           {this.props.value.dir === "asc" ? <i className="fa fa-arrow-up" /> : <i className="fa fa-arrow-down" />}
         </a>
         <ExprComponent

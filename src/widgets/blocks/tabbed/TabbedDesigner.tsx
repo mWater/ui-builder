@@ -42,8 +42,13 @@ export default class TabbedDesigner extends React.Component<Props, State> {
     const labelText = localize(tab.label, this.props.designCtx.locale)
 
     return (
-      <li className={this.state.activeIndex === index ? "active" : ""} key={index}>
-        <a onClick={this.handleSelectTab.bind(null, index)}>{labelText}</a>
+      <li className="nav-item" key={index}>
+        <a
+          className={this.state.activeIndex === index ? "nav-link active" : "nav-link"}
+          onClick={this.handleSelectTab.bind(null, index)}
+        >
+          {labelText}
+        </a>
       </li>
     )
   }
