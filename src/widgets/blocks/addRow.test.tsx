@@ -1,16 +1,16 @@
-import { BlockDef } from "../blocks";
-import simpleSchema from "../../__fixtures__/schema";
-import { DataSource } from 'mwater-expressions';
-import { PageStack } from '../../PageStack';
-import { mount } from "enzyme";
-import React from "react";
-import VirtualDatabase from "../../database/VirtualDatabase";
-import { NullDatabase } from "../../database/Database";
-import BlockFactory from "../BlockFactory";
-import { ActionLibrary } from "../ActionLibrary";
-import { AddRowBlockDef, AddRowBlock } from "./addRow";
-import { InstanceCtx } from "../../contexts";
-import { TextboxBlockDef } from "./controls/textbox";
+import { BlockDef } from "../blocks"
+import simpleSchema from "../../__fixtures__/schema"
+import { DataSource } from "mwater-expressions"
+import { PageStack } from "../../PageStack"
+import { mount } from "enzyme"
+import React from "react"
+import VirtualDatabase from "../../database/VirtualDatabase"
+import { NullDatabase } from "../../database/Database"
+import BlockFactory from "../BlockFactory"
+import { ActionLibrary } from "../ActionLibrary"
+import { AddRowBlockDef, AddRowBlock } from "./addRow"
+import { InstanceCtx } from "../../contexts"
+import { TextboxBlockDef } from "./controls/textbox"
 
 // Outer context vars
 const schema = simpleSchema()
@@ -31,7 +31,7 @@ beforeEach(() => {
     getContextVarExprValue: jest.fn(),
     actionLibrary: {} as ActionLibrary,
     pageStack: {} as PageStack,
-    contextVarValues: { },
+    contextVarValues: {},
     getFilters: jest.fn(),
     setFilter: jest.fn(),
     locale: "en",
@@ -43,10 +43,12 @@ beforeEach(() => {
         const childBlock = createBlock(childBlockDef)
         return childBlock.renderInstance(props)
       }
-      return <div/>
+      return <div />
     },
     widgetLibrary: { widgets: {} },
-    registerForValidation: () => { return () => {} },
+    registerForValidation: () => {
+      return () => {}
+    },
     T: (str) => str
   }
 })
@@ -59,10 +61,10 @@ const addRowBlockDef: AddRowBlockDef = {
   type: "addRow",
   table: "t1",
   columnValues: {
-    text: { contextVarId: null, expr: { type: "literal", valueType: "text", value: "abc" }}
+    text: { contextVarId: null, expr: { type: "literal", valueType: "text", value: "abc" } }
   },
-  content: { 
-    type: "textbox", 
+  content: {
+    type: "textbox",
     id: "tb1",
     rowContextVarId: "ar1",
     column: "text",
@@ -71,11 +73,11 @@ const addRowBlockDef: AddRowBlockDef = {
 }
 
 test("save writes to database", async () => {
-  (rips.getContextVarExprValue as jest.Mock).mockReturnValue("abc")
-  
-  const addRowBlock = new AddRowBlock(addRowBlockDef);
+  ;(rips.getContextVarExprValue as jest.Mock).mockReturnValue("abc")
 
-  const inst = mount(addRowBlock.renderInstance(rips));
+  const addRowBlock = new AddRowBlock(addRowBlockDef)
+
+  const inst = mount(addRowBlock.renderInstance(rips))
 
   // Wait for load
   await pause()
@@ -88,16 +90,17 @@ test("save writes to database", async () => {
 })
 
 test("reuses existing", async () => {
-  const rips2: InstanceCtx = { ...rips, 
+  const rips2: InstanceCtx = {
+    ...rips,
     contextVars: [{ id: "existing", type: "row", table: "t1", name: "Existing" }],
     contextVarValues: { existing: "123" }
   }
 
-  const addRowBlock = new AddRowBlock({ 
-    ...addRowBlockDef, 
+  const addRowBlock = new AddRowBlock({
+    ...addRowBlockDef,
     existingContextVarId: "existing",
-    content: { 
-      type: "textbox", 
+    content: {
+      type: "textbox",
       id: "tb1",
       rowContextVarId: "existing",
       column: "text",
@@ -116,16 +119,17 @@ test("reuses existing", async () => {
 })
 
 test("does not reuse non-existing existing", async () => {
-  const rips2: InstanceCtx = { ...rips, 
+  const rips2: InstanceCtx = {
+    ...rips,
     contextVars: [{ id: "existing", type: "row", table: "t1", name: "Existing" }],
     contextVarValues: { existing: null }
   }
 
-  const addRowBlock = new AddRowBlock({ 
-    ...addRowBlockDef, 
+  const addRowBlock = new AddRowBlock({
+    ...addRowBlockDef,
     existingContextVarId: "existing",
-    content: { 
-      type: "textbox", 
+    content: {
+      type: "textbox",
       id: "tb1",
       rowContextVarId: "existing",
       column: "text",

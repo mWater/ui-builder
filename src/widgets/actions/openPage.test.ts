@@ -1,19 +1,18 @@
-import VirtualDatabase from "../../database/VirtualDatabase";
-import { NullDatabase } from "../../database/Database";
-import simpleSchema from "../../__fixtures__/schema";
-import { PageStack, Page } from "../../PageStack";
-import { OpenPageActionDef, OpenPageAction } from "./openPage";
-import mockInstanceCtx from "../../__fixtures__/mockInstanceCtx";
-import { ContextVar, Filter } from "../blocks";
-
+import VirtualDatabase from "../../database/VirtualDatabase"
+import { NullDatabase } from "../../database/Database"
+import simpleSchema from "../../__fixtures__/schema"
+import { PageStack, Page } from "../../PageStack"
+import { OpenPageActionDef, OpenPageAction } from "./openPage"
+import mockInstanceCtx from "../../__fixtures__/mockInstanceCtx"
+import { ContextVar, Filter } from "../blocks"
 
 test("performs action", async () => {
-  const ad : OpenPageActionDef = {
+  const ad: OpenPageActionDef = {
     type: "openPage",
     pageType: "normal",
     widgetId: "innerPage",
     contextVarValues: {
-      "innercv1": {
+      innercv1: {
         type: "ref",
         contextVarId: "outercv1"
       }
@@ -26,21 +25,28 @@ test("performs action", async () => {
     openPage: openPage as unknown
   } as PageStack
 
-  const instanceCtx = { ...mockInstanceCtx(),
+  const instanceCtx = {
+    ...mockInstanceCtx(),
     database: database,
     schema: schema,
     pageStack: pageStack,
     contextVars: [{ id: "outercv1", table: "t2", name: "Cv1", type: "rowset" } as ContextVar],
-    contextVarValues: { outercv1: { type: "literal", valueType: "boolean", value: true }},
-    getContextVarExprValue: () => { throw new Error("Not implemented") },
-    getFilters: (cvid: string) => {
-      return cvid == "outercv1" ? [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: false }} as Filter] : []
+    contextVarValues: { outercv1: { type: "literal", valueType: "boolean", value: true } },
+    getContextVarExprValue: () => {
+      throw new Error("Not implemented")
     },
-    widgetLibrary: { widgets: {
-      "innerPage": {
-        contextVars: [{ id: "innercv1", type: "boolean" }] as ContextVar[]
-      } as any
-    }}
+    getFilters: (cvid: string) => {
+      return cvid == "outercv1"
+        ? [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: false } } as Filter]
+        : []
+    },
+    widgetLibrary: {
+      widgets: {
+        innerPage: {
+          contextVars: [{ id: "innercv1", type: "boolean" }] as ContextVar[]
+        } as any
+      }
+    }
   }
 
   const action = new OpenPageAction(ad)
@@ -59,4 +65,3 @@ test("performs action", async () => {
     ]
   })
 })
-

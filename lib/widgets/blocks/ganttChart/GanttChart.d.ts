@@ -1,9 +1,9 @@
 /// <reference types="react" />
-import { BlockDef, ContextVar } from '../../blocks';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
-import LeafBlock from '../../LeafBlock';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { ActionDef } from '../../actions';
+import { BlockDef, ContextVar } from "../../blocks";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
+import LeafBlock from "../../LeafBlock";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { ActionDef } from "../../actions";
 /** Gantt chart */
 export interface GanttChartBlockDef extends BlockDef {
     type: "ganttChart";

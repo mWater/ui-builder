@@ -1,8 +1,8 @@
-import { ActionLibrary } from "../widgets/ActionLibrary";
-import { PageStack } from "../PageStack";
-import { Database } from "../database/Database";
-import { Schema, DataSource } from "mwater-expressions";
-import { InstanceCtx } from "../contexts";
+import { ActionLibrary } from "../widgets/ActionLibrary"
+import { PageStack } from "../PageStack"
+import { Database } from "../database/Database"
+import { Schema, DataSource } from "mwater-expressions"
+import { InstanceCtx } from "../contexts"
 
 export default () => {
   return {
@@ -12,7 +12,7 @@ export default () => {
     getContextVarExprValue: jest.fn(),
     actionLibrary: {} as ActionLibrary,
     pageStack: {} as PageStack,
-    contextVarValues: { },
+    contextVarValues: {},
     getFilters: () => [],
     setFilter: jest.fn(),
     locale: "en",

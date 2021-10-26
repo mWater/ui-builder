@@ -1,7 +1,7 @@
-import * as React from "react";
+import * as React from "react"
 import { ConnectDragSource, DragSource, DragSourceConnector, DragSourceSpec, DragSourceMonitor } from "react-dnd"
-import uuid from 'uuid'
-import { BlockDef } from "../widgets/blocks";
+import uuid from "uuid"
+import { BlockDef } from "../widgets/blocks"
 
 interface Props {
   onSelect(blockId: string): void
@@ -24,12 +24,10 @@ const blockSourceSpec: DragSourceSpec<Props, { blockDef: BlockDef }> = {
 /** Button that can be dragged into the designer to create an addWizard block */
 class AddWizardPalette extends React.Component<Props> {
   render() {
-    return (
-      this.props.connectDragSource!(
-        <button type="button" className="btn btn-default btn-sm active" style={{ cursor: "move" }}>
-          <i className="fa fa-arrows"/> Add Block
-        </button>
-      )
+    return this.props.connectDragSource!(
+      <button type="button" className="btn btn-default btn-sm active" style={{ cursor: "move" }}>
+        <i className="fa fa-arrows" /> Add Block
+      </button>
     )
   }
 }

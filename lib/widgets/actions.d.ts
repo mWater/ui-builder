@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { DesignCtx, InstanceCtx } from '../contexts';
+import * as React from "react";
+import { DesignCtx, InstanceCtx } from "../contexts";
 /** Action definition. Something that can be performed. */
 export interface ActionDef {
     type: string;

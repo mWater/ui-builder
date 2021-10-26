@@ -1,8 +1,8 @@
-import { Expr, Schema, ExprUtils, ExprValidator } from "mwater-expressions";
-import { ContextVar, createExprVariables, validateContextVarExpr } from "./widgets/blocks";
-import * as d3Format from 'd3-format';
-import { FormatLocaleObject } from "d3-format";
-import moment from "moment";
+import { Expr, Schema, ExprUtils, ExprValidator } from "mwater-expressions"
+import { ContextVar, createExprVariables, validateContextVarExpr } from "./widgets/blocks"
+import * as d3Format from "d3-format"
+import { FormatLocaleObject } from "d3-format"
+import moment from "moment"
 
 /** Expression which is embedded in the text string */
 export interface EmbeddedExpr {
@@ -34,7 +34,7 @@ export const formatEmbeddedExprString = (options: {
   const formatLocale = options.formatLocale || d3Format
 
   // Format and replace
-  for (let i = 0 ; i < options.exprValues.length ; i++) {
+  for (let i = 0; i < options.exprValues.length; i++) {
     let str
 
     const expr = options.embeddedExprs![i].expr
@@ -44,28 +44,27 @@ export const formatEmbeddedExprString = (options: {
 
     if (value == null) {
       str = ""
-    }
-    else {
+    } else {
       if (exprType === "number" && value != null) {
         // d3 multiplies by 100 when appending a percentage. Remove this behaviour for consistency
         if ((format || "").includes("%")) {
           str = formatLocale.format(format || "")(value / 100.0)
-        }
-        else {
+        } else {
           str = formatLocale.format(format || "")(value)
         }
-      }
-      else if (exprType === "date" && value != null) {
+      } else if (exprType === "date" && value != null) {
         str = moment(value, moment.ISO_8601).format(format || "ll")
-      }
-      else if (exprType === "datetime" && value != null) {
+      } else if (exprType === "datetime" && value != null) {
         str = moment(value, moment.ISO_8601).format(format || "lll")
-      }
-      else {
-        str = new ExprUtils(options.schema, createExprVariables(options.contextVars)).stringifyExprLiteral(expr, value, options.locale)
+      } else {
+        str = new ExprUtils(options.schema, createExprVariables(options.contextVars)).stringifyExprLiteral(
+          expr,
+          value,
+          options.locale
+        )
       }
     }
-    
+
     text = text.replace(`{${i}}`, str)
   }
   return text

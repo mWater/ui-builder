@@ -1,9 +1,9 @@
 /// <reference types="react" />
-import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
-import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
-import { OrderBy } from '../../../database/Database';
-import { ActionDef } from '../../actions';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
+import { Block, BlockDef, ContextVar, ChildBlock } from "../../blocks";
+import { Expr, Schema, LocalizedString, Row } from "mwater-expressions";
+import { OrderBy } from "../../../database/Database";
+import { ActionDef } from "../../actions";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
 export interface QueryTableBlockDef extends BlockDef {
     type: "queryTable";
     /** Determines if one table row contains one or multiple database table rows */

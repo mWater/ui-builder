@@ -1,5 +1,5 @@
-import { ActionDef, Action } from '../actions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { ActionDef, Action } from "../actions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface BrowserBackActionDef extends ActionDef {
     type: "browserBack";
 }

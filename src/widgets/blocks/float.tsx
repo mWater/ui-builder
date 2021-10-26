@@ -1,10 +1,10 @@
-import * as React from 'react';
-import * as _ from 'lodash';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks'
-import { LabeledProperty, PropertyEditor } from '../propertyEditors';
-import { Toggle } from 'react-library/lib/bootstrap';
-import produce from 'immer';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react"
+import * as _ from "lodash"
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks"
+import { LabeledProperty, PropertyEditor } from "../propertyEditors"
+import { Toggle } from "react-library/lib/bootstrap"
+import produce from "immer"
+import { DesignCtx, InstanceCtx } from "../../contexts"
 
 /** Floats some content either right or left of main content */
 export interface FloatBlockDef extends BlockDef {
@@ -14,7 +14,7 @@ export interface FloatBlockDef extends BlockDef {
   direction: "left" | "right"
 
   /** Which way to vertically align */
-  verticalAlign: "top" | "middle" | "bottom" 
+  verticalAlign: "top" | "middle" | "bottom"
 
   /** Main content of block */
   mainContent: BlockDef | null
@@ -26,10 +26,15 @@ export interface FloatBlockDef extends BlockDef {
 export class FloatBlock extends Block<FloatBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     // Get for all cells
-    return _.compact([this.blockDef.mainContent, this.blockDef.floatContent]).map(bd => ({ blockDef: bd!, contextVars: contextVars }))
+    return _.compact([this.blockDef.mainContent, this.blockDef.floatContent]).map((bd) => ({
+      blockDef: bd!,
+      contextVars: contextVars
+    }))
   }
 
-  validate() { return null }
+  validate() {
+    return null
+  }
 
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     return produce(this.blockDef, (draft: FloatBlockDef) => {
@@ -40,35 +45,49 @@ export class FloatBlock extends Block<FloatBlockDef> {
 
   renderDesign(props: DesignCtx) {
     const handleSetMainContent = (blockDef: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: FloatBlockDef) => { 
-        b.mainContent = blockDef 
-      }), blockDef.id)
+      props.store.alterBlock(
+        this.id,
+        produce((b: FloatBlockDef) => {
+          b.mainContent = blockDef
+        }),
+        blockDef.id
+      )
     }
     const handleSetFloatContent = (blockDef: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: FloatBlockDef) => { 
-        b.floatContent = blockDef 
-      }), blockDef.id)
+      props.store.alterBlock(
+        this.id,
+        produce((b: FloatBlockDef) => {
+          b.floatContent = blockDef
+        }),
+        blockDef.id
+      )
     }
 
     const mainContentNode = props.renderChildBlock(props, this.blockDef.mainContent, handleSetMainContent)
     const floatContentNode = props.renderChildBlock(props, this.blockDef.floatContent, handleSetFloatContent)
 
-    return <FloatComponent 
-      float={floatContentNode} 
-      main={mainContentNode} 
-      direction={this.blockDef.direction} 
-      verticalAlign={this.blockDef.verticalAlign} />
+    return (
+      <FloatComponent
+        float={floatContentNode}
+        main={mainContentNode}
+        direction={this.blockDef.direction}
+        verticalAlign={this.blockDef.verticalAlign}
+      />
+    )
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
     const mainContentNode = props.renderChildBlock(props, this.blockDef.mainContent)
     const floatContentNode = props.renderChildBlock(props, this.blockDef.floatContent)
 
-    return <FloatComponent 
-      float={floatContentNode} 
-      main={mainContentNode} 
-      direction={this.blockDef.direction} 
-      verticalAlign={this.blockDef.verticalAlign} />
+    return (
+      <FloatComponent
+        float={floatContentNode}
+        main={mainContentNode}
+        direction={this.blockDef.direction}
+        verticalAlign={this.blockDef.verticalAlign}
+      />
+    )
   }
 
   renderEditor(props: DesignCtx) {
@@ -76,52 +95,63 @@ export class FloatBlock extends Block<FloatBlockDef> {
       <div>
         <LabeledProperty label="Direction">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="direction">
-            {(value, onChange) => 
-              <Toggle 
-                value={value} 
-                onChange={onChange} 
+            {(value, onChange) => (
+              <Toggle
+                value={value}
+                onChange={onChange}
                 options={[
-                  { value: "left", label: <i className="fa fa-align-left"/> },
-                  { value: "right", label: <i className="fa fa-align-right"/> }
-                ]} />
-            }
+                  { value: "left", label: <i className="fa fa-align-left" /> },
+                  { value: "right", label: <i className="fa fa-align-right" /> }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
         <LabeledProperty label="Vertical Alignment">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="verticalAlign">
-            {(value, onChange) => 
-              <Toggle 
-                value={value} 
-                onChange={onChange} 
+            {(value, onChange) => (
+              <Toggle
+                value={value}
+                onChange={onChange}
                 options={[
                   { value: "top", label: "Top" },
                   { value: "middle", label: "Middle" },
                   { value: "bottom", label: "Bottom" }
-                ]} />
-            }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-     </div>
+      </div>
     )
   }
 }
 
-const FloatComponent = (props: { 
-  main: React.ReactNode 
+const FloatComponent = (props: {
+  main: React.ReactNode
   float: React.ReactNode
   direction: "left" | "right"
   verticalAlign: "top" | "middle" | "bottom"
- }) => {
+}) => {
   return (
-    <table style={{width: "100%"}}>
+    <table style={{ width: "100%" }}>
       <tbody>
         <tr key="float">
-          { props.direction == "left" ? <td key="left" style={{ verticalAlign: props.verticalAlign }}>{props.float}</td> : null }
-          <td key="main" style={{ width: "100%", verticalAlign: props.verticalAlign }}>{props.main}</td>
-          { props.direction == "right" ? <td key="right" style={{ verticalAlign: props.verticalAlign }}>{props.float}</td> : null }
+          {props.direction == "left" ? (
+            <td key="left" style={{ verticalAlign: props.verticalAlign }}>
+              {props.float}
+            </td>
+          ) : null}
+          <td key="main" style={{ width: "100%", verticalAlign: props.verticalAlign }}>
+            {props.main}
+          </td>
+          {props.direction == "right" ? (
+            <td key="right" style={{ verticalAlign: props.verticalAlign }}>
+              {props.float}
+            </td>
+          ) : null}
         </tr>
-      </tbody>      
+      </tbody>
     </table>
-
   )
 }

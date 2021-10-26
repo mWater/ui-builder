@@ -1,9 +1,9 @@
-import * as React from 'react';
-import LeafBlock from '../LeafBlock';
-import { BlockDef } from '../blocks';
-import { ActionDef } from '../actions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import './image.css';
+import * as React from "react";
+import LeafBlock from "../LeafBlock";
+import { BlockDef } from "../blocks";
+import { ActionDef } from "../actions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
+import "./image.css";
 export interface ImageBlockDef extends BlockDef {
     type: "image";
     /** URL of image */

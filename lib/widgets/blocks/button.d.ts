@@ -1,10 +1,10 @@
-import React from 'react';
-import LeafBlock from '../LeafBlock';
-import { BlockDef, ContextVar } from '../blocks';
-import { ActionDef } from '../actions';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { EmbeddedExpr } from '../../embeddedExprs';
+import React from "react";
+import LeafBlock from "../LeafBlock";
+import { BlockDef, ContextVar } from "../blocks";
+import { ActionDef } from "../actions";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
+import { EmbeddedExpr } from "../../embeddedExprs";
 export interface ButtonBlockDef extends BlockDef {
     type: "button";
     label: LocalizedString | null;

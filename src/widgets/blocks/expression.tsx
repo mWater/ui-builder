@@ -1,17 +1,26 @@
-import * as React from 'react';
-import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from '../blocks'
-import { PropertyEditor, ContextVarPropertyEditor, LabeledProperty, NumberFormatEditor, DateFormatEditor, DatetimeFormatEditor, ContextVarAndExprPropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
-import { Expr, ExprUtils, ExprValidator, LocalizedString } from 'mwater-expressions';
-import * as _ from 'lodash';
-import * as d3Format from 'd3-format';
-import moment from 'moment'
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { TextualBlockDef, TextualBlock } from './textual';
-import { localize } from '../localization';
+import * as React from "react"
+import { BlockDef, ContextVar, createExprVariables, validateContextVarExpr } from "../blocks"
+import {
+  PropertyEditor,
+  ContextVarPropertyEditor,
+  LabeledProperty,
+  NumberFormatEditor,
+  DateFormatEditor,
+  DatetimeFormatEditor,
+  ContextVarAndExprPropertyEditor,
+  LocalizedTextPropertyEditor
+} from "../propertyEditors"
+import { Expr, ExprUtils, ExprValidator, LocalizedString } from "mwater-expressions"
+import * as _ from "lodash"
+import * as d3Format from "d3-format"
+import moment from "moment"
+import { DesignCtx, InstanceCtx } from "../../contexts"
+import { TextualBlockDef, TextualBlock } from "./textual"
+import { localize } from "../localization"
 
 export interface ExpressionBlockDef extends TextualBlockDef {
   type: "expression"
-  
+
   /** Context variable (row or rowset) to use for expression */
   contextVarId: string | null
 
@@ -29,8 +38,8 @@ export interface ExpressionBlockDef extends TextualBlockDef {
 }
 
 export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
-  getContextVarExprs(contextVar: ContextVar): Expr[] { 
-    return (contextVar.id === this.blockDef.contextVarId && this.blockDef.expr) ? [this.blockDef.expr] : [] 
+  getContextVarExprs(contextVar: ContextVar): Expr[] {
+    return contextVar.id === this.blockDef.contextVarId && this.blockDef.expr ? [this.blockDef.expr] : []
   }
 
   validate(ctx: DesignCtx) {
@@ -43,7 +52,10 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   renderDesign(props: DesignCtx) {
-    let summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(this.blockDef.expr, props.locale)
+    let summary = new ExprUtils(props.schema, createExprVariables(props.contextVars)).summarizeExpr(
+      this.blockDef.expr,
+      props.locale
+    )
     if (summary.length > 20) {
       summary = summary.substr(0, 20) + "..."
     }
@@ -54,12 +66,12 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
         {summary}
         <span className="text-muted">&gt;</span>
       </div>
-    )     
+    )
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
     if (!this.blockDef.expr) {
-      return <div/>
+      return <div />
     }
 
     const value = props.getContextVarExprValue(this.blockDef.contextVarId, this.blockDef.expr)
@@ -70,47 +82,41 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
     let str
     if (value == null) {
       str = ""
-    }
-    else {
+    } else {
       if (exprType === "number") {
         // d3 multiplies by 100 when appending a percentage. Remove this behaviour for consistency
         if ((this.blockDef.format || "").includes("%")) {
           str = formatLocale.format(this.blockDef.format || "")(value / 100.0)
-        }
-        else {
+        } else {
           str = formatLocale.format(this.blockDef.format || "")(value)
         }
-      }
-      else if (exprType === "date" && value != null) {
+      } else if (exprType === "date" && value != null) {
         str = moment(value, moment.ISO_8601).format(this.blockDef.format || "ll")
-      }
-      else if (exprType === "datetime" && value != null) {
+      } else if (exprType === "datetime" && value != null) {
         str = moment(value, moment.ISO_8601).format(this.blockDef.format || "lll")
-      }
-      else if (exprType == "boolean") {
+      } else if (exprType == "boolean") {
         if (value == true) {
           str = this.blockDef.trueLabel ? localize(this.blockDef.trueLabel, props.locale) : "True"
-        }
-        else if (value == false) {
+        } else if (value == false) {
           str = this.blockDef.falseLabel ? localize(this.blockDef.falseLabel, props.locale) : "False"
-        }
-        else {
+        } else {
           str = ""
         }
-      }
-      else {
-        str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(this.blockDef.expr, value, props.locale)
+      } else {
+        str = new ExprUtils(props.schema, createExprVariables(props.contextVars)).stringifyExprLiteral(
+          this.blockDef.expr,
+          value,
+          props.locale
+        )
       }
     }
 
     let node
     if (this.blockDef.html) {
       node = this.processHTML(str)
-    }
-    else if (this.blockDef.markdown) {
+    } else if (this.blockDef.markdown) {
       node = this.processMarkdown(str)
-    }
-    else {
+    } else {
       node = str
     }
 
@@ -118,7 +124,9 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
   }
 
   renderEditor(props: DesignCtx) {
-    const contextVar = this.blockDef.contextVarId ? props.contextVars.find(cv => cv.id === this.blockDef.contextVarId) || null : null
+    const contextVar = this.blockDef.contextVarId
+      ? props.contextVars.find((cv) => cv.id === this.blockDef.contextVarId) || null
+      : null
 
     const exprType = new ExprUtils(props.schema, createExprVariables(props.contextVars)).getExprType(this.blockDef.expr)
 
@@ -127,79 +135,76 @@ export class ExpressionBlock extends TextualBlock<ExpressionBlockDef> {
         <LabeledProperty label="Expression">
           <ContextVarAndExprPropertyEditor
             contextVars={props.contextVars}
-            schema={props.schema} 
-            dataSource={props.dataSource} 
-            aggrStatuses={contextVar && contextVar.type == "row" ? ["individual", "literal"] : ["individual", "aggregate", "literal"]}
+            schema={props.schema}
+            dataSource={props.dataSource}
+            aggrStatuses={
+              contextVar && contextVar.type == "row"
+                ? ["individual", "literal"]
+                : ["individual", "aggregate", "literal"]
+            }
             contextVarId={this.blockDef.contextVarId}
-            expr={this.blockDef.expr} 
+            expr={this.blockDef.expr}
             onChange={(contextVarId, expr) => {
               props.store.replaceBlock({ ...this.blockDef, contextVarId, expr } as ExpressionBlockDef)
             }}
-            />
+          />
         </LabeledProperty>
 
-        { exprType === "number" ?
+        {exprType === "number" ? (
           <LabeledProperty label="Number Format">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
-              {(value: string, onChange) => (
-                <NumberFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
+              {(value: string, onChange) => <NumberFormatEditor value={value} onChange={onChange} />}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
+        ) : null}
 
-        { exprType === "date" ?
+        {exprType === "date" ? (
           <LabeledProperty label="Date Format">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
-              {(value: string, onChange) => (
-                <DateFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
+              {(value: string, onChange) => <DateFormatEditor value={value} onChange={onChange} />}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
+        ) : null}
 
-        { exprType === "datetime" ?
+        {exprType === "datetime" ? (
           <LabeledProperty label="Date/time Format">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
-              {(value: string, onChange) => (
-                <DatetimeFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
+              {(value: string, onChange) => <DatetimeFormatEditor value={value} onChange={onChange} />}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
+        ) : null}
 
-        { exprType === "boolean" ?
+        {exprType === "boolean" ? (
           <LabeledProperty label="Display True As">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="trueLabel">
               {(value, onChange) => (
-                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="True" />
+                <LocalizedTextPropertyEditor
+                  value={value}
+                  onChange={onChange}
+                  locale={props.locale}
+                  placeholder="True"
+                />
               )}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
+        ) : null}
 
-        { exprType === "boolean" ?
+        {exprType === "boolean" ? (
           <LabeledProperty label="Display False As">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="falseLabel">
               {(value, onChange) => (
-                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="False" />
+                <LocalizedTextPropertyEditor
+                  value={value}
+                  onChange={onChange}
+                  locale={props.locale}
+                  placeholder="False"
+                />
               )}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
+        ) : null}
 
-        { this.renderTextualEditor(props) }
+        {this.renderTextualEditor(props)}
       </div>
     )
   }

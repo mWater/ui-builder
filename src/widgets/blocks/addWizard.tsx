@@ -1,27 +1,27 @@
-import _ from 'lodash'
-import * as React from 'react';
-import LeafBlock from '../LeafBlock'
-import { BlockDef, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from '../blocks'
-import ModalWindowComponent from 'react-library/lib/ModalWindowComponent'
-import { BlockPaletteEntry } from '../../designer/blockPaletteEntries';
-import { Schema, DataSource, LocalizedString } from 'mwater-expressions';
-import BlockPlaceholder from '../BlockPlaceholder';
-import { useState, useRef, useEffect } from 'react';
-import { SearchControl } from './search/SearchBlockInstance';
-import TabbedComponent from 'react-library/lib/TabbedComponent'
-import { localize } from '../localization';
-import uuid = require('uuid');
-import { ExpressionBlock, ExpressionBlockDef } from './expression';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { LabeledBlockDef } from './labeled';
-import { TextboxBlockDef } from './controls/textbox';
-import { NumberboxBlockDef } from './controls/numberbox';
-import { DatefieldBlockDef } from './controls/datefield';
-import { DropdownBlockDef } from './controls/dropdown';
-import { WidgetBlockDef } from './widget';
-import { Toggle } from 'react-library/lib/bootstrap';
-import { HorizontalBlockDef } from './horizontal';
-import { TextBlockDef } from './text';
+import _ from "lodash"
+import * as React from "react"
+import LeafBlock from "../LeafBlock"
+import { BlockDef, CreateBlock, NullBlockStore, ContextVar, duplicateBlockDef } from "../blocks"
+import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
+import { BlockPaletteEntry } from "../../designer/blockPaletteEntries"
+import { Schema, DataSource, LocalizedString } from "mwater-expressions"
+import BlockPlaceholder from "../BlockPlaceholder"
+import { useState, useRef, useEffect } from "react"
+import { SearchControl } from "./search/SearchBlockInstance"
+import TabbedComponent from "react-library/lib/TabbedComponent"
+import { localize } from "../localization"
+import uuid = require("uuid")
+import { ExpressionBlock, ExpressionBlockDef } from "./expression"
+import { DesignCtx, InstanceCtx } from "../../contexts"
+import { LabeledBlockDef } from "./labeled"
+import { TextboxBlockDef } from "./controls/textbox"
+import { NumberboxBlockDef } from "./controls/numberbox"
+import { DatefieldBlockDef } from "./controls/datefield"
+import { DropdownBlockDef } from "./controls/dropdown"
+import { WidgetBlockDef } from "./widget"
+import { Toggle } from "react-library/lib/bootstrap"
+import { HorizontalBlockDef } from "./horizontal"
+import { TextBlockDef } from "./text"
 
 export interface AddWizardBlockDef extends BlockDef {
   type: "addWizard"
@@ -33,8 +33,8 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
     super(blockDef)
   }
 
-  validate(options: DesignCtx) { 
-    return null 
+  validate(options: DesignCtx) {
+    return null
   }
 
   renderDesign(props: DesignCtx) {
@@ -44,27 +44,20 @@ export class AddWizardBlock extends LeafBlock<AddWizardBlockDef> {
         const duplicatedBlockDef = duplicateBlockDef(newBlockDef, props.createBlock)
         duplicatedBlockDef.id = this.blockDef.id
         props.store.alterBlock(this.blockDef.id, (bd) => duplicatedBlockDef)
-      }
-      else {
+      } else {
         props.store.alterBlock(this.blockDef.id, (bd) => null)
       }
     }
 
     return (
-      <ModalWindowComponent
-        isOpen={true}
-        onRequestClose={() => handleSet(null)}>
-          <AddWizardPane
-            designCtx={props}
-            onSelect={handleSet}
-            contextVars={props.contextVars}
-          />
-        </ModalWindowComponent>
+      <ModalWindowComponent isOpen={true} onRequestClose={() => handleSet(null)}>
+        <AddWizardPane designCtx={props} onSelect={handleSet} contextVars={props.contextVars} />
+      </ModalWindowComponent>
     )
   }
 
   renderInstance(props: InstanceCtx): React.ReactElement<any> {
-    return <div/>
+    return <div />
   }
 }
 
@@ -95,7 +88,7 @@ const AddWizardPane = (props: {
 
   // Focus on load
   const searchControl = useRef<SearchControl>(null)
-  useEffect(() => { 
+  useEffect(() => {
     if (searchControl.current) {
       searchControl.current.focus()
     }
@@ -108,16 +101,14 @@ const AddWizardPane = (props: {
     const wrapBlockDef = (label: LocalizedString, blockDef: BlockDef): BlockDef => {
       if (controlMode == "plain") {
         return blockDef
-      }
-      else if (controlMode == "labelAbove") {
+      } else if (controlMode == "labelAbove") {
         return {
           id: uuid(),
           type: "labeled",
           label: label,
           child: blockDef
         } as LabeledBlockDef
-      }
-      else if (controlMode == "labelBefore") {
+      } else if (controlMode == "labelBefore") {
         return {
           id: uuid(),
           type: "labeled",
@@ -130,18 +121,18 @@ const AddWizardPane = (props: {
     }
 
     // Find context var of type row
-    for (const contextVar of props.contextVars.filter(cv => cv.type == "row").reverse()) {
+    for (const contextVar of props.contextVars.filter((cv) => cv.type == "row").reverse()) {
       // Get columns
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
         const addBlock = (child: BlockDef) => {
-          allEntries.push({ 
-            title: localize(column.name) || "", 
+          allEntries.push({
+            title: localize(column.name) || "",
             blockDef: wrapBlockDef(column.name, child)
           })
         }
-    
+
         if (column.type == "text") {
           addBlock({
             id: uuid(),
@@ -173,11 +164,13 @@ const AddWizardPane = (props: {
           } as DatefieldBlockDef)
         }
 
-        if (column.type === "enum" 
-          || column.type === "enumset" 
-          || column.type === "id" 
-          || column.type === "id[]"
-          || column.type === "boolean") {
+        if (
+          column.type === "enum" ||
+          column.type === "enumset" ||
+          column.type === "id" ||
+          column.type === "id[]" ||
+          column.type === "boolean"
+        ) {
           addBlock({
             id: uuid(),
             type: "dropdown",
@@ -198,16 +191,14 @@ const AddWizardPane = (props: {
     const wrapBlockDef = (label: LocalizedString, blockDef: ExpressionBlockDef): BlockDef => {
       if (expressionMode == "plain") {
         return blockDef
-      }
-      else if (expressionMode == "labelAbove") {
+      } else if (expressionMode == "labelAbove") {
         return {
           id: uuid(),
           type: "labeled",
           label: label,
           child: blockDef
         } as LabeledBlockDef
-      }
-      else if (expressionMode == "labelBefore") {
+      } else if (expressionMode == "labelBefore") {
         return {
           id: uuid(),
           type: "labeled",
@@ -220,7 +211,7 @@ const AddWizardPane = (props: {
     }
 
     // Find context var of type row
-    for (const contextVar of props.contextVars.filter(cv => cv.type == "row").reverse()) {  
+    for (const contextVar of props.contextVars.filter((cv) => cv.type == "row").reverse()) {
       // Get columns
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
@@ -230,11 +221,11 @@ const AddWizardPane = (props: {
           continue
         }
 
-        allEntries.push({ 
-          title: localize(column.name) || "", 
-          blockDef: wrapBlockDef(column.name, { 
+        allEntries.push({
+          title: localize(column.name) || "",
+          blockDef: wrapBlockDef(column.name, {
             id: uuid(),
-            type: "expression", 
+            type: "expression",
             contextVarId: contextVar.id,
             expr: { type: "field", table: contextVar.table!, column: column.id },
             format: column.type == "number" ? "," : null
@@ -253,7 +244,7 @@ const AddWizardPane = (props: {
     for (const widgetId in props.designCtx.widgetLibrary.widgets) {
       const widget = props.designCtx.widgetLibrary.widgets[widgetId]
 
-      // TODO Skip self 
+      // TODO Skip self
       allEntries.push({
         title: widget.name,
         subtitle: widget.description,
@@ -262,87 +253,100 @@ const AddWizardPane = (props: {
           type: "widget",
           widgetId: widgetId,
           contextVarMap: {}
-         } as WidgetBlockDef,
-         elem: <div/>
+        } as WidgetBlockDef,
+        elem: <div />
       })
     }
 
     return allEntries
   }
-  
+
   const displayAndFilterEntries = (entries: BlockPaletteEntry[]) => {
     // Compute visible entries
-    const visibleEntries = entries.filter(entry => {
+    const visibleEntries = entries.filter((entry) => {
       return search ? entry.title.toLowerCase().includes(search.toLowerCase()) : true
     })
 
-    return <div>
-      { visibleEntries.map((entry, index) => {
-        return <PaletteItem 
-          entry={entry}
-          key={index}
-          designCtx={designCtx}
-          onSelect={() => props.onSelect(typeof entry.blockDef == "function" ? entry.blockDef(props.contextVars) : entry.blockDef)} />
-      })}
-    </div>
+    return (
+      <div>
+        {visibleEntries.map((entry, index) => {
+          return (
+            <PaletteItem
+              entry={entry}
+              key={index}
+              designCtx={designCtx}
+              onSelect={() =>
+                props.onSelect(typeof entry.blockDef == "function" ? entry.blockDef(props.contextVars) : entry.blockDef)
+              }
+            />
+          )
+        })}
+      </div>
+    )
   }
 
   const renderExpressionOptions = () => {
-    return <div style={{ float: "right", paddingRight: 10 }}>
-      <Toggle 
-        value={expressionMode}
-        onChange={(em: LayoutMode) => { 
-          setExpressionMode(em)
-          defaultExpressionMode = em
-        }}
-        size="sm"
-        options={[
-          { value: "plain", label: "Plain" },
-          { value: "labelAbove", label: "Label Above" },
-          { value: "labelBefore", label: "Label Before" }
-        ]} />
-    </div>
+    return (
+      <div style={{ float: "right", paddingRight: 10 }}>
+        <Toggle
+          value={expressionMode}
+          onChange={(em: LayoutMode) => {
+            setExpressionMode(em)
+            defaultExpressionMode = em
+          }}
+          size="sm"
+          options={[
+            { value: "plain", label: "Plain" },
+            { value: "labelAbove", label: "Label Above" },
+            { value: "labelBefore", label: "Label Before" }
+          ]}
+        />
+      </div>
+    )
   }
 
   const renderControlOptions = () => {
-    return <div style={{ float: "right", paddingRight: 10 }}>
-      <Toggle 
-        value={controlMode}
-        onChange={(em: LayoutMode) => { 
-          setControlMode(em)
-          defaultControlMode = em
-        }}
-        size="sm"
-        options={[
-          { value: "plain", label: "Plain" },
-          { value: "labelAbove", label: "Label Above" },
-          { value: "labelBefore", label: "Label Before" }
-        ]} />
-    </div>
+    return (
+      <div style={{ float: "right", paddingRight: 10 }}>
+        <Toggle
+          value={controlMode}
+          onChange={(em: LayoutMode) => {
+            setControlMode(em)
+            defaultControlMode = em
+          }}
+          size="sm"
+          options={[
+            { value: "plain", label: "Plain" },
+            { value: "labelAbove", label: "Label Above" },
+            { value: "labelBefore", label: "Label Before" }
+          ]}
+        />
+      </div>
+    )
   }
 
-  return <div>
+  return (
     <div>
-      <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..."/>
-      { currentTabId == "expressions" ? renderExpressionOptions() : null }
-      { currentTabId == "controls" ? renderControlOptions() : null }
-    </div>
-    <TabbedComponent 
-      tabId={currentTabId}
-      onTabClick={tabId => { 
-        defaultCurrentTabId = tabId
-        setCurrentTabId(tabId) 
-      }}
-      tabs={
-        [
+      <div>
+        <SearchControl value={search} onChange={setSearch} ref={searchControl} placeholder="Search widgets..." />
+        {currentTabId == "expressions" ? renderExpressionOptions() : null}
+        {currentTabId == "controls" ? renderControlOptions() : null}
+      </div>
+      <TabbedComponent
+        tabId={currentTabId}
+        onTabClick={(tabId) => {
+          defaultCurrentTabId = tabId
+          setCurrentTabId(tabId)
+        }}
+        tabs={[
           { id: "palette", label: "Palette", elem: displayAndFilterEntries(designCtx.blockPaletteEntries) },
           { id: "controls", label: "Controls", elem: displayAndFilterEntries(getControlEntries()) },
           { id: "expressions", label: "Expressions", elem: displayAndFilterEntries(getExpressionEntries()) },
           { id: "widgets", label: "Widgets", elem: displayAndFilterEntries(getWidgetEntries()) }
-        ]
-      }    
-    />
-  </div>
+        ]}
+      />
+    </div>
+  )
 }
 
 /** Single item in the palette of block choices */
@@ -359,7 +363,9 @@ class PaletteItem extends React.Component<{
     }
 
     const entry = this.props.entry
-    const block = designCtx.createBlock(typeof entry.blockDef == "function" ? entry.blockDef(designCtx.contextVars) : entry.blockDef)
+    const block = designCtx.createBlock(
+      typeof entry.blockDef == "function" ? entry.blockDef(designCtx.contextVars) : entry.blockDef
+    )
 
     return block.renderDesign({
       ...designCtx,
@@ -371,11 +377,10 @@ class PaletteItem extends React.Component<{
         if (childBlockDef) {
           const childBlock = designCtx.createBlock(childBlockDef)
           return childBlock.renderDesign(props)
+        } else {
+          return <BlockPlaceholder />
         }
-        else {
-          return <BlockPlaceholder/>
-        }
-      },
+      }
     })
   }
 
@@ -385,7 +390,7 @@ class PaletteItem extends React.Component<{
         <div className="add-wizard-palette-item-title">{this.props.entry.title}</div>
         {this.renderContents()}
         <div className="add-wizard-palette-item-subtitle">{this.props.entry.subtitle}</div>
-        <div onClick={this.props.onSelect} className="add-wizard-palette-item-cover"/>
+        <div onClick={this.props.onSelect} className="add-wizard-palette-item-cover" />
       </div>
     )
   }
@@ -393,5 +398,5 @@ class PaletteItem extends React.Component<{
 
 /** Appends to a localized string */
 function appendStr(str: LocalizedString, append: string): LocalizedString {
-  return _.mapValues(str, (v, k) => k == "_base" ? v : v + append) as LocalizedString
+  return _.mapValues(str, (v, k) => (k == "_base" ? v : v + append)) as LocalizedString
 }

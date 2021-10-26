@@ -1,13 +1,13 @@
-import _ from 'lodash'
+import _ from "lodash"
 import React from "react"
 import { Page, PageStack } from "./PageStack"
 import { BlockDef } from "./widgets/blocks"
 import ContextVarsInjector from "./widgets/ContextVarsInjector"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { BaseCtx, InstanceCtx } from "./contexts"
-import uuid from 'uuid'
+import uuid from "uuid"
 
-import './PageStackDisplay.css'
+import "./PageStackDisplay.css"
 
 interface Props {
   baseCtx: BaseCtx
@@ -27,7 +27,9 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
    * before being saved. Contains pageIndex as well to allow validating a single page.
    * Indexed by random uuid.
    */
-  validationRegistrations: { [key: string]: { pageIndex: number, validate: (() => string | null | Promise<string | null>) } }
+  validationRegistrations: {
+    [key: string]: { pageIndex: number; validate: () => string | null | Promise<string | null> }
+  }
 
   constructor(props: Props) {
     super(props)
@@ -65,7 +67,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   /** Close top page. Returns whether successful and pages still open */
-  async closePage(): Promise<{ success: boolean, pageCount: number }> {
+  async closePage(): Promise<{ success: boolean; pageCount: number }> {
     if (this.state.pages.length == 0) {
       throw new Error("Zero pages in stack")
     }
@@ -98,7 +100,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       }
       pages.splice(pages.length - 1, 1)
     }
-    
+
     this.setState({ pages: [] })
     return true
   }
@@ -170,10 +172,18 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       pageStack: this.props.overridePageStack || this,
       contextVars: [],
       contextVarValues: {},
-      getContextVarExprValue: () => { throw new Error("Non-existant context variable") },
-      onSelectContextVar: () => { throw new Error("Non-existant context variable") },
-      setFilter: () => { throw new Error("Non-existant context variable") },
-      getFilters: () => { throw new Error("Non-existant context variable") },
+      getContextVarExprValue: () => {
+        throw new Error("Non-existant context variable")
+      },
+      onSelectContextVar: () => {
+        throw new Error("Non-existant context variable")
+      },
+      setFilter: () => {
+        throw new Error("Non-existant context variable")
+      },
+      getFilters: () => {
+        throw new Error("Non-existant context variable")
+      },
       renderChildBlock: this.renderChildBlock,
       registerForValidation: this.registerChildForValidation.bind(null, pageIndex)
     }
@@ -183,31 +193,41 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       .concat(widgetDef.privateContextVars || [])
 
     // Page context var values contains global and context vars. Add private values
-    const injectedContextVarValues = { 
-      ...page.contextVarValues, 
+    const injectedContextVarValues = {
+      ...page.contextVarValues,
       // Exclude stale values
-      ...(_.pick(widgetDef.privateContextVarValues || {}, (widgetDef.privateContextVars || []).map(cv => cv.id)))
+      ..._.pick(
+        widgetDef.privateContextVarValues || {},
+        (widgetDef.privateContextVars || []).map((cv) => cv.id)
+      )
     }
 
     // Wrap in context var injector
-    return <ContextVarsInjector 
-      injectedContextVars={injectedContextVars}
-      innerBlock={widgetDef.blockDef}
-      injectedContextVarValues={injectedContextVarValues}
-      instanceCtx={{ ...outerInstanceCtx, database: page.database }}>
+    return (
+      <ContextVarsInjector
+        injectedContextVars={injectedContextVars}
+        innerBlock={widgetDef.blockDef}
+        injectedContextVarValues={injectedContextVarValues}
+        instanceCtx={{ ...outerInstanceCtx, database: page.database }}
+      >
         {(innerInstanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
           if (loading) {
-            return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+            return (
+              <div style={{ color: "#AAA", textAlign: "center" }}>
+                <i className="fa fa-circle-o-notch fa-spin" />
+              </div>
+            )
           }
           return this.renderChildBlock(innerInstanceCtx, widgetDef.blockDef)
         }}
       </ContextVarsInjector>
+    )
   }
 
   renderPage(page: Page, index: number) {
     // Determine if invisible (behind a normal page)
     let invisible = false
-    for (let i = index + 1; i < this.state.pages.length ; i++) {
+    for (let i = index + 1; i < this.state.pages.length; i++) {
       if (this.state.pages[i].type === "normal") {
         invisible = true
       }
@@ -225,7 +245,13 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       case "normal":
         return (
           <div style={{ display: invisible ? "none" : "block" }} key={index}>
-            <NormalPage isFirst={index === 0} onClose={this.handleClose} key={index} title={page.title} pageMargins={widgetDef.pageMargins || "normal"}>
+            <NormalPage
+              isFirst={index === 0}
+              onClose={this.handleClose}
+              key={index}
+              title={page.title}
+              pageMargins={widgetDef.pageMargins || "normal"}
+            >
               {contents}
             </NormalPage>
           </div>
@@ -246,31 +272,31 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
         )
     }
   }
- 
+
   render() {
     return this.state.pages.map((page, index) => this.renderPage(page, index))
   }
 }
 
-class NormalPage extends React.Component<{ 
+class NormalPage extends React.Component<{
   isFirst: boolean
   onClose: () => void
-  title?: string 
+  title?: string
   pageMargins: "normal" | "none"
 }> {
   render() {
     return (
       <div className={`normal-page normal-page-margins-${this.props.pageMargins}`}>
-        { !this.props.isFirst || this.props.title ?
+        {!this.props.isFirst || this.props.title ? (
           <div className="normal-page-header" key="header">
             <h4>
-              { !this.props.isFirst ?
+              {!this.props.isFirst ? (
                 <i className="normal-page-header-back fa fa-arrow-left fa-fw" onClick={this.props.onClose} />
-              : null }
-              { this.props.title }
+              ) : null}
+              {this.props.title}
             </h4>
           </div>
-        : null}
+        ) : null}
         <div key="contents" className="normal-page-contents">
           {this.props.children}
         </div>
@@ -279,10 +305,19 @@ class NormalPage extends React.Component<{
   }
 }
 
-class ModalPage extends React.Component<{ title?: string, onClose: () => void, size: "small" | "normal" | "large" | "full" }> {
+class ModalPage extends React.Component<{
+  title?: string
+  onClose: () => void
+  size: "small" | "normal" | "large" | "full"
+}> {
   render() {
     return (
-      <ModalPopupComponent onClose={this.props.onClose} size={this.props.size} header={this.props.title} showCloseX={true}>
+      <ModalPopupComponent
+        onClose={this.props.onClose}
+        size={this.props.size}
+        header={this.props.title}
+        showCloseX={true}
+      >
         {this.props.children}
       </ModalPopupComponent>
     )

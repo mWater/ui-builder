@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface CollapsibleBlockDef extends BlockDef {
     type: "collapsible";
     label: BlockDef | null;

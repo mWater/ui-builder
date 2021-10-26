@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../../blocks';
-import { Expr, Schema, LocalizedString, Row } from 'mwater-expressions';
-import { OrderBy } from '../../../database/Database';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
+import * as React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../../blocks";
+import { Expr, Schema, LocalizedString, Row } from "mwater-expressions";
+import { OrderBy } from "../../../database/Database";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
 export interface QueryRepeatBlockDef extends BlockDef {
     type: "queryRepeat";
     /** Contents to repeat */

@@ -1,41 +1,41 @@
-import { BlockDef, ContextVar } from "../widgets/blocks";
+import { BlockDef, ContextVar } from "../widgets/blocks"
 import uuid from "uuid/v4"
-import React from "react";
-import { QueryTableBlockDef } from "src/widgets/blocks/queryTable/queryTable";
-import { TextBlockDef } from "src/widgets/blocks/text";
-import { AlertBlockDef } from "../widgets/blocks/alert";
-import { HeaderBlockDef } from "../widgets/blocks/header";
-import { CollapsibleBlockDef } from "../widgets/blocks/collapsible";
-import { RowsetBlockDef } from "../widgets/blocks/rowset";
-import { RowBlockDef } from "../widgets/blocks/row";
-import { TextboxBlockDef } from "../widgets/blocks/controls/textbox";
-import { NumberboxBlockDef } from "../widgets/blocks/controls/numberbox";
-import { DropdownBlockDef } from "../widgets/blocks/controls/dropdown";
-import { DatefieldBlockDef } from "../widgets/blocks/controls/datefield";
-import { ExpressionBlockDef } from "../widgets/blocks/expression";
-import { ConditionalBlockDef } from "../widgets/blocks/conditional";
-import { FloatBlockDef } from "../widgets/blocks/float";
-import { WidgetBlockDef } from "../widgets/blocks/widget";
-import { SpacerBlockDef } from "../widgets/blocks/spacer";
-import { PanelBlockDef } from "../widgets/blocks/panel";
-import { FixedTableBlockDef } from "../widgets/blocks/fixedTable";
-import { SearchBlockDef } from "../widgets/blocks/search/search";
-import { DropdownFilterBlockDef } from "../widgets/blocks/dropdownFilter/dropdownFilter";
-import { ButtonBlockDef } from "../widgets/blocks/button";
-import { SaveCancelBlockDef } from "../widgets/blocks/saveCancel";
-import { AddRowBlockDef } from "../widgets/blocks/addRow";
-import { TabbedBlockDef } from "../widgets/blocks/tabbed/tabbed";
-import { TOCBlockDef } from "../widgets/blocks/toc/toc";
-import { ImageBlockDef } from "../widgets/blocks/image";
-import { ValidationBlockDef } from "../widgets/blocks/validation";
-import { PrintBlockDef } from "../widgets/blocks/print";
-import { QueryRepeatBlockDef } from "../widgets/blocks/queryRepeat/queryRepeat";
-import { LabeledBlockDef } from "../widgets/blocks/labeled";
-import { DateInjectBlockDef } from "../widgets/blocks/dateInject";
-import { ToggleBlockDef } from "../widgets/blocks/controls/toggle";
-import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart";
-import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter";
-import { TagsEditorBlockDef } from "../widgets/blocks/controls/tagsEditor";
+import React from "react"
+import { QueryTableBlockDef } from "src/widgets/blocks/queryTable/queryTable"
+import { TextBlockDef } from "src/widgets/blocks/text"
+import { AlertBlockDef } from "../widgets/blocks/alert"
+import { HeaderBlockDef } from "../widgets/blocks/header"
+import { CollapsibleBlockDef } from "../widgets/blocks/collapsible"
+import { RowsetBlockDef } from "../widgets/blocks/rowset"
+import { RowBlockDef } from "../widgets/blocks/row"
+import { TextboxBlockDef } from "../widgets/blocks/controls/textbox"
+import { NumberboxBlockDef } from "../widgets/blocks/controls/numberbox"
+import { DropdownBlockDef } from "../widgets/blocks/controls/dropdown"
+import { DatefieldBlockDef } from "../widgets/blocks/controls/datefield"
+import { ExpressionBlockDef } from "../widgets/blocks/expression"
+import { ConditionalBlockDef } from "../widgets/blocks/conditional"
+import { FloatBlockDef } from "../widgets/blocks/float"
+import { WidgetBlockDef } from "../widgets/blocks/widget"
+import { SpacerBlockDef } from "../widgets/blocks/spacer"
+import { PanelBlockDef } from "../widgets/blocks/panel"
+import { FixedTableBlockDef } from "../widgets/blocks/fixedTable"
+import { SearchBlockDef } from "../widgets/blocks/search/search"
+import { DropdownFilterBlockDef } from "../widgets/blocks/dropdownFilter/dropdownFilter"
+import { ButtonBlockDef } from "../widgets/blocks/button"
+import { SaveCancelBlockDef } from "../widgets/blocks/saveCancel"
+import { AddRowBlockDef } from "../widgets/blocks/addRow"
+import { TabbedBlockDef } from "../widgets/blocks/tabbed/tabbed"
+import { TOCBlockDef } from "../widgets/blocks/toc/toc"
+import { ImageBlockDef } from "../widgets/blocks/image"
+import { ValidationBlockDef } from "../widgets/blocks/validation"
+import { PrintBlockDef } from "../widgets/blocks/print"
+import { QueryRepeatBlockDef } from "../widgets/blocks/queryRepeat/queryRepeat"
+import { LabeledBlockDef } from "../widgets/blocks/labeled"
+import { DateInjectBlockDef } from "../widgets/blocks/dateInject"
+import { ToggleBlockDef } from "../widgets/blocks/controls/toggle"
+import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart"
+import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter"
+import { TagsEditorBlockDef } from "../widgets/blocks/controls/tagsEditor"
 
 export interface BlockPaletteEntry {
   title: string
@@ -48,85 +48,101 @@ export interface BlockPaletteEntry {
 export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Text",
-    blockDef: { id: "", type: "text", text: { _base: "en", en: "" }, style: "div" } as TextBlockDef,
+    blockDef: { id: "", type: "text", text: { _base: "en", en: "" }, style: "div" } as TextBlockDef
   },
   {
     title: "Header",
-    blockDef: { id: "", type: "header", child: {
-      type: "text",
+    blockDef: {
       id: "",
-      style: "h4",
-      text: { _base: "en", en: "Header"}
-    }} as HeaderBlockDef,
+      type: "header",
+      child: {
+        type: "text",
+        id: "",
+        style: "h4",
+        text: { _base: "en", en: "Header" }
+      }
+    } as HeaderBlockDef
   },
   {
     title: "Labeled Section",
-    blockDef: { id: "", type: "labeled", label: { _base: "en", en: "" }, child: null } as LabeledBlockDef,
+    blockDef: { id: "", type: "labeled", label: { _base: "en", en: "" }, child: null } as LabeledBlockDef
   },
   {
     title: "Collapsible Section",
-    blockDef: { id: "", type: "collapsible", label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" }, content: null } as CollapsibleBlockDef,
+    blockDef: {
+      id: "",
+      type: "collapsible",
+      label: { id: "text", type: "text", text: { _base: "en", en: "Collapsible" }, style: "div" },
+      content: null
+    } as CollapsibleBlockDef
   },
   {
     title: "Rowset",
-    blockDef: { id: "", type: "rowset", content: null, filter: null } as RowsetBlockDef,
+    blockDef: { id: "", type: "rowset", content: null, filter: null } as RowsetBlockDef
   },
   {
     title: "Row",
-    blockDef: { id: "", type: "row", content: null, filter: null } as RowBlockDef,
+    blockDef: { id: "", type: "row", content: null, filter: null } as RowBlockDef
   },
   {
     title: "TextBox Control",
-    blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null } as TextboxBlockDef,
+    blockDef: { id: "", type: "textbox", rowContextVarId: null, column: null } as TextboxBlockDef
   },
   {
     title: "NumberBox Control",
-    blockDef: { id: "", type: "numberbox", rowContextVarId: null, decimal: true, column: null } as NumberboxBlockDef,
+    blockDef: { id: "", type: "numberbox", rowContextVarId: null, decimal: true, column: null } as NumberboxBlockDef
   },
   {
     title: "Dropdown Control",
-    blockDef: { id: "", type: "dropdown", rowContextVarId: null, column: null } as DropdownBlockDef,
+    blockDef: { id: "", type: "dropdown", rowContextVarId: null, column: null } as DropdownBlockDef
   },
   {
     title: "Toggle Control",
-    blockDef: { id: "", type: "toggle", rowContextVarId: null, column: null } as ToggleBlockDef,
+    blockDef: { id: "", type: "toggle", rowContextVarId: null, column: null } as ToggleBlockDef
   },
   {
     title: "Date/Datetime Control",
-    blockDef: { id: "", type: "datefield", rowContextVarId: null, column: null } as DatefieldBlockDef,
+    blockDef: { id: "", type: "datefield", rowContextVarId: null, column: null } as DatefieldBlockDef
   },
   {
     title: "Expression",
-    blockDef: { id: "", type: "expression", expr: null } as ExpressionBlockDef,
+    blockDef: { id: "", type: "expression", expr: null } as ExpressionBlockDef
   },
   {
     title: "Conditional",
-    blockDef: { id: "", type: "conditional", expr: null } as ConditionalBlockDef,
+    blockDef: { id: "", type: "conditional", expr: null } as ConditionalBlockDef
   },
   {
     title: "Float",
-    blockDef: { id: "", type: "float", direction: "right", verticalAlign: "top", mainContent: null, floatContent: null } as FloatBlockDef,
+    blockDef: {
+      id: "",
+      type: "float",
+      direction: "right",
+      verticalAlign: "top",
+      mainContent: null,
+      floatContent: null
+    } as FloatBlockDef
   },
   {
     title: "Embed Widget",
-    blockDef: { id: "", type: "widget", widgetId: null, contextVarMap: {} } as WidgetBlockDef,
+    blockDef: { id: "", type: "widget", widgetId: null, contextVarMap: {} } as WidgetBlockDef
   },
   {
     title: "Spacer",
-    blockDef: { id: "", type: "spacer", height: 5 } as SpacerBlockDef,
+    blockDef: { id: "", type: "spacer", height: 5 } as SpacerBlockDef
   },
   {
     title: "Panel",
-    blockDef: { id: "", type: "panel", mainContent: null, headerContent: null } as PanelBlockDef,
+    blockDef: { id: "", type: "panel", mainContent: null, headerContent: null } as PanelBlockDef
   },
   {
     title: "Alert",
-    blockDef: { id: "", type: "alert", content: null, style: "warning" } as AlertBlockDef,
+    blockDef: { id: "", type: "alert", content: null, style: "warning" } as AlertBlockDef
   },
   {
     title: "Query Table",
     blockDef: (contextVars: ContextVar[]) => {
-      const rowsetCV = contextVars.find(cv => cv.type == "rowset")
+      const rowsetCV = contextVars.find((cv) => cv.type == "rowset")
       return {
         id: "",
         mode: "singleRow",
@@ -151,30 +167,39 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       type: "fixedTable",
       numRows: 2,
       numColumns: 2,
-      rows: [
-        { cells: [{ content: null }, { content: null }]},
-        { cells: [{ content: null }, { content: null }]}
-      ]
+      rows: [{ cells: [{ content: null }, { content: null }] }, { cells: [{ content: null }, { content: null }] }]
     } as FixedTableBlockDef
   },
   {
     title: "Search Box",
-    blockDef: { id: "", type: "search", searchExprs: [], placeholder: null, rowsetContextVarId: null } as SearchBlockDef,
+    blockDef: { id: "", type: "search", searchExprs: [], placeholder: null, rowsetContextVarId: null } as SearchBlockDef
   },
   {
     title: "Dropdown Filter",
-    blockDef: { id: "", type: "dropdownFilter", filterExpr: null, placeholder: null } as DropdownFilterBlockDef,
+    blockDef: { id: "", type: "dropdownFilter", filterExpr: null, placeholder: null } as DropdownFilterBlockDef
   },
   {
     title: "Toggle Filter",
-    blockDef: { id: "", type: "toggleFilter", initialOption: 0, forceSelection: false, options: [
-      { label: { _base: "en", en: "Option A" }, filters: [] },
-      { label: { _base: "en", en: "Option B" }, filters: [] },
-    ]} as ToggleFilterBlockDef
+    blockDef: {
+      id: "",
+      type: "toggleFilter",
+      initialOption: 0,
+      forceSelection: false,
+      options: [
+        { label: { _base: "en", en: "Option A" }, filters: [] },
+        { label: { _base: "en", en: "Option B" }, filters: [] }
+      ]
+    } as ToggleFilterBlockDef
   },
   {
     title: "Button",
-    blockDef: { id: "", type: "button", label: { _base: "en", en: "Button" }, style: "default", size: "normal" } as ButtonBlockDef
+    blockDef: {
+      id: "",
+      type: "button",
+      label: { _base: "en", en: "Button" },
+      style: "default",
+      size: "normal"
+    } as ButtonBlockDef
   },
   {
     title: "Save/Cancel",
@@ -199,7 +224,11 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Tabbed",
-    blockDef: { id: "", type: "tabbed", tabs: [{ id: uuid(), label: { _base: "en", en: "Tab1" }, content: null }]} as TabbedBlockDef
+    blockDef: {
+      id: "",
+      type: "tabbed",
+      tabs: [{ id: uuid(), label: { _base: "en", en: "Tab1" }, content: null }]
+    } as TabbedBlockDef
   },
   {
     title: "Static Image",
@@ -213,7 +242,13 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Validation",
     blockDef: { id: "", type: "validation", validations: [] } as ValidationBlockDef,
-    elem: <div className="alert alert-danger"><div><i className="fa fa-exclamation-triangle"/> Validation</div></div>
+    elem: (
+      <div className="alert alert-danger">
+        <div>
+          <i className="fa fa-exclamation-triangle" /> Validation
+        </div>
+      </div>
+    )
   },
   {
     title: "Print",
@@ -221,12 +256,24 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "Repeating Block",
-    blockDef: { id: "", type: "queryRepeat", content: null, separator: "solid_line", limit: 100 } as QueryRepeatBlockDef,
+    blockDef: {
+      id: "",
+      type: "queryRepeat",
+      content: null,
+      separator: "solid_line",
+      limit: 100
+    } as QueryRepeatBlockDef,
     subtitle: "Repeats a block once for each result of a query"
   },
   {
     title: "Tags Editor",
-    blockDef: { id: "", type: "tagsEditor", rowContextVarId: null, column: null, required: false } as TagsEditorBlockDef,
+    blockDef: {
+      id: "",
+      type: "tagsEditor",
+      rowContextVarId: null,
+      column: null,
+      required: false
+    } as TagsEditorBlockDef,
     subtitle: "Allows editing/creating tags for a text array column"
   },
   {
@@ -236,8 +283,8 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   },
   {
     title: "GANTT Chart",
-    blockDef: { 
-      id: "", 
+    blockDef: {
+      id: "",
       type: "ganttChart",
       rowsetContextVarId: null,
       rowLabelExpr: null,
@@ -250,6 +297,6 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       endDate: null,
       barColor: null,
       milestoneColor: null
-     } as GanttChartBlockDef,
+    } as GanttChartBlockDef
   }
 ]

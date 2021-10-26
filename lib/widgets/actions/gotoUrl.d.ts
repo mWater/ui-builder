@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { EmbeddedExpr } from '../../embeddedExprs';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { ActionDef, Action, RenderActionEditorProps } from "../actions";
+import { EmbeddedExpr } from "../../embeddedExprs";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface GotoUrlActionDef extends ActionDef {
     type: "gotoUrl";
     url?: string | null;

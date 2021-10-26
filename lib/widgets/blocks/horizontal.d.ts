@@ -1,6 +1,6 @@
-import React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface HorizontalBlockDef extends BlockDef {
     type: "horizontal";
     items: BlockDef[];
@@ -14,7 +14,7 @@ export interface HorizontalBlockDef extends BlockDef {
     columnWidths?: string[];
     /** Responsive breaks. Array with one entry for each gap (e.g. entry 0 is for gap between column 0 and 1, etc.)
      * If present, is the width of the horizontal block at which a line break is added
-    */
+     */
     responsiveBreaks?: (number | null)[];
 }
 export declare class HorizontalBlock extends Block<HorizontalBlockDef> {

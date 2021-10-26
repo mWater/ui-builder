@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { BlockDef, ContextVar } from '../blocks';
-import LeafBlock from '../LeafBlock';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { Expr, LocalizedString } from "mwater-expressions";
+import { BlockDef, ContextVar } from "../blocks";
+import LeafBlock from "../LeafBlock";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Block that appears when one or more validation conditions fail */
 export interface ValidationBlockDef extends BlockDef {
     type: "validation";

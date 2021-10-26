@@ -1,14 +1,19 @@
-import _ from 'lodash'
-import { default as React, useEffect, useState } from 'react';
-import LeafBlock from '../LeafBlock'
-import { BlockDef, ContextVar, createExprVariables } from '../blocks'
-import { Expr, ExprValidator, Schema, LocalizedString, DataSource } from 'mwater-expressions';
-import { LabeledProperty, ContextVarPropertyEditor, PropertyEditor, LocalizedTextPropertyEditor } from '../propertyEditors';
-import { ExprComponent } from 'mwater-expressions-ui';
-import { localize } from '../localization';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { Checkbox, Toggle } from 'react-library/lib/bootstrap';
-import ListEditor from '../ListEditor';
+import _ from "lodash"
+import { default as React, useEffect, useState } from "react"
+import LeafBlock from "../LeafBlock"
+import { BlockDef, ContextVar, createExprVariables } from "../blocks"
+import { Expr, ExprValidator, Schema, LocalizedString, DataSource } from "mwater-expressions"
+import {
+  LabeledProperty,
+  ContextVarPropertyEditor,
+  PropertyEditor,
+  LocalizedTextPropertyEditor
+} from "../propertyEditors"
+import { ExprComponent } from "mwater-expressions-ui"
+import { localize } from "../localization"
+import { DesignCtx, InstanceCtx } from "../../contexts"
+import { Checkbox, Toggle } from "react-library/lib/bootstrap"
+import ListEditor from "../ListEditor"
 
 export interface ToggleFilterBlockDef extends BlockDef {
   type: "toggleFilter"
@@ -58,7 +63,7 @@ export class ToggleFilterBlock extends LeafBlock<ToggleFilterBlockDef> {
       // Validate filters
       for (const filter of option.filters) {
         // Validate rowset
-        const rowsetCV = options.contextVars.find(cv => cv.id === filter.rowsetContextVarId && cv.type === "rowset")
+        const rowsetCV = options.contextVars.find((cv) => cv.id === filter.rowsetContextVarId && cv.type === "rowset")
         if (!rowsetCV) {
           return "Rowset required"
         }
@@ -71,7 +76,7 @@ export class ToggleFilterBlock extends LeafBlock<ToggleFilterBlockDef> {
       }
 
       // Ensure that a max of one filter per rowset
-      if (_.uniq(option.filters.map(f => f.rowsetContextVarId)).length < option.filters.length) {
+      if (_.uniq(option.filters.map((f) => f.rowsetContextVarId)).length < option.filters.length) {
         return "Maximum of one filter per rowset per option"
       }
     }
@@ -88,57 +93,71 @@ export class ToggleFilterBlock extends LeafBlock<ToggleFilterBlockDef> {
 
   renderDesign(props: DesignCtx) {
     const options = this.blockDef.options.map((o, index) => ({ value: index, label: localize(o.label, props.locale) }))
-    return <Toggle
-      options={options}
-      value={this.blockDef.initialOption}
-      onChange={index => props.store.replaceBlock({ ...this.blockDef, initialOption: index } as ToggleFilterBlockDef)}
-      allowReset={!this.blockDef.forceSelection}
-      size={mapToggleSize(this.blockDef.size)}
-    />
+    return (
+      <Toggle
+        options={options}
+        value={this.blockDef.initialOption}
+        onChange={(index) =>
+          props.store.replaceBlock({ ...this.blockDef, initialOption: index } as ToggleFilterBlockDef)
+        }
+        allowReset={!this.blockDef.forceSelection}
+        size={mapToggleSize(this.blockDef.size)}
+      />
+    )
   }
 
   renderInstance(ctx: InstanceCtx) {
-    return <ToggleFilterInstance
-      blockDef={this.blockDef}
-      ctx={ctx}
-    />
+    return <ToggleFilterInstance blockDef={this.blockDef} ctx={ctx} />
   }
 
   renderEditor(props: DesignCtx) {
     return (
       <div>
-         <LabeledProperty label="Size">
+        <LabeledProperty label="Size">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="size">
-            {(value, onChange) => 
-            <Toggle value={value || "normal"} onChange={onChange}
-              options={[
-                { value: "normal", label: "Default"},
-                { value: "small", label: "Small"},
-                { value: "extrasmall", label: "Extra-small"},
-                { value: "large", label: "Large"}
-            ]}/> }
+            {(value, onChange) => (
+              <Toggle
+                value={value || "normal"}
+                onChange={onChange}
+                options={[
+                  { value: "normal", label: "Default" },
+                  { value: "small", label: "Small" },
+                  { value: "extrasmall", label: "Extra-small" },
+                  { value: "large", label: "Large" }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-       <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="forceSelection" key="forceSelection">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Force Selection</Checkbox>}
+        <PropertyEditor
+          obj={this.blockDef}
+          onChange={props.store.replaceBlock}
+          property="forceSelection"
+          key="forceSelection"
+        >
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Force Selection
+            </Checkbox>
+          )}
         </PropertyEditor>
         <LabeledProperty label="Options" key="options">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="options">
             {(value, onOptionsChange) => {
               const handleAddSearchExpr = () => {
-                onOptionsChange((value || []).concat({ label: { _base: "en", en: "Option" }, filters: []}))
+                onOptionsChange((value || []).concat({ label: { _base: "en", en: "Option" }, filters: [] }))
               }
-              
+
               return (
                 <div>
                   <ListEditor items={value || []} onItemsChange={onOptionsChange}>
-                    { (option: ToggleFilterOption, onOptionChange) => (
-                      <EditOptionComponent 
-                        option={option} 
+                    {(option: ToggleFilterOption, onOptionChange) => (
+                      <EditOptionComponent
+                        option={option}
                         contextVars={props.contextVars}
-                        schema={props.schema} 
-                        dataSource={props.dataSource} 
-                        onChange={onOptionChange} 
+                        schema={props.schema}
+                        dataSource={props.dataSource}
+                        onChange={onOptionChange}
                         locale={props.locale}
                       />
                     )}
@@ -165,38 +184,45 @@ function EditOptionComponent(props: {
   locale: string
   onChange: (option: ToggleFilterOption) => void
 }) {
-  return <div>
-    <LabeledProperty label="Label" key="label">
-      <PropertyEditor obj={props.option} onChange={props.onChange} property="label">
-        {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
-      </PropertyEditor>
-    </LabeledProperty>
-    <LabeledProperty label="Filters" key="filters">
-      <PropertyEditor obj={props.option} onChange={props.onChange} property="filters">
-        {(value, onChange) => {
-          function handleAddFilter() {
-            onChange([...value, { rowsetContextVarId: null, filterExpr: null }])
-          }
+  return (
+    <div>
+      <LabeledProperty label="Label" key="label">
+        <PropertyEditor obj={props.option} onChange={props.onChange} property="label">
+          {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+        </PropertyEditor>
+      </LabeledProperty>
+      <LabeledProperty label="Filters" key="filters">
+        <PropertyEditor obj={props.option} onChange={props.onChange} property="filters">
+          {(value, onChange) => {
+            function handleAddFilter() {
+              onChange([...value, { rowsetContextVarId: null, filterExpr: null }])
+            }
 
-          return <div>
-            <ListEditor items={value} onItemsChange={onChange}>
-              {(filter, onFilterChange) => {
-                return <EditFilterComponent
-                  filter={filter}
-                  onChange={onFilterChange}
-                  contextVars={props.contextVars}
-                  schema={props.schema}
-                  dataSource={props.dataSource} />
-              }}
-            </ListEditor>
-            <button type="button" className="btn btn-link btn-xs" onClick={handleAddFilter}>
-              + Add Filter
-            </button>
-          </div>
-        }}
-      </PropertyEditor>
-    </LabeledProperty>
-  </div>
+            return (
+              <div>
+                <ListEditor items={value} onItemsChange={onChange}>
+                  {(filter, onFilterChange) => {
+                    return (
+                      <EditFilterComponent
+                        filter={filter}
+                        onChange={onFilterChange}
+                        contextVars={props.contextVars}
+                        schema={props.schema}
+                        dataSource={props.dataSource}
+                      />
+                    )
+                  }}
+                </ListEditor>
+                <button type="button" className="btn btn-link btn-xs" onClick={handleAddFilter}>
+                  + Add Filter
+                </button>
+              </div>
+            )
+          }}
+        </PropertyEditor>
+      </LabeledProperty>
+    </div>
+  )
 }
 
 /** Edits a single filter of an option */
@@ -207,57 +233,66 @@ function EditFilterComponent(props: {
   schema: Schema
   dataSource: DataSource
 }) {
-  const extraFilterCV = props.contextVars.find(cv => cv.id === props.filter.rowsetContextVarId)
+  const extraFilterCV = props.contextVars.find((cv) => cv.id === props.filter.rowsetContextVarId)
 
-  return <div>
-    <LabeledProperty label="Rowset">
-      <PropertyEditor obj={props.filter} onChange={props.onChange} property="rowsetContextVarId">
-        {(value, onChange) => <ContextVarPropertyEditor value={value} onChange={onChange} contextVars={props.contextVars} types={["rowset"]} />}
-      </PropertyEditor>
-    </LabeledProperty>
-
-    { extraFilterCV ?
-      <LabeledProperty label="Filter expression">
-        <PropertyEditor obj={props.filter} onChange={props.onChange} property="filterExpr">
-          {(value, onChange) => <ExprComponent 
-            value={value} 
-            schema={props.schema} 
-            dataSource={props.dataSource} 
-            onChange={onChange} 
-            table={extraFilterCV.table!} 
-            variables={createExprVariables(props.contextVars)}
-            types={["boolean"]} /> 
-          }
+  return (
+    <div>
+      <LabeledProperty label="Rowset">
+        <PropertyEditor obj={props.filter} onChange={props.onChange} property="rowsetContextVarId">
+          {(value, onChange) => (
+            <ContextVarPropertyEditor
+              value={value}
+              onChange={onChange}
+              contextVars={props.contextVars}
+              types={["rowset"]}
+            />
+          )}
         </PropertyEditor>
       </LabeledProperty>
-    : null}
-  </div>                      
+
+      {extraFilterCV ? (
+        <LabeledProperty label="Filter expression">
+          <PropertyEditor obj={props.filter} onChange={props.onChange} property="filterExpr">
+            {(value, onChange) => (
+              <ExprComponent
+                value={value}
+                schema={props.schema}
+                dataSource={props.dataSource}
+                onChange={onChange}
+                table={extraFilterCV.table!}
+                variables={createExprVariables(props.contextVars)}
+                types={["boolean"]}
+              />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+      ) : null}
+    </div>
+  )
 }
 
-function ToggleFilterInstance(props: {
-  blockDef: ToggleFilterBlockDef
-  ctx: InstanceCtx
-}) {
+function ToggleFilterInstance(props: { blockDef: ToggleFilterBlockDef; ctx: InstanceCtx }) {
   const { blockDef, ctx } = props
   const [selectedIndex, setSelectedIndex] = useState(blockDef.initialOption)
 
   // Set filter
   useEffect(() => {
     // Get all rowset variables possibly used
-    const rowsetCVIds = _.uniq(_.flattenDeep(blockDef.options.map(o => o.filters).map(fs => fs.map(f => f.rowsetContextVarId!))))
+    const rowsetCVIds = _.uniq(
+      _.flattenDeep(blockDef.options.map((o) => o.filters).map((fs) => fs.map((f) => f.rowsetContextVarId!)))
+    )
 
     // For each rowset
     for (const rowsetCVId of rowsetCVIds) {
       // Determine filter
       const option = selectedIndex != null ? blockDef.options[selectedIndex] : null
-      const filter = option ? option.filters.find(f => f.rowsetContextVarId == rowsetCVId) : null
+      const filter = option ? option.filters.find((f) => f.rowsetContextVarId == rowsetCVId) : null
       if (filter) {
         ctx.setFilter(rowsetCVId, {
           id: blockDef.id,
           expr: filter.filterExpr
         })
-      }
-      else {
+      } else {
         ctx.setFilter(rowsetCVId, {
           id: blockDef.id,
           expr: null
@@ -268,13 +303,15 @@ function ToggleFilterInstance(props: {
 
   const options = blockDef.options.map((o, index) => ({ value: index, label: localize(o.label, ctx.locale) }))
 
-  return <Toggle
-    options={options}
-    value={selectedIndex}
-    onChange={setSelectedIndex}
-    allowReset={!blockDef.forceSelection}
-    size={mapToggleSize(blockDef.size)}
-  />
+  return (
+    <Toggle
+      options={options}
+      value={selectedIndex}
+      onChange={setSelectedIndex}
+      allowReset={!blockDef.forceSelection}
+      size={mapToggleSize(blockDef.size)}
+    />
+  )
 }
 
 /** Map to toggle sizes */

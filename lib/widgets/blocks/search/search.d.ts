@@ -1,8 +1,8 @@
-import * as React from 'react';
-import LeafBlock from '../../LeafBlock';
-import { BlockDef } from '../../blocks';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
+import * as React from "react";
+import LeafBlock from "../../LeafBlock";
+import { BlockDef } from "../../blocks";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../../contexts";
 export interface SearchBlockDef extends BlockDef, SearchTarget {
     type: "search";
     /** Placeholder in box */

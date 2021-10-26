@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react";
+import { Block, BlockDef, ContextVar, ChildBlock } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 /** Panels with optional header and footer */
 export interface PanelBlockDef extends BlockDef {
     type: "panel";

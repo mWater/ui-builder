@@ -1,5 +1,5 @@
 import { BlockDef } from "./blocks";
-import { ConnectDropTarget } from 'react-dnd';
+import { ConnectDropTarget } from "react-dnd";
 import "./BlockPlaceholder.css";
 interface Props {
     isOver?: boolean;

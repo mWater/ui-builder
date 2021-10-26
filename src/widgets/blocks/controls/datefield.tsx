@@ -1,12 +1,18 @@
-import * as React from 'react';
-import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, LocalizedString } from 'mwater-expressions';
-import { localize } from '../../localization';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, DateFormatEditor, DatetimeFormatEditor } from '../../propertyEditors';
-import DatePicker from 'react-datepicker'
-import moment, { Moment } from 'moment'
-import { DesignCtx } from '../../../contexts';
-import ReactDOM from 'react-dom';
+import * as React from "react"
+import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBlock"
+import { Column, LocalizedString } from "mwater-expressions"
+import { localize } from "../../localization"
+import {
+  LabeledProperty,
+  PropertyEditor,
+  LocalizedTextPropertyEditor,
+  DateFormatEditor,
+  DatetimeFormatEditor
+} from "../../propertyEditors"
+import DatePicker from "react-datepicker"
+import moment, { Moment } from "moment"
+import { DesignCtx } from "../../../contexts"
+import ReactDOM from "react-dom"
 
 export interface DatefieldBlockDef extends ControlBlockDef {
   type: "datefield"
@@ -28,21 +34,23 @@ export class DatefieldBlock extends ControlBlock<DatefieldBlockDef> {
     }
 
     const datetime = column ? column.type === "datetime" : false
-    const format = this.blockDef.format ? this.blockDef.format : (datetime ? "lll" : "ll")
+    const format = this.blockDef.format ? this.blockDef.format : datetime ? "lll" : "ll"
 
-    return <Datefield
-      value={props.value} 
-      onChange={props.onChange}
-      placeholder={localize(this.blockDef.placeholder, props.locale)}
-      disabled={props.disabled || !props.onChange}
-      datetime={datetime}
-      format={format}
+    return (
+      <Datefield
+        value={props.value}
+        onChange={props.onChange}
+        placeholder={localize(this.blockDef.placeholder, props.locale)}
+        disabled={props.disabled || !props.onChange}
+        datetime={datetime}
+        format={format}
       />
+    )
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   renderControlEditor(props: DesignCtx) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
+    const contextVar = props.contextVars.find((cv) => cv.id === this.blockDef.rowContextVarId)
 
     // Get column
     let column
@@ -54,43 +62,34 @@ export class DatefieldBlock extends ControlBlock<DatefieldBlockDef> {
       <div>
         <LabeledProperty label="Placeholder">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
-            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+            {(value, onChange) => (
+              <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
-        { column && column.type === "date" ?
+        {column && column.type === "date" ? (
           <LabeledProperty label="Date Format">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
-              {(value: string, onChange) => (
-                <DateFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
+              {(value: string, onChange) => <DateFormatEditor value={value} onChange={onChange} />}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
+        ) : null}
 
-        { column && column.type === "datetime" ?
+        {column && column.type === "datetime" ? (
           <LabeledProperty label="Date/time Format">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="format">
-              {(value: string, onChange) => (
-                <DatetimeFormatEditor
-                  value={value} 
-                  onChange={onChange} />
-              )}
+              {(value: string, onChange) => <DatetimeFormatEditor value={value} onChange={onChange} />}
             </PropertyEditor>
           </LabeledProperty>
-          : null
-        }
-
+        ) : null}
       </div>
     )
   }
 
   /** Filter the columns that this control is for */
   filterColumn(column: Column) {
-    return column.type === "date" || column.type === "datetime" 
+    return column.type === "date" || column.type === "datetime"
   }
 
   /** Clear format */
@@ -114,11 +113,10 @@ class Datefield extends React.Component<DatefieldProps> {
     if (!this.props.onChange) {
       return
     }
-    
+
     if (this.props.datetime) {
       this.props.onChange!(value ? value.toISOString() : null)
-    }
-    else {
+    } else {
       this.props.onChange!(value ? value.format("YYYY-MM-DD") : null)
     }
   }

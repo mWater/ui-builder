@@ -1,46 +1,50 @@
-import * as React from 'react';
-import BlockFactory from './widgets/BlockFactory';
-import { Schema } from 'mwater-expressions';
-import { WidgetLibraryDesigner, WidgetLibrary } from './designer/widgetLibrary';
-import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource'
-import { ActionLibrary } from './widgets/ActionLibrary';
-import _ from 'lodash'
-import { defaultT } from 'ez-localize'
+import * as React from "react"
+import BlockFactory from "./widgets/BlockFactory"
+import { Schema } from "mwater-expressions"
+import { WidgetLibraryDesigner, WidgetLibrary } from "./designer/widgetLibrary"
+import MWaterDataSource from "mwater-expressions/lib/MWaterDataSource"
+import { ActionLibrary } from "./widgets/ActionLibrary"
+import _ from "lodash"
+import { defaultT } from "ez-localize"
 
 // import 'bootstrap/dist/css/bootstrap.css'
 // import 'font-awesome/css/font-awesome.css'
-import './Demo.css'
-import * as ReactDOM from 'react-dom';
-import { defaultBlockPaletteEntries } from './designer/blockPaletteEntries';
+import "./Demo.css"
+import * as ReactDOM from "react-dom"
+import { defaultBlockPaletteEntries } from "./designer/blockPaletteEntries"
 
-import { DragDropContext } from "react-dnd";
-import HTML5Backend from 'react-dnd-html5-backend'
-import { Database, Transaction } from './database/Database';
-import { DataSourceDatabase } from './database/DataSourceDatabase';
-import { BaseCtx } from './contexts';
+import { DragDropContext } from "react-dnd"
+import HTML5Backend from "react-dnd-html5-backend"
+import { Database, Transaction } from "./database/Database"
+import { DataSourceDatabase } from "./database/DataSourceDatabase"
+import { BaseCtx } from "./contexts"
 
 const basicBlockFactory = new BlockFactory()
 
-const defaultWidgetLibrary : WidgetLibrary = {
+const defaultWidgetLibrary: WidgetLibrary = {
   widgets: {}
 }
 
-const initialWidgetLibrary: WidgetLibrary = JSON.parse(window.localStorage.getItem("widgetLibrary") || "null") || defaultWidgetLibrary
+const initialWidgetLibrary: WidgetLibrary =
+  JSON.parse(window.localStorage.getItem("widgetLibrary") || "null") || defaultWidgetLibrary
 
-const urlParams = new URLSearchParams(window.location.search);
-const client = urlParams.get('client')
-const extraTables = _.compact((urlParams.get('extraTables') || "").split(","))
+const urlParams = new URLSearchParams(window.location.search)
+const client = urlParams.get("client")
+const extraTables = _.compact((urlParams.get("extraTables") || "").split(","))
 
-const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", client, { localCaching: false, serverCaching: false })
+const dataSource = new MWaterDataSource("https://api.mwater.co/v3/", client, {
+  localCaching: false,
+  serverCaching: false
+})
 
 const actionLibrary = new ActionLibrary()
 
 class MockTransaction implements Transaction {
-  async addRow(table: string, values: { [column: string]: any; }): Promise<any> {
+  async addRow(table: string, values: { [column: string]: any }): Promise<any> {
     console.log(`add(${table}, ${JSON.stringify(values)})`)
     return "1"
   }
-  async updateRow(table: string, primaryKey: any, updates: { [column: string]: any; }): Promise<void> {
+  async updateRow(table: string, primaryKey: any, updates: { [column: string]: any }): Promise<void> {
     console.log(`update(${table}, ${primaryKey}, ${JSON.stringify(updates)})`)
   }
   async removeRow(table: string, primaryKey: any): Promise<void> {
@@ -54,22 +58,30 @@ class MockTransaction implements Transaction {
 }
 
 @DragDropContext(HTML5Backend)
-class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: Schema, openTabs: string[], database?: Database }> {
+class Demo extends React.Component<
+  {},
+  { widgetLibrary: WidgetLibrary; schema?: Schema; openTabs: string[]; database?: Database }
+> {
   constructor(props: object) {
     super(props)
 
     this.state = {
       widgetLibrary: initialWidgetLibrary,
-      openTabs: _.intersection(JSON.parse(window.localStorage.getItem("openTabs") || "null") || [], _.keys(initialWidgetLibrary.widgets))
+      openTabs: _.intersection(
+        JSON.parse(window.localStorage.getItem("openTabs") || "null") || [],
+        _.keys(initialWidgetLibrary.widgets)
+      )
     }
   }
 
   componentDidMount() {
-    fetch("https://api.mwater.co/v3/schema?client=" + (client || "") + "&extraTables=" + extraTables.join(",")).then(req => req.json()).then(json => {
-      const schema = new Schema(json)
-      const database = new DataSourceDatabase(schema, dataSource, () => new MockTransaction())
-      this.setState({ schema, database })
-    })
+    fetch("https://api.mwater.co/v3/schema?client=" + (client || "") + "&extraTables=" + extraTables.join(","))
+      .then((req) => req.json())
+      .then((json) => {
+        const schema = new Schema(json)
+        const database = new DataSourceDatabase(schema, dataSource, () => new MockTransaction())
+        this.setState({ schema, database })
+      })
   }
 
   handleWidgetLibraryChange = (widgetLibrary: WidgetLibrary) => {
@@ -82,7 +94,7 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
     this.setState({ openTabs: openTabs })
     window.localStorage.setItem("openTabs", JSON.stringify(openTabs))
   }
-  
+
   render() {
     if (!this.state.schema || !this.state.database) {
       return <div>Loading...</div>
@@ -96,13 +108,21 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
       schema: this.state.schema,
       dataSource: dataSource,
       locale: "en",
-      locales: [{ code: "en", name: "English" }, { code: "es", name: "Spanish" }],
+      locales: [
+        { code: "en", name: "English" },
+        { code: "es", name: "Spanish" }
+      ],
       globalContextVars: [
         { type: "id", idTable: "users", id: "user", name: "User" },
-        { type: "enum", id: "setting", name: "Setting", enumValues: [
-          { id: "a", name: { _base: "en", en: "A" }},
-          { id: "b", name: { _base: "en", en: "B" }},
-        ] }
+        {
+          type: "enum",
+          id: "setting",
+          name: "Setting",
+          enumValues: [
+            { id: "a", name: { _base: "en", en: "A" } },
+            { id: "b", name: { _base: "en", en: "B" } }
+          ]
+        }
       ],
       T: defaultT
     }
@@ -114,15 +134,12 @@ class Demo extends React.Component<{}, { widgetLibrary: WidgetLibrary, schema?: 
           dataSource={dataSource}
           openTabs={this.state.openTabs}
           onOpenTabsChange={this.handleOpenTabsChange}
-          onWidgetLibraryChange={this.handleWidgetLibraryChange} 
+          onWidgetLibraryChange={this.handleWidgetLibraryChange}
           blockPaletteEntries={defaultBlockPaletteEntries}
-          />
+        />
       </div>
     )
   }
 }
 
-ReactDOM.render(
-  <Demo />,
-  document.getElementById('main') as HTMLElement
-);
+ReactDOM.render(<Demo />, document.getElementById("main") as HTMLElement)

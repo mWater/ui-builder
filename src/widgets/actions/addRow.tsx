@@ -1,13 +1,13 @@
-import * as React from 'react';
-import * as _ from 'lodash'
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { ExprValidator, LiteralExpr, Expr, ExprUtils, LiteralType } from 'mwater-expressions';
-import { ContextVar, createExprVariables } from '../blocks';
-import { LabeledProperty, PropertyEditor, TableSelect } from '../propertyEditors';
-import { ColumnValuesEditor } from '../columnValues';
-import { InstanceCtx, DesignCtx } from '../../contexts';
-import { evalContextVarExpr } from '../evalContextVarExpr';
-import { ContextVarExpr } from '../../ContextVarExpr';
+import * as React from "react"
+import * as _ from "lodash"
+import { ActionDef, Action, RenderActionEditorProps } from "../actions"
+import { ExprValidator, LiteralExpr, Expr, ExprUtils, LiteralType } from "mwater-expressions"
+import { ContextVar, createExprVariables } from "../blocks"
+import { LabeledProperty, PropertyEditor, TableSelect } from "../propertyEditors"
+import { ColumnValuesEditor } from "../columnValues"
+import { InstanceCtx, DesignCtx } from "../../contexts"
+import { evalContextVarExpr } from "../evalContextVarExpr"
+import { ContextVarExpr } from "../../ContextVarExpr"
 
 export interface AddRowActionDef extends ActionDef {
   type: "addRow"
@@ -24,9 +24,11 @@ export class AddRowAction extends Action<AddRowActionDef> {
 
     for (const columnId of Object.keys(this.actionDef.columnValues)) {
       const contextVarExpr: ContextVarExpr = this.actionDef.columnValues[columnId]
-      const contextVar = contextVarExpr.contextVarId ? instanceCtx.contextVars.find(cv => cv.id == contextVarExpr.contextVarId)! : null
-      row[columnId] = await evalContextVarExpr({ 
-        contextVar, 
+      const contextVar = contextVarExpr.contextVarId
+        ? instanceCtx.contextVars.find((cv) => cv.id == contextVarExpr.contextVarId)!
+        : null
+      row[columnId] = await evalContextVarExpr({
+        contextVar,
         contextVarValue: contextVar ? instanceCtx.contextVarValues[contextVar.id] : null,
         ctx: instanceCtx,
         expr: contextVarExpr.expr
@@ -69,12 +71,11 @@ export class AddRowAction extends Action<AddRowActionDef> {
     let contextVar: ContextVar | undefined
 
     if (contextVarExpr.contextVarId) {
-      contextVar = designCtx.contextVars.find(cv => cv.id === contextVarExpr.contextVarId)
+      contextVar = designCtx.contextVars.find((cv) => cv.id === contextVarExpr.contextVarId)
       if (!contextVar || !contextVar.table) {
         return "Context variable not found"
       }
-    }
-    else {
+    } else {
       contextVar = undefined
       // Must be literal
       const aggrStatus = exprUtils.getExprAggrStatus(contextVarExpr.expr)
@@ -85,20 +86,20 @@ export class AddRowAction extends Action<AddRowActionDef> {
 
     // Override for special case of allowing to set joins
     const idTable = column.type == "join" ? column.join!.toTable : column.idTable
-    const type = column.type == "join" ? "id" : column.type as LiteralType
-    
+    const type = column.type == "join" ? "id" : (column.type as LiteralType)
+
     // Validate expr
     let error
-    error = exprValidator.validateExpr(contextVarExpr.expr, { 
-      table: contextVar ? contextVar.table : undefined, 
+    error = exprValidator.validateExpr(contextVarExpr.expr, {
+      table: contextVar ? contextVar.table : undefined,
       types: [type],
       idTable: idTable,
-      aggrStatuses: contextVar && contextVar.type == "rowset"  ? ["aggregate", "literal"] : ["individual", "literal"]
+      aggrStatuses: contextVar && contextVar.type == "rowset" ? ["aggregate", "literal"] : ["individual", "literal"]
     })
     if (error) {
       return error
     }
-  
+
     return null
   }
 
@@ -109,29 +110,29 @@ export class AddRowAction extends Action<AddRowActionDef> {
       <div>
         <LabeledProperty label="Table">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="table">
-            {(value, onChange) => 
-              <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange}/>
-            }
+            {(value, onChange) => (
+              <TableSelect schema={props.schema} locale={props.locale} value={value} onChange={onChange} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-        { this.actionDef.table ? 
-        <LabeledProperty label="Column Values">
-          <PropertyEditor obj={this.actionDef} onChange={onChange} property="columnValues">
-            {(value, onChange) => 
-              <ColumnValuesEditor 
-                value={value} 
-                onChange={onChange}
-                schema={props.schema} 
-                dataSource={props.dataSource}
-                table={this.actionDef.table!}
-                contextVars={props.contextVars}
-                locale={props.locale}
-                />}
-          </PropertyEditor>
-        </LabeledProperty>
-        : null }
+        {this.actionDef.table ? (
+          <LabeledProperty label="Column Values">
+            <PropertyEditor obj={this.actionDef} onChange={onChange} property="columnValues">
+              {(value, onChange) => (
+                <ColumnValuesEditor
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  table={this.actionDef.table!}
+                  contextVars={props.contextVars}
+                  locale={props.locale}
+                />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
       </div>
     )
   }
 }
-

@@ -1,18 +1,18 @@
-import { shallow, mount } from 'enzyme'
-import * as React from "react";
+import { shallow, mount } from "enzyme"
+import * as React from "react"
 
-import { ContextVar } from "../../blocks";
-import { QueryRepeatBlockDef, QueryRepeatBlock } from "./queryRepeat";
-import QueryRepeatBlockInstance from "./QueryRepeatBlockInstance";
-import simpleSchema from "../../../__fixtures__/schema";
-import BlockFactory from '../../BlockFactory';
-import mockDatabase from '../../../__fixtures__/mockDatabase';
-import { QueryOptions, OrderByDir } from '../../../database/Database';
-import { Expr, DataSource } from 'mwater-expressions';
-import { ActionLibrary } from '../../ActionLibrary';
-import { PageStack } from '../../../PageStack';
-import { InstanceCtx } from '../../../contexts';
-import { ExpressionBlockDef } from '../expression';
+import { ContextVar } from "../../blocks"
+import { QueryRepeatBlockDef, QueryRepeatBlock } from "./queryRepeat"
+import QueryRepeatBlockInstance from "./QueryRepeatBlockInstance"
+import simpleSchema from "../../../__fixtures__/schema"
+import BlockFactory from "../../BlockFactory"
+import mockDatabase from "../../../__fixtures__/mockDatabase"
+import { QueryOptions, OrderByDir } from "../../../database/Database"
+import { Expr, DataSource } from "mwater-expressions"
+import { ActionLibrary } from "../../ActionLibrary"
+import { PageStack } from "../../../PageStack"
+import { InstanceCtx } from "../../../contexts"
+import { ExpressionBlockDef } from "../expression"
 
 // Outer context vars
 const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "", table: "t1" }
@@ -44,34 +44,34 @@ beforeEach(() => {
   database = mockDatabase()
 
   rips = {
-   createBlock: createBlock,
-   contextVars: contextVars,
-   database: database,
-   getContextVarExprValue: jest.fn(),
-   actionLibrary: {} as ActionLibrary,
-   pageStack: {} as PageStack,
-   // Simple filter
-   contextVarValues: { cv1: { type: "field", table: "t1", column: "boolean" } },
-   getFilters: () => [],
-   setFilter: jest.fn(),
-   locale: "en",
-   onSelectContextVar: jest.fn(),
-   schema: schema,
-   dataSource: {} as DataSource,
-   renderChildBlock: jest.fn(),
-   widgetLibrary: { widgets: {} },
-   registerForValidation: () => () => {},
-   T: (str) => str
- }
+    createBlock: createBlock,
+    contextVars: contextVars,
+    database: database,
+    getContextVarExprValue: jest.fn(),
+    actionLibrary: {} as ActionLibrary,
+    pageStack: {} as PageStack,
+    // Simple filter
+    contextVarValues: { cv1: { type: "field", table: "t1", column: "boolean" } },
+    getFilters: () => [],
+    setFilter: jest.fn(),
+    locale: "en",
+    onSelectContextVar: jest.fn(),
+    schema: schema,
+    dataSource: {} as DataSource,
+    renderChildBlock: jest.fn(),
+    widgetLibrary: { widgets: {} },
+    registerForValidation: () => () => {},
+    T: (str) => str
+  }
 })
 
 test("creates query", () => {
-  (database.query as jest.Mock).mockResolvedValue([])
+  ;(database.query as jest.Mock).mockResolvedValue([])
 
   const inst = mount(<QueryRepeatBlockInstance block={qtb} instanceCtx={rips} />)
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions
   expect(queryOptions).toEqual({
-    select: { 
+    select: {
       id: { type: "id", table: "t1" },
       e0: exprText
     },
@@ -80,7 +80,7 @@ test("creates query", () => {
       type: "op",
       op: "and",
       table: "t1",
-      exprs: [{ type: "field", table: "t1", column: "boolean" }],
+      exprs: [{ type: "field", table: "t1", column: "boolean" }]
     },
     orderBy: [{ expr: { type: "id", table: "t1" }, dir: "asc" }],
     limit: 10
@@ -88,21 +88,19 @@ test("creates query", () => {
 })
 
 test("adds filters, orderBy and where", () => {
-  (database.query as jest.Mock).mockResolvedValue([])
+  ;(database.query as jest.Mock).mockResolvedValue([])
 
-  rips.getFilters = () => [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: true }}]
-  const qtb = createBlock({ 
-    ...qrbd, 
+  rips.getFilters = () => [{ id: "f1", expr: { type: "literal", valueType: "boolean", value: true } }]
+  const qtb = createBlock({
+    ...qrbd,
     where: { type: "literal", valueType: "boolean", value: false },
-    orderBy: [
-      { expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }
-    ]
+    orderBy: [{ expr: { type: "field", table: "t1", column: "number" }, dir: "desc" }]
   } as QueryRepeatBlockDef) as QueryRepeatBlock
   const inst = mount(<QueryRepeatBlockInstance block={qtb} instanceCtx={rips} />)
 
   const queryOptions = database.query.mock.calls[0][0] as QueryOptions
   expect(queryOptions).toEqual({
-    select: { 
+    select: {
       id: { type: "id", table: "t1" },
       e0: exprText
     },
@@ -123,11 +121,10 @@ test("adds filters, orderBy and where", () => {
     ],
     limit: 10
   })
-
 })
 
 test("injects context variables", () => {
-  (database.query as jest.Mock).mockResolvedValue([])
+  ;(database.query as jest.Mock).mockResolvedValue([])
 
   const inst = mount(<QueryRepeatBlockInstance block={qtb} instanceCtx={rips} />)
   inst.setState({ rows: [{ id: "r1", e0: "abc" }] })
@@ -139,4 +136,3 @@ test("injects context variables", () => {
 })
 
 // TODO performs action on row click
-

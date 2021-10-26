@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Expr, Variable, LiteralType, EnumValue, AggrStatus, Schema } from 'mwater-expressions';
-import { InstanceCtx, DesignCtx } from '../contexts';
+import * as React from "react";
+import { Expr, Variable, LiteralType, EnumValue, AggrStatus, Schema } from "mwater-expressions";
+import { InstanceCtx, DesignCtx } from "../contexts";
 import "./blocks.css";
 /** Side on which another block is dropped on a block */
 export declare enum DropSide {

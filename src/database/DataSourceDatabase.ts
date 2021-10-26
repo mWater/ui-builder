@@ -1,8 +1,8 @@
-import _ from 'lodash'
-import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database";
-import { DataSource, Schema, Row } from "mwater-expressions";
-import { QueryCompiler } from "./QueryCompiler";
-import { createExprVariables, ContextVar, createExprVariableValues } from "../widgets/blocks";
+import _ from "lodash"
+import { Database, QueryOptions, DatabaseChangeListener, Transaction } from "./Database"
+import { DataSource, Schema, Row } from "mwater-expressions"
+import { QueryCompiler } from "./QueryCompiler"
+import { createExprVariables, ContextVar, createExprVariableValues } from "../widgets/blocks"
 
 type TransactionHandler = () => Transaction
 
@@ -19,24 +19,27 @@ export class DataSourceDatabase implements Database {
     this.transactionHandler = transactionHandler
     this.changeListeners = []
   }
-  
+
   query(options: QueryOptions, contextVars: ContextVar[], filteredContextVarValues: { [variableId: string]: any }) {
-    const queryCompiler = new QueryCompiler(this.schema, createExprVariables(contextVars), createExprVariableValues(contextVars, filteredContextVarValues))
+    const queryCompiler = new QueryCompiler(
+      this.schema,
+      createExprVariables(contextVars),
+      createExprVariableValues(contextVars, filteredContextVarValues)
+    )
     const { jsonql, rowMapper } = queryCompiler.compileQuery(options)
-    
+
     return new Promise<Row[]>((resolve, reject) => {
       this.dataSource.performQuery(jsonql, (error, rows) => {
         if (error) {
           reject(error)
-        }
-        else {
+        } else {
           // Transform rows to remove c_ from columns
           resolve(rows.map(rowMapper))
         }
       })
     })
   }
-  
+
   /** Adds a listener which is called with each change to the database */
   addChangeListener(changeListener: DatabaseChangeListener) {
     this.changeListeners = _.union(this.changeListeners, [changeListener])
@@ -49,7 +52,7 @@ export class DataSourceDatabase implements Database {
   /** Force change event to fire after clearing cache */
   refresh() {
     this.dataSource.clearCache()
-    
+
     for (const changeListener of this.changeListeners) {
       changeListener()
     }

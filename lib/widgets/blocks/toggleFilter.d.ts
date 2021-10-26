@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import LeafBlock from '../LeafBlock';
-import { BlockDef } from '../blocks';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import LeafBlock from "../LeafBlock";
+import { BlockDef } from "../blocks";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface ToggleFilterBlockDef extends BlockDef {
     type: "toggleFilter";
     /** Options to display */

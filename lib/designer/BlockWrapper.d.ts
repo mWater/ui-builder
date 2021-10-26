@@ -1,5 +1,5 @@
 import { BlockDef, BlockStore } from "../widgets/blocks";
-import { ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from 'react-dnd';
+import { ConnectDragSource, ConnectDropTarget, ConnectDragPreview } from "react-dnd";
 import "./BlockWrapper.css";
 interface Props {
     blockDef: BlockDef;

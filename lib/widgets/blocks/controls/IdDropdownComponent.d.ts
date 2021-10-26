@@ -1,8 +1,8 @@
 import { Database, OrderBy } from "../../../database/Database";
-import { Expr } from 'mwater-expressions';
-import React from 'react';
-import { ContextVar } from '../../blocks';
-import { Styles } from 'react-select';
+import { Expr } from "mwater-expressions";
+import React from "react";
+import { ContextVar } from "../../blocks";
+import { Styles } from "react-select";
 interface SingleProps<T> {
     database: Database;
     table: string;

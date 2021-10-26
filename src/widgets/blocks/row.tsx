@@ -1,17 +1,23 @@
-import produce from 'immer'
-import React from 'react';
-import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from '../blocks'
-import _ from 'lodash';
-import { Expr, ExprValidator } from 'mwater-expressions';
-import ContextVarsInjector from '../ContextVarsInjector';
-import { TextInput, Toggle } from 'react-library/lib/bootstrap';
-import { FilterExprComponent } from 'mwater-expressions-ui';
-import { PropertyEditor, LabeledProperty, TableSelect, ContextVarAndExprPropertyEditor, OrderByArrayEditor } from '../propertyEditors';
-import { localize } from '../localization';
-import { useEffect, useState } from 'react';
-import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from '../../contexts';
-import { ContextVarExpr } from '../../ContextVarExpr';
-import { OrderBy } from '../../database/Database';
+import produce from "immer"
+import React from "react"
+import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from "../blocks"
+import _ from "lodash"
+import { Expr, ExprValidator } from "mwater-expressions"
+import ContextVarsInjector from "../ContextVarsInjector"
+import { TextInput, Toggle } from "react-library/lib/bootstrap"
+import { FilterExprComponent } from "mwater-expressions-ui"
+import {
+  PropertyEditor,
+  LabeledProperty,
+  TableSelect,
+  ContextVarAndExprPropertyEditor,
+  OrderByArrayEditor
+} from "../propertyEditors"
+import { localize } from "../localization"
+import { useEffect, useState } from "react"
+import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from "../../contexts"
+import { ContextVarExpr } from "../../ContextVarExpr"
+import { OrderBy } from "../../database/Database"
 
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
@@ -19,7 +25,7 @@ export interface RowBlockDef extends BlockDef {
 
   /** Table that the row is from */
   table?: string
-  
+
   /** Name of the row context variable */
   name?: string | null
 
@@ -43,7 +49,9 @@ export class RowBlock extends Block<RowBlockDef> {
   getChildren(contextVars: ContextVar[]): ChildBlock[] {
     if (this.blockDef.content) {
       const contextVar = this.createContextVar()
-      return [{ blockDef: this.blockDef.content, contextVars: contextVar ? contextVars.concat([contextVar]) : contextVars }]
+      return [
+        { blockDef: this.blockDef.content, contextVars: contextVar ? contextVars.concat([contextVar]) : contextVars }
+      ]
     }
     return []
   }
@@ -55,14 +63,14 @@ export class RowBlock extends Block<RowBlockDef> {
     return null
   }
 
-  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] { 
+  getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] {
     if (this.blockDef.idContextVarExpr && contextVar.id == this.blockDef.idContextVarExpr.contextVarId) {
       return [this.blockDef.idContextVarExpr.expr]
     }
     return []
   }
 
-  validate(options: DesignCtx) { 
+  validate(options: DesignCtx) {
     const exprValidator = new ExprValidator(options.schema, createExprVariables(options.contextVars))
     let error: string | null
 
@@ -71,10 +79,13 @@ export class RowBlock extends Block<RowBlockDef> {
     }
 
     const mode = this.blockDef.mode || "filter"
-    
+
     // Validate filter
     if (mode == "filter") {
-      error = exprValidator.validateExpr(this.blockDef.filter || null, { table: this.blockDef.table, types: ["boolean"] })
+      error = exprValidator.validateExpr(this.blockDef.filter || null, {
+        table: this.blockDef.table,
+        types: ["boolean"]
+      })
       if (error) {
         return error
       }
@@ -110,26 +121,30 @@ export class RowBlock extends Block<RowBlockDef> {
 
     return null
   }
- 
+
   processChildren(action: (self: BlockDef | null) => BlockDef | null): BlockDef {
     const content = action(this.blockDef.content)
-    return produce(this.blockDef, draft => {
+    return produce(this.blockDef, (draft) => {
       draft.content = content
     })
   }
 
   renderDesign(props: DesignCtx) {
     const handleSetContent = (blockDef: BlockDef) => {
-      props.store.alterBlock(this.id, produce((b: RowBlockDef) => { 
-        b.content = blockDef 
-        return b
-      }), blockDef.id)
+      props.store.alterBlock(
+        this.id,
+        produce((b: RowBlockDef) => {
+          b.content = blockDef
+          return b
+        }),
+        blockDef.id
+      )
     }
 
     // Create props for child
     const contextVar = this.createContextVar()
     let contentProps = props
-    
+
     // Add context variable if knowable
     if (contextVar) {
       contentProps = { ...contentProps, contextVars: props.contextVars.concat([contextVar]) }
@@ -137,28 +152,23 @@ export class RowBlock extends Block<RowBlockDef> {
 
     const contentNode = props.renderChildBlock(contentProps, this.blockDef.content, handleSetContent)
 
-    return (
-      <div style={{ paddingTop: 5, paddingBottom: 5, border: "dashed 1px #CCC" }}>
-        {contentNode}
-      </div>
-    )
+    return <div style={{ paddingTop: 5, paddingBottom: 5, border: "dashed 1px #CCC" }}>{contentNode}</div>
   }
 
-  renderInstance(props: InstanceCtx) { 
+  renderInstance(props: InstanceCtx) {
     const contextVar = this.createContextVar()!
-    return <RowInstance
-      contextVar={contextVar}
-      blockDef={this.blockDef}
-      instanceProps={props} />
+    return <RowInstance contextVar={contextVar} blockDef={this.blockDef} instanceProps={props} />
   }
 
   renderEditor(props: DesignCtx) {
     const handleTableChange = (tableId: string) => {
       const table = props.schema.getTable(tableId)!
-      props.store.replaceBlock(produce(this.blockDef, (bd) => {
-        bd.table = tableId
-        bd.name = bd.name || localize(table.name)
-      }))
+      props.store.replaceBlock(
+        produce(this.blockDef, (bd) => {
+          bd.table = tableId
+          bd.name = bd.name || localize(table.name)
+        })
+      )
     }
 
     const mode = this.blockDef.mode || "filter"
@@ -167,7 +177,12 @@ export class RowBlock extends Block<RowBlockDef> {
       <div>
         <h3>Row</h3>
         <LabeledProperty label="Table">
-          <TableSelect schema={props.schema} locale={props.locale} value={this.blockDef.table || null} onChange={handleTableChange}/>
+          <TableSelect
+            schema={props.schema}
+            locale={props.locale}
+            value={this.blockDef.table || null}
+            onChange={handleTableChange}
+          />
         </LabeledProperty>
         <LabeledProperty label="Name">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="name">
@@ -176,76 +191,79 @@ export class RowBlock extends Block<RowBlockDef> {
         </LabeledProperty>
         <LabeledProperty label="Mode" key="mode">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="mode">
-            {(value, onChange) =>
-              <Toggle 
-                value={value || "filter"} 
-                onChange={onChange} 
+            {(value, onChange) => (
+              <Toggle
+                value={value || "filter"}
+                onChange={onChange}
                 options={[
                   { value: "filter", label: "By Filter" },
                   { value: "id", label: "By ID" }
-                ]} />
-              }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-        { this.blockDef.table && mode == "filter" ? 
-        <LabeledProperty label="Filter">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
-            {(value, onChange) => 
-              <FilterExprComponent 
-                value={value} 
-                onChange={onChange}
-                schema={props.schema} 
-                dataSource={props.dataSource}
-                table={this.blockDef.table!}
-                variables={createExprVariables(props.contextVars)}
-                />}
-          </PropertyEditor>
-        </LabeledProperty>
-        : null }
-        <LabeledProperty label="Filter Order" key="filterOrderBy" hint="If filter matches more than one row, first one is taken">
+        {this.blockDef.table && mode == "filter" ? (
+          <LabeledProperty label="Filter">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filter">
+              {(value, onChange) => (
+                <FilterExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  table={this.blockDef.table!}
+                  variables={createExprVariables(props.contextVars)}
+                />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
+        <LabeledProperty
+          label="Filter Order"
+          key="filterOrderBy"
+          hint="If filter matches more than one row, first one is taken"
+        >
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="filterOrderBy">
-            {(value, onChange) => 
-              <OrderByArrayEditor 
-                value={value || []} 
-                onChange={onChange} 
-                schema={props.schema} 
-                dataSource={props.dataSource} 
+            {(value, onChange) => (
+              <OrderByArrayEditor
+                value={value || []}
+                onChange={onChange}
+                schema={props.schema}
+                dataSource={props.dataSource}
                 contextVars={props.contextVars}
                 table={this.blockDef.table!}
-               />
-            }
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
-        { this.blockDef.table && mode == "id" ? 
-        <LabeledProperty label="ID of row">
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idContextVarExpr">
-            {(value, onChange) => 
-              <ContextVarAndExprPropertyEditor
-                contextVars={props.contextVars}
-                contextVarId={value ? value.contextVarId : null}
-                expr={value ? value.expr : null}
-                onChange={(contextVarId, expr) => {
-                  onChange({ contextVarId, expr })
-                }}
-                schema={props.schema} 
-                dataSource={props.dataSource}
-                idTable={this.blockDef.table}
-                types={["id"]}
-              />}
-          </PropertyEditor>
-        </LabeledProperty>
-        : null }
+        {this.blockDef.table && mode == "id" ? (
+          <LabeledProperty label="ID of row">
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idContextVarExpr">
+              {(value, onChange) => (
+                <ContextVarAndExprPropertyEditor
+                  contextVars={props.contextVars}
+                  contextVarId={value ? value.contextVarId : null}
+                  expr={value ? value.expr : null}
+                  onChange={(contextVarId, expr) => {
+                    onChange({ contextVarId, expr })
+                  }}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  idTable={this.blockDef.table}
+                  types={["id"]}
+                />
+              )}
+            </PropertyEditor>
+          </LabeledProperty>
+        ) : null}
       </div>
     )
   }
 }
 
-const RowInstance = (props: {
-  blockDef: RowBlockDef
-  instanceProps: InstanceCtx
-  contextVar: ContextVar
-}) => {
+const RowInstance = (props: { blockDef: RowBlockDef; instanceProps: InstanceCtx; contextVar: ContextVar }) => {
   const { blockDef, instanceProps, contextVar } = props
   const db = instanceProps.database
   const table = contextVar.table!
@@ -259,37 +277,46 @@ const RowInstance = (props: {
   useEffect(() => {
     if (mode == "filter") {
       // Query to get match
-      db.query({
-        select: { id: { type: "id", table: table }},
-        from: table,
-        where: blockDef.filter,
-        orderBy: blockDef.filterOrderBy || undefined,
-        limit: 1
-      }, instanceProps.contextVars, getFilteredContextVarValues(instanceProps))
+      db.query(
+        {
+          select: { id: { type: "id", table: table } },
+          from: table,
+          where: blockDef.filter,
+          orderBy: blockDef.filterOrderBy || undefined,
+          limit: 1
+        },
+        instanceProps.contextVars,
+        getFilteredContextVarValues(instanceProps)
+      )
         .then((rows) => {
           if (rows.length > 0) {
             setId(rows[0].id)
-          }
-          else {
+          } else {
             setId(null)
           }
           setLoading(false)
         })
-        .catch(err => {
+        .catch((err) => {
           setError(err)
           setLoading(false)
         })
-    }
-    else {
+    } else {
       // Just set id from context var
-      const exprValue = instanceProps.getContextVarExprValue(blockDef.idContextVarExpr!.contextVarId, blockDef.idContextVarExpr!.expr)
+      const exprValue = instanceProps.getContextVarExprValue(
+        blockDef.idContextVarExpr!.contextVarId,
+        blockDef.idContextVarExpr!.expr
+      )
       setId(exprValue)
       setLoading(false)
     }
   }, [])
 
   if (loading) {
-    return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+    return (
+      <div style={{ color: "#AAA", textAlign: "center" }}>
+        <i className="fa fa-circle-o-notch fa-spin" />
+      </div>
+    )
   }
 
   if (error) {
@@ -297,17 +324,23 @@ const RowInstance = (props: {
   }
 
   // Inject context variable
-  return <ContextVarsInjector 
-    injectedContextVars={[contextVar]} 
-    injectedContextVarValues={{ [contextVar.id]: id }}
-    innerBlock={blockDef.content!}
-    instanceCtx={instanceProps}>
+  return (
+    <ContextVarsInjector
+      injectedContextVars={[contextVar]}
+      injectedContextVarValues={{ [contextVar.id]: id }}
+      innerBlock={blockDef.content!}
+      instanceCtx={instanceProps}
+    >
       {(instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => {
         if (loading) {
-          return <div style={{ color: "#AAA", textAlign: "center" }}><i className="fa fa-circle-o-notch fa-spin"/></div>
+          return (
+            <div style={{ color: "#AAA", textAlign: "center" }}>
+              <i className="fa fa-circle-o-notch fa-spin" />
+            </div>
+          )
         }
-        return instanceProps.renderChildBlock(instanceCtx, blockDef.content) 
+        return instanceProps.renderChildBlock(instanceCtx, blockDef.content)
       }}
     </ContextVarsInjector>
-
+  )
 }

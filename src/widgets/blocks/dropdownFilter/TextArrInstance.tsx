@@ -1,12 +1,12 @@
-import _ from 'lodash'
-import React, { CSSProperties } from "react";
-import { DropdownFilterBlockDef } from "./dropdownFilter";
-import { Schema, ExprUtils, Expr } from "mwater-expressions";
-import { ContextVar, createExprVariables } from "../../blocks";
-import { localize } from "../../localization";
-import Async from 'react-select/async'
-import { QueryOptions, Database } from "../../../database/Database";
-import { InstanceCtx, getFilteredContextVarValues } from '../../../contexts';
+import _ from "lodash"
+import React, { CSSProperties } from "react"
+import { DropdownFilterBlockDef } from "./dropdownFilter"
+import { Schema, ExprUtils, Expr } from "mwater-expressions"
+import { ContextVar, createExprVariables } from "../../blocks"
+import { localize } from "../../localization"
+import Async from "react-select/async"
+import { QueryOptions, Database } from "../../../database/Database"
+import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts"
 
 /** Dropdown filter that is a text[]. Should search in database for matches, returning value to match */
 export default class TextArrInstance extends React.Component<{
@@ -20,10 +20,10 @@ export default class TextArrInstance extends React.Component<{
   instanceCtx: InstanceCtx
 }> {
   /** Options to be displayed (unfiltered) */
-  options: { value: string, label: string }[]
+  options: { value: string; label: string }[]
 
   async loadOptions() {
-    const contextVar = this.props.contextVars.find(cv => cv.id === this.props.blockDef.rowsetContextVarId)!
+    const contextVar = this.props.contextVars.find((cv) => cv.id === this.props.blockDef.rowsetContextVarId)!
     const table = contextVar.table!
 
     const whereExprs: Expr[] = []
@@ -63,8 +63,8 @@ export default class TextArrInstance extends React.Component<{
       const rows = await this.props.database.query(queryOptions, this.props.contextVars, {})
 
       // Flatten and keep distinct
-      const values = _.uniq(_.flatten(rows.map(r => r.value))).sort()
-      return values.map(v => ({ value: v, label: v }))
+      const values = _.uniq(_.flatten(rows.map((r) => r.value))).sort()
+      return values.map((v) => ({ value: v, label: v }))
     } catch (err) {
       // TODO localize
       alert("Unable to load options")
@@ -80,15 +80,14 @@ export default class TextArrInstance extends React.Component<{
 
     // Filter by input string
     if (input) {
-      return this.options.filter(o => o.label.toLowerCase().startsWith(input.toLowerCase()))
-    }
-    else {
+      return this.options.filter((o) => o.label.toLowerCase().startsWith(input.toLowerCase()))
+    } else {
       return this.options
     }
   }
 
   handleChange = (option: any) => {
-    const value = option ? (option.value || null) : null // Blank is null
+    const value = option ? option.value || null : null // Blank is null
     this.props.onChange(value)
   }
 
@@ -104,17 +103,19 @@ export default class TextArrInstance extends React.Component<{
       menuPortal: (style: CSSProperties) => ({ ...style, zIndex: 2000 })
     }
 
-    return <Async 
-      placeholder={localize(this.props.blockDef.placeholder, this.props.locale)}
-      value={currentValue}
-      defaultOptions={true}
-      loadOptions={this.getOptions}
-      onChange={this.handleChange}
-      isClearable={true}
-      noOptionsMessage={noOptionsMessage}
-      styles={styles}
-      classNamePrefix="react-select-short" 
-      menuPortalTarget={document.body}
-    />
+    return (
+      <Async
+        placeholder={localize(this.props.blockDef.placeholder, this.props.locale)}
+        value={currentValue}
+        defaultOptions={true}
+        loadOptions={this.getOptions}
+        onChange={this.handleChange}
+        isClearable={true}
+        noOptionsMessage={noOptionsMessage}
+        styles={styles}
+        classNamePrefix="react-select-short"
+        menuPortalTarget={document.body}
+      />
+    )
   }
 }

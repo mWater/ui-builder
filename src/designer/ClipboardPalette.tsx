@@ -1,6 +1,16 @@
-import * as React from "react";
-import { ConnectDragSource, DragSource, DragSourceConnector, DragSourceSpec, DragSourceMonitor, ConnectDropTarget, DropTargetSpec, DropTargetMonitor, DropTarget } from "react-dnd"
-import { BlockDef, duplicateBlockDef, CreateBlock } from "../widgets/blocks";
+import * as React from "react"
+import {
+  ConnectDragSource,
+  DragSource,
+  DragSourceConnector,
+  DragSourceSpec,
+  DragSourceMonitor,
+  ConnectDropTarget,
+  DropTargetSpec,
+  DropTargetMonitor,
+  DropTarget
+} from "react-dnd"
+import { BlockDef, duplicateBlockDef, CreateBlock } from "../widgets/blocks"
 
 var clipboardContents: BlockDef | null = null
 
@@ -36,7 +46,7 @@ const blockTargetSpec: DropTargetSpec<Props> = {
     if (!monitor.getItem().blockDef) {
       return false
     }
-    
+
     return true
   },
   drop(props: Props, monitor: DropTargetMonitor, component: any) {
@@ -51,13 +61,11 @@ const blockTargetSpec: DropTargetSpec<Props> = {
 class ClipboardPalette extends React.Component<Props> {
   render() {
     const className = this.props.isOver ? "btn btn-primary btn-sm active" : "btn btn-default btn-sm active"
-    return (
-      this.props.connectDropTarget!(
-        this.props.connectDragSource!(
-          <button type="button" className={className} style={{ cursor: "move" }}>
-            <i className="fa fa-arrows"/> Clipboard
-          </button>
-        )
+    return this.props.connectDropTarget!(
+      this.props.connectDragSource!(
+        <button type="button" className={className} style={{ cursor: "move" }}>
+          <i className="fa fa-arrows" /> Clipboard
+        </button>
       )
     )
   }

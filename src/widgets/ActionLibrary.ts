@@ -8,28 +8,33 @@ import { RefreshDataAction, RefreshDataActionDef } from "./actions/refreshData"
 
 /** Library of actions */
 export class ActionLibrary {
-  customActions: { 
+  customActions: {
     type: string
-    name: string 
-    
+    name: string
+
     /** Creates a default action definition */
     actionDefFactory: (type: string) => ActionDef
 
     /** Creates an action */
-    actionFactory: (actionDef: ActionDef) => Action<ActionDef> 
+    actionFactory: (actionDef: ActionDef) => Action<ActionDef>
   }[]
 
   constructor() {
     this.customActions = []
   }
 
-  registerCustomAction(type: string, name: string, actionDefFactory: (type: string) => ActionDef, actionFactory: (actionDef: ActionDef) => Action<ActionDef>) {
+  registerCustomAction(
+    type: string,
+    name: string,
+    actionDefFactory: (type: string) => ActionDef,
+    actionFactory: (actionDef: ActionDef) => Action<ActionDef>
+  ) {
     this.customActions.push({ type, name, actionDefFactory, actionFactory })
   }
 
   /** Creates an action from an action def */
-  createAction(actionDef: ActionDef): Action<ActionDef>  {
-    switch(actionDef.type) {
+  createAction(actionDef: ActionDef): Action<ActionDef> {
+    switch (actionDef.type) {
       case "openPage":
         return new OpenPageAction(actionDef as OpenPageActionDef)
       case "addRow":
@@ -42,7 +47,7 @@ export class ActionLibrary {
         return new BrowserBackAction(actionDef as BrowserBackActionDef)
       case "refreshData":
         return new RefreshDataAction(actionDef as RefreshDataActionDef)
-      }
+    }
 
     for (const customAction of this.customActions) {
       if (customAction.type == actionDef.type) {
@@ -54,7 +59,7 @@ export class ActionLibrary {
 
   /** Create a new action def with defaults set of the specified type */
   createNewActionDef(type: string): ActionDef {
-    switch(type) {
+    switch (type) {
       case "openPage":
         return {
           type: "openPage",
@@ -62,27 +67,27 @@ export class ActionLibrary {
           widgetId: null,
           contextVarValues: {}
         } as OpenPageActionDef
-      case "addRow": 
+      case "addRow":
         return {
           type: "addRow",
           table: null,
           columnValues: {}
         } as AddRowActionDef
-      case "removeRow": 
+      case "removeRow":
         return {
           type: "removeRow",
           contextVarId: null,
           idExpr: null
         } as RemoveRowActionDef
-      case "gotoUrl": 
+      case "gotoUrl":
         return {
           type: "gotoUrl"
         } as GotoUrlActionDef
-      case "browserBack": 
+      case "browserBack":
         return {
           type: "browserBack"
         } as BrowserBackActionDef
-      case "refreshData": 
+      case "refreshData":
         return {
           type: "refreshData"
         } as RefreshDataActionDef
@@ -98,7 +103,7 @@ export class ActionLibrary {
   }
 
   /** Get a list of all known action types */
-  getActionTypes(): Array<{ type: string, name: string }> {
+  getActionTypes(): Array<{ type: string; name: string }> {
     const list = [
       { type: "openPage", name: "Open Page" },
       { type: "addRow", name: "Add Row" },

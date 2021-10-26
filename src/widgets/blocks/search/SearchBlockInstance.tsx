@@ -1,17 +1,14 @@
-import _ from "lodash";
-import React from "react";
-import { SearchBlockDef, SearchTarget } from "./search";
-import { createExprVariables, Filter } from "../../blocks";
-import { Expr, ExprUtils } from "mwater-expressions";
-import { localize } from "../../localization";
-import { InstanceCtx } from "../../../contexts";
-import { useState, useRef, useEffect } from "react";
+import _ from "lodash"
+import React from "react"
+import { SearchBlockDef, SearchTarget } from "./search"
+import { createExprVariables, Filter } from "../../blocks"
+import { Expr, ExprUtils } from "mwater-expressions"
+import { localize } from "../../localization"
+import { InstanceCtx } from "../../../contexts"
+import { useState, useRef, useEffect } from "react"
 
 /** Search block that filters the rowset */
-const SearchBlockInstance = (props: {
-  blockDef: SearchBlockDef
-  instanceCtx: InstanceCtx
-}) => {
+const SearchBlockInstance = (props: { blockDef: SearchBlockDef; instanceCtx: InstanceCtx }) => {
   const { blockDef, instanceCtx } = props
   const [searchText, setSearchText] = useState("")
   const searchControlRef = useRef<SearchControl>(null)
@@ -24,7 +21,7 @@ const SearchBlockInstance = (props: {
   }, [])
 
   const createExprFilter = (expr: Expr, searchText: string, table: string) => {
-    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
 
     const exprUtils = new ExprUtils(instanceCtx.schema, createExprVariables(instanceCtx.contextVars))
 
@@ -36,10 +33,7 @@ const SearchBlockInstance = (props: {
         type: "op",
         op: "~*",
         table: table,
-        exprs: [
-          expr,
-          { type: "literal", valueType: "text", value: escapeRegex(searchText) }
-        ]
+        exprs: [expr, { type: "literal", valueType: "text", value: escapeRegex(searchText) }]
       } as Expr
     }
 
@@ -57,7 +51,9 @@ const SearchBlockInstance = (props: {
 
     if (exprType === "enum") {
       // Find matching enums
-      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
+      const enumValues = exprUtils
+        .getExprEnumValues(expr)!
+        .filter((ev) => localize(ev.name, instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
       if (enumValues.length === 0) {
         return null
       }
@@ -65,16 +61,15 @@ const SearchBlockInstance = (props: {
         type: "op",
         op: "= any",
         table: table,
-        exprs: [
-          expr,
-          { type: "literal", valueType: "enumset", value: enumValues.map(ev => ev.id) }
-        ]
+        exprs: [expr, { type: "literal", valueType: "enumset", value: enumValues.map((ev) => ev.id) }]
       } as Expr
     }
 
     if (exprType === "enumset") {
       // Find matching enums
-      const enumValues = exprUtils.getExprEnumValues(expr)!.filter(ev => localize(ev.name, instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
+      const enumValues = exprUtils
+        .getExprEnumValues(expr)!
+        .filter((ev) => localize(ev.name, instanceCtx.locale).toLowerCase().includes(searchText.toLowerCase()))
       if (enumValues.length === 0) {
         return null
       }
@@ -82,61 +77,60 @@ const SearchBlockInstance = (props: {
         type: "op",
         op: "intersects",
         table: table,
-        exprs: [
-          expr,
-          { type: "literal", valueType: "enumset", value: enumValues.map(ev => ev.id) }
-        ]
+        exprs: [expr, { type: "literal", valueType: "enumset", value: enumValues.map((ev) => ev.id) }]
       } as Expr
     }
-  
-    throw new Error("Unsupported search type " + exprType) 
-  }
 
+    throw new Error("Unsupported search type " + exprType)
+  }
 
   /** Create a filter for the target with the specified filter id */
   function createFilter(searchTarget: SearchTarget, filterId: string, searchText: string): Filter {
     // Get table
-    const table = instanceCtx.contextVars.find(cv => cv.id === searchTarget.rowsetContextVarId)!.table!
-    
+    const table = instanceCtx.contextVars.find((cv) => cv.id === searchTarget.rowsetContextVarId)!.table!
+
     if (searchText) {
-      const searchExprs: Expr[] = searchTarget.searchExprs.map(se => createExprFilter(se, searchText, table))
+      const searchExprs: Expr[] = searchTarget.searchExprs.map((se) => createExprFilter(se, searchText, table))
 
       const expr: Expr = {
-        type: "op", 
+        type: "op",
         op: "or",
-        table: table, 
+        table: table,
         exprs: searchExprs
       }
 
       return { id: filterId, expr: expr }
-    }
-    else {
+    } else {
       return { id: filterId, expr: null }
     }
   }
 
-
   const handleChange = (value: string) => {
     setSearchText(value)
 
-    // Set filters 
+    // Set filters
     instanceCtx.setFilter(blockDef.rowsetContextVarId!, createFilter(blockDef, blockDef.id, value))
 
     // Set extra filters
     if (blockDef.extraSearchTargets) {
-      for (let i = 0 ; i < blockDef.extraSearchTargets.length ; i++) {
+      for (let i = 0; i < blockDef.extraSearchTargets.length; i++) {
         const searchTarget = blockDef.extraSearchTargets[i]
-        instanceCtx.setFilter(searchTarget.rowsetContextVarId!,
-          createFilter(searchTarget, `${blockDef.id}-${i}`, value))
+        instanceCtx.setFilter(
+          searchTarget.rowsetContextVarId!,
+          createFilter(searchTarget, `${blockDef.id}-${i}`, value)
+        )
       }
     }
   }
 
-  return <SearchControl 
-    value={searchText} 
-    onChange={handleChange}
-    ref={searchControlRef}
-    placeholder={localize(blockDef.placeholder, instanceCtx.locale)} />
+  return (
+    <SearchControl
+      value={searchText}
+      onChange={handleChange}
+      ref={searchControlRef}
+      placeholder={localize(blockDef.placeholder, instanceCtx.locale)}
+    />
+  )
 }
 
 export default SearchBlockInstance
@@ -166,16 +160,20 @@ export class SearchControl extends React.Component<SearchControlProps> {
   render() {
     return (
       <div style={{ position: "relative", display: "inline-block", margin: 5, width: "15em" }}>
-        <i className="fa fa-search" style={{ position: "absolute", right: 8, top: 10, color: "#AAA", pointerEvents: "none" }} />
-        <input 
-          type="text" 
+        <i
+          className="fa fa-search"
+          style={{ position: "absolute", right: 8, top: 10, color: "#AAA", pointerEvents: "none" }}
+        />
+        <input
+          type="text"
           ref={this.inputRef}
-          className="form-control" 
+          className="form-control"
           style={{ width: "100%" }}
-          value={this.props.value} 
+          value={this.props.value}
           onChange={this.handleChange}
-          placeholder={this.props.placeholder} />
-    </div>
-    )  
+          placeholder={this.props.placeholder}
+        />
+      </div>
+    )
   }
 }

@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { ContextVar } from '../blocks';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { TextualBlockDef, TextualBlock } from './textual';
+import * as React from "react";
+import { ContextVar } from "../blocks";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
+import { TextualBlockDef, TextualBlock } from "./textual";
 export interface ExpressionBlockDef extends TextualBlockDef {
     type: "expression";
     /** Context variable (row or rowset) to use for expression */

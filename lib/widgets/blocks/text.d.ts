@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { ContextVar } from '../blocks';
-import { Expr, LocalizedString } from 'mwater-expressions';
-import { EmbeddedExpr } from '../../embeddedExprs';
-import { DesignCtx, InstanceCtx } from '../../contexts';
-import { TextualBlockDef, TextualBlock } from './textual';
+import * as React from "react";
+import { ContextVar } from "../blocks";
+import { Expr, LocalizedString } from "mwater-expressions";
+import { EmbeddedExpr } from "../../embeddedExprs";
+import { DesignCtx, InstanceCtx } from "../../contexts";
+import { TextualBlockDef, TextualBlock } from "./textual";
 export interface TextBlockDef extends TextualBlockDef {
     type: "text";
     /** Text content */

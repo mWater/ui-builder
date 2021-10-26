@@ -1,8 +1,8 @@
-import moment from 'moment';
-import React from 'react';
-import { Expr, LocalizedString } from 'mwater-expressions';
+import moment from "moment";
+import React from "react";
+import { Expr, LocalizedString } from "mwater-expressions";
 import "react-datepicker/dist/react-datepicker.css";
-import './datepicker-tweaks.css';
+import "./datepicker-tweaks.css";
 /** Either range or preset id or null */
 export declare type DateValue = [string | null, string | null] | string | null;
 interface Props {

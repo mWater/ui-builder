@@ -1,8 +1,8 @@
-import { QueryRepeatBlockDef, QueryRepeatBlock } from "./queryRepeat";
-import { ContextVar } from "../../blocks";
-import simpleSchema from "../../../__fixtures__/schema";
-import BlockFactory from "../../BlockFactory";
-import { InstanceCtx } from "../../../contexts";
+import { QueryRepeatBlockDef, QueryRepeatBlock } from "./queryRepeat"
+import { ContextVar } from "../../blocks"
+import simpleSchema from "../../../__fixtures__/schema"
+import BlockFactory from "../../BlockFactory"
+import { InstanceCtx } from "../../../contexts"
 
 // Outer context vars
 const rowsetCV: ContextVar = { id: "cv1", type: "rowset", name: "CV1", table: "t1" }
@@ -34,11 +34,9 @@ test("gets row cv", () => {
   })
 })
 
-
 test("gets row cv value", () => {
   expect(qrb.getRowContextVarValue({ id: "123" }, [], schema, rowsetCV, contextVars)).toEqual("123")
 })
-
 
 test("gets row expressions", () => {
   // Create single expression in contents

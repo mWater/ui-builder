@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column } from 'mwater-expressions';
+import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBlock";
+import { Column } from "mwater-expressions";
 export interface TagsEditorBlockDef extends ControlBlockDef {
     type: "tagsEditor";
 }

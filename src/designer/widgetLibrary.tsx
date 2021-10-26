@@ -1,13 +1,13 @@
 import React from "react"
-import { v4 as uuid } from 'uuid'
-import { validateWidget, WidgetDef } from "../widgets/widgets";
-import { DataSource } from "mwater-expressions";
-import WidgetDesigner from "./WidgetDesigner";
-import produce from "immer";
-import _ from "lodash";
-import { BlockPaletteEntry } from "./blockPaletteEntries";
-import { NewTab } from "./NewTab";
-import { BaseCtx } from "../contexts";
+import { v4 as uuid } from "uuid"
+import { validateWidget, WidgetDef } from "../widgets/widgets"
+import { DataSource } from "mwater-expressions"
+import WidgetDesigner from "./WidgetDesigner"
+import produce from "immer"
+import _ from "lodash"
+import { BlockPaletteEntry } from "./blockPaletteEntries"
+import { NewTab } from "./NewTab"
+import { BaseCtx } from "../contexts"
 
 /** All widgets in current project */
 export interface WidgetLibrary {
@@ -26,7 +26,7 @@ interface Props {
 
 interface State {
   /** Index of active tab. Can be one past end for new tab */
-  activeTabIndex: number     
+  activeTabIndex: number
 }
 
 /** Design mode for a library of widgets */
@@ -39,9 +39,11 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
   }
 
   handleTabChange = (widgetId: string, widgetDef: WidgetDef) => {
-    this.props.onWidgetLibraryChange(produce(this.props.baseCtx.widgetLibrary, (draft) => {
-      draft.widgets[widgetId] = widgetDef
-    }))
+    this.props.onWidgetLibraryChange(
+      produce(this.props.baseCtx.widgetLibrary, (draft) => {
+        draft.widgets[widgetId] = widgetDef
+      })
+    )
   }
 
   handleSelectTab = (index: number) => {
@@ -109,11 +111,11 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     }
 
     return (
-      <li className={(index === this.state.activeTabIndex) ? "active" : ""} key={index}>
+      <li className={index === this.state.activeTabIndex ? "active" : ""} key={index}>
         <a onClick={this.handleSelectTab.bind(null, index)}>
           {widgetDef.name}
           &nbsp;
-          <i onClick={this.handleCloseTab.bind(null, index)} className="fa fa-remove text-muted"/>
+          <i onClick={this.handleCloseTab.bind(null, index)} className="fa fa-remove text-muted" />
         </a>
       </li>
     )
@@ -128,24 +130,27 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
         return null
       }
 
-      return <WidgetDesigner
-        key={widgetDef.id}
-        widgetDef={widgetDef}
-        baseCtx={this.props.baseCtx}
-        dataSource={this.props.dataSource}
-        blockPaletteEntries={this.props.blockPaletteEntries}
-        onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
-      />
-    }
-    else {
-      return <NewTab 
-        widgetLibrary={this.props.baseCtx.widgetLibrary} 
-        onAddWidget={this.handleAddWidget} 
-        onOpenWidget={this.handleOpenWidget} 
-        onRemoveWidget={this.handleRemoveWidget}
-        onDuplicateWidget={this.handleDuplicateWidget}
-        validateWidget={this.validateSingleWidget}
+      return (
+        <WidgetDesigner
+          key={widgetDef.id}
+          widgetDef={widgetDef}
+          baseCtx={this.props.baseCtx}
+          dataSource={this.props.dataSource}
+          blockPaletteEntries={this.props.blockPaletteEntries}
+          onWidgetDefChange={this.handleTabChange.bind(null, activeTabId)}
         />
+      )
+    } else {
+      return (
+        <NewTab
+          widgetLibrary={this.props.baseCtx.widgetLibrary}
+          onAddWidget={this.handleAddWidget}
+          onOpenWidget={this.handleOpenWidget}
+          onRemoveWidget={this.handleRemoveWidget}
+          onDuplicateWidget={this.handleDuplicateWidget}
+          validateWidget={this.validateSingleWidget}
+        />
+      )
     }
   }
 
@@ -154,12 +159,10 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
       <div style={{ height: "100%", display: "grid", gridTemplateRows: "auto 1fr" }}>
         <ul className="nav nav-tabs" style={{ marginBottom: 5 }}>
           {this.props.openTabs.map((tab, index) => this.renderTab(index))}
-          <li 
-            className={(this.state.activeTabIndex >= this.props.openTabs.length) ? "active" : ""}
-            key="new">
-              <a onClick={this.handleSelectTab.bind(null, this.props.openTabs.length)}>
-                <i className="fa fa-plus"/>
-              </a>
+          <li className={this.state.activeTabIndex >= this.props.openTabs.length ? "active" : ""} key="new">
+            <a onClick={this.handleSelectTab.bind(null, this.props.openTabs.length)}>
+              <i className="fa fa-plus" />
+            </a>
           </li>
         </ul>
         {this.renderActiveTabContents()}
@@ -167,4 +170,3 @@ export class WidgetLibraryDesigner extends React.Component<Props, State> {
     )
   }
 }
-

@@ -10,9 +10,9 @@
 }
 
 .block-placeholder a:hover {
-  color: #38D;
+  color: #38d;
 }
 
 .block-placeholder.drop {
-  border: dashed 2px #38D;
+  border: dashed 2px #38d;
 }

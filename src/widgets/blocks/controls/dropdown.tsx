@@ -1,21 +1,28 @@
-import _ from 'lodash'
-import React from 'react';
-import { createExprVariables, ContextVar } from '../../blocks';
-import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, EnumValue, Expr, ExprValidator, LocalizedString } from 'mwater-expressions';
-import { localize } from '../../localization';
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor, EnumArrayEditor, EmbeddedExprsEditor, OrderByArrayEditor } from '../../propertyEditors';
+import _ from "lodash"
+import React from "react"
+import { createExprVariables, ContextVar } from "../../blocks"
+import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBlock"
+import { Column, EnumValue, Expr, ExprValidator, LocalizedString } from "mwater-expressions"
+import { localize } from "../../localization"
+import {
+  LabeledProperty,
+  PropertyEditor,
+  LocalizedTextPropertyEditor,
+  EnumArrayEditor,
+  EmbeddedExprsEditor,
+  OrderByArrayEditor
+} from "../../propertyEditors"
 import ReactSelect, { Styles } from "react-select"
-import { ExprComponent, FilterExprComponent } from 'mwater-expressions-ui';
-import { IdDropdownComponent } from './IdDropdownComponent';
-import { DesignCtx, InstanceCtx } from '../../../contexts';
-import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from '../../../embeddedExprs';
-import { Database, OrderBy } from '../../../database/Database';
-import { Toggle, Select } from 'react-library/lib/bootstrap';
-import ListEditor from '../../ListEditor';
-import { ToggleBlockDef } from './toggle';
-import { memo, useCallback, useMemo } from 'react';
-import { useStabilizeFunction, useStabilizeValue } from '../../../hooks';
+import { ExprComponent, FilterExprComponent } from "mwater-expressions-ui"
+import { IdDropdownComponent } from "./IdDropdownComponent"
+import { DesignCtx, InstanceCtx } from "../../../contexts"
+import { EmbeddedExpr, validateEmbeddedExprs, formatEmbeddedExprString } from "../../../embeddedExprs"
+import { Database, OrderBy } from "../../../database/Database"
+import { Toggle, Select } from "react-library/lib/bootstrap"
+import ListEditor from "../../ListEditor"
+import { ToggleBlockDef } from "./toggle"
+import { memo, useCallback, useMemo } from "react"
+import { useStabilizeFunction, useStabilizeValue } from "../../../hooks"
 
 export interface DropdownBlockDef extends ControlBlockDef {
   type: "dropdown"
@@ -41,7 +48,7 @@ export interface DropdownBlockDef extends ControlBlockDef {
   idLabelText?: LocalizedString | null
 
   /** Advanced mode: Expressions embedded in the id label text string. Referenced by {0}, {1}, etc. Context variable is ignored */
-  idLabelEmbeddedExprs?: EmbeddedExpr[] 
+  idLabelEmbeddedExprs?: EmbeddedExpr[]
 
   /** Advanced mode: Text/enum expressions to search on */
   idSearchExprs?: Expr[]
@@ -64,7 +71,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return error
     }
 
-    const contextVar = options.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)!
+    const contextVar = options.contextVars.find((cv) => cv.id === this.blockDef.rowContextVarId)!
     const column = options.schema.getColumn(contextVar.table!, this.blockDef.column!)!
 
     if (column.type === "id" || column.type == "id[]" || column.type == "join") {
@@ -79,7 +86,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       }
 
       if (idMode == "simple") {
-        if (!this.blockDef.idLabelExpr)  {
+        if (!this.blockDef.idLabelExpr) {
           return "Label Expression required"
         }
 
@@ -88,8 +95,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         if (error) {
           return error
         }
-      }
-      else {
+      } else {
         // Complex mode
         if (!this.blockDef.idLabelText) {
           return "Label required"
@@ -128,7 +134,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
           if (!searchExpr) {
             return "Search expression required"
           }
-    
+
           // Validate expr
           error = exprValidator.validateExpr(searchExpr, { table: idTable, types: ["text", "enum", "enumset"] })
           if (error) {
@@ -142,93 +148,105 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
 
   /** Generate a single synthetic context variable to allow embedded expressions to work in label */
   generateEmbedContextVars(idTable: string): ContextVar[] {
-    return [
-      { id: "dropdown-embed", name: "Label", table: idTable, type: "row" }
-    ]
+    return [{ id: "dropdown-embed", name: "Label", table: idTable, type: "row" }]
   }
 
   renderControl(props: RenderControlProps) {
     // If can't be rendered due to missing context variable, just show placeholder
     if (!props.rowContextVar || !this.blockDef.column) {
-      return <ReactSelect 
-        menuPortalTarget={document.body}
-        classNamePrefix="react-select-short" 
-        styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-      />
+      return (
+        <ReactSelect
+          menuPortalTarget={document.body}
+          classNamePrefix="react-select-short"
+          styles={{ menuPortal: (style) => ({ ...style, zIndex: 2000 }) }}
+        />
+      )
     }
 
     // Get column
     const column = props.schema.getColumn(props.rowContextVar.table!, this.blockDef.column)!
     if (!column) {
-      return <ReactSelect
-        menuPortalTarget={document.body}
-        classNamePrefix="react-select-short" 
-        styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-      />
+      return (
+        <ReactSelect
+          menuPortalTarget={document.body}
+          classNamePrefix="react-select-short"
+          styles={{ menuPortal: (style) => ({ ...style, zIndex: 2000 }) }}
+        />
+      )
     }
 
     if (column.type === "enum") {
-      return <EnumDropdownInstance 
-        blockDef={this.blockDef} 
-        column={column} 
-        locale={props.locale}
-        disabled={props.disabled}
-        value={props.value}
-        onChange={props.onChange}
-      />
+      return (
+        <EnumDropdownInstance
+          blockDef={this.blockDef}
+          column={column}
+          locale={props.locale}
+          disabled={props.disabled}
+          value={props.value}
+          onChange={props.onChange}
+        />
+      )
     }
     if (column.type === "enumset") {
-      return <EnumsetDropdownInstance 
-        blockDef={this.blockDef} 
-        column={column} 
-        locale={props.locale}
-        disabled={props.disabled}
-        value={props.value}
-        onChange={props.onChange}
-      />
-  }
+      return (
+        <EnumsetDropdownInstance
+          blockDef={this.blockDef}
+          column={column}
+          locale={props.locale}
+          disabled={props.disabled}
+          value={props.value}
+          onChange={props.onChange}
+        />
+      )
+    }
     if (column.type === "id") {
-      return <IdDropdownInstance
-        blockDef={this.blockDef}
-        column={column}
-        contextVars={props.contextVars}
-        contextVarValues={props.contextVarValues}
-        database={props.database}
-        disabled={props.disabled}
-        formatIdLabel={this.formatIdLabel.bind(null, props)}
-        value={props.value}
-        onChange={props.onChange}
-      />
+      return (
+        <IdDropdownInstance
+          blockDef={this.blockDef}
+          column={column}
+          contextVars={props.contextVars}
+          contextVarValues={props.contextVarValues}
+          database={props.database}
+          disabled={props.disabled}
+          formatIdLabel={this.formatIdLabel.bind(null, props)}
+          value={props.value}
+          onChange={props.onChange}
+        />
+      )
     }
     if (column.type === "id[]") {
-      return <IdsDropdownInstance
-        blockDef={this.blockDef}
-        column={column}
-        contextVars={props.contextVars}
-        contextVarValues={props.contextVarValues}
-        database={props.database}
-        disabled={props.disabled}
-        formatIdLabel={this.formatIdLabel.bind(null, props)}
-        value={props.value}
-        onChange={props.onChange}
-      />
+      return (
+        <IdsDropdownInstance
+          blockDef={this.blockDef}
+          column={column}
+          contextVars={props.contextVars}
+          contextVarValues={props.contextVarValues}
+          database={props.database}
+          disabled={props.disabled}
+          formatIdLabel={this.formatIdLabel.bind(null, props)}
+          value={props.value}
+          onChange={props.onChange}
+        />
+      )
     }
     if (column.type === "boolean") {
       return this.renderBoolean(props, column)
     }
     // Dropdowns support n-1 and 1-1 joins as well as id columns
     if (column.type === "join" && (column.join!.type === "n-1" || column.join!.type === "1-1")) {
-      return <IdDropdownInstance
-        blockDef={this.blockDef}
-        column={column}
-        contextVars={props.contextVars}
-        contextVarValues={props.contextVarValues}
-        database={props.database}
-        disabled={props.disabled}
-        formatIdLabel={this.formatIdLabel.bind(null, props)}
-        value={props.value}
-        onChange={props.onChange}
-      />
+      return (
+        <IdDropdownInstance
+          blockDef={this.blockDef}
+          column={column}
+          contextVars={props.contextVars}
+          contextVarValues={props.contextVarValues}
+          database={props.database}
+          disabled={props.disabled}
+          formatIdLabel={this.formatIdLabel.bind(null, props)}
+          value={props.value}
+          onChange={props.onChange}
+        />
+      )
     }
     throw new Error("Unsupported type")
   }
@@ -244,30 +262,31 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
         locale: ctx.locale,
         schema: ctx.schema
       })
-    }
-    else {
+    } else {
       return labelValues[0]
     }
   }
 
   renderBoolean(props: RenderControlProps, column: Column) {
     console.log(props.value)
-    return <Select
-      options={[
-        { value: true, label: localize(this.blockDef.trueLabel) || "Yes" },
-        { value: false, label: localize(this.blockDef.falseLabel) || "No" }
-      ]}
-      value={props.value}
-      onChange={props.onChange}
-      nullLabel={""}
-    />
+    return (
+      <Select
+        options={[
+          { value: true, label: localize(this.blockDef.trueLabel) || "Yes" },
+          { value: false, label: localize(this.blockDef.falseLabel) || "No" }
+        ]}
+        value={props.value}
+        onChange={props.onChange}
+        nullLabel={""}
+      />
+    )
   }
 
   /** Implement this to render any editor parts that are not selecting the basic row cv and column */
   renderControlEditor(props: DesignCtx) {
-    const contextVar = props.contextVars.find(cv => cv.id === this.blockDef.rowContextVarId)
+    const contextVar = props.contextVars.find((cv) => cv.id === this.blockDef.rowContextVarId)
     let column: Column | null = null
-    
+
     if (contextVar && contextVar.table && this.blockDef.column) {
       column = props.schema.getColumn(contextVar.table, this.blockDef.column)
     }
@@ -294,68 +313,81 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       <div>
         <LabeledProperty label="Placeholder" key="placeholder">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="placeholder">
-            {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+            {(value, onChange) => (
+              <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+            )}
           </PropertyEditor>
         </LabeledProperty>
-        { isIdType ?
+        {isIdType ? (
           <LabeledProperty label="Mode" key="mode">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idMode">
-              {(value, onChange) => 
-                <Toggle 
-                  value={value || "simple"} 
-                  onChange={onChange} 
+              {(value, onChange) => (
+                <Toggle
+                  value={value || "simple"}
+                  onChange={onChange}
                   options={[
                     { value: "simple", label: "Simple" },
                     { value: "advanced", label: "Advanced" }
-                  ]} />
-              }
+                  ]}
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { isIdType && idMode == "simple" ?
+        ) : null}
+        {isIdType && idMode == "simple" ? (
           <LabeledProperty label="Label Expression" key="idLabelExpr">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelExpr">
-              {(value, onChange) => <ExprComponent 
-                value={value || null} 
-                onChange={onChange} 
-                schema={props.schema}
-                dataSource={props.dataSource}
-                types={["text"]}
-                table={idTable!}
+              {(value, onChange) => (
+                <ExprComponent
+                  value={value || null}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  types={["text"]}
+                  table={idTable!}
                 />
-              }
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { isIdType && idMode == "advanced" ?
+        ) : null}
+        {isIdType && idMode == "advanced" ? (
           <div>
             <LabeledProperty label="Label" key="idLabelText">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelText">
-                {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
+                {(value, onChange) => (
+                  <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
+                )}
               </PropertyEditor>
             </LabeledProperty>
-            <LabeledProperty label="Embedded label expressions" help="Reference in text as {0}, {1}, etc." key="idLabelEmbeddedExprs">
+            <LabeledProperty
+              label="Embedded label expressions"
+              help="Reference in text as {0}, {1}, etc."
+              key="idLabelEmbeddedExprs"
+            >
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idLabelEmbeddedExprs">
                 {(value: EmbeddedExpr[] | null | undefined, onChange) => (
-                  <EmbeddedExprsEditor 
-                    value={value} 
-                    onChange={onChange} 
-                    schema={props.schema} 
+                  <EmbeddedExprsEditor
+                    value={value}
+                    onChange={onChange}
+                    schema={props.schema}
                     dataSource={props.dataSource}
-                    contextVars={this.generateEmbedContextVars(idTable!)} />
+                    contextVars={this.generateEmbedContextVars(idTable!)}
+                  />
                 )}
               </PropertyEditor>
             </LabeledProperty>
             <LabeledProperty label="Option ordering" key="idOrderBy">
               <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idOrderBy">
-                {(value, onChange) => 
-                  <OrderByArrayEditor 
-                    value={value || []} 
-                    onChange={onChange} 
-                    schema={props.schema} 
-                    dataSource={props.dataSource} 
+                {(value, onChange) => (
+                  <OrderByArrayEditor
+                    value={value || []}
+                    onChange={onChange}
+                    schema={props.schema}
+                    dataSource={props.dataSource}
                     contextVars={props.contextVars}
-                    table={idTable!} /> }
+                    table={idTable!}
+                  />
+                )}
               </PropertyEditor>
             </LabeledProperty>
             <LabeledProperty label="Search expressions" key="idSearchExprs">
@@ -367,16 +399,16 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
                   return (
                     <div>
                       <ListEditor items={value || []} onItemsChange={onItemsChange}>
-                        { (expr: Expr, onExprChange) => (
-                          <ExprComponent 
-                            value={expr} 
-                            schema={props.schema} 
-                            dataSource={props.dataSource} 
-                            onChange={onExprChange} 
-                            table={idTable!} 
-                            types={["text", "enum", "enumset"]} 
+                        {(expr: Expr, onExprChange) => (
+                          <ExprComponent
+                            value={expr}
+                            schema={props.schema}
+                            dataSource={props.dataSource}
+                            onChange={onExprChange}
+                            table={idTable!}
+                            types={["text", "enum", "enumset"]}
                             variables={createExprVariables(props.contextVars)}
-                            />
+                          />
                         )}
                       </ListEditor>
                       <button type="button" className="btn btn-link btn-sm" onClick={handleAddSearchExpr}>
@@ -388,65 +420,71 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
               </PropertyEditor>
             </LabeledProperty>
           </div>
-        : null }
-        { isIdType ?
+        ) : null}
+        {isIdType ? (
           <LabeledProperty label="Filter Expression" key="idFilterExpr">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="idFilterExpr">
-              {(value, onChange) => <FilterExprComponent 
-                value={value} 
-                onChange={onChange} 
-                schema={props.schema}
-                dataSource={props.dataSource}
-                table={idTable!}
-                variables={createExprVariables(props.contextVars)}
+              {(value, onChange) => (
+                <FilterExprComponent
+                  value={value}
+                  onChange={onChange}
+                  schema={props.schema}
+                  dataSource={props.dataSource}
+                  table={idTable!}
+                  variables={createExprVariables(props.contextVars)}
                 />
-              }
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { column && (column.type === "enum" || column.type === "enumset") ?
+        ) : null}
+        {column && (column.type === "enum" || column.type === "enumset") ? (
           <LabeledProperty label="Include Values" key="includeValues">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="includeValues">
-              {(value, onChange) => <EnumArrayEditor 
-                value={value} 
-                onChange={onChange} 
-                enumValues={column!.enumValues!}
-                />
-              }
+              {(value, onChange) => (
+                <EnumArrayEditor value={value} onChange={onChange} enumValues={column!.enumValues!} />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { column && (column.type === "enum" || column.type === "enumset") ?
+        ) : null}
+        {column && (column.type === "enum" || column.type === "enumset") ? (
           <LabeledProperty label="Exclude Values" key="excludeValues">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="excludeValues">
-              {(value, onChange) => <EnumArrayEditor 
-                value={value} 
-                onChange={onChange} 
-                enumValues={column!.enumValues!}
-                />
-              }
+              {(value, onChange) => (
+                <EnumArrayEditor value={value} onChange={onChange} enumValues={column!.enumValues!} />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null }
-        { !isIdType ? 
+        ) : null}
+        {!isIdType ? (
           <div key="convert_to_toggle">
-            <button className="btn btn-link btn-sm" onClick={handleConvertToToggle}>Convert to Toggle</button>
+            <button className="btn btn-link btn-sm" onClick={handleConvertToToggle}>
+              Convert to Toggle
+            </button>
           </div>
-        : null }
-        { isBooleanType ?
+        ) : null}
+        {isBooleanType ? (
           <LabeledProperty label="Label for true" key="trueLabel" hint="Must be set to allow localization">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="trueLabel">
-              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="Yes" />}
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor
+                  value={value}
+                  onChange={onChange}
+                  locale={props.locale}
+                  placeholder="Yes"
+                />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null}
-        { isBooleanType ?
+        ) : null}
+        {isBooleanType ? (
           <LabeledProperty label="Label for false" key="falseLabel" hint="Must be set to allow localization">
             <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="falseLabel">
-              {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="No" />}
+              {(value, onChange) => (
+                <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} placeholder="No" />
+              )}
             </PropertyEditor>
           </LabeledProperty>
-        : null}
+        ) : null}
       </div>
     )
   }
@@ -457,118 +495,134 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
       return false
     }
 
-    return column.type === "enum" 
-      || column.type === "enumset" 
-      || column.type === "id" 
-      || column.type === "id[]"
-      || column.type == "boolean"
-      || (column.type == "join" && (column.join!.type === "n-1" || column.join!.type === "1-1"))
+    return (
+      column.type === "enum" ||
+      column.type === "enumset" ||
+      column.type === "id" ||
+      column.type === "id[]" ||
+      column.type == "boolean" ||
+      (column.type == "join" && (column.join!.type === "n-1" || column.join!.type === "1-1"))
+    )
   }
 }
 
-const EnumDropdownInstance = memo((props: {
-  blockDef: DropdownBlockDef
-  column: Column
-  locale: string
-  disabled: boolean
-  value: any
-  onChange?: (value: any) => void
-}) => {
-  const { column, blockDef } = props
+const EnumDropdownInstance = memo(
+  (props: {
+    blockDef: DropdownBlockDef
+    column: Column
+    locale: string
+    disabled: boolean
+    value: any
+    onChange?: (value: any) => void
+  }) => {
+    const { column, blockDef } = props
 
-  const enumValues = useMemo(() => {
-    let result = column.enumValues!
+    const enumValues = useMemo(() => {
+      let result = column.enumValues!
 
-    // Handle include/exclude
-    if (blockDef.includeValues && blockDef.includeValues.length > 0) {
-      result = result.filter(ev => blockDef.includeValues!.includes(ev.id))
-    }
-    if (blockDef.excludeValues && blockDef.excludeValues.length > 0) {
-      result = result.filter(ev => !blockDef.excludeValues!.includes(ev.id))
-    }
-    return result
-  }, [column.enumValues, blockDef])
+      // Handle include/exclude
+      if (blockDef.includeValues && blockDef.includeValues.length > 0) {
+        result = result.filter((ev) => blockDef.includeValues!.includes(ev.id))
+      }
+      if (blockDef.excludeValues && blockDef.excludeValues.length > 0) {
+        result = result.filter((ev) => !blockDef.excludeValues!.includes(ev.id))
+      }
+      return result
+    }, [column.enumValues, blockDef])
 
-  // Lookup enumvalue
-  const enumValue = enumValues.find(ev => ev.id === props.value) || null
+    // Lookup enumvalue
+    const enumValue = enumValues.find((ev) => ev.id === props.value) || null
 
-  const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
-  const getOptionValue = (ev: EnumValue) => ev.id
-  const handleChange = useCallback((ev: EnumValue | null) => {
-    if (props.onChange) {
-      props.onChange(ev ? ev.id : null)
-    }
-  }, [props.onChange])
+    const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
+    const getOptionValue = (ev: EnumValue) => ev.id
+    const handleChange = useCallback(
+      (ev: EnumValue | null) => {
+        if (props.onChange) {
+          props.onChange(ev ? ev.id : null)
+        }
+      },
+      [props.onChange]
+    )
 
-  return <ReactSelect
-     value={enumValue} 
-     onChange={handleChange}
-     options={enumValues}
-     placeholder={localize(blockDef.placeholder, props.locale)}
-     getOptionLabel={getOptionLabel}
-     getOptionValue={getOptionValue}
-     isDisabled={props.disabled || !props.onChange}
-     isClearable={true}
-     closeMenuOnScroll={true}
-     menuPortalTarget={document.body}
-     classNamePrefix="react-select-short" 
-     styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-     />
-})
-
-const EnumsetDropdownInstance = memo((props: {
-  blockDef: DropdownBlockDef
-  column: Column
-  locale: string
-  disabled: boolean
-  value: any
-  onChange?: (value: any) => void
-}) => {
-  const { column, blockDef } = props
-
-  const enumValues = useMemo(() => {
-    let result = column.enumValues!
-
-    // Handle include/exclude
-    if (blockDef.includeValues && blockDef.includeValues.length > 0) {
-      result = result.filter(ev => blockDef.includeValues!.includes(ev.id))
-    }
-    if (blockDef.excludeValues && blockDef.excludeValues.length > 0) {
-      result = result.filter(ev => !blockDef.excludeValues!.includes(ev.id))
-    }
-    return result
-  }, [column.enumValues, blockDef])
-
-  // Map value to array
-  let value: EnumValue[] | null = null
-  if (props.value) {
-    value = _.compact(props.value.map((v: any) => enumValues.find(ev => ev.id === v)))
+    return (
+      <ReactSelect
+        value={enumValue}
+        onChange={handleChange}
+        options={enumValues}
+        placeholder={localize(blockDef.placeholder, props.locale)}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
+        isDisabled={props.disabled || !props.onChange}
+        isClearable={true}
+        closeMenuOnScroll={true}
+        menuPortalTarget={document.body}
+        classNamePrefix="react-select-short"
+        styles={{ menuPortal: (style) => ({ ...style, zIndex: 2000 }) }}
+      />
+    )
   }
+)
 
-  const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
-  const getOptionValue = (ev: EnumValue) => ev.id
-  const handleChange = useCallback((evs: EnumValue[] | null) => {
-    if (props.onChange) {
-      props.onChange(evs && evs.length > 0 ? evs.map(ev => ev.id) : null)
+const EnumsetDropdownInstance = memo(
+  (props: {
+    blockDef: DropdownBlockDef
+    column: Column
+    locale: string
+    disabled: boolean
+    value: any
+    onChange?: (value: any) => void
+  }) => {
+    const { column, blockDef } = props
+
+    const enumValues = useMemo(() => {
+      let result = column.enumValues!
+
+      // Handle include/exclude
+      if (blockDef.includeValues && blockDef.includeValues.length > 0) {
+        result = result.filter((ev) => blockDef.includeValues!.includes(ev.id))
+      }
+      if (blockDef.excludeValues && blockDef.excludeValues.length > 0) {
+        result = result.filter((ev) => !blockDef.excludeValues!.includes(ev.id))
+      }
+      return result
+    }, [column.enumValues, blockDef])
+
+    // Map value to array
+    let value: EnumValue[] | null = null
+    if (props.value) {
+      value = _.compact(props.value.map((v: any) => enumValues.find((ev) => ev.id === v)))
     }
-  }, [props.onChange])
 
-  return <ReactSelect
-    value={value} 
-    onChange={handleChange}
-    options={enumValues}
-    placeholder={localize(blockDef.placeholder, props.locale)}
-    getOptionLabel={getOptionLabel}
-    getOptionValue={getOptionValue}
-    isDisabled={props.disabled || !props.onChange}
-    isClearable={true}
-    isMulti={true}
-    closeMenuOnScroll={true}
-    menuPortalTarget={document.body}
-    classNamePrefix="react-select-short" 
-    styles={{ menuPortal: style => ({ ...style, zIndex: 2000 })}}
-  />
-})
+    const getOptionLabel = (ev: EnumValue) => localize(ev.name, props.locale)
+    const getOptionValue = (ev: EnumValue) => ev.id
+    const handleChange = useCallback(
+      (evs: EnumValue[] | null) => {
+        if (props.onChange) {
+          props.onChange(evs && evs.length > 0 ? evs.map((ev) => ev.id) : null)
+        }
+      },
+      [props.onChange]
+    )
+
+    return (
+      <ReactSelect
+        value={value}
+        onChange={handleChange}
+        options={enumValues}
+        placeholder={localize(blockDef.placeholder, props.locale)}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
+        isDisabled={props.disabled || !props.onChange}
+        isClearable={true}
+        isMulti={true}
+        closeMenuOnScroll={true}
+        menuPortalTarget={document.body}
+        classNamePrefix="react-select-short"
+        styles={{ menuPortal: (style) => ({ ...style, zIndex: 2000 }) }}
+      />
+    )
+  }
+)
 
 function IdDropdownInstance(props: {
   blockDef: DropdownBlockDef
@@ -585,27 +639,23 @@ function IdDropdownInstance(props: {
 
   const labelEmbeddedExprs: Expr[] = useMemo(() => {
     return blockDef.idMode == "advanced"
-      ? (blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
+      ? (blockDef.idLabelEmbeddedExprs || []).map((ee) => ee.expr)
       : [blockDef.idLabelExpr!]
   }, [blockDef])
 
   const searchExprs: Expr[] = useMemo(() => {
-    return blockDef.idMode == "advanced"
-      ? blockDef.idSearchExprs! || []
-      : [blockDef.idLabelExpr!]
+    return blockDef.idMode == "advanced" ? blockDef.idSearchExprs! || [] : [blockDef.idLabelExpr!]
   }, [blockDef])
 
   const orderBy: OrderBy[] = useMemo(() => {
-    return blockDef.idMode == "advanced"
-      ? blockDef.idOrderBy! || []
-      : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
+    return blockDef.idMode == "advanced" ? blockDef.idOrderBy! || [] : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
   }, [blockDef])
 
   // Dropdowns support n-1 and 1-1 joins as well as id columns
   const idTable = column.type == "join" ? column.join!.toTable : column.idTable!
 
   const styles = useMemo<Partial<Styles>>(() => {
-    return { menuPortal: style => ({ ...style, zIndex: 2000 })}
+    return { menuPortal: (style) => ({ ...style, zIndex: 2000 }) }
   }, [])
 
   // Stabilize functions and values
@@ -615,21 +665,23 @@ function IdDropdownInstance(props: {
   const contextVarValues = useStabilizeValue(props.contextVarValues)
   const value = useStabilizeValue(props.value)
 
-  return <IdDropdownComponent
-    database={props.database}
-    table={idTable}
-    value={value}
-    onChange={onChange}
-    multi={false}
-    labelEmbeddedExprs={labelEmbeddedExprs}
-    searchExprs={searchExprs}
-    orderBy={orderBy}
-    filterExpr={blockDef.idFilterExpr || null}
-    formatLabel={formatIdLabel}
-    contextVars={contextVars}
-    contextVarValues={contextVarValues}
-    styles={styles}
-  />
+  return (
+    <IdDropdownComponent
+      database={props.database}
+      table={idTable}
+      value={value}
+      onChange={onChange}
+      multi={false}
+      labelEmbeddedExprs={labelEmbeddedExprs}
+      searchExprs={searchExprs}
+      orderBy={orderBy}
+      filterExpr={blockDef.idFilterExpr || null}
+      formatLabel={formatIdLabel}
+      contextVars={contextVars}
+      contextVarValues={contextVarValues}
+      styles={styles}
+    />
+  )
 }
 
 function IdsDropdownInstance(props: {
@@ -647,24 +699,20 @@ function IdsDropdownInstance(props: {
 
   const labelEmbeddedExprs: Expr[] = useMemo(() => {
     return blockDef.idMode == "advanced"
-      ? (blockDef.idLabelEmbeddedExprs || []).map(ee => ee.expr)
+      ? (blockDef.idLabelEmbeddedExprs || []).map((ee) => ee.expr)
       : [blockDef.idLabelExpr!]
   }, [blockDef])
 
   const searchExprs: Expr[] = useMemo(() => {
-    return blockDef.idMode == "advanced"
-      ? blockDef.idSearchExprs! || []
-      : [blockDef.idLabelExpr!]
+    return blockDef.idMode == "advanced" ? blockDef.idSearchExprs! || [] : [blockDef.idLabelExpr!]
   }, [blockDef])
 
   const orderBy: OrderBy[] = useMemo(() => {
-    return blockDef.idMode == "advanced"
-      ? blockDef.idOrderBy! || []
-      : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
+    return blockDef.idMode == "advanced" ? blockDef.idOrderBy! || [] : [{ expr: blockDef.idLabelExpr!, dir: "asc" }]
   }, [blockDef])
 
   const styles = useMemo<Partial<Styles>>(() => {
-    return { menuPortal: style => ({ ...style, zIndex: 2000 })}
+    return { menuPortal: (style) => ({ ...style, zIndex: 2000 }) }
   }, [])
 
   // Stabilize functions and values
@@ -674,19 +722,21 @@ function IdsDropdownInstance(props: {
   const contextVarValues = useStabilizeValue(props.contextVarValues)
   const value = useStabilizeValue(props.value)
 
-  return <IdDropdownComponent
-    database={props.database}
-    table={column.idTable!}
-    value={value}
-    onChange={onChange}
-    multi={true}
-    labelEmbeddedExprs={labelEmbeddedExprs}
-    searchExprs={searchExprs}
-    orderBy={orderBy}
-    filterExpr={blockDef.idFilterExpr || null}
-    formatLabel={formatIdLabel}
-    contextVars={contextVars}
-    contextVarValues={contextVarValues}
-    styles={styles}
-  />
+  return (
+    <IdDropdownComponent
+      database={props.database}
+      table={column.idTable!}
+      value={value}
+      onChange={onChange}
+      multi={true}
+      labelEmbeddedExprs={labelEmbeddedExprs}
+      searchExprs={searchExprs}
+      orderBy={orderBy}
+      filterExpr={blockDef.idFilterExpr || null}
+      formatLabel={formatIdLabel}
+      contextVars={contextVars}
+      contextVarValues={contextVarValues}
+      styles={styles}
+    />
+  )
 }

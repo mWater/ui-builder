@@ -3,10 +3,10 @@ import { ContextVar } from "./blocks";
 import { ActionDef } from "./actions";
 import { LocalizedString, Schema, DataSource, Expr, Table, EnumValue, AggrStatus, LiteralType } from "mwater-expressions";
 import { OrderBy } from "../database/Database";
-import * as PropTypes from 'prop-types';
+import * as PropTypes from "prop-types";
 import { EmbeddedExpr } from "../embeddedExprs";
 import { DesignCtx } from "../contexts";
-import { ContextVarExpr } from '..';
+import { ContextVarExpr } from "..";
 /** Labeled group */
 export declare const LabeledProperty: React.FC<{
     label: string;

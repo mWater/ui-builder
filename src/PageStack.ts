@@ -1,14 +1,14 @@
-import { Database } from "./database/Database";
+import { Database } from "./database/Database"
 
 export interface Page {
-  /** Whether page is a normal page or a modal. "inline" is displayed as 
+  /** Whether page is a normal page or a modal. "inline" is displayed as
    * an inline widget without padding. It assumes that all child pages
-   * will be modals 
+   * will be modals
    */
   type: "modal" | "normal" | "inline"
 
   /** Modal size. Default is "normal" */
-  modalSize?: "small" | "normal" | "large" | "full" 
+  modalSize?: "small" | "normal" | "large" | "full"
 
   /** Widget to display in page */
   widgetId: string
@@ -19,7 +19,7 @@ export interface Page {
   title?: string
 
   /** Values of context variables that widget needs. Includes values of global context variables */
-  contextVarValues: { [contextVarId: string]: any };  
+  contextVarValues: { [contextVarId: string]: any }
 }
 
 /** Manages the stack of pages, allowing opening and closing of pages */
@@ -30,5 +30,5 @@ export interface PageStack {
   replacePage(page: Page): Promise<boolean>
 
   /** Close top page. Returns whether successful and pages still open */
-  closePage(): Promise<{ success: boolean, pageCount: number }>
+  closePage(): Promise<{ success: boolean; pageCount: number }>
 }

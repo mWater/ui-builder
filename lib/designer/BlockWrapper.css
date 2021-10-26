@@ -10,7 +10,7 @@
 }
 
 .block-wrapper.selected {
-  border: dashed 1px #38D;
+  border: dashed 1px #38d;
 }
 
 .block-wrapper.validation-error {
@@ -19,7 +19,7 @@
 
 .block-wrapper .delete-block {
   position: absolute;
-  color: #38D;
+  color: #38d;
   top: -11px;
   right: -6px;
   cursor: pointer;
@@ -29,7 +29,7 @@
   position: absolute;
   padding-left: 3px;
   padding-right: 3px;
-  color: #AAA;
+  color: #aaa;
   background-color: white;
   font-size: 6pt;
   top: -6px;
@@ -42,5 +42,5 @@
 
 .block-wrapper.selected > .block-wrapper-label {
   display: block;
-  color: #38D;
+  color: #38d;
 }

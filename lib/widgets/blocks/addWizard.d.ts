@@ -1,7 +1,7 @@
-import * as React from 'react';
-import LeafBlock from '../LeafBlock';
-import { BlockDef } from '../blocks';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import * as React from "react";
+import LeafBlock from "../LeafBlock";
+import { BlockDef } from "../blocks";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface AddWizardBlockDef extends BlockDef {
     type: "addWizard";
 }

@@ -1,9 +1,9 @@
-.toc-split { 
+.toc-split {
   height: 100%;
-  position: relative
+  position: relative;
 }
 
-.toc-split-left { 
+.toc-split-left {
   height: 100%;
   width: 25%;
   float: left;
@@ -15,7 +15,7 @@
 }
 
 .toc-split.dark .toc-item-label:not(.toc-item-label-selected) {
-  color: #DDD;
+  color: #ddd;
 }
 
 .toc-split.light .toc-item-label:not(.toc-item-label-selected) {
@@ -28,15 +28,15 @@
 }
 
 .toc-split.light .toc-item-label-selectable:hover:not(.toc-item-label-selected) {
-  background-color: #DDD;
+  background-color: #ddd;
   color: black;
 }
 
-.toc-split-right { 
+.toc-split-right {
   height: 100%;
   width: 75%;
   float: left;
-  border-left: solid 1px #DDD;
+  border-left: solid 1px #ddd;
   overflow-y: auto;
 }
 
@@ -99,7 +99,7 @@
   left: 0px;
   width: 50%;
   background-color: white;
-  border: solid 1px #AAA;
+  border: solid 1px #aaa;
   z-index: 1000;
 }
 

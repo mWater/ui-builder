@@ -1,24 +1,24 @@
-import { BlockDef, Block } from "../blocks";
-import LeafBlock from "../LeafBlock";
-import React from "react";
-import { DesignCtx } from "../../contexts";
-import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from "../propertyEditors";
-import { Select } from "react-library/lib/bootstrap";
-import { Checkbox, Toggle } from "react-library/lib/bootstrap";
-import Markdown from 'markdown-it'
-import { sanitize } from 'dompurify'
+import { BlockDef, Block } from "../blocks"
+import LeafBlock from "../LeafBlock"
+import React from "react"
+import { DesignCtx } from "../../contexts"
+import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from "../propertyEditors"
+import { Select } from "react-library/lib/bootstrap"
+import { Checkbox, Toggle } from "react-library/lib/bootstrap"
+import Markdown from "markdown-it"
+import { sanitize } from "dompurify"
 
 /** Common base class for text and expression */
 export interface TextualBlockDef extends BlockDef {
   bold?: boolean
   italic?: boolean
   underline?: boolean
-  
+
   /** Default is div */
   style?: "p" | "div" | "h1" | "h2" | "h3" | "h4" | "h5"
 
   /** Color of text. Default is no coloring */
-  color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger" 
+  color?: null | "muted" | "primary" | "success" | "info" | "warning" | "danger"
 
   /** How to align text. Default is left */
   align?: "left" | "center" | "right" | "justify"
@@ -79,7 +79,7 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
   processHTML(text: string) {
     return <div dangerouslySetInnerHTML={{ __html: sanitize(text) }} />
   }
-  
+
   canonicalize() {
     if (this.blockDef.html && this.blockDef.markdown) {
       return { ...this.blockDef, markdown: false }
@@ -92,77 +92,104 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
       <div>
         <LabeledProperty label="Style">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="style">
-            {(value, onChange) => 
-              <Select 
-                value={value || "div"} 
+            {(value, onChange) => (
+              <Select
+                value={value || "div"}
                 onChange={onChange}
                 options={[
-                  { value: "div", label: "Plain Text"},
-                  { value: "p", label: "Paragraph"},
-                  { value: "h1", label: "Heading 1"},
-                  { value: "h2", label: "Heading 2"},
-                  { value: "h3", label: "Heading 3"},
-                  { value: "h4", label: "Heading 4"},
-                  { value: "h5", label: "Heading 5"}
-            ]} /> }
+                  { value: "div", label: "Plain Text" },
+                  { value: "p", label: "Paragraph" },
+                  { value: "h1", label: "Heading 1" },
+                  { value: "h2", label: "Heading 2" },
+                  { value: "h3", label: "Heading 3" },
+                  { value: "h4", label: "Heading 4" },
+                  { value: "h5", label: "Heading 5" }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="bold">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Bold</Checkbox>}
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Bold
+            </Checkbox>
+          )}
         </PropertyEditor>
 
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="italic">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Italic</Checkbox>}
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Italic
+            </Checkbox>
+          )}
         </PropertyEditor>
 
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="underline">
-          {(value, onChange) => <Checkbox value={value} onChange={onChange}>Underline</Checkbox>}
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Underline
+            </Checkbox>
+          )}
         </PropertyEditor>
 
         <LabeledProperty label="Alignment">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="align">
-            {(value, onChange) => 
-              <Toggle 
-                value={value || "left"} 
-                onChange={onChange} 
+            {(value, onChange) => (
+              <Toggle
+                value={value || "left"}
+                onChange={onChange}
                 options={[
-                  { value: "left", label: <i className="fa fa-align-left"/> },
-                  { value: "center", label: <i className="fa fa-align-center"/> },
-                  { value: "right", label: <i className="fa fa-align-right"/> },
-                  { value: "justify", label: <i className="fa fa-align-justify"/> }
-                ]} />
-            }
+                  { value: "left", label: <i className="fa fa-align-left" /> },
+                  { value: "center", label: <i className="fa fa-align-center" /> },
+                  { value: "right", label: <i className="fa fa-align-right" /> },
+                  { value: "justify", label: <i className="fa fa-align-justify" /> }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
 
         <div>
-          { !this.blockDef.html ?
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="markdown">
-            {(value, onChange) => <Checkbox inline value={value} onChange={onChange}>Markdown</Checkbox>}
-          </PropertyEditor>
-          : null }
-
-          { !this.blockDef.markdown ?
-          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="html">
-            {(value, onChange) => <Checkbox inline value={value} onChange={onChange}>HTML</Checkbox>}
-          </PropertyEditor>
-          : null }
-
-          { !this.blockDef.markdown && !this.blockDef.html ? 
-            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
-              {(value, onChange) => <Checkbox inline value={value} onChange={onChange}>Multi-line</Checkbox>}
+          {!this.blockDef.html ? (
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="markdown">
+              {(value, onChange) => (
+                <Checkbox inline value={value} onChange={onChange}>
+                  Markdown
+                </Checkbox>
+              )}
             </PropertyEditor>
-          : null }
+          ) : null}
+
+          {!this.blockDef.markdown ? (
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="html">
+              {(value, onChange) => (
+                <Checkbox inline value={value} onChange={onChange}>
+                  HTML
+                </Checkbox>
+              )}
+            </PropertyEditor>
+          ) : null}
+
+          {!this.blockDef.markdown && !this.blockDef.html ? (
+            <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="multiline">
+              {(value, onChange) => (
+                <Checkbox inline value={value} onChange={onChange}>
+                  Multi-line
+                </Checkbox>
+              )}
+            </PropertyEditor>
+          ) : null}
         </div>
-        <br/>
+        <br />
         <LabeledProperty label="Color">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="color">
-            {(value, onChange) => 
+            {(value, onChange) => (
               // Had to use "as any" due to Tyepscript bug
-              <Select 
-                value={value as any} 
-                onChange={onChange} 
+              <Select
+                value={value as any}
+                onChange={onChange}
                 options={[
                   { value: null, label: "Default" },
                   { value: "muted", label: "Muted" },
@@ -171,8 +198,9 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
                   { value: "info", label: "Info" },
                   { value: "warning", label: "Warning" },
                   { value: "danger", label: "Danger" }
-                ]} />
-            }
+                ]}
+              />
+            )}
           </PropertyEditor>
         </LabeledProperty>
       </div>

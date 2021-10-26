@@ -1,10 +1,10 @@
-import { QueryOptions, OrderByDir } from './Database'
-import { QueryCompiler } from './QueryCompiler';
-import simpleSchema from '../__fixtures__/schema';
-import { Variable } from 'mwater-expressions';
+import { QueryOptions, OrderByDir } from "./Database"
+import { QueryCompiler } from "./QueryCompiler"
+import simpleSchema from "../__fixtures__/schema"
+import { Variable } from "mwater-expressions"
 
-const variables: Variable[] = [{ id: "varnumber", name: { _base: "en", en: "Varnumber"}, type: "number" }]
-const variableValues = { varnumber: { type: "literal", valueType: "number", value: 123 }}
+const variables: Variable[] = [{ id: "varnumber", name: { _base: "en", en: "Varnumber" }, type: "number" }]
+const variableValues = { varnumber: { type: "literal", valueType: "number", value: 123 } }
 
 const schema = simpleSchema()
 const compiler = new QueryCompiler(schema, variables, variableValues)
@@ -12,16 +12,14 @@ const compiler = new QueryCompiler(schema, variables, variableValues)
 test("compiles simple query", () => {
   const options: QueryOptions = {
     select: { x: { type: "field", table: "t1", column: "text" } },
-    from: "t1",
+    from: "t1"
   }
 
   const { jsonql, rowMapper } = compiler.compileQuery(options)
 
   expect(jsonql).toEqual({
     type: "query",
-    selects: [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" }
-    ],
+    selects: [{ type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" }],
     from: { type: "table", table: "t1", alias: "main" },
     groupBy: [],
     orderBy: []
@@ -34,16 +32,14 @@ test("compiles distinct query", () => {
   const options: QueryOptions = {
     select: { x: { type: "field", table: "t1", column: "text" } },
     distinct: true,
-    from: "t1",
+    from: "t1"
   }
 
   const { jsonql, rowMapper } = compiler.compileQuery(options)
 
   expect(jsonql).toEqual({
     type: "query",
-    selects: [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" }
-    ],
+    selects: [{ type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c_0" }],
     distinct: true,
     from: { type: "table", table: "t1", alias: "main" },
     groupBy: [],
@@ -55,9 +51,9 @@ test("compiles distinct query", () => {
 
 test("compiles aggregated, limited query", () => {
   const options: QueryOptions = {
-    select: { 
+    select: {
       x: { type: "field", table: "t1", column: "text" },
-      y: { type: "op", table: "t1", op: "count", exprs: [] } 
+      y: { type: "op", table: "t1", op: "count", exprs: [] }
     },
     from: "t1",
     limit: 10
@@ -106,16 +102,14 @@ test("compiles ordered where query", () => {
 test("compiles variable query", () => {
   const options: QueryOptions = {
     select: { x: { type: "variable", variableId: "varnumber" } },
-    from: "t1",
+    from: "t1"
   }
 
   const { jsonql, rowMapper } = compiler.compileQuery(options)
 
   expect(jsonql).toEqual({
     type: "query",
-    selects: [
-      { type: "select", expr: { type: "literal", value: 123 }, alias: "c_0" }
-    ],
+    selects: [{ type: "select", expr: { type: "literal", value: 123 }, alias: "c_0" }],
     from: { type: "table", table: "t1", alias: "main" },
     groupBy: [],
     orderBy: []

@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, LocalizedString } from 'mwater-expressions';
-import { DesignCtx } from '../../../contexts';
-import './textbox.css';
+import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBlock";
+import { Column, LocalizedString } from "mwater-expressions";
+import { DesignCtx } from "../../../contexts";
+import "./textbox.css";
 export interface TextboxBlockDef extends ControlBlockDef {
     type: "textbox";
     placeholder?: LocalizedString | null;

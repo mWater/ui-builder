@@ -1,7 +1,7 @@
 .save-cancel-footer {
   text-align: right;
   padding: 10px;
-  border-top: solid 1px #DDD;
+  border-top: solid 1px #ddd;
   margin-top: 10px;
 }
 
@@ -12,13 +12,13 @@
   border-radius: 5px;
   width: 400px;
   display: inline-block;
-  vertical-align: top
+  vertical-align: top;
 }
 
 .add-wizard-palette-item-title {
   text-align: center;
   font-size: 13px;
-  background-color: #EEE;
+  background-color: #eee;
 }
 
 .add-wizard-palette-item-subtitle {
@@ -37,7 +37,7 @@
 }
 
 .add-wizard-palette-item-cover:hover {
-  background-color: #AAA;
+  background-color: #aaa;
   opacity: 0.3;
 }
 
@@ -47,13 +47,16 @@
   margin-bottom: 15px;
 }
 
-.header-block h1, .header-block h2, .header-block h3, .header-block h4  {
+.header-block h1,
+.header-block h2,
+.header-block h3,
+.header-block h4 {
   margin: 0;
 }
 
 @media screen {
   .page-break {
-    border-bottom: dashed 1px #AAA;
+    border-bottom: dashed 1px #aaa;
     padding-top: 10px;
     margin-bottom: 20px;
   }
@@ -66,7 +69,9 @@
 }
 
 /* Fix react datepicker behind button groups */
-.react-datepicker-popper { z-index: 2000 !important }
+.react-datepicker-popper {
+  z-index: 2000 !important;
+}
 
 /* Make react-select in front and shorter */
 .react-select-short__control {
@@ -86,11 +91,11 @@
 }
 
 /* Add borderless table */
-.table.table-borderless>tbody>tr>td, 
-.table.table-borderless>tbody>tr>th, 
-.table.table-borderless>tfoot>tr>td, 
-.table.table-borderless>tfoot>tr>th, 
-.table.table-borderless>thead>tr>td, 
-.table.table-borderless>thead>tr>th {
+.table.table-borderless > tbody > tr > td,
+.table.table-borderless > tbody > tr > th,
+.table.table-borderless > tfoot > tr > td,
+.table.table-borderless > tfoot > tr > th,
+.table.table-borderless > thead > tr > td,
+.table.table-borderless > thead > tr > th {
   border: none;
 }

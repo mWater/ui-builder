@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { ActionDef, Action, RenderActionEditorProps } from '../actions';
-import { DesignCtx, InstanceCtx } from '../../contexts';
+import { ActionDef, Action, RenderActionEditorProps } from "../actions";
+import { DesignCtx, InstanceCtx } from "../../contexts";
 export interface RefreshDataActionDef extends ActionDef {
     type: "refreshData";
 }

@@ -10,7 +10,7 @@
 
 .normal-page-header-back {
   padding-right: 10px;
-  color: #AAA;
+  color: #aaa;
   cursor: pointer;
 }
 .normal-page-header-back:hover {
@@ -36,6 +36,6 @@
 
   .normal-page-header {
     padding: 10px 5px 10px 10px;
-    margin-bottom: 5px;  
+    margin-bottom: 5px;
   }
 }

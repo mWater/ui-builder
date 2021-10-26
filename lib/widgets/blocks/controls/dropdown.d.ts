@@ -1,10 +1,10 @@
 /// <reference types="react" />
-import { ContextVar } from '../../blocks';
-import { ControlBlock, ControlBlockDef, RenderControlProps } from './ControlBlock';
-import { Column, Expr, LocalizedString } from 'mwater-expressions';
-import { DesignCtx } from '../../../contexts';
-import { EmbeddedExpr } from '../../../embeddedExprs';
-import { OrderBy } from '../../../database/Database';
+import { ContextVar } from "../../blocks";
+import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBlock";
+import { Column, Expr, LocalizedString } from "mwater-expressions";
+import { DesignCtx } from "../../../contexts";
+import { EmbeddedExpr } from "../../../embeddedExprs";
+import { OrderBy } from "../../../database/Database";
 export interface DropdownBlockDef extends ControlBlockDef {
     type: "dropdown";
     placeholder: LocalizedString | null;
