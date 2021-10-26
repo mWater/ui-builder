@@ -25,7 +25,7 @@ const blockSourceSpec: DragSourceSpec<Props, { blockDef: BlockDef }> = {
 class AddWizardPalette extends React.Component<Props> {
   render() {
     return this.props.connectDragSource!(
-      <button type="button" className="btn btn-secondary btn-sm active" style={{ cursor: "move" }}>
+      <button type="button" className="btn btn-outline-primary btn-sm" style={{ cursor: "move" }}>
         <i className="fa fa-arrows" /> Add Block
       </button>
     )

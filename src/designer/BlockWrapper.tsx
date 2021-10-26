@@ -149,25 +149,25 @@ class BlockWrapper extends React.Component<Props, State> {
     if (this.props.isOver) {
       switch (this.state.hoverSide) {
         case DropSide.left:
-          lineStyle.borderLeft = "solid 3px #38D"
+          lineStyle.borderLeft = "solid 3px var(--bs-primary)"
           lineStyle.top = 0
           lineStyle.bottom = 0
           lineStyle.left = 0
           break
         case DropSide.right:
-          lineStyle.borderRight = "solid 3px #38D"
+          lineStyle.borderRight = "solid 3px var(--bs-primary)"
           lineStyle.top = 0
           lineStyle.right = 0
           lineStyle.bottom = 0
           break
         case DropSide.top:
-          lineStyle.borderTop = "solid 3px #38D"
+          lineStyle.borderTop = "solid 3px var(--bs-primary)"
           lineStyle.top = 0
           lineStyle.left = 0
           lineStyle.right = 0
           break
         case DropSide.bottom:
-          lineStyle.borderBottom = "solid 3px #38D"
+          lineStyle.borderBottom = "solid 3px var(--bs-primary)"
           lineStyle.bottom = 0
           lineStyle.left = 0
           lineStyle.right = 0

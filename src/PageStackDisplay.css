@@ -14,7 +14,7 @@
   cursor: pointer;
 }
 .normal-page-header-back:hover {
-  color: #38d;
+  color: var(--bs-primary);
 }
 
 .normal-page-header h4 {
