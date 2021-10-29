@@ -283,7 +283,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
           borderRadius: 4
         }}
       >
-        <ul className="nav nav-pills nav-justified">
+        <ul className="nav nav-pills flex-column">
           {presets.map((preset) => {
             return (
               <li key={preset.id} className="nav-item">
