@@ -286,15 +286,15 @@ export default class DateExprComponent extends React.Component<Props, State> {
         <ul className="nav nav-pills nav-justified">
           {presets.map((preset) => {
             return (
-              <li key={preset.id}>
-                <a style={{ padding: 5 }} onClick={this.handlePreset.bind(null, preset)}>
+              <li key={preset.id} className="nav-item">
+                <a className="nav-link" style={{ padding: 5 }} onClick={this.handlePreset.bind(null, preset)}>
                   {localize(preset.name, this.props.locale)}
                 </a>
               </li>
             )
           })}
-          <li>
-            <a style={{ padding: 5 }} onClick={this.handleCustom}>
+          <li className="nav-item">
+            <a className="nav-link" style={{ padding: 5 }} onClick={this.handleCustom}>
               {localize(
                 {
                   _base: "en",
