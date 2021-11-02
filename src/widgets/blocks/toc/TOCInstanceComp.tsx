@@ -120,7 +120,7 @@ export default function TOCInstanceComp(props: {
 
     const labelClasses = ["toc-item-label", `toc-item-label-level${depth}`]
     if (item.id === selectedId) {
-      labelClasses.push(`toc-item-label-selected bg-primary`)
+      labelClasses.push(`toc-item-label-selected`)
     }
     if (item.widgetId || collapsible) {
       labelClasses.push("toc-item-label-selectable")
