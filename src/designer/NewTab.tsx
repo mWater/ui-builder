@@ -113,10 +113,10 @@ export const NewTab = (props: {
                 key={widget.id}
                 onClick={props.onOpenWidget.bind(null, widget.id)}
               >
-                <span style={{ float: "right" }} onClick={handleRemoveWidget.bind(null, widget.id)}>
+                <span className="text-primary" style={{ float: "right", cursor: "pointer" }} onClick={handleRemoveWidget.bind(null, widget.id)}>
                   <i className="fa fa-fw fa-remove" />
                 </span>
-                <span style={{ float: "right" }} onClick={handleDuplicateWidget.bind(null, widget)}>
+                <span className="text-primary" style={{ float: "right", cursor: "pointer" }} onClick={handleDuplicateWidget.bind(null, widget)}>
                   <i className="fa fa-fw fa-files-o" />
                 </span>
                 {errors.includes(widget.id) ? (
