@@ -157,7 +157,7 @@ export default function TOCDesignComp(props: { blockDef: TOCBlockDef; renderProp
   function renderItem(item: TOCItem, index: number, depth: number, dragHandleProps?: DraggableProvidedDragHandleProps) {
     const labelClasses = ["toc-item-label", `toc-item-label-level${depth}`]
     if (item.id === selectedId) {
-      labelClasses.push(`toc-item-label-selected bg-primary`)
+      labelClasses.push(`toc-item-label-selected`)
     }
     if (item.widgetId) {
       labelClasses.push("toc-item-label-selectable")

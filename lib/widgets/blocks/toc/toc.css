@@ -18,6 +18,11 @@
   color: #ddd;
 }
 
+.toc-split.dark .toc-item-label.toc-item-label-selected {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
 .toc-split.light .toc-item-label:not(.toc-item-label-selected) {
   color: #444;
 }
@@ -30,6 +35,11 @@
 .toc-split.light .toc-item-label-selectable:hover:not(.toc-item-label-selected) {
   background-color: #ddd;
   color: black;
+}
+
+.toc-split.light .toc-item-label.toc-item-label-selected {
+  background-color: var(--bs-primary);
+  color: white;
 }
 
 .toc-split-right {

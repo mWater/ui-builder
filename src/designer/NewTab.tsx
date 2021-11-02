@@ -86,7 +86,7 @@ export const NewTab = (props: {
 
   function renderWidgetGroupHeader(group: string | undefined) {
     return (
-      <h4 style={{ cursor: "pointer" }} onClick={() => toggleGroup(group)}>
+      <h4 className="mt-4" style={{ cursor: "pointer" }} onClick={() => toggleGroup(group)}>
         <span style={{ color: "var(--bs-primary)" }}>
           {collapsedGroups.includes(group) ? (
             <i className="fa fa-fw fa-caret-right" />
