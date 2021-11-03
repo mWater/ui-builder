@@ -149,8 +149,8 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
                   options={[
                     { value: "normal", label: "Default" },
                     { value: "small", label: "Small" },
-                    { value: "extrasmall", label: "Extra-small (deprecated!)" },
-                    { value: "large", label: "Large" }
+                    { value: "large", label: "Large" },
+                    { value: "extrasmall", label: "X-small (deprecated)" }
                   ]}
                 />
               )}
@@ -287,7 +287,7 @@ function ButtonComponent(props: {
       </div>
     )
   }
-  let className = "btn btn-" + blockDef.style
+  let className = "btn btn-" + (blockDef.style == "default" ? "secondary" : blockDef.style)
 
   switch (blockDef.size) {
     case "normal":
@@ -312,10 +312,14 @@ function ButtonComponent(props: {
   if (!blockDef.block) {
     style.margin = 5
   }
+  else {
+    style.display = "grid"
+    style.marginBottom = 5
+  }
 
   return (
-    <div>
-      <button type="button" className={className} onClick={props.onClick} style={style} disabled={props.busy}>
+    <div style={style} >
+      <button type="button" className={className} onClick={props.onClick} disabled={props.busy}>
         {props.busy && icon ? <i className="fa fa-spinner fa-spin fa-fw" /> : icon}
         {icon && label ? "\u00A0" : null}
         {label}
