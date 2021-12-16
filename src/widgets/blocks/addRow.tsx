@@ -281,8 +281,8 @@ class AddRowInstance extends React.Component<Props, State> {
 
     try {
       const txn = this.props.instanceCtx.database.transaction()
-      const addedRowId = await txn.addRow(this.props.blockDef.table!, row)
-      await txn.commit()
+      await txn.addRow(this.props.blockDef.table!, row)
+      const addedRowId = (await txn.commit())[0]
       this.setState({ addedRowId })
     } catch (err) {
       // TODO localize
