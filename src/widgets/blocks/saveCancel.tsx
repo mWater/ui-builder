@@ -337,8 +337,8 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
     // Validate all instances that have registered
     const validationMessages: string[] = []
 
-    for (const key of Object.keys(this.validationRegistrations)) {
-      const msg = await this.validationRegistrations[key](validationMessages.length == 0)
+    for (const validator of Object.values(this.validationRegistrations)) {
+      const msg = await validator(validationMessages.length == 0)
       if (msg != null) {
         validationMessages.push(msg)
       }
