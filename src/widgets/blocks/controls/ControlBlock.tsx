@@ -343,7 +343,7 @@ function ControlInstance(props: { block: ControlBlock<ControlBlockDef>; instance
 
   const renderControlProps: RenderControlProps = {
     value: stableValue,
-    onChange: readonly ? undefined : stableOnChange,
+    onChange: readonly || id == null ? undefined : stableOnChange,
     rowId: id,
     schema: instanceCtx.schema,
     dataSource: instanceCtx.dataSource,
