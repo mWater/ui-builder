@@ -42,6 +42,23 @@
   color: white;
 }
 
+/* hX have overrides at times for color. Make sure they show selected */
+.toc-item-label.toc-item-label-selected h1 {
+  color: white;
+}
+.toc-item-label.toc-item-label-selected h2 {
+  color: white;
+}
+.toc-item-label.toc-item-label-selected h3 {
+  color: white;
+}
+.toc-item-label.toc-item-label-selected h4 {
+  color: white;
+}
+.toc-item-label.toc-item-label-selected h5 {
+  color: white;
+}
+
 .toc-split-right {
   height: 100%;
   width: 75%;
