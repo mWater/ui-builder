@@ -318,10 +318,25 @@ class ModalPage extends React.Component<{
   size: "small" | "normal" | "large" | "full"
 }> {
   render() {
+    // Map to larger styles, as BS5 has quite small modals
+    let size: "large" | "full" | "normal" | "small" | "x-large" = "normal"
+    if (this.props.size == "small") {
+      size = "normal"
+    }
+    else if (this.props.size == "normal") {
+      size = "large"
+    }
+    else if (this.props.size == "large") {
+      size = "x-large"
+    }
+    else if (this.props.size == "full") {
+      size = "full"
+    }
+
     return (
       <ModalPopupComponent
         onClose={this.props.onClose}
-        size={this.props.size}
+        size={size}
         header={this.props.title}
         showCloseX={true}
       >
