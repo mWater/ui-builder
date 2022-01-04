@@ -86,7 +86,7 @@ export const NewTab = (props: {
 
   function renderWidgetGroupHeader(group: string | undefined) {
     return (
-      <h4 className="mt-4" style={{ cursor: "pointer" }} onClick={() => toggleGroup(group)}>
+      <h5 style={{ cursor: "pointer" }} onClick={() => toggleGroup(group)}>
         <span style={{ color: "var(--bs-primary)" }}>
           {collapsedGroups.includes(group) ? (
             <i className="fa fa-fw fa-caret-right" />
@@ -96,7 +96,7 @@ export const NewTab = (props: {
           &nbsp;
         </span>
         {group || "No Group"}
-      </h4>
+      </h5>
     )
   }
 
@@ -105,7 +105,7 @@ export const NewTab = (props: {
       <div>
         {hasGroups ? renderWidgetGroupHeader(group) : null}
         {!collapsedGroups.includes(group) ? (
-          <ul className="list-group">
+          <ul className="list-group mb-3">
             {widgets.map((widget) => (
               <li
                 className="list-group-item"

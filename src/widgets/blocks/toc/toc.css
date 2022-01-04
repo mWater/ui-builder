@@ -43,20 +43,21 @@
 }
 
 /* hX have overrides at times for color. Make sure they show selected */
-.toc-item-label.toc-item-label-selected h1 {
-  color: white;
-}
-.toc-item-label.toc-item-label-selected h2 {
-  color: white;
-}
-.toc-item-label.toc-item-label-selected h3 {
-  color: white;
-}
-.toc-item-label.toc-item-label-selected h4 {
-  color: white;
-}
+.toc-item-label.toc-item-label-selected h1, 
+.toc-item-label.toc-item-label-selected h2, 
+.toc-item-label.toc-item-label-selected h3, 
+.toc-item-label.toc-item-label-selected h4, 
 .toc-item-label.toc-item-label-selected h5 {
   color: white;
+}
+
+/* hX should not be used in TOC, but if they are, remove margins */
+.toc-item-label h1,
+.toc-item-label h2,
+.toc-item-label h3,
+.toc-item-label h4,
+.toc-item-label h5 {
+  margin-bottom: 0px;
 }
 
 .toc-split-right {
@@ -134,4 +135,14 @@
   font-size: 20px;
   margin-bottom: 5px;
   display: inline-block;
+}
+
+.toc-selector .toc-item-label-selectable:hover:not(.toc-item-label-selected) {
+  background-color: #ddd;
+  color: black;
+}
+
+.toc-selector .toc-item-label.toc-item-label-selected {
+  background-color: var(--bs-primary);
+  color: white;
 }
