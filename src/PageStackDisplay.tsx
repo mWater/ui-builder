@@ -13,7 +13,7 @@ interface Props {
   baseCtx: BaseCtx
   initialPage?: Page
 
-  /** Allows overriding the page stack that is passed to the widgets */
+  /** Allows overriding the page stack that is passed to the widgets and used for the close arrow */
   overridePageStack?: PageStack
 }
 
@@ -66,24 +66,26 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     return true
   }
 
-  /** Close top page. Returns whether successful and pages still open */
-  async closePage(): Promise<{ success: boolean; pageCount: number }> {
+  /** Close top page. Returns whether successful and pages still open and page */
+  async closePage(): Promise<{ success: boolean; pageCount: number, page: Page }> {
     if (this.state.pages.length == 0) {
       throw new Error("Zero pages in stack")
     }
 
-    // Validate all instances within page
     const pageIndex = this.state.pages.length - 1
+    const page = this.state.pages[pageIndex]
+    
+    // Validate all instances within page
     const result = await this.validatePage(pageIndex)
     if (!result) {
-      return { success: false, pageCount: this.state.pages.length }
+      return { success: false, pageCount: this.state.pages.length, page }
     }
 
     const pages = this.state.pages.slice()
     pages.splice(pages.length - 1, 1)
     this.setState({ pages })
 
-    return { success: true, pageCount: pages.length }
+    return { success: true, pageCount: pages.length, page }
   }
 
   /** Closes all pages. true for success, false for failure */
