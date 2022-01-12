@@ -6,7 +6,7 @@ import "./PageStackDisplay.css";
 interface Props {
     baseCtx: BaseCtx;
     initialPage?: Page;
-    /** Allows overriding the page stack that is passed to the widgets */
+    /** Allows overriding the page stack that is passed to the widgets and used for the close arrow */
     overridePageStack?: PageStack;
 }
 interface State {
@@ -28,10 +28,11 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     openPage(page: Page): void;
     /** Replace current page with specified one */
     replacePage(page: Page): Promise<boolean>;
-    /** Close top page. Returns whether successful and pages still open */
+    /** Close top page. Returns whether successful and pages still open and page */
     closePage(): Promise<{
         success: boolean;
         pageCount: number;
+        page: Page;
     }>;
     /** Closes all pages. true for success, false for failure */
     closeAllPages(): Promise<boolean>;
