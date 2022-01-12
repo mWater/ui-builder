@@ -141,7 +141,12 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 
   handleClose = () => {
-    this.closePage()
+    if (this.props.overridePageStack) {
+      this.props.overridePageStack.closePage()
+    }
+    else {
+      this.closePage()
+    }
   }
 
   /** Stores the registration for validation of a child block and returns an unregister function */
