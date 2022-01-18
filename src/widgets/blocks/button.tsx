@@ -304,10 +304,6 @@ function ButtonComponent(props: {
       break
   }
 
-  if (blockDef.block) {
-    className += " btn-block"
-  }
-
   const style: React.CSSProperties = {}
   if (!blockDef.block) {
     style.margin = 5
