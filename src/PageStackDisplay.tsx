@@ -251,7 +251,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     switch (page.type) {
       case "normal":
         return (
-          <div style={{ display: invisible ? "none" : "block" }} key={index}>
+          <div style={{ display: invisible ? "none" : "block" }} key={index} className={`page-${page.widgetId}`}>
             <NormalPage
               isFirst={index === 0}
               onClose={this.handleClose}
@@ -265,7 +265,7 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
         )
       case "modal":
         return (
-          <div style={{ display: invisible ? "none" : "block" }} key={index}>
+          <div style={{ display: invisible ? "none" : "block" }} key={index} className={`page-${page.widgetId}`}>
             <ModalPage onClose={this.handleClose} key={index} title={page.title} size={page.modalSize || "normal"}>
               {contents}
             </ModalPage>
