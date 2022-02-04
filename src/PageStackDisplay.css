@@ -8,6 +8,10 @@
   margin-bottom: 15px;
 }
 
+.normal-page-margins-none .normal-page-header {
+  margin-bottom: 0px;
+}
+
 .normal-page-header-back {
   padding-right: 10px;
   color: #aaa;
