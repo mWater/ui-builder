@@ -78,6 +78,9 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Striping of table */
   striped?: boolean
+
+  /** Sticky headers of the table */
+  stickyHeaders?: boolean
 }
 
 interface QueryTableColumnInfo {
@@ -600,6 +603,14 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
           {(value, onChange) => (
             <Checkbox value={value} onChange={onChange}>
               Striped
+            </Checkbox>
+          )}
+        </PropertyEditor>
+
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="stickyHeaders">
+          {(value, onChange) => (
+            <Checkbox value={value} onChange={onChange}>
+              Sticky Headers (may not work in all settings)
             </Checkbox>
           )}
         </PropertyEditor>

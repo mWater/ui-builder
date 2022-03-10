@@ -6,6 +6,7 @@ import * as _ from "lodash"
 import { localize } from "../../localization"
 import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts"
 import { BlockDef, createExprVariables, createExprVariableValues } from "../../blocks"
+import { CSSProperties } from "react"
 
 interface Props {
   block: QueryTableBlock
@@ -382,8 +383,14 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       )
     }
 
+    const style: CSSProperties = {}
+    if (this.props.block.blockDef.stickyHeaders) {
+      style.position = "sticky"
+      style.top = 0
+    }
+
     return (
-      <th key={index}>
+      <th key={index} style={style}>
         {renderOrder()}
         {riProps.renderChildBlock(riProps, header)}
       </th>

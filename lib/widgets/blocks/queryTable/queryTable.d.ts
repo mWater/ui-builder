@@ -36,6 +36,8 @@ export interface QueryTableBlockDef extends BlockDef {
     padding?: "normal" | "compact";
     /** Striping of table */
     striped?: boolean;
+    /** Sticky headers of the table */
+    stickyHeaders?: boolean;
 }
 interface QueryTableColumnInfo {
     /** Column order expressions. When present for a column, makes it orderable via icon at top */
