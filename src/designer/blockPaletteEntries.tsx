@@ -36,6 +36,7 @@ import { ToggleBlockDef } from "../widgets/blocks/controls/toggle"
 import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart"
 import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter"
 import { TagsEditorBlockDef } from "../widgets/blocks/controls/tagsEditor"
+import { ExpressionFilterBlockDef } from "../widgets/blocks/expressionFilter"
 
 export interface BlockPaletteEntry {
   title: string
@@ -190,6 +191,15 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
         { label: { _base: "en", en: "Option B" }, filters: [] }
       ]
     } as ToggleFilterBlockDef
+  },
+  {
+    title: "Expression Filter",
+    blockDef: {
+      id: "",
+      type: "expressionFilter",
+      rowsetContextVarId: null,
+      defaultFilterExpr: null
+    } as ExpressionFilterBlockDef
   },
   {
     title: "Button",
