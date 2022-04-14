@@ -80,8 +80,8 @@ export declare abstract class Block<T extends BlockDef> {
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /** Get any context variables expressions that this block needs *including* child blocks. Can be overridden */
     getSubtreeContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
-    /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
-    abstract getChildren(contextVars: ContextVar[]): ChildBlock[];
+    /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in and the schema */
+    abstract getChildren(contextVars: ContextVar[], schema: Schema): ChildBlock[];
     /** Determine if block is valid. null means valid, string is error message. Does not validate children */
     abstract validate(designCtx: DesignCtx): string | null;
     /**
@@ -113,9 +113,9 @@ export declare function dropBlock(droppedBlockDef: BlockDef, targetBlockDef: Blo
  * @param blockId block to find
  * @returns array of child blocks, each with information about which context variables were injected by their parent
  */
-export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[], blockId: string): ChildBlock[] | null;
+export declare function findBlockAncestry(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[], blockId: string, schema: Schema): ChildBlock[] | null;
 /** Get the entire tree of blocks from a root, including context variables for each */
-export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[]): ChildBlock[];
+export declare function getBlockTree(rootBlockDef: BlockDef, createBlock: CreateBlock, contextVars: ContextVar[], schema: Schema): ChildBlock[];
 /** Create the variables as needed by mwater-expressions */
 export declare function createExprVariables(contextVar: ContextVar[]): Variable[];
 /** Create the variable values as needed by mwater-expressions */

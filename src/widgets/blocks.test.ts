@@ -2,6 +2,9 @@ import * as blocks from "./blocks"
 import BlockFactory from "./BlockFactory"
 import { ContextVar } from "./blocks"
 import { QueryTableBlockDef } from "./blocks/queryTable/queryTable"
+import { Schema } from "mwater-expressions"
+
+const schema = new Schema()
 
 test("drops left", () => {
   const source = { id: "a", type: "dummy" }
@@ -30,14 +33,14 @@ test("findBlockAncestry", () => {
     ]
   }
 
-  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "a1")!.map((b) => b.blockDef!.id)).toEqual(["a1"])
-  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "b1")!.map((b) => b.blockDef!.id)).toEqual(["a1", "b1"])
-  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "c1")!.map((b) => b.blockDef!.id)).toEqual([
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "a1", schema)!.map((b) => b.blockDef!.id)).toEqual(["a1"])
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "b1", schema)!.map((b) => b.blockDef!.id)).toEqual(["a1", "b1"])
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "c1", schema)!.map((b) => b.blockDef!.id)).toEqual([
     "a1",
     "b1",
     "c1"
   ])
-  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "x")).toBeNull()
+  expect(blocks.findBlockAncestry(blockDef, createBlock, [], "x", schema)).toBeNull()
 })
 
 test("findBlockAncestry with queryTable", () => {
@@ -56,7 +59,7 @@ test("findBlockAncestry with queryTable", () => {
     contents: [{ id: "c1", type: "horizontal", items: [] }]
   }
 
-  const ancestry = blocks.findBlockAncestry(blockDef, createBlock, rootContextVars, "c1")
+  const ancestry = blocks.findBlockAncestry(blockDef, createBlock, rootContextVars, "c1", schema)!
   expect(ancestry).toEqual([
     { blockDef: blockDef, contextVars: rootContextVars },
     {
@@ -83,7 +86,7 @@ test("getBlockTree", () => {
     ]
   }
 
-  expect(blocks.getBlockTree(blockDef, createBlock, []).map((b) => b.blockDef.id)).toEqual(["a1", "b1", "c1"])
+  expect(blocks.getBlockTree(blockDef, createBlock, [], schema).map((b) => b.blockDef.id)).toEqual(["a1", "b1", "c1"])
 })
 
 test("createExprVariables", () => {

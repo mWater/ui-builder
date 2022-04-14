@@ -78,7 +78,7 @@ export function validateWidget(widgetDef: WidgetDef, ctx: BaseCtx, includeChildr
   if (includeChildren) {
     const contextVars = globalContextVars.concat(widgetDef.contextVars).concat(privateContextVars)
 
-    for (const childBlock of getBlockTree(widgetDef.blockDef, ctx.createBlock, contextVars)) {
+    for (const childBlock of getBlockTree(widgetDef.blockDef, ctx.createBlock, contextVars, ctx.schema)) {
       const block = ctx.createBlock(childBlock.blockDef)
 
       // Create design context for validating block

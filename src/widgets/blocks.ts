@@ -122,15 +122,15 @@ export abstract class Block<T extends BlockDef> {
     let ownExprs = this.getContextVarExprs(contextVar, ctx)
 
     // Append child ones
-    for (const childBlock of this.getChildren(ctx.contextVars)) {
+    for (const childBlock of this.getChildren(ctx.contextVars, ctx.schema)) {
       const block = ctx.createBlock(childBlock.blockDef)
       ownExprs = ownExprs.concat(block.getSubtreeContextVarExprs(contextVar, ctx))
     }
     return ownExprs
   }
 
-  /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in. */
-  abstract getChildren(contextVars: ContextVar[]): ChildBlock[]
+  /** Get child blocks. Child blocks or their injected context vars can depend on type of context variables passed in and the schema */
+  abstract getChildren(contextVars: ContextVar[], schema: Schema): ChildBlock[]
 
   /** Determine if block is valid. null means valid, string is error message. Does not validate children */
   abstract validate(designCtx: DesignCtx): string | null
@@ -167,7 +167,7 @@ export abstract class Block<T extends BlockDef> {
     let ownFilters = this.getInitialFilters(contextVarId, instanceCtx)
 
     // Append child ones
-    for (const childBlock of this.getChildren(instanceCtx.contextVars)) {
+    for (const childBlock of this.getChildren(instanceCtx.contextVars, instanceCtx.schema)) {
       const block = instanceCtx.createBlock(childBlock.blockDef)
       ownFilters = ownFilters.concat(block.getSubtreeInitialFilters(contextVarId, instanceCtx))
     }
@@ -232,7 +232,8 @@ export function findBlockAncestry(
   rootBlockDef: BlockDef,
   createBlock: CreateBlock,
   contextVars: ContextVar[],
-  blockId: string
+  blockId: string,
+  schema: Schema
 ): ChildBlock[] | null {
   const rootBlock = createBlock(rootBlockDef)
 
@@ -242,13 +243,14 @@ export function findBlockAncestry(
   }
 
   // For each child
-  for (const childBlock of rootBlock.getChildren(contextVars)) {
+  for (const childBlock of rootBlock.getChildren(contextVars, schema)) {
     if (childBlock.blockDef) {
       const childAncestry: ChildBlock[] | null = findBlockAncestry(
         childBlock.blockDef,
         createBlock,
         childBlock.contextVars,
-        blockId
+        blockId,
+        schema
       )
       if (childAncestry) {
         return [{ blockDef: rootBlockDef, contextVars: contextVars } as ChildBlock].concat(childAncestry)
@@ -263,7 +265,8 @@ export function findBlockAncestry(
 export function getBlockTree(
   rootBlockDef: BlockDef,
   createBlock: CreateBlock,
-  contextVars: ContextVar[]
+  contextVars: ContextVar[],
+  schema: Schema
 ): ChildBlock[] {
   const rootChildBlock: ChildBlock = { blockDef: rootBlockDef, contextVars: contextVars }
 
@@ -271,9 +274,9 @@ export function getBlockTree(
   let list = [rootChildBlock]
 
   // For each child
-  for (const childBlock of createBlock(rootBlockDef).getChildren(contextVars)) {
+  for (const childBlock of createBlock(rootBlockDef).getChildren(contextVars, schema)) {
     if (childBlock.blockDef) {
-      const childTree = getBlockTree(childBlock.blockDef, createBlock, childBlock.contextVars)
+      const childTree = getBlockTree(childBlock.blockDef, createBlock, childBlock.contextVars, schema)
       list = list.concat(childTree)
     }
   }

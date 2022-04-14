@@ -38,6 +38,7 @@ import { GanttChartBlock, GanttChartBlockDef } from "./blocks/ganttChart/GanttCh
 import { ToggleFilterBlock, ToggleFilterBlockDef } from "./blocks/toggleFilter"
 import { TagsEditorBlock, TagsEditorBlockDef } from "./blocks/controls/tagsEditor"
 import { ExpressionFilterBlock, ExpressionFilterBlockDef } from "./blocks/expressionFilter"
+import { VariableBlock, VariableBlockDef } from "./blocks/variable"
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -126,6 +127,8 @@ export default class BlockFactory {
         return new GanttChartBlock(blockDef as GanttChartBlockDef)
       case "toggleFilter":
         return new ToggleFilterBlock(blockDef as ToggleFilterBlockDef)
+      case "variable":
+        return new VariableBlock(blockDef as VariableBlockDef)
       case "tagsEditor":
         return new TagsEditorBlock(blockDef as TagsEditorBlockDef)
       case "expressionFilter":

@@ -37,6 +37,7 @@ import { GanttChartBlockDef } from "../widgets/blocks/ganttChart/GanttChart"
 import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter"
 import { TagsEditorBlockDef } from "../widgets/blocks/controls/tagsEditor"
 import { ExpressionFilterBlockDef } from "../widgets/blocks/expressionFilter"
+import { VariableBlockDef } from "../widgets/blocks/variable"
 
 export interface BlockPaletteEntry {
   title: string
@@ -274,6 +275,15 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       limit: 100
     } as QueryRepeatBlockDef,
     subtitle: "Repeats a block once for each result of a query"
+  },
+  {
+    title: "Inject Variable",
+    blockDef: {
+      id: "",
+      type: "variable",
+      content: null
+    } as VariableBlockDef,
+    subtitle: "Evaluates an expression and injects as a variable"
   },
   {
     title: "Tags Editor",

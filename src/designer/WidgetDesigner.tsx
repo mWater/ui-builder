@@ -236,7 +236,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
         this.props.widgetDef.blockDef,
         this.props.baseCtx.createBlock,
         contextVars,
-        this.state.selectedBlockId
+        this.state.selectedBlockId,
+        this.props.baseCtx.schema
       )
 
       // Create props
@@ -289,7 +290,8 @@ export default class WidgetDesigner extends React.Component<WidgetDesignerProps,
       for (const childBlock of getBlockTree(
         this.props.widgetDef.blockDef,
         this.props.baseCtx.createBlock,
-        contextVars
+        contextVars,
+        this.props.baseCtx.schema
       )) {
         const block = this.props.baseCtx.createBlock(childBlock.blockDef)
 
