@@ -3,7 +3,7 @@ import { ControlBlock, ControlBlockDef, RenderControlProps } from "./ControlBloc
 import { Column, LocalizedString } from "mwater-expressions"
 import { localize } from "../../localization"
 import { LabeledProperty, PropertyEditor, LocalizedTextPropertyEditor } from "../../propertyEditors"
-import { NumberInput, Checkbox } from "react-library/lib/bootstrap"
+import { NumberInput, Checkbox, Select } from "react-library/lib/bootstrap"
 import { DesignCtx } from "../../../contexts"
 
 export interface NumberboxBlockDef extends ControlBlockDef {
@@ -16,6 +16,9 @@ export interface NumberboxBlockDef extends ControlBlockDef {
 
   /** Number of decimal places to always display/restrict to */
   decimalPlaces?: number | null
+
+  /** Width of number box (default "12em") */
+  width?: "8em" | "12em" | "16em" | "100%"
 }
 
 export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
@@ -24,7 +27,7 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
       <NumberInput
         value={props.value}
         onChange={props.onChange}
-        style={{ maxWidth: "12em", width: "100%" }}
+        style={{ maxWidth: this.blockDef.width || "12em", width: "100%" }}
         placeholder={localize(this.blockDef.placeholder, props.locale)}
         decimal={this.blockDef.decimal}
         decimalPlaces={this.blockDef.decimalPlaces != null ? this.blockDef.decimalPlaces : undefined}
@@ -58,6 +61,22 @@ export class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
             </PropertyEditor>
           </LabeledProperty>
         ) : null}
+        <LabeledProperty label="Width">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="width">
+            {(value, onChange) => 
+              <Select 
+                value={value || "12em"} 
+                onChange={onChange}
+                options={[
+                  { value: "8em", label: "8em" },
+                  { value: "12em", label: "12em" },
+                  { value: "16em", label: "16em" },
+                  { value: "100%", label: "100%" }
+                ]}
+              />
+            }
+          </PropertyEditor>
+        </LabeledProperty>
       </div>
     )
   }

@@ -9,6 +9,8 @@ export interface NumberboxBlockDef extends ControlBlockDef {
     decimal: boolean;
     /** Number of decimal places to always display/restrict to */
     decimalPlaces?: number | null;
+    /** Width of number box (default "12em") */
+    width?: "8em" | "12em" | "16em" | "100%";
 }
 export declare class NumberboxBlock extends ControlBlock<NumberboxBlockDef> {
     renderControl(props: RenderControlProps): JSX.Element;
