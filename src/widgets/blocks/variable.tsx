@@ -50,11 +50,18 @@ export class VariableBlock extends Block<VariableBlockDef> {
 
     // Determine type of context variable
     const exprUtils = new ExprUtils(schema, createExprVariables(contextVars))
-    const type = exprUtils.getExprType(this.blockDef.contextVarExpr!.expr)
+    const expr = this.blockDef.contextVarExpr!.expr
+    const type = exprUtils.getExprType(expr)
 
     if (type) {
       // Type of variable matches the type of the expression
-      return { type: type, id: this.blockDef.id, name: this.blockDef.name || "Unnamed" }
+      return { 
+        type: type, 
+        id: this.blockDef.id, 
+        name: this.blockDef.name || "Unnamed",
+        idTable: exprUtils.getExprIdTable(expr) || undefined,
+        enumValues: exprUtils.getExprEnumValues(expr) || undefined
+      }
     }
     return null
   }
