@@ -3,7 +3,7 @@ import { Expr } from "mwater-expressions";
 import React from "react";
 import { ContextVar } from "../../blocks";
 import { Styles } from "react-select";
-interface SingleProps<T> {
+export interface SingleProps<T> {
     database: Database;
     table: string;
     value: T | null;
@@ -28,7 +28,7 @@ interface SingleProps<T> {
     /** Styling for react-select */
     styles?: Partial<Styles>;
 }
-interface MultiProps<T> {
+export interface MultiProps<T> {
     database: Database;
     table: string;
     value: T[] | null;
@@ -53,7 +53,13 @@ interface MultiProps<T> {
     /** Optional styling for react-select */
     styles?: Partial<Styles>;
 }
-declare type Props<T> = SingleProps<T> | MultiProps<T>;
+export declare type Props<T> = SingleProps<T> | MultiProps<T>;
+/** One option of the control */
+export interface Option<T> {
+    /** Values of parts of the label */
+    labelValues: string[];
+    id: T;
+}
 /** Displays a combo box that allows selecting one id value from a list */
 declare function IdDropdownComponent<T>(props: Props<T>): JSX.Element;
 declare const MemoIdDropdownComponent: React.MemoExoticComponent<typeof IdDropdownComponent>;

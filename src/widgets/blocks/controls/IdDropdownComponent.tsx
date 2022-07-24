@@ -1,5 +1,5 @@
 import _ from "lodash"
-import Async from "react-select/async"
+import ReactSelect from "react-select"
 import { Database, OrderBy, QueryOptions } from "../../../database/Database"
 import { Expr } from "mwater-expressions"
 import { useState, useCallback, useEffect, memo } from "react"
@@ -7,7 +7,7 @@ import React from "react"
 import { ContextVar } from "../../blocks"
 import { Styles } from "react-select"
 
-interface SingleProps<T> {
+export interface SingleProps<T> {
   database: Database
   table: string
   value: T | null
@@ -40,7 +40,7 @@ interface SingleProps<T> {
   styles?: Partial<Styles>
 }
 
-interface MultiProps<T> {
+export interface MultiProps<T> {
   database: Database
   table: string
   value: T[] | null
@@ -73,10 +73,10 @@ interface MultiProps<T> {
   styles?: Partial<Styles>
 }
 
-type Props<T> = SingleProps<T> | MultiProps<T>
+export type Props<T> = SingleProps<T> | MultiProps<T>
 
 /** One option of the control */
-interface Option<T> {
+export interface Option<T> {
   /** Values of parts of the label */
   labelValues: string[]
   id: T
@@ -86,6 +86,25 @@ interface Option<T> {
 function IdDropdownComponent<T>(props: Props<T>) {
   const [currentValue, setCurrentValue] = useState<Option<T> | Option<T>[]>()
   const [loading, setLoading] = useState(false)
+  const [inputValue, setInputValue] = useState("")
+  const [options, setOptions] = useState<Option<T>[]>([])
+
+  // Keep track of latest input value to ensure options are latest
+  const inputValueRef = React.useRef(inputValue)
+  inputValueRef.current = inputValue
+
+  // Increment when database is changed
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  useEffect(() => {
+    const changeListener = () => {
+      setRefreshTrigger(refreshTrigger + 1)
+    }
+    props.database.addChangeListener(changeListener)
+    return () => {
+      props.database.removeChangeListener(changeListener)
+    }
+  })
 
   /** Creates an option from a query row that is in form { id:, label0:, label1:, ...} */
   const rowToOption = (row: any) => {
@@ -160,11 +179,11 @@ function IdDropdownComponent<T>(props: Props<T>) {
     } else {
       setCurrentValue(undefined)
     }
-  }, [props.value, props.table, props.multi])
+  }, [props.value, props.table, props.multi, refreshTrigger])
 
   // Callback that react-select uses to get values
   const loadOptions = useCallback(
-    (input: string, callback: any) => {
+    (input: string) => {
       // Determine filter expressions
       const filters: Expr[] = []
       if (input) {
@@ -204,11 +223,18 @@ function IdDropdownComponent<T>(props: Props<T>) {
       const results = props.database.query(query, props.contextVars, props.contextVarValues)
 
       results.then((rows) => {
-        callback(rows.map((r) => rowToOption(r)))
+        // If not stale, set options
+        if (inputValueRef.current == input) {
+          setOptions(rows.map((r) => rowToOption(r)))
+        }
       })
     },
     [props.table, props.filterExpr]
   )
+
+  useEffect(() => {
+    loadOptions(inputValue)
+  }, [inputValue, refreshTrigger])
 
   const handleChange = useCallback(
     (option: any) => {
@@ -236,19 +262,24 @@ function IdDropdownComponent<T>(props: Props<T>) {
     return option.id + ""
   }, [])
 
+  // Filtering is done by query
+  const filterOption = useCallback(() => true, [])
+
   return (
     <div style={{ width: "100%", minWidth: 160 }}>
-      <Async
+      <ReactSelect
+        inputValue={inputValue}
+        onInputChange={setInputValue}
         value={currentValue}
         placeholder={props.placeholder}
-        loadOptions={loadOptions}
         isMulti={props.multi}
         isClearable={true}
         isLoading={loading}
         onChange={props.onChange ? handleChange : undefined}
+        options={loading ? [] : options}
+        filterOption={filterOption}
         isDisabled={!props.onChange}
         noOptionsMessage={() => "..."}
-        defaultOptions={true}
         closeMenuOnScroll={true}
         menuPortalTarget={document.body}
         getOptionLabel={getOptionLabel}
