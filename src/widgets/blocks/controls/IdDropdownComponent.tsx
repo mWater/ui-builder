@@ -1,6 +1,6 @@
 import _ from "lodash"
 import ReactSelect from "react-select"
-import { Database, OrderBy, QueryOptions } from "../../../database/Database"
+import { Database, OrderBy, QueryOptions, useDatabaseChangeListener } from "../../../database/Database"
 import { Expr } from "mwater-expressions"
 import { useState, useCallback, useEffect, memo } from "react"
 import React from "react"
@@ -94,17 +94,7 @@ function IdDropdownComponent<T>(props: Props<T>) {
   inputValueRef.current = inputValue
 
   // Increment when database is changed
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
-
-  useEffect(() => {
-    const changeListener = () => {
-      setRefreshTrigger(refreshTrigger + 1)
-    }
-    props.database.addChangeListener(changeListener)
-    return () => {
-      props.database.removeChangeListener(changeListener)
-    }
-  })
+  const refreshTrigger = useDatabaseChangeListener(props.database)
 
   /** Creates an option from a query row that is in form { id:, label0:, label1:, ...} */
   const rowToOption = (row: any) => {

@@ -17,7 +17,7 @@ import { localize } from "../localization"
 import { useEffect, useState } from "react"
 import { DesignCtx, InstanceCtx, getFilteredContextVarValues } from "../../contexts"
 import { ContextVarExpr } from "../../ContextVarExpr"
-import { OrderBy } from "../../database/Database"
+import { OrderBy, useDatabaseChangeListener } from "../../database/Database"
 
 /** Block which creates a new row context variable */
 export interface RowBlockDef extends BlockDef {
@@ -265,7 +265,7 @@ export class RowBlock extends Block<RowBlockDef> {
 
 const RowInstance = (props: { blockDef: RowBlockDef; instanceProps: InstanceCtx; contextVar: ContextVar }) => {
   const { blockDef, instanceProps, contextVar } = props
-  const db = instanceProps.database
+  const database = instanceProps.database
   const table = contextVar.table!
 
   const [error, setError] = useState(null)
@@ -274,10 +274,13 @@ const RowInstance = (props: { blockDef: RowBlockDef; instanceProps: InstanceCtx;
 
   const mode = blockDef.mode || "filter"
 
+  // Increment when database is changed
+  const refreshTrigger = useDatabaseChangeListener(database)
+
   useEffect(() => {
     if (mode == "filter") {
       // Query to get match
-      db.query(
+      database.query(
         {
           select: { id: { type: "id", table: table } },
           from: table,
@@ -309,7 +312,7 @@ const RowInstance = (props: { blockDef: RowBlockDef; instanceProps: InstanceCtx;
       setId(exprValue)
       setLoading(false)
     }
-  }, [])
+  }, [refreshTrigger])
 
   if (loading) {
     return (
