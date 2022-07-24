@@ -180,8 +180,12 @@ export default class VirtualDatabase implements Database {
     for (const mutation of this.mutations) {
       switch (mutation.type) {
         case "add":
-          // Map any primary keys
+          // Map any primary keys that are part of this virtual database to the real primary keys
           const mappedValues = this.replaceTempPrimaryKeys(mutation.values, (pk) => {
+            if (!this.tempPrimaryKeys.includes(pk)) {
+              return pk
+            }
+
             if (pkMapping[pk]) {
               return pkMapping[pk]
             }
@@ -192,8 +196,12 @@ export default class VirtualDatabase implements Database {
           pkMapping[mutation.primaryKey] = primaryKey
           break
         case "update":
-          // Map any primary keys
+          // Map any primary keys that are part of this virtual database to the real primary keys
           const mappedUpdates = this.replaceTempPrimaryKeys(mutation.updates, (pk) => {
+            if (!this.tempPrimaryKeys.includes(pk)) {
+              return pk
+            }
+            
             if (pkMapping[pk]) {
               return pkMapping[pk]
             }
