@@ -126,6 +126,11 @@ const AddWizardPane = (props: {
       const columns = designCtx.schema.getColumns(contextVar.table!)
 
       for (const column of columns) {
+        // Skip expressions
+        if (column.expr != null) {
+          continue
+        }
+        
         const addBlock = (child: BlockDef) => {
           allEntries.push({
             title: localize(column.name) || "",
