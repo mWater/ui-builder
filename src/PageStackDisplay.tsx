@@ -298,10 +298,10 @@ class NormalPage extends React.Component<{
   render() {
     return (
       <div className={`normal-page normal-page-margins-${this.props.pageMargins}`}>
-        {!this.props.isFirst || this.props.title ? (
+        {this.props.title ? (
           <div className="normal-page-header" key="header">
             <h4>
-              {!this.props.isFirst && this.props.title ? (
+              {!this.props.isFirst ? (
                 <i className="normal-page-header-back fa fa-arrow-left fa-fw" onClick={this.props.onClose} />
               ) : null}
               {this.props.title}
