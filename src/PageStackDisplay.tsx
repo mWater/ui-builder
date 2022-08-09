@@ -285,6 +285,10 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
   }
 }
 
+/** Displays a page that is not a modal. Shows the title if present.
+ * If the title is present and is not the first page, it may show a back
+ * arrow as well.
+ */
 class NormalPage extends React.Component<{
   isFirst: boolean
   onClose: () => void
@@ -297,7 +301,7 @@ class NormalPage extends React.Component<{
         {!this.props.isFirst || this.props.title ? (
           <div className="normal-page-header" key="header">
             <h4>
-              {!this.props.isFirst ? (
+              {!this.props.isFirst && this.props.title ? (
                 <i className="normal-page-header-back fa fa-arrow-left fa-fw" onClick={this.props.onClose} />
               ) : null}
               {this.props.title}
