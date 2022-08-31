@@ -17,21 +17,26 @@ export class ContextVarValueEditor extends React.Component<{
     const value = this.props.contextVarValue
 
     if (this.props.contextVar.type === "row") {
-      if (this.props.schema.getTable(this.props.contextVar.table!)) {
-        return (
-          <IdLiteralComponent
-            schema={this.props.schema}
-            dataSource={this.props.dataSource}
-            idTable={this.props.contextVar.table!}
-            value={value}
-            onChange={this.props.onContextVarValueChange}
-          />
-        )
+      if (!this.props.schema.getTable(this.props.contextVar.table!)) {
+        return <div>Uneditable</div>
       }
-      return <div>Uneditable</div>
+
+      return (
+        <IdLiteralComponent
+          schema={this.props.schema}
+          dataSource={this.props.dataSource}
+          idTable={this.props.contextVar.table!}
+          value={value}
+          onChange={this.props.onContextVarValueChange}
+        />
+      )
     }
 
     if (this.props.contextVar.type === "rowset") {
+      if (!this.props.schema.getTable(this.props.contextVar.table!)) {
+        return <div>Uneditable</div>
+      }
+
       return (
         <ExprComponent
           schema={this.props.schema}
