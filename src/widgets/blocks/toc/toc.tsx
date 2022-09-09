@@ -1,13 +1,13 @@
 import * as React from "react"
 import * as _ from "lodash"
-import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from "../../blocks"
+import { Block, BlockDef, ContextVar, ChildBlock, validateContextVarExpr } from "../../blocks"
 import { produce, original } from "immer"
-import { Expr, ExprValidator, LocalizedString } from "mwater-expressions"
+import { Expr, LocalizedString } from "mwater-expressions"
 import TOCDesignComp from "./TOCDesignComp"
 import TOCInstanceComp from "./TOCInstanceComp"
 import "./toc.css"
 import { LabeledProperty, PropertyEditor, ResponsiveWidthSelector } from "../../propertyEditors"
-import { Checkbox, Select, Toggle } from "react-library/lib/bootstrap"
+import { Toggle } from "react-library/lib/bootstrap"
 import { DesignCtx, InstanceCtx } from "../../../contexts"
 import { TextBlockDef } from "../text"
 import uuid from "uuid"
@@ -199,7 +199,9 @@ export class TOCBlock extends Block<TOCBlockDef> {
 
       // For all other blocks
       for (const item of iterateItems(draft.items)) {
-        item.labelBlock = action(original(item.labelBlock) || null)
+        if (item.labelBlock) {
+          item.labelBlock = action(original(item.labelBlock) || null)
+        }
       }
     })
   }
