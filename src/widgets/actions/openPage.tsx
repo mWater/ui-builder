@@ -372,6 +372,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
               schema={props.schema}
               types={[contextVar.type == "row" ? "id" : (contextVar.type as LiteralType)]}
               idTable={contextVar.type == "row" ? contextVar.table : contextVar.idTable}
+              enumValues={contextVar.enumValues}
               onChange={(contextVarId, expr) => {
                 handleCVVChange({ ...cvv, expr, contextVarId })
               }}
