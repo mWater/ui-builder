@@ -604,17 +604,15 @@ export const EmbeddedExprEditor = (props: {
 
   return (
     <div>
-      <LabeledProperty label={`Expression`}>
-        <ContextVarAndExprPropertyEditor
-          contextVarId={props.value.contextVarId}
-          expr={props.value.expr}
-          onChange={handleChange}
-          schema={schema}
-          dataSource={dataSource}
-          contextVars={contextVars}
-          aggrStatuses={["individual", "aggregate", "literal"]}
-        />
-      </LabeledProperty>
+      <ContextVarAndExprPropertyEditor
+        contextVarId={props.value.contextVarId}
+        expr={props.value.expr}
+        onChange={handleChange}
+        schema={schema}
+        dataSource={dataSource}
+        contextVars={contextVars}
+        aggrStatuses={["individual", "aggregate", "literal"]}
+      />
 
       {exprType === "number" ? (
         <LabeledProperty label="Number Format">
