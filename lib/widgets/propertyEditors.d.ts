@@ -195,7 +195,6 @@ export declare const EmbeddedExprEditor: (props: {
     schema: Schema;
     dataSource: DataSource;
     contextVars: ContextVar[];
-    index: number;
 }) => JSX.Element;
 /** Edits the width of a table column */
 export declare const TableColumnWidthEditor: (props: {
