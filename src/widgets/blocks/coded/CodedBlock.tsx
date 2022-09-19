@@ -4,14 +4,15 @@ import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import { Expr, localizeString } from "mwater-expressions"
 import { CodedExpr, CodedExprsEditor } from "./CodedExpr"
 import { CodedQuery, CodedQueriesEditor, validateCodedQuery } from "./CodedQuery"
-import FileSaver from "file-saver"
 import { CodedLocalizedString, CodedLocalizedStringsEditor } from "./CodedLocalizedString"
 import { CodedAction, CodedActionsEditor } from "./CodedAction"
 import { BlockDef, ContextVar, DesignCtx, InstanceCtx, LabeledProperty, PropertyEditor, validateContextVarExpr, QueryOptions, getFilteredContextVarValues } from "../../.."
 import ErrorBoundary from "../../../designer/ErrorBoundary"
 import LeafBlock from "../../LeafBlock"
 
-/** Extra packages that can be imported inside a coded block */
+/** Extra packages that can be imported inside a coded block. By default, only
+ * includes react.
+ */
 const extraPackages: { [packageId: string]: () => Promise<any> } = {}
 
 /** Register an extra package id that can be imported using "import" inside a coded
@@ -57,18 +58,6 @@ async function evaluateModule(code: string) {
   for (const req of requires) {
     if (req == "react") {
       importedModules[req] = await import("react")
-    }
-    else if (req == "lodash") {
-      importedModules[req] = await import("lodash")
-    }
-    else if (req == "react-select") {
-      importedModules[req] = await import("react-select")
-    }
-    else if (req == "moment") {
-      importedModules[req] = await import("moment")
-    }
-    else if (req == "file-saver") {
-      importedModules[req] = FileSaver
     }
     else if (req in extraPackages) {
       importedModules[req] = await importedModules[req]()
