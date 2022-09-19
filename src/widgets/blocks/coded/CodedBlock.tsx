@@ -60,7 +60,7 @@ async function evaluateModule(code: string) {
       importedModules[req] = await import("react")
     }
     else if (req in extraPackages) {
-      importedModules[req] = await importedModules[req]()
+      importedModules[req] = await extraPackages[req]()
     }
     else {
       throw new Error(`Import ${req} not found`)
