@@ -38,6 +38,8 @@ import { ToggleFilterBlockDef } from "../widgets/blocks/toggleFilter"
 import { TagsEditorBlockDef } from "../widgets/blocks/controls/tagsEditor"
 import { ExpressionFilterBlockDef } from "../widgets/blocks/expressionFilter"
 import { VariableBlockDef } from "../widgets/blocks/variable"
+import { HtmlBlockDef } from "../widgets/blocks/html/HtmlBlock"
+import { CodedBlockDef } from "../widgets/blocks/coded/CodedBlock"
 
 export interface BlockPaletteEntry {
   title: string
@@ -64,6 +66,10 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
         text: { _base: "en", en: "Header" }
       }
     } as HeaderBlockDef
+  },
+  {
+    title: "Expression",
+    blockDef: { id: "", type: "expression", expr: null } as ExpressionBlockDef
   },
   {
     title: "Labeled Section",
@@ -105,10 +111,6 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
   {
     title: "Date/Datetime Control",
     blockDef: { id: "", type: "datefield", rowContextVarId: null, column: null } as DatefieldBlockDef
-  },
-  {
-    title: "Expression",
-    blockDef: { id: "", type: "expression", expr: null } as ExpressionBlockDef
   },
   {
     title: "Conditional",
@@ -297,6 +299,32 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     subtitle: "Allows editing/creating tags for a text array column"
   },
   {
+    title: "HTML Block",
+    blockDef: { id: "", type: "html" } as HtmlBlockDef
+  },
+  {
+    title: "Coded Block",
+    blockDef: {
+      id: "",
+      type: "coded",
+      code: `import React from 'react'
+
+/* props are ctx (instance context), and any expressions defined */
+export function InstanceComp(props) {
+  return <div>TODO</div>
+}
+
+/* Optional design component. props are ctx (design context) */
+export function DesignComp(props) {
+  return <div>Coded Block</div>
+}
+        `,
+      compiledCode: "",
+      codedExprs: []
+    } as CodedBlockDef,
+    elem: <div style={{ textAlign: "center", color: "#AAA", fontSize: 18 }}>Coded Block</div>
+  },
+  {
     title: "Date Inject",
     blockDef: { id: "", type: "dateInject", content: null } as DateInjectBlockDef,
     subtitle: "Allows selecting a date and injects that date as a variable to the inner block"
@@ -318,5 +346,5 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       barColor: null,
       milestoneColor: null
     } as GanttChartBlockDef
-  }
+  },
 ]

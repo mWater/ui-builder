@@ -21,3 +21,4 @@ export * from "./database/VirtualDatabase";
 export { localize } from "./widgets/localization";
 export { ContextVarExpr } from "./ContextVarExpr";
 export { evalContextVarExpr } from "./widgets/evalContextVarExpr";
+export { registerExtraCodedPackage } from "./widgets/blocks/coded/CodedBlock";

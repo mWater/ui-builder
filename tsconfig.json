@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "module": "commonjs",
     "target": "ES2016",
-    "lib": ["es2017", "dom"],
+    "lib": ["ES2020", "dom"],
     "sourceMap": true,
     "jsx": "react",
     "declaration": true,

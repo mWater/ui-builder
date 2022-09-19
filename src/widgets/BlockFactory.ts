@@ -39,6 +39,8 @@ import { ToggleFilterBlock, ToggleFilterBlockDef } from "./blocks/toggleFilter"
 import { TagsEditorBlock, TagsEditorBlockDef } from "./blocks/controls/tagsEditor"
 import { ExpressionFilterBlock, ExpressionFilterBlockDef } from "./blocks/expressionFilter"
 import { VariableBlock, VariableBlockDef } from "./blocks/variable"
+import HtmlBlock, { HtmlBlockDef } from "./blocks/html/HtmlBlock"
+import CodedBlock, { CodedBlockDef } from "./blocks/coded/CodedBlock"
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -133,6 +135,14 @@ export default class BlockFactory {
         return new TagsEditorBlock(blockDef as TagsEditorBlockDef)
       case "expressionFilter":
         return new ExpressionFilterBlock(blockDef as ExpressionFilterBlockDef)
+      case "html":
+      case "mwater-common:html": // Legacy
+      case "waterorg:html": // Legacy
+        return new HtmlBlock(blockDef as HtmlBlockDef)
+      case "coded":
+      case "mwater-common:coded": // Legacy
+      case "waterorg:coded": // Legacy
+        return new CodedBlock(blockDef as CodedBlockDef)
     }
 
     // Use custom blocks
