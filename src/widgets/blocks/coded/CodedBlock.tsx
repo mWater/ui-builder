@@ -339,22 +339,6 @@ const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; o
         })
       })
     })
-    // import("@babel/standalone").then((b) => {
-    //   setBabel(b)
-    // })
-
-    // const script = document.createElement('script')
-    // script.setAttribute("type", "module")
-    // script.innerHTML = `
-    // import x from "https://unpkg.com/@monaco-editor/loader/lib/es"
-    // import y from "https://unpkg.com/@monaco-editor/react"
-    // `
-    // document.head.appendChild(script)
-
-    // loadScript("https://unpkg.com/@monaco-editor/react@4.4.5/lib/es/index.js").then(() => {
-    //   debugger
-    //   //setMonaco(m.default)
-    // })
   }, [])
 
   const monacoOptions = useMemo(

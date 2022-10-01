@@ -288,8 +288,13 @@ function HtmlBlockEditModal(props: { blockDef: HtmlBlockDef; ctx: DesignCtx; onC
   const [preview, setPreview] = useState(false)
 
   useEffect(() => {
-    import("@monaco-editor/react").then((m) => {
-      setMonaco(m.default)
+    window.React = React
+    loadScript("https://unpkg.com/prop-types@15.7.2/prop-types.js").then(() => {
+      loadScript("https://unpkg.com/@monaco-editor/loader@1.3.2/lib/umd/monaco-loader.min.js").then(() => {
+        loadScript("https://unpkg.com/@monaco-editor/react@4.4.5/lib/umd/monaco-react.js").then(() => {
+          setMonaco(window["monaco_react"].default)
+        })
+      })
     })
   }, [])
 
@@ -392,4 +397,17 @@ function HtmlBlockEditModal(props: { blockDef: HtmlBlockDef; ctx: DesignCtx; onC
         )}
     </ModalWindowComponent>
   )
+}
+
+/** Loads a script */
+async function loadScript(src: string) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.setAttribute("src", src)
+    script.setAttribute("type", "module")
+    document.body.appendChild(script)
+
+    script.onload = resolve
+    script.onerror = reject
+  })
 }
