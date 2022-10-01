@@ -328,13 +328,33 @@ const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; o
   const [Monaco, setMonaco] = useState<any>()
 
   useEffect(() => {
-    import("@babel/standalone").then((b) => {
-      setBabel(b)
+    window.React = React
+    loadScript("https://unpkg.com/prop-types@15.7.2/prop-types.js").then(() => {
+      loadScript("https://unpkg.com/@monaco-editor/loader@1.3.2/lib/umd/monaco-loader.min.js").then(() => {
+        loadScript("https://unpkg.com/@monaco-editor/react@4.4.5/lib/umd/monaco-react.js").then(() => {
+          loadScript("https://unpkg.com/@babel/standalone@7.19.3/babel.js").then(() => {
+            setMonaco(window["monaco_react"].default)
+            setBabel(window["Babel"])
+          })
+        })
+      })
     })
+    // import("@babel/standalone").then((b) => {
+    //   setBabel(b)
+    // })
 
-    import("@monaco-editor/react").then((m) => {
-      setMonaco(m.default)
-    })
+    // const script = document.createElement('script')
+    // script.setAttribute("type", "module")
+    // script.innerHTML = `
+    // import x from "https://unpkg.com/@monaco-editor/loader/lib/es"
+    // import y from "https://unpkg.com/@monaco-editor/react"
+    // `
+    // document.head.appendChild(script)
+
+    // loadScript("https://unpkg.com/@monaco-editor/react@4.4.5/lib/es/index.js").then(() => {
+    //   debugger
+    //   //setMonaco(m.default)
+    // })
   }, [])
 
   const monacoOptions = useMemo(
@@ -409,11 +429,6 @@ const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; o
   }
 
   const handleSave = () => {
-    if (!babel) {
-      alert("Please retry later. Loading Babel")
-      return
-    }
-
     try {
       const compiled = babel.transform(code, { plugins: ["transform-modules-commonjs", "transform-react-jsx"] }).code
       //console.log(compiled)
@@ -435,7 +450,7 @@ const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; o
 
   return (
     <ModalWindowComponent isOpen={true} onRequestClose={handleSave}>
-      {Monaco ? (
+      {Monaco && babel ? (
         <Monaco
           language="javascript"
           height="100%"
@@ -447,4 +462,17 @@ const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; o
       ) : null}
     </ModalWindowComponent>
   )
+}
+
+/** Loads a script */
+async function loadScript(src: string) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.setAttribute("src", src)
+    script.setAttribute("type", "module")
+    document.body.appendChild(script)
+
+    script.onload = resolve
+    script.onerror = reject
+  })
 }

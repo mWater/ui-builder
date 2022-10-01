@@ -1,5 +1,5 @@
 import * as React from "react"
-import * as _ from "lodash"
+import _ from "lodash"
 import { ActionDef, Action, RenderActionEditorProps } from "../actions"
 import { LabeledProperty, PropertyEditor, ContextVarPropertyEditor } from "../propertyEditors"
 import { InstanceCtx, DesignCtx } from "../../contexts"

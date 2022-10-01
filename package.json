@@ -4,8 +4,6 @@
   "private": true,
   "main": "lib/index.js",
   "dependencies": {
-    "@babel/standalone": "^7.19.2",
-    "@monaco-editor/react": "^4.4.5",
     "@types/dompurify": "^2.0.4",
     "@types/react-datepicker": "^1.8.0",
     "bootstrap": "^3.4.1",
