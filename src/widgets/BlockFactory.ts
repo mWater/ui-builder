@@ -138,10 +138,12 @@ export default class BlockFactory {
       case "html":
       case "mwater-common:html": // Legacy
       case "waterorg:html": // Legacy
+      case "bluekey:html": // Legacy
         return new HtmlBlock(blockDef as HtmlBlockDef)
       case "coded":
       case "mwater-common:coded": // Legacy
       case "waterorg:coded": // Legacy
+      case "bluekey:coded": // Legacy
         return new CodedBlock(blockDef as CodedBlockDef)
     }
 
