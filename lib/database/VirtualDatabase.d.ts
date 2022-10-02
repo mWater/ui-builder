@@ -58,25 +58,37 @@ export default class VirtualDatabase implements Database {
     private mutateRows;
     private handleChange;
 }
+/** Mutation to the database, whether add, update or remove */
 export declare type Mutation = AddMutation | UpdateMutation | RemoveMutation;
+/** Add a single row */
 export interface AddMutation {
     type: "add";
+    /** Table id to add to */
     table: string;
+    /** Temporary primary key for the added row */
     primaryKey: any;
+    /** Values to add to the new row, excluding the primary key */
     values: {
         [column: string]: any;
     };
 }
+/** Update a single row */
 export interface UpdateMutation {
     type: "update";
+    /** Table id to update */
     table: string;
+    /** Primary key of row to update */
     primaryKey: any;
+    /** Values update in the row */
     updates: {
         [column: string]: any;
     };
 }
+/** Remove a single row */
 export interface RemoveMutation {
     type: "remove";
+    /** Table id to remove from */
     table: string;
+    /** Primary key of row to remove */
     primaryKey: any;
 }
