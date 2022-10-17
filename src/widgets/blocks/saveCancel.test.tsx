@@ -11,6 +11,7 @@ import BlockFactory from "../BlockFactory"
 import { ActionLibrary } from "../ActionLibrary"
 import { InstanceCtx } from "../../contexts"
 import { TextboxBlockDef } from "./controls/textbox"
+import { act } from 'react-dom/test-utils'
 
 // Outer context vars
 const rowCV: ContextVar = { id: "cv1", type: "row", name: "", table: "t1" }
@@ -100,7 +101,9 @@ test("save writes to database", async () => {
   expect(inst.find("input").prop("value")).toBe("abc")
 
   // Fire on change
-  inst.find("input").prop("onChange")!({ target: { value: "def" } } as any)
+  act(() => {
+    inst.find("input").prop("onChange")!({ target: { value: "def" } } as any)
+  })
 
   // Wait for load
   await pause()
@@ -109,8 +112,10 @@ test("save writes to database", async () => {
   expect(inst.find("input").prop("value")).toBe("def")
 
   // Blur
-  inst.find("input").prop("onBlur")!({ target: { value: "def" } } as any)
-
+  act(() => {
+    inst.find("input").prop("onBlur")!({ target: { value: "def" } } as any)
+  })
+  
   // Wait for load
   await pause()
   inst.update()

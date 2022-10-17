@@ -137,7 +137,7 @@ const ValidationEditor = (props: {
 }) => {
   return (
     <div>
-      <LabeledProperty label="Condition that must be not be false">
+      <LabeledProperty label="Condition that must be true">
         <ContextVarAndExprPropertyEditor
           contextVars={props.contextVars}
           schema={props.schema}
@@ -152,7 +152,7 @@ const ValidationEditor = (props: {
         />
       </LabeledProperty>
 
-      <LabeledProperty label="Error Message">
+      <LabeledProperty label="Error Message" hint="Shown if condition is *not* true">
         <PropertyEditor obj={props.validation} onChange={props.onValidationChange} property="message">
           {(value, onChange) => <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />}
         </PropertyEditor>
@@ -168,7 +168,7 @@ const getValidationErrors = (blockDef: ValidationBlockDef, renderProps: Instance
   for (const validation of blockDef.validations) {
     // Get value of condition
     const value = renderProps.getContextVarExprValue(validation.contextVarId!, validation.condition)
-    if (value === false) {
+    if (value !== true) {
       errors.push(localize(validation.message, renderProps.locale))
     }
   }
