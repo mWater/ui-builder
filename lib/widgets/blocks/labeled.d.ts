@@ -13,6 +13,10 @@ export interface LabeledBlockDef extends BlockDef {
     requiredStar?: boolean;
     /** Layout of control. Default is stacked */
     layout?: "stacked" | "horizontal";
+    /** True if label is bolded (default is true) */
+    labelBold?: boolean;
+    /** True if label is muted (default is false) */
+    labelMuted?: boolean;
     child: BlockDef | null;
 }
 export declare class LabeledBlock extends Block<LabeledBlockDef> {

@@ -23,6 +23,12 @@ export interface LabeledBlockDef extends BlockDef {
   /** Layout of control. Default is stacked */
   layout?: "stacked" | "horizontal"
 
+  /** True if label is bolded (default is true) */
+  labelBold?: boolean
+
+  /** True if label is muted (default is false) */
+  labelMuted?: boolean
+
   child: BlockDef | null
 }
 
@@ -65,6 +71,8 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
         hintText={hintText}
         helpText={helpText}
         requiredStar={this.blockDef.requiredStar}
+        labelBold={this.blockDef.labelBold ?? true}
+        labelMuted={this.blockDef.labelMuted ?? false}
       >
         {props.renderChildBlock(props, this.blockDef.child, handleAdd)}
       </HorizLabeledControl>
@@ -73,6 +81,8 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
         labelText={labelText || "Label"}
         hintText={hintText}
         helpText={helpText}
+        labelBold={this.blockDef.labelBold ?? true}
+        labelMuted={this.blockDef.labelMuted ?? false}
         requiredStar={this.blockDef.requiredStar}
       >
         {props.renderChildBlock(props, this.blockDef.child, handleAdd)}
@@ -90,6 +100,8 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
         labelText={labelText || "Label"}
         hintText={hintText}
         helpText={helpText}
+        labelBold={this.blockDef.labelBold ?? true}
+        labelMuted={this.blockDef.labelMuted ?? false}
         requiredStar={this.blockDef.requiredStar}
       >
         {props.renderChildBlock(props, this.blockDef.child)}
@@ -99,6 +111,8 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
         labelText={labelText}
         hintText={hintText}
         helpText={helpText}
+        labelBold={this.blockDef.labelBold ?? true}
+        labelMuted={this.blockDef.labelMuted ?? false}
         requiredStar={this.blockDef.requiredStar}
       >
         {props.renderChildBlock(props, this.blockDef.child)}
@@ -137,6 +151,20 @@ export class LabeledBlock extends Block<LabeledBlockDef> {
             </Checkbox>
           )}
         </PropertyEditor>
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="labelBold">
+          {(value, onChange) => (
+            <Checkbox value={value ?? true} onChange={onChange}>
+              Label Bold
+            </Checkbox>
+          )}
+        </PropertyEditor>
+        <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="labelMuted">
+          {(value, onChange) => (
+            <Checkbox value={value ?? false} onChange={onChange}>
+              Label Muted
+            </Checkbox>
+          )}
+        </PropertyEditor>
         <LabeledProperty label="Layout">
           <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="layout">
             {(value, onChange) => (
@@ -161,12 +189,14 @@ function StackedLabeledControl(props: {
   requiredStar?: boolean
   hintText: string
   helpText: string
+  labelBold: boolean
+  labelMuted: boolean
   children: any
 }) {
   return (
     <div style={{ paddingTop: 5, paddingBottom: 5 }}>
       <div key="label">
-        <span key="label" style={{ fontWeight: "bold" }}>
+        <span key="label" style={{ fontWeight: props.labelBold ? "bold" : undefined }} className={props.labelMuted ? "text-muted" : undefined}>
           {props.labelText}
         </span>
         {props.requiredStar ? <span style={{ color: "red", paddingLeft: 2 }}>*</span> : null}
@@ -194,6 +224,8 @@ function HorizLabeledControl(props: {
   requiredStar?: boolean
   hintText: string
   helpText: string
+  labelBold: boolean
+  labelMuted: boolean
   children: any
 }) {
   return (
@@ -208,7 +240,7 @@ function HorizLabeledControl(props: {
       }}
     >
       <div key="label" style={{ paddingTop: props.designMode ? 2 : undefined, marginRight: 5 }}>
-        <span key="label" style={{ fontWeight: "bold" }}>
+        <span key="label" style={{ fontWeight: props.labelBold ? "bold" : undefined }} className={props.labelMuted ? "text-muted" : undefined}>
           {props.labelText}
         </span>
         {props.requiredStar ? <span style={{ color: "red", paddingLeft: 2 }}>*</span> : null}
