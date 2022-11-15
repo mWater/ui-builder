@@ -10,6 +10,8 @@ import LeafBlock from "../../LeafBlock";
  * block. Importer should return imported module e.g. return import("lodash")
  */
 export declare function registerExtraCodedPackage(packageId: string, importer: () => Promise<any>): void;
+/** Register an extra prop that is available inside a coded block */
+export declare function registerExtraProp(propId: string, value: any): void;
 /** Block that contains a coded component.
  * It can define expressions that will be present as props.
  */

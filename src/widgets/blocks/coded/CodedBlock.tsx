@@ -22,6 +22,14 @@ export function registerExtraCodedPackage(packageId: string, importer: () => Pro
   extraPackages[packageId] = importer
 }
 
+/** Extra props that are available inside a coded block */
+const extraProps: { [propId: string]: any } = {}
+
+/** Register an extra prop that is available inside a coded block */
+export function registerExtraProp(propId: string, value: any) {
+  extraProps[propId] = value
+}
+
 /** Block that contains a coded component.
  * It can define expressions that will be present as props.
  */
@@ -241,7 +249,7 @@ function CodedBlockInstance(props: { blockDef: CodedBlockDef; instanceCtx: Insta
   }
 
   // Create props
-  const compProps: any = { ctx: props.instanceCtx }
+  const compProps: any = { ctx: props.instanceCtx, ...extraProps }
 
   // Add coded expressions
   for (const codedExpr of props.blockDef.codedExprs) {
@@ -295,7 +303,7 @@ function CodedBlockDesign(props: { blockDef: CodedBlockDef; designCtx: DesignCtx
   // Create props
   if (mod.DesignComp) {
     // Create props
-    const compProps: any = { ctx: props.designCtx }
+    const compProps: any = { ctx: props.designCtx, ...extraProps }
 
     // Add coded strings
     for (const codedLocalizedString of props.blockDef.codedLocalizedStrings || []) {
