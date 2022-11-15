@@ -145,7 +145,7 @@ export class SaveCancelBlock extends Block<SaveCancelBlockDef> {
         {props.renderChildBlock(props, this.blockDef.child, handleAdd)}
         <div className="save-cancel-footer">
           {this.blockDef.deleteContextVarId ? (
-            <button type="button" className="btn btn-danger" style={{ float: "left" }}>
+            <button type="button" className="btn btn-outline-danger" style={{ float: "left" }}>
               <i className="fa fa-remove" /> {deleteLabelText}
             </button>
           ) : null}
