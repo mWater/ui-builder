@@ -484,7 +484,7 @@ class SaveCancelInstance extends React.Component<SaveCancelInstanceProps, SaveCa
 
         <div className="save-cancel-footer">
           {canDelete ? (
-            <button type="button" className="btn btn-danger" onClick={this.handleDelete} style={{ float: "left" }}>
+            <button type="button" className="btn btn-outline-danger" onClick={this.handleDelete} style={{ float: "left" }}>
               <i className="fa fa-remove" /> {deleteLabelText}
             </button>
           ) : null}
