@@ -31,8 +31,7 @@ export default class VirtualDatabase implements Database {
         [contextVarId: string]: any;
     }): Promise<Row[]>;
     /** Determine if query should be simply sent to the underlying database.
-     * Do if no mutations to any tables referenced *and* it is not a simple id = query which
-     * is best to cache *and* it doesn't reference temporary primary keys
+     * Do if no mutations to any tables referenced *and* it doesn't reference temporary primary keys
      */
     private shouldPassthrough;
     /** Test if an expression references a temporary primary key, meaning it cannot be sent to the server */
