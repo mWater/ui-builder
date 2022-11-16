@@ -68,7 +68,7 @@ export default class VirtualDatabase implements Database {
 
     const exprUtils = new ExprUtils(this.schema, variables)
 
-    // Pass through if no changes and not id query
+    // Pass through if no changes
     if (this.shouldPassthrough(query, exprUtils, contextVars, contextVarValues)) {
       return this.queryCache.get({ query, contextVars, contextVarValues })
     }
@@ -83,8 +83,7 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Determine if query should be simply sent to the underlying database.
-   * Do if no mutations to any tables referenced *and* it is not a simple id = query which
-   * is best to cache *and* it doesn't reference temporary primary keys
+   * Do if no mutations to any tables referenced *and* it doesn't reference temporary primary keys
    */
   private shouldPassthrough(
     query: QueryOptions,
@@ -107,11 +106,6 @@ export default class VirtualDatabase implements Database {
 
     // Can't passthrough if depends on mutated table
     if (_.intersection(tablesReferenced, mutatedTables).length > 0) {
-      return false
-    }
-
-    // Don't passthrough if simple id query, so that caching still happens
-    if (getWherePrimaryKey(query.where)) {
       return false
     }
 
@@ -268,7 +262,7 @@ export default class VirtualDatabase implements Database {
 
     // Alter where clause to include any rows that have been updated, as the update
     // may have altered the row in such a way as it now matches the where clause
-    const updatedIds = _.uniq(this.mutations.filter((m) => m.type == "update").map((m) => m.primaryKey))
+    const updatedIds = _.uniq(this.mutations.filter((m) => m.type == "update" && m.table == from).map((m) => m.primaryKey))
     if (updatedIds.length > 0 && where) {
       queryOptions.where = {
         type: "op",
