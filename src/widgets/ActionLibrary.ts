@@ -5,6 +5,7 @@ import { GotoUrlAction, GotoUrlActionDef } from "./actions/gotoUrl"
 import { RemoveRowAction, RemoveRowActionDef } from "./actions/removeRow"
 import { BrowserBackAction, BrowserBackActionDef } from "./actions/browserBack"
 import { RefreshDataAction, RefreshDataActionDef } from "./actions/refreshData"
+import { ConditionalAction, ConditionalActionDef } from "./actions/conditional"
 
 /** Library of actions */
 export class ActionLibrary {
@@ -47,7 +48,9 @@ export class ActionLibrary {
         return new BrowserBackAction(actionDef as BrowserBackActionDef)
       case "refreshData":
         return new RefreshDataAction(actionDef as RefreshDataActionDef)
-    }
+      case "conditional":
+        return new ConditionalAction(actionDef as ConditionalActionDef)
+      }
 
     for (const customAction of this.customActions) {
       if (customAction.type == actionDef.type) {
@@ -91,7 +94,13 @@ export class ActionLibrary {
         return {
           type: "refreshData"
         } as RefreshDataActionDef
-    }
+      case "conditional":
+        return {
+          type: "conditional",
+          thenAction: null,
+          elseAction: null,
+        } as ConditionalActionDef
+      }
 
     for (const customAction of this.customActions) {
       if (customAction.type == type) {
@@ -110,7 +119,8 @@ export class ActionLibrary {
       { type: "removeRow", name: "Remove Row" },
       { type: "gotoUrl", name: "Goto URL" },
       { type: "browserBack", name: "Browser Back" },
-      { type: "refreshData", name: "Refresh Data" }
+      { type: "refreshData", name: "Refresh Data" },
+      { type: "conditional", name: "Conditional Action" }
     ]
 
     for (const customAction of this.customActions) {

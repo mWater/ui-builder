@@ -1,12 +1,10 @@
 import produce from "immer"
 import * as React from "react"
-import { Block, BlockDef, ContextVar, ChildBlock, createExprVariables, validateContextVarExpr } from "../blocks"
+import { Block, BlockDef, ContextVar, ChildBlock, validateContextVarExpr } from "../blocks"
 import * as _ from "lodash"
-import { ExprValidator, Expr } from "mwater-expressions"
+import { Expr } from "mwater-expressions"
 import {
-  PropertyEditor,
   LabeledProperty,
-  ContextVarPropertyEditor,
   ContextVarAndExprPropertyEditor
 } from "../propertyEditors"
 import { DesignCtx, InstanceCtx } from "../../contexts"
