@@ -38,6 +38,8 @@ export interface QueryTableBlockDef extends BlockDef {
     striped?: boolean;
     /** Sticky headers of the table */
     stickyHeaders?: boolean;
+    /** Maximum height of the table with a scrollbar if exceeds */
+    maxHeight?: number | null;
 }
 interface QueryTableColumnInfo {
     /** Column order expressions. When present for a column, makes it orderable via icon at top */

@@ -7,8 +7,9 @@ import { localize } from "../../localization"
 import { InstanceCtx, getFilteredContextVarValues } from "../../../contexts"
 import { BlockDef, createExprVariables, createExprVariableValues } from "../../blocks"
 import { CSSProperties } from "react"
+import "./queryTable.css"
 
-interface Props {
+export interface Props {
   block: QueryTableBlock
   instanceCtx: InstanceCtx
 }
@@ -428,34 +429,39 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       divStyle.overflowX = "auto"
     }
 
+    if (this.props.block.blockDef.maxHeight) {
+      divStyle.overflowY = "auto"
+      divStyle.maxHeight = this.props.block.blockDef.maxHeight
+    }
+
     // Fade if refreshing
     if (this.state.refreshing) {
       tableStyle.opacity = 0.6
     }
 
-    let className = "table"
+    let className = "ui-builder-table"
     switch (blockDef.borders || "horizontal") {
       case "all":
-        className += " table-bordered"
+        className += " ui-builder-table-bordered"
         break
       case "none":
-        className += " table-borderless"
+        className += " ui-builder-table-borderless"
         break
     }
 
     switch (blockDef.padding || "normal") {
       case "compact":
-        className += " table-condensed"
+        className += " ui-builder-table-condensed"
         break
     }
 
     // Put hover if an action connected
     if (blockDef.rowClickAction) {
-      className += " table-hover"
+      className += " ui-builder-table-hover"
     }
 
     if (blockDef.striped) {
-      className += " table-striped"
+      className += " ui-builder-table-striped"
     }
 
     return (

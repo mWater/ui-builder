@@ -4,7 +4,8 @@ import { Row } from "mwater-expressions";
 import { QueryOptions } from "../../../database/Database";
 import { InstanceCtx } from "../../../contexts";
 import { BlockDef } from "../../blocks";
-interface Props {
+import "./queryTable.css";
+export interface Props {
     block: QueryTableBlock;
     instanceCtx: InstanceCtx;
 }

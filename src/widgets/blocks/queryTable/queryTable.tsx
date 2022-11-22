@@ -10,7 +10,6 @@ import {
   LocalizedString,
   Row,
   DataSource,
-  Column,
   Variable
 } from "mwater-expressions"
 import { OrderBy } from "../../../database/Database"
@@ -24,7 +23,7 @@ import {
   LocalizedTextPropertyEditor,
   TableColumnWidthEditor
 } from "../../propertyEditors"
-import { NumberInput, Select, Checkbox, Toggle } from "react-library/lib/bootstrap"
+import { NumberInput, Checkbox, Toggle } from "react-library/lib/bootstrap"
 import { ExprComponent } from "mwater-expressions-ui"
 import { ActionDef } from "../../actions"
 import { DesignCtx, InstanceCtx } from "../../../contexts"
@@ -81,6 +80,9 @@ export interface QueryTableBlockDef extends BlockDef {
 
   /** Sticky headers of the table */
   stickyHeaders?: boolean
+
+  /** Maximum height of the table with a scrollbar if exceeds */
+  maxHeight?: number | null
 }
 
 interface QueryTableColumnInfo {
@@ -318,24 +320,24 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
       divStyle.overflowX = "auto"
     }
 
-    let className = "table"
+    let className = "ui-builder-table"
     switch (this.blockDef.borders || "horizontal") {
       case "all":
-        className += " table-bordered"
+        className += " ui-builder-table-bordered"
         break
       case "none":
-        className += " table-borderless"
+        className += " ui-builder-table-borderless"
         break
     }
 
     switch (this.blockDef.padding || "normal") {
       case "compact":
-        className += " table-condensed"
+        className += " ui-builder-table-condensed"
         break
     }
 
     if (this.blockDef.striped) {
-      className += " table-striped"
+      className += " ui-builder-table-striped"
     }
 
     const getColumnVerticalAlign = (colIndex: number) => {
@@ -606,6 +608,14 @@ export class QueryTableBlock extends Block<QueryTableBlockDef> {
             </Checkbox>
           )}
         </PropertyEditor>
+
+        <LabeledProperty label="Maximum height" hint="Scrolls if exceeds">
+          <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="maxHeight">
+            {(value, onChange) => (
+              <NumberInput value={value} onChange={onChange} decimal={false} style={{ display: "inline-block" }} placeholder="Unlimited" />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
 
         <PropertyEditor obj={this.blockDef} onChange={props.store.replaceBlock} property="stickyHeaders">
           {(value, onChange) => (
