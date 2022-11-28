@@ -11,7 +11,7 @@ import { localize } from "../../localization"
 /** Either range or preset id or null */
 export type DateValue = [string | null, string | null] | string | null
 
-interface Props {
+export interface Props {
   value: DateValue
   onChange: (value: DateValue) => void
   /** true to use datetime */
@@ -371,7 +371,7 @@ export default class DateExprComponent extends React.Component<Props, State> {
           <div className="form-control" style={{ width: 220, height: 34 }} onClick={this.handleOpen}>
             {this.renderSummary()}
           </div>
-          {this.props.value && this.props.onChange ? this.renderClear() : null}
+          {this.props.value ? this.renderClear() : null}
           {this.state.dropdownOpen ? this.renderDropdown() : null}
         </div>
       </ClickOutHandler>

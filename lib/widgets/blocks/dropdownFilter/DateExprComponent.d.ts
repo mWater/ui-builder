@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./datepicker-tweaks.css";
 /** Either range or preset id or null */
 export declare type DateValue = [string | null, string | null] | string | null;
-interface Props {
+export interface Props {
     value: DateValue;
     onChange: (value: DateValue) => void;
     /** true to use datetime */
