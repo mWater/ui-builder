@@ -67,7 +67,7 @@ async function evaluateModule(code: string) {
     if (req == "react") {
       importedModules[req] = await import("react")
     }
-    if (req == "react-dom") {
+    else if (req == "react-dom") {
       importedModules[req] = await import("react-dom")
     }
     else if (req in extraPackages) {
