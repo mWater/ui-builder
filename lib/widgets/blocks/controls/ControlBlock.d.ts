@@ -49,9 +49,9 @@ export interface RenderControlProps {
 }
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
-    abstract renderControl(props: RenderControlProps): React.ReactElement<any>;
+    abstract renderControl(ctx: RenderControlProps): React.ReactElement<any>;
     /** Implement this to render any editor parts that are not selecting the basic row cv and column */
-    renderControlEditor(props: DesignCtx): React.ReactElement<any> | null;
+    renderControlEditor(ctx: DesignCtx): React.ReactElement<any> | null;
     /** Filter the columns that this control is for */
     abstract filterColumn(column: Column): boolean;
     renderDesign(designCtx: DesignCtx): React.ReactElement<any, string | React.JSXElementConstructor<any>>;

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Expr, Variable, LiteralType, EnumValue, AggrStatus, Schema } from "mwater-expressions";
 import { InstanceCtx, DesignCtx } from "../contexts";
 import "./blocks.css";
+import { ContextVarExpr } from "../ContextVarExpr";
 /** Side on which another block is dropped on a block */
 export declare enum DropSide {
     top = "Top",
@@ -127,6 +128,16 @@ export declare function createExprVariableValues(contextVars: ContextVar[], cont
 /** Make a duplicate of a block */
 export declare function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock): BlockDef;
 /** Validates a context variable/expr combo. Null if ok */
+export declare function validateContextVarExpr(options: {
+    contextVars: ContextVar[];
+    schema: Schema;
+    contextVarExpr: ContextVarExpr;
+    types?: LiteralType[];
+    /** If not set, implies all possible */
+    aggrStatuses?: AggrStatus[];
+    idTable?: string;
+    enumValueIds?: string[];
+}): string | null;
 export declare function validateContextVarExpr(options: {
     contextVars: ContextVar[];
     schema: Schema;

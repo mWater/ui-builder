@@ -6,6 +6,7 @@ import { InstanceCtx, DesignCtx } from "../contexts"
 import "./blocks.css"
 import { HorizontalBlockDef } from "./blocks/horizontal"
 import { VerticalBlockDef } from "./blocks/vertical"
+import { ContextVarExpr } from "../ContextVarExpr"
 
 /** Side on which another block is dropped on a block */
 export enum DropSide {
@@ -357,6 +358,16 @@ export function duplicateBlockDef(blockDef: BlockDef, createBlock: CreateBlock):
 export function validateContextVarExpr(options: {
   contextVars: ContextVar[]
   schema: Schema
+  contextVarExpr: ContextVarExpr
+  types?: LiteralType[]
+  /** If not set, implies all possible */
+  aggrStatuses?: AggrStatus[]
+  idTable?: string
+  enumValueIds?: string[]
+}): string | null 
+export function validateContextVarExpr(options: {
+  contextVars: ContextVar[]
+  schema: Schema
   contextVarId: string | null
   expr: Expr
   types?: LiteralType[]
@@ -364,14 +375,29 @@ export function validateContextVarExpr(options: {
   aggrStatuses?: AggrStatus[]
   idTable?: string
   enumValueIds?: string[]
-}) {
+}): string | null 
+export function validateContextVarExpr(options: {
+  contextVars: ContextVar[]
+  schema: Schema
+  contextVarExpr?: ContextVarExpr | null
+  contextVarId?: string | null
+  expr?: Expr
+  types?: LiteralType[]
+  /** If not set, implies all possible */
+  aggrStatuses?: AggrStatus[]
+  idTable?: string
+  enumValueIds?: string[]
+}): string | null {
   let error: string | null
+
+  const contextVarId = options.contextVarExpr ? options.contextVarExpr.contextVarId : options.contextVarId
+  const expr = options.contextVarExpr ? options.contextVarExpr.expr : options.expr
 
   // Validate cv
   let contextVar: ContextVar | undefined = undefined
-  if (options.contextVarId) {
+  if (contextVarId) {
     contextVar = options.contextVars.find(
-      (cv) => cv.id === options.contextVarId && (cv.type === "rowset" || cv.type === "row")
+      (cv) => cv.id === contextVarId && (cv.type === "rowset" || cv.type === "row")
     )
     if (!contextVar) {
       return "Context variable not found"
@@ -380,7 +406,7 @@ export function validateContextVarExpr(options: {
 
   // Only include context variables before up to an including one referenced, or all context variables if null
   // This is because an outer context var expr cannot reference an inner context variable
-  const cvIndex = options.contextVars.findIndex((cv) => cv.id === options.contextVarId)
+  const cvIndex = options.contextVars.findIndex((cv) => cv.id === contextVarId)
   const availContextVars = cvIndex >= 0 ? _.take(options.contextVars, cvIndex + 1) : options.contextVars
 
   const exprValidator = new ExprValidator(options.schema, createExprVariables(availContextVars))
@@ -391,7 +417,7 @@ export function validateContextVarExpr(options: {
     (contextVar && contextVar.type == "row" ? ["individual", "literal"] : ["aggregate", "individual", "literal"])
 
   // Validate expr
-  error = exprValidator.validateExpr(options.expr, {
+  error = exprValidator.validateExpr(expr!, {
     table: contextVar ? contextVar.table : undefined,
     types: options.types,
     aggrStatuses: aggrStatuses,
