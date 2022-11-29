@@ -89,6 +89,8 @@ export declare function performEvalQuery(options: {
 }): Promise<Row[]>;
 /** Determine if a where clause expression filters by primary key, and if so, return the key */
 export declare function getWherePrimaryKey(where?: Expr): any;
+/** Determine if a where clause expression filters by multiple primary keys, and if so, return the keys */
+export declare function getWherePrimaryKeys(where?: Expr): any[] | null;
 /** Determine if a query is aggregate (either select or order clauses) */
 export declare function isQueryAggregate(query: QueryOptions, exprUtils: ExprUtils): boolean;
 /** Stable sort on field */

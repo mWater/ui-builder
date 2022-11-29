@@ -302,6 +302,26 @@ export function getWherePrimaryKey(where?: Expr): any {
   return null
 }
 
+/** Determine if a where clause expression filters by multiple primary keys, and if so, return the keys */
+export function getWherePrimaryKeys(where?: Expr): any[] | null {
+  if (!where) {
+    return null
+  }
+
+  // Only match if is a single expression that uses = any
+  if (where.type == "op" && where.op == "= any" && where.exprs[0]!.type == "id" && where.exprs[1]!.type == "literal") {
+    return (where.exprs[1] as LiteralExpr).value
+  }
+
+  // And expressions that are collapsible are ok
+  if (where.type == "op" && where.op == "and" && where.exprs.length == 1) {
+    return getWherePrimaryKeys(where.exprs[0])
+  }
+
+  return null
+}
+
+
 /** Determine if a query is aggregate (either select or order clauses) */
 export function isQueryAggregate(query: QueryOptions, exprUtils: ExprUtils) {
   for (const select of Object.values(query.select)) {

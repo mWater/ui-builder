@@ -4,13 +4,15 @@ import {
   DatabaseChangeListener,
   Transaction,
   performEvalQuery,
-  getWherePrimaryKey
+  getWherePrimaryKey,
+  getWherePrimaryKeys
 } from "./Database"
 import { Schema, Column, ExprUtils, Expr, PromiseExprEvaluator, PromiseExprEvaluatorRow, Row } from "mwater-expressions"
 import _ from "lodash"
 import { v4 as uuid } from "uuid"
 import { ContextVar, createExprVariables, createExprVariableValues } from "../widgets/blocks"
 import { BatchingCache } from "./BatchingCache"
+import produce from "immer"
 
 /**
  * Database which is backed by a real database, but can accept changes such as adds, updates or removes
@@ -109,7 +111,7 @@ export default class VirtualDatabase implements Database {
       return false
     }
 
-    // Can't passthrough if depends on primary key
+    // Can't passthrough if depends on temporary primary key
     if (this.doesReferenceTempPk(query.where, exprUtils, contextVars, contextVarValues)) {
       return false
     }
@@ -293,10 +295,41 @@ export default class VirtualDatabase implements Database {
     // Perform query
     let rows: Row[] | undefined
 
+    const wherePrimaryKey = getWherePrimaryKey(where)
+    const wherePrimaryKeys = getWherePrimaryKeys(where)
+    
     // Skip if us just a query on a temporary row, which will not match anything
-    if (this.tempPrimaryKeys.includes(getWherePrimaryKey(where))) {
+    if (wherePrimaryKey && this.tempPrimaryKeys.includes(wherePrimaryKey)) {
       rows = []
-    } else if (this.doesReferenceTempPk(where, exprUtils, contextVars, contextVarValues)) {
+    } 
+    // Adjust filter if query on mix of primary keys and temporary primary keys
+    else if (wherePrimaryKeys && this.tempPrimaryKeys.some(tpk => wherePrimaryKeys.includes(tpk))) {
+      // Create alterate where clause that excludes temp primary keys
+      const nonTempKeys = wherePrimaryKeys.filter(pk => !this.tempPrimaryKeys.includes(pk))
+      if (nonTempKeys.length > 0) {
+        const newQueryOptions = produce(queryOptions, (draft: QueryOptions) => {
+          draft.where = {
+            type: "op",
+            op: "= any",
+            table: from,
+            exprs: [
+              { type: "id", table: from },
+              { type: "literal", valueType: "id[]", idTable: from, value: nonTempKeys }
+            ]
+          }
+        })
+        
+        rows = await this.queryCache.get({
+          query: newQueryOptions,
+          contextVars: contextVars,
+          contextVarValues: contextVarValues
+        })
+      }
+      else {
+        rows = []
+      }
+    } 
+    else if (this.doesReferenceTempPk(where, exprUtils, contextVars, contextVarValues)) {
       // This is a tricky decision, as there is a query that references a temporary primary key
       // and as such, rows that do not exist. This part of the query cannot be sent to the real
       // database. However, a query that had a *not* on that condition would incorrectly be missing
