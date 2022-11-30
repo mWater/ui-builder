@@ -97,4 +97,6 @@ export declare function isQueryAggregate(query: QueryOptions, exprUtils: ExprUti
 export declare function stableSort<T>(items: T[], iteratee: (item: T) => any, direction: "asc" | "desc"): T[];
 /** Hook to listen for database changes. Returns an integer that increments with each change */
 export declare function useDatabaseChangeListener(database: Database): number;
+/** Determine if a primary key is a temporary one */
+export declare function isTempPrimaryKey(primaryKey: any): boolean;
 export {};

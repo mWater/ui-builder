@@ -91,5 +91,3 @@ export interface RemoveMutation {
     /** Primary key of row to remove */
     primaryKey: any;
 }
-/** Determine if a primary key is a temporary one */
-export declare function isTempPrimaryKey(primaryKey: any): boolean;

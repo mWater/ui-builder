@@ -379,3 +379,8 @@ export function useDatabaseChangeListener(database: Database) {
 
   return incr
 }
+
+/** Determine if a primary key is a temporary one */
+export function isTempPrimaryKey(primaryKey: any) {
+  return typeof primaryKey == "string" && primaryKey.match(/^pk_[0-9a-zA-Z]+_temp$/) != null
+}
