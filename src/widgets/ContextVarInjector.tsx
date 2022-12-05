@@ -1,12 +1,12 @@
-import { ContextVar, BlockDef, CreateBlock, Filter, createExprVariables, createExprVariableValues } from "./blocks"
+import { ContextVar, Filter, createExprVariables, createExprVariableValues } from "./blocks"
 import * as React from "react"
-import { Expr, ExprUtils, Schema, Variable, PromiseExprEvaluator } from "mwater-expressions"
-import { QueryOptions, Database } from "../database/Database"
+import { Expr, ExprUtils, Variable, PromiseExprEvaluator } from "mwater-expressions"
+import { QueryOptions } from "../database/Database"
 import canonical from "canonical-json"
 import _ from "lodash"
 import { InstanceCtx, getFilteredContextVarValues } from "../contexts"
 
-interface Props {
+export interface Props {
   injectedContextVar: ContextVar
   value: any
   instanceCtx: InstanceCtx
