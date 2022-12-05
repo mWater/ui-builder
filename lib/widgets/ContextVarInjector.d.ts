@@ -3,16 +3,16 @@ import * as React from "react";
 import { Expr, Variable } from "mwater-expressions";
 import { QueryOptions } from "../database/Database";
 import { InstanceCtx } from "../contexts";
-interface Props {
+export interface Props {
     injectedContextVar: ContextVar;
     value: any;
     instanceCtx: InstanceCtx;
     contextVarExprs?: Expr[];
-    initialFilters?: Filter[];
+    initialFilters?: Promise<Filter[]>;
     children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any> | null;
 }
 interface State {
-    filters: Filter[];
+    filters?: Filter[];
     loading: boolean;
     refreshing: boolean;
     error?: Error;

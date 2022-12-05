@@ -14,7 +14,7 @@ export interface ExpressionFilterBlockDef extends BlockDef {
  */
 export declare class ExpressionFilterBlock extends LeafBlock<ExpressionFilterBlockDef> {
     validate(options: DesignCtx): string | null;
-    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];
+    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]>;
     renderDesign(props: DesignCtx): JSX.Element;
     renderInstance(ctx: InstanceCtx): JSX.Element;
     renderEditor(ctx: DesignCtx): JSX.Element;

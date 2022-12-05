@@ -11,12 +11,12 @@ export interface Props {
   value: any
   instanceCtx: InstanceCtx
   contextVarExprs?: Expr[]
-  initialFilters?: Filter[]
+  initialFilters?: Promise<Filter[]>
   children: (instanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => React.ReactElement<any> | null
 }
 
 interface State {
-  filters: Filter[]
+  filters?: Filter[]
   loading: boolean
   refreshing: boolean
   error?: Error
@@ -40,7 +40,6 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      filters: props.initialFilters || [],
       loading: true,
       refreshing: false,
       exprValues: {},
@@ -51,7 +50,23 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.performQueries()
+    // Load filters first
+    if (this.props.initialFilters) {
+      this.props.initialFilters.then((filters) => {
+        if (this.unmounted) {
+          return
+        }
+        this.setState({ filters })
+      }).catch(err => {
+        if (this.unmounted) {
+          return
+        }
+        this.setState({ error: err })
+      })
+    }
+    else {
+      this.setState({ filters: [] })
+    }
 
     // Listen for changes to database
     this.props.instanceCtx.database.addChangeListener(this.handleDatabaseChange)
@@ -122,12 +137,12 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
 
     // Add filters
-    if (this.state.filters.length > 0) {
+    if (this.state.filters!.length > 0) {
       queryOptions.where = {
         type: "op",
         table: table,
         op: "and",
-        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map((f) => f.expr))))
+        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters!.map((f) => f.expr))))
       }
       if (queryOptions.where.exprs.length === 0) {
         queryOptions.where = null
@@ -150,12 +165,12 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     }
 
     // Add filters
-    if (this.state.filters.length > 0) {
+    if (this.state.filters!.length > 0) {
       queryOptions.where = {
         type: "op",
         table: table,
         op: "and",
-        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters.map((f) => f.expr))))
+        exprs: _.compact([queryOptions.where || null].concat(_.compact(this.state.filters!.map((f) => f.expr))))
       }
       if (queryOptions.where.exprs.length === 0) {
         queryOptions.where = null
@@ -344,7 +359,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       setFilter: (contextVarId, filter) => {
         if (contextVarId === this.props.injectedContextVar.id) {
           // Remove existing with same id
-          const filters = this.state.filters.filter((f) => f.id !== filter.id)
+          const filters = this.state.filters!.filter((f) => f.id !== filter.id)
           filters.push(filter)
           return this.setState({ filters })
         } else {
@@ -353,7 +368,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       },
       getFilters: (contextVarId) => {
         if (contextVarId === this.props.injectedContextVar.id) {
-          return this.state.filters
+          return this.state.filters!
         } else {
           return outer.getFilters(contextVarId)
         }
@@ -367,6 +382,9 @@ export default class ContextVarInjector extends React.Component<Props, State> {
     if (this.state.error) {
       // TODO localize
       return <div className="alert alert-danger">Error loading data</div>
+    }
+    if (!this.state.filters) {
+      return <div><i className="fas fa-spinner fa-spin"/></div>
     }
     return this.props.children(this.createInnerProps(), this.state.loading, this.state.refreshing)
   }

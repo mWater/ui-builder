@@ -466,7 +466,7 @@ export class DropdownFilterBlock extends LeafBlock<DropdownFilterBlockDef> {
     )
   }
 
-  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] {
+  async getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]> {
     const filters: Filter[] = []
     if (contextVarId == this.blockDef.rowsetContextVarId) {
       if (this.blockDef.defaultValue) {

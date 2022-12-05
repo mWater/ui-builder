@@ -39,7 +39,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     return null
   }
 
-  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] {
+  async getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]> {
     const widgetDef = instanceCtx.widgetLibrary.widgets[this.blockDef.widgetId!]
     if (widgetDef && widgetDef.blockDef) {
       const innerBlock = instanceCtx.createBlock(widgetDef.blockDef)

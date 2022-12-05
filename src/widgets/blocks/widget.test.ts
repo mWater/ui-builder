@@ -83,7 +83,7 @@ describe("getContextVarExprs", () => {
 })
 
 describe("getInitialFilters", () => {
-  test("translates", () => {
+  test("translates", async () => {
     const createBlock = jest.fn()
     const widgetBlock = new WidgetBlock(blockDef)
 
@@ -94,9 +94,9 @@ describe("getInitialFilters", () => {
     // Return inner block
     createBlock.mockReset()
     createBlock.mockReturnValueOnce(innerBlock)
-    innerBlock.getInitialFilters.mockReturnValue([{ id: "f1", memo: "m", expr: {} as Expr }])
+    innerBlock.getInitialFilters.mockReturnValue(Promise.resolve([{ id: "f1", memo: "m", expr: {} as Expr }]))
 
-    const filters = widgetBlock.getInitialFilters("a1", {
+    const filters = await widgetBlock.getInitialFilters("a1", {
       widgetLibrary: widgetLibrary,
       contextVars: [] as ContextVar[],
       createBlock: createBlock as CreateBlock

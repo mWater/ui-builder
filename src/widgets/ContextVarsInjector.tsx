@@ -43,7 +43,7 @@ export default class ContextVarsInjector extends React.Component<Props> {
             ...this.props.instanceCtx,
             contextVars: allContextVars
           })
-        : []
+        : Promise.resolve([])
 
       const currentElem = elem
       elem = (outerInstanceCtx: InstanceCtx, loading: boolean, refreshing: boolean) => (

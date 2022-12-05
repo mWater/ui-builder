@@ -210,7 +210,7 @@ test("filters are applied for rowset variables", (done) => {
       injectedContextVar={contextVar}
       value={value}
       contextVarExprs={contextVarExprs}
-      initialFilters={initialFilters}
+      initialFilters={Promise.resolve(initialFilters)}
     >
       {(instanceCtx: InstanceCtx, isLoading: boolean) => {
         innerRenderProps = instanceCtx
@@ -220,20 +220,21 @@ test("filters are applied for rowset variables", (done) => {
     </ContextVarInjector>
   )
 
-  // Query should have been made
-  const queryOptions = (database.query as jest.Mock).mock.calls[0][0] as QueryOptions
-  const expectedQueryOptions: QueryOptions = {
-    select: {
-      e0: contextVarExprs[0]
-    },
-    from: "t1",
-    where: { type: "op", table: "t1", op: "and", exprs: [value, initialFilters[0].expr!] },
-    limit: 1
-  }
   // TODO test properly isLoading
   // expect(innerIsLoading).toBe(true)
 
-  setImmediate(() => {
+  setTimeout(() => {
+    // Query should have been made
+    const queryOptions = (database.query as jest.Mock).mock.calls[0][0] as QueryOptions
+    const expectedQueryOptions: QueryOptions = {
+      select: {
+        e0: contextVarExprs[0]
+      },
+      from: "t1",
+      where: { type: "op", table: "t1", op: "and", exprs: [value, initialFilters[0].expr!] },
+      limit: 1
+    }
+
     // Should perform the query
     expect(queryOptions).toEqual(expectedQueryOptions)
 
@@ -260,7 +261,7 @@ test("filters are applied for rowset variables", (done) => {
 
       done()
     }, 10)
-  })
+  }, 100)
 })
 
 test("null filters are ignored for rowset variables", (done) => {
@@ -279,7 +280,7 @@ test("null filters are ignored for rowset variables", (done) => {
       injectedContextVar={contextVar}
       value={value}
       contextVarExprs={contextVarExprs}
-      initialFilters={initialFilters}
+      initialFilters={Promise.resolve(initialFilters)}
     >
       {(instanceCtx: InstanceCtx, isLoading: boolean) => {
         innerRenderProps = instanceCtx
@@ -289,20 +290,21 @@ test("null filters are ignored for rowset variables", (done) => {
     </ContextVarInjector>
   )
 
-  // Query should have been made
-  const queryOptions = (database.query as jest.Mock).mock.calls[0][0] as QueryOptions
-  const expectedQueryOptions: QueryOptions = {
-    select: {
-      e0: contextVarExprs[0]
-    },
-    from: "t1",
-    where: { type: "op", table: "t1", op: "and", exprs: [value] },
-    limit: 1
-  }
   // TODO test properly isLoading
   // expect(innerIsLoading).toBe(true)
 
   setImmediate(() => {
+    // Query should have been made
+    const queryOptions = (database.query as jest.Mock).mock.calls[0][0] as QueryOptions
+    const expectedQueryOptions: QueryOptions = {
+      select: {
+        e0: contextVarExprs[0]
+      },
+      from: "t1",
+      where: { type: "op", table: "t1", op: "and", exprs: [value] },
+      limit: 1
+    }
+
     // Should perform the query
     expect(queryOptions).toEqual(expectedQueryOptions)
 
@@ -336,7 +338,7 @@ test("filters are not applied for rowset variables to variable value", (done) =>
   const contextVar: ContextVar = { id: "cv1", name: "cv1", type: "rowset", table: "t1" }
   const value: Expr = { type: "literal", valueType: "boolean", value: false }
   const contextVarExprs: Expr[] = [{ type: "op", table: "t1", op: "count", exprs: [] }]
-  const initialFilters: Filter[] = [{ id: "f1", expr: { type: "field", table: "t1", column: "c2" } }]
+  const initialFilters: Promise<Filter[]> = Promise.resolve([{ id: "f1", expr: { type: "field", table: "t1", column: "c2" } }])
 
   let innerRenderProps: InstanceCtx
   let innerIsLoading = false

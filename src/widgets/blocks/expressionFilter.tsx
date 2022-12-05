@@ -40,7 +40,7 @@ export class ExpressionFilterBlock extends LeafBlock<ExpressionFilterBlockDef> {
     return null
   }
 
-  getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[] {
+  async getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]> {
     if (contextVarId == this.blockDef.rowsetContextVarId) {
       if (this.blockDef.defaultFilterExpr) {
         return [{

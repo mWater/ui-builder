@@ -13,7 +13,7 @@ export interface WidgetBlockDef extends BlockDef {
 }
 export declare class WidgetBlock extends LeafBlock<WidgetBlockDef> {
     validate(options: DesignCtx): "Widget required" | "Invalid widget" | "Missing context variable in mapping" | null;
-    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Filter[];
+    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]>;
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
     /** Maps variables in an expression from inner variable names to outer ones */
     mapInnerToOuterVariables(expr: Expr): Expr;
