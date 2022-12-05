@@ -42,15 +42,17 @@
 }
 
 .header-block {
-  padding: 5px 5px 15px 5px;
+  padding: 5px 5px 10px 5px;
   border-bottom: 1px solid #e5e5e5;
   margin-bottom: 15px;
+  margin-top: 5px;
 }
 
 .header-block h1,
 .header-block h2,
 .header-block h3,
-.header-block h4 {
+.header-block h4,
+.header-block h5 {
   margin: 0;
 }
 
