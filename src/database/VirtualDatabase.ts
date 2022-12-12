@@ -558,6 +558,9 @@ export default class VirtualDatabase implements Database {
   }
 }
 
+/** Incremented number to make new temporary primary keys ordered */
+let tempPrimaryKeyCounter = 0
+
 class VirtualDatabaseTransaction implements Transaction {
   virtualDatabase: VirtualDatabase
 
@@ -570,8 +573,9 @@ class VirtualDatabaseTransaction implements Transaction {
   }
 
   addRow(table: string, values: { [column: string]: any }) {
-    // Use a pattern for easy replacement
-    const primaryKey = `pk_${uuid().replace(/-/g, "")}_temp`
+    // Use a pattern for easy replacement. Order by primary key
+    const primaryKey = `pk_${tempPrimaryKeyCounter.toString().padStart(6, "0")}${uuid().replace(/-/g, "")}_temp`
+    tempPrimaryKeyCounter += 1  
 
     // Save temporary primary key
     this.virtualDatabase.tempPrimaryKeys.push(primaryKey)
