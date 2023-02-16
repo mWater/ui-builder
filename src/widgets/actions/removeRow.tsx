@@ -25,9 +25,14 @@ export class RemoveRowAction extends Action<RemoveRowActionDef> {
       return
     }
 
-    const txn = instanceCtx.database.transaction()
-    await txn.removeRow(table, id)
-    await txn.commit()
+    try {
+      const txn = instanceCtx.database.transaction()
+      await txn.removeRow(table, id)
+      await txn.commit()
+    } catch (err) {
+      // TODO localize
+      alert("Error deleting row: " + err.message)
+    }
   }
 
   validate(designCtx: DesignCtx) {
