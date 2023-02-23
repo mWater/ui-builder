@@ -80,7 +80,10 @@ export default class ContextVarInjector extends React.Component<Props, State> {
       !_.isEqual(prevState.filters, this.state.filters) ||
       !_.isEqual(getFilteredContextVarValues(this.createInnerProps()), this.state.filteredContextVarValues)
     ) {
-      this.performQueries()
+      // Ensure filters are loaded
+      if (this.state.filters) {
+        this.performQueries()
+      }
     }
   }
 
