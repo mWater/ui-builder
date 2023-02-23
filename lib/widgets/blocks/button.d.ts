@@ -15,7 +15,7 @@ export interface ButtonBlockDef extends BlockDef {
     /** plainlink is a plain link without padding */
     style: "default" | "primary" | "link" | "plainlink";
     size: "normal" | "small" | "large" | "extrasmall";
-    icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download" | "info-circle" | "link" | "external-link" | "search" | "question-circle" | "folder-open" | "refresh" | "arrow-right";
+    icon?: "plus" | "times" | "pencil" | "print" | "upload" | "download" | "info-circle" | "link" | "external-link" | "search" | "question-circle" | "folder-open" | "refresh" | "arrow-right" | "check";
     /** True to make block-style button */
     block?: boolean;
     /** If present, message to display when confirming action */

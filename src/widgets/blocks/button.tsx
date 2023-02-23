@@ -44,6 +44,7 @@ export interface ButtonBlockDef extends BlockDef {
     | "folder-open"
     | "refresh"
     | "arrow-right"
+    | "check"
 
   /** True to make block-style button */
   block?: boolean
@@ -178,7 +179,8 @@ export class ButtonBlock extends LeafBlock<ButtonBlockDef> {
                   { value: "question-circle", label: "Help" },
                   { value: "folder-open", label: "Open" },
                   { value: "refresh", label: "Refresh" },
-                  { value: "arrow-right", label: "Right Arrow" }
+                  { value: "arrow-right", label: "Right Arrow" },
+                  { value: "check", label: "Check" }
                 ]}
               />
             )}
