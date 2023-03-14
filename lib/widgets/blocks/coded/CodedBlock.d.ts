@@ -4,7 +4,7 @@ import { CodedExpr } from "./CodedExpr";
 import { CodedQuery } from "./CodedQuery";
 import { CodedLocalizedString } from "./CodedLocalizedString";
 import { CodedAction } from "./CodedAction";
-import { BlockDef, ContextVar, DesignCtx, InstanceCtx } from "../../..";
+import { BlockDef, ContextVar, DesignCtx, InstanceCtx, Filter } from "../../..";
 import LeafBlock from "../../LeafBlock";
 /** Register an extra package id that can be imported using "import" inside a coded
  * block. Importer should return imported module e.g. return import("lodash")
@@ -14,6 +14,13 @@ export declare function registerExtraCodedPackage(packageId: string, importer: (
 export declare function registerExtraProp(propId: string, value: any): void;
 /** Block that contains a coded component.
  * It can define expressions that will be present as props.
+ * It can define queries that will be present as props.
+ * It can define localized strings that will be present as props.
+ * It can define actions that will be present as props.
+ *
+ * It can define a design component that will be used in the designer (optional, export DesignComp)
+ * It can define an instance component that will be used in the viewer (required, export InstanceComp)
+ * It can define initial filters that will be applied to the context variables (export getInitialFilters)
  */
 export interface CodedBlockDef extends BlockDef {
     type: "coded";
@@ -33,6 +40,7 @@ export interface CodedBlockDef extends BlockDef {
 export default class CodedBlock extends LeafBlock<CodedBlockDef> {
     constructor(blockDef: CodedBlockDef);
     getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[];
+    getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]>;
     renderDesign(ctx: DesignCtx): JSX.Element;
     renderInstance(ctx: InstanceCtx): JSX.Element;
     renderEditor(ctx: DesignCtx): JSX.Element;

@@ -6,7 +6,7 @@ import { CodedExpr, CodedExprsEditor } from "./CodedExpr"
 import { CodedQuery, CodedQueriesEditor, validateCodedQuery } from "./CodedQuery"
 import { CodedLocalizedString, CodedLocalizedStringsEditor } from "./CodedLocalizedString"
 import { CodedAction, CodedActionsEditor } from "./CodedAction"
-import { BlockDef, ContextVar, DesignCtx, InstanceCtx, LabeledProperty, PropertyEditor, validateContextVarExpr, QueryOptions, getFilteredContextVarValues } from "../../.."
+import { BlockDef, ContextVar, DesignCtx, InstanceCtx, LabeledProperty, PropertyEditor, validateContextVarExpr, QueryOptions, getFilteredContextVarValues, Filter } from "../../.."
 import ErrorBoundary from "../../../designer/ErrorBoundary"
 import LeafBlock from "../../LeafBlock"
 
@@ -32,6 +32,13 @@ export function registerExtraProp(propId: string, value: any) {
 
 /** Block that contains a coded component.
  * It can define expressions that will be present as props.
+ * It can define queries that will be present as props.
+ * It can define localized strings that will be present as props.
+ * It can define actions that will be present as props.
+ * 
+ * It can define a design component that will be used in the designer (optional, export DesignComp)
+ * It can define an instance component that will be used in the viewer (required, export InstanceComp)
+ * It can define initial filters that will be applied to the context variables (export getInitialFilters)
  */
 export interface CodedBlockDef extends BlockDef {
   type: "coded"
@@ -97,6 +104,14 @@ export default class CodedBlock extends LeafBlock<CodedBlockDef> {
 
   getContextVarExprs(contextVar: ContextVar, ctx: DesignCtx | InstanceCtx): Expr[] {
     return this.blockDef.codedExprs.filter((ce) => ce.contextVarId == contextVar.id).map((ce) => ce.expr)
+  }
+
+  async getInitialFilters(contextVarId: string, instanceCtx: InstanceCtx): Promise<Filter[]> {
+    const mod = await evaluateModule(this.blockDef.compiledCode)
+    if (mod.getInitialFilters) {
+      return mod.getInitialFilters(contextVarId, instanceCtx)
+    }
+    return []
   }
 
   renderDesign(ctx: DesignCtx) {
