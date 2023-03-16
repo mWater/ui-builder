@@ -9,6 +9,9 @@ import { CodedAction, CodedActionsEditor } from "./CodedAction"
 import { BlockDef, ContextVar, DesignCtx, InstanceCtx, LabeledProperty, PropertyEditor, validateContextVarExpr, QueryOptions, getFilteredContextVarValues, Filter } from "../../.."
 import ErrorBoundary from "../../../designer/ErrorBoundary"
 import LeafBlock from "../../LeafBlock"
+import _ from "lodash"
+import FillDownwardComponent from "react-library/lib/FillDownwardComponent"
+import { Toggle } from "react-library/lib/bootstrap"
 
 /** Extra packages that can be imported inside a coded block. By default, only
  * includes react.
@@ -46,8 +49,11 @@ export interface CodedBlockDef extends BlockDef {
   /** JSX + ES6 code. Should export InstanceComp and optionally DesignComp as React components. */
   code: string
 
-  /** ES5 compiled version of code */
+  /** ES5 compiled version of code. Empty if invalid or not compiled */
   compiledCode: string
+
+  /** Edit mode. Default is modal */
+  editMode?: "modal" | "inline"
 
   /** Expressions that are made available as props */
   codedExprs: CodedExpr[]
@@ -115,7 +121,14 @@ export default class CodedBlock extends LeafBlock<CodedBlockDef> {
   }
 
   renderDesign(ctx: DesignCtx) {
-    return <CodedBlockDesign blockDef={this.blockDef} designCtx={ctx} />
+    if (this.blockDef.editMode == "inline") {
+      return <CodedBlockEditInline
+        blockDef={this.blockDef}
+        ctx={ctx}
+      />
+    } else {
+      return <CodedBlockDesign blockDef={this.blockDef} designCtx={ctx} />
+    }
   }
 
   renderInstance(ctx: InstanceCtx) {
@@ -125,7 +138,20 @@ export default class CodedBlock extends LeafBlock<CodedBlockDef> {
   renderEditor(ctx: DesignCtx) {
     return (
       <div>
-        <CodedBlockCodeEditor blockDef={this.blockDef} ctx={ctx} />
+        <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="editMode">
+          {(value, onChange) => (
+            <Toggle
+              value={value || "modal"}
+              options={[
+                { value: "modal", label: "Modal" },
+                { value: "inline", label: "Inline" }
+              ]}
+              onChange={onChange}
+              size="sm"
+            />
+          )}
+        </PropertyEditor>
+        { (this.blockDef.editMode || "modal") == "modal" &&  <CodedBlockEditor blockDef={this.blockDef} ctx={ctx} /> }
         <br />
         <LabeledProperty label="Expressions" key="exprs">
           <PropertyEditor obj={this.blockDef} onChange={ctx.store.replaceBlock} property="codedExprs">
@@ -333,11 +359,15 @@ function CodedBlockDesign(props: { blockDef: CodedBlockDef; designCtx: DesignCtx
   return <div style={{ border: "solid 1px #DDD", padding: 5 }}>Coded Block</div>
 }
 
-const CodedBlockCodeEditor = (props: { blockDef: CodedBlockDef; ctx: DesignCtx }) => {
+/** Button with modal editor */
+function CodedBlockEditor(props: { 
+  blockDef: CodedBlockDef
+  ctx: DesignCtx
+} ) {
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
-    <div>
+    <div className="mt-2">
       {modalOpen ? (
         <CodedBlockEditModal blockDef={props.blockDef} ctx={props.ctx} onClose={() => setModalOpen(false)} />
       ) : null}
@@ -348,20 +378,132 @@ const CodedBlockCodeEditor = (props: { blockDef: CodedBlockDef; ctx: DesignCtx }
   )
 }
 
-const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; onClose: () => void }) => {
+/** Modal that compiles on close */
+function CodedBlockEditModal(props: { blockDef: CodedBlockDef; ctx: DesignCtx; onClose: () => void} ) {
   const [code, setCode] = useState<string>(props.blockDef.code)
   const [babel, setBabel] = useState<any>()
+
+  useEffect(() => {
+    window.React = React
+    loadScript("https://cdn.jsdelivr.net/npm/@babel/standalone@7.19.3/babel.js").then(() => {
+      setBabel(window["Babel"])
+    })
+  }, [])
+
+  const handleChange = (value: string) => {
+    setCode(value)
+  }
+
+  const handleSave = () => {
+    try {
+      const compiled = babel.transform(code, { plugins: ["transform-modules-commonjs", "transform-react-jsx"] }).code
+      //console.log(compiled)
+      props.ctx.store.alterBlock(
+        props.blockDef.id,
+        produce((b: CodedBlockDef) => {
+          b.code = code
+          b.compiledCode = compiled
+        }) as (blockDef: BlockDef) => BlockDef | null
+      )
+
+      props.onClose()
+    } catch (err: any) {
+      alert(err.message)
+      return
+    }
+  }
+
+  return (
+    <ModalWindowComponent isOpen={true} onRequestClose={handleSave}>
+      {babel != null &&
+        <CodedBlockCodeEditor
+          code={code}
+          ctx={props.ctx}
+          onCodeChange={handleChange} />}
+    </ModalWindowComponent>
+  )
+}
+
+/** Inline editor of a coded block */
+function CodedBlockEditInline(props: { 
+  blockDef: CodedBlockDef
+  ctx: DesignCtx
+} ) {
+  const [code, setCode] = useState<string>(props.blockDef.code)
+  const [babel, setBabel] = useState<any>()
+  const [error, setError] = useState<string>()
+
+  useEffect(() => {
+    window.React = React
+    loadScript("https://cdn.jsdelivr.net/npm/@babel/standalone@7.19.3/babel.js").then(() => {
+      setBabel(window["Babel"])
+    })
+  }, [])
+
+  // Throttled callback to save and compile code
+  const saveBlock = useMemo(() => {
+    function saveBlockInner(code: string) {
+      try {
+        const compiled = babel.transform(code, { plugins: ["transform-modules-commonjs", "transform-react-jsx"] }).code
+
+        props.ctx.store.alterBlock(
+          props.blockDef.id,
+          produce((b: CodedBlockDef) => {
+            b.code = code
+            b.compiledCode = compiled
+          }) as (blockDef: BlockDef) => BlockDef | null
+        )
+        setError(undefined)
+      } catch (err: any) {
+        props.ctx.store.alterBlock(
+          props.blockDef.id,
+          produce((b: CodedBlockDef) => {
+            b.code = code
+            b.compiledCode = ""
+          }) as (blockDef: BlockDef) => BlockDef | null
+        )
+        setError(err.message)
+      }
+    }
+
+    return _.debounce(saveBlockInner, 1000, { leading: false, trailing: true })
+  }, [babel])
+
+  const handleChange = (value: string) => {
+    setCode(value)
+    saveBlock(value)
+  }
+
+  if (babel == null) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <div style={{ marginBottom: 10 }}>
+      {error ? <div className="text-danger">{error}</div> : <div>&nbsp;</div>}
+      <FillDownwardComponent>
+        <CodedBlockCodeEditor
+          code={code}
+          ctx={props.ctx}
+          onCodeChange={handleChange} />
+      </FillDownwardComponent>
+    </div>
+  )
+}
+
+function CodedBlockCodeEditor(props: {
+  code: string
+  ctx: DesignCtx
+  onCodeChange: (code: string) => void
+}) {
   const [Monaco, setMonaco] = useState<any>()
 
   useEffect(() => {
     window.React = React
-    loadScript("https://unpkg.com/prop-types@15.7.2/prop-types.js").then(() => {
-      loadScript("https://unpkg.com/@monaco-editor/loader@1.3.2/lib/umd/monaco-loader.min.js").then(() => {
-        loadScript("https://unpkg.com/@monaco-editor/react@4.4.5/lib/umd/monaco-react.js").then(() => {
-          loadScript("https://unpkg.com/@babel/standalone@7.19.3/babel.js").then(() => {
-            setMonaco(window["monaco_react"].default)
-            setBabel(window["Babel"])
-          })
+    loadScript("https://cdn.jsdelivr.net/npm/prop-types@15.7.2/prop-types.js").then(() => {
+      loadScript("https://cdn.jsdelivr.net/npm/@monaco-editor/loader@1.3.2/lib/umd/monaco-loader.min.js").then(() => {
+        loadScript("https://cdn.jsdelivr.net/npm/@monaco-editor/react@4.4.5/lib/umd/monaco-react.js").then(() => {
+          setMonaco(window["monaco_react"].default)
         })
       })
     })
@@ -435,42 +577,19 @@ const CodedBlockEditModal = (props: { blockDef: CodedBlockDef; ctx: DesignCtx; o
   )
 
   const handleChange = (value: string) => {
-    setCode(value)
-  }
-
-  const handleSave = () => {
-    try {
-      const compiled = babel.transform(code, { plugins: ["transform-modules-commonjs", "transform-react-jsx"] }).code
-      //console.log(compiled)
-
-      props.ctx.store.alterBlock(
-        props.blockDef.id,
-        produce((b: CodedBlockDef) => {
-          b.code = code
-          b.compiledCode = compiled
-        }) as (blockDef: BlockDef) => BlockDef | null
-      )
-
-      props.onClose()
-    } catch (err: any) {
-      alert(err.message)
-      return
-    }
+    props.onCodeChange(value)
   }
 
   return (
-    <ModalWindowComponent isOpen={true} onRequestClose={handleSave}>
-      {Monaco && babel ? (
-        <Monaco
-          language="javascript"
-          height="100%"
-          onChange={handleChange}
-          theme="vs-dark"
-          value={code}
-          options={monacoOptions as any}
-        />
-      ) : null}
-    </ModalWindowComponent>
+    Monaco ? (
+      <Monaco
+        language="javascript"
+        height="100%"
+        onChange={handleChange}
+        theme="vs-dark"
+        value={props.code}
+        options={monacoOptions as any} />
+    ) : null
   )
 }
 

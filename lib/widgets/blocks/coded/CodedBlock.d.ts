@@ -26,8 +26,10 @@ export interface CodedBlockDef extends BlockDef {
     type: "coded";
     /** JSX + ES6 code. Should export InstanceComp and optionally DesignComp as React components. */
     code: string;
-    /** ES5 compiled version of code */
+    /** ES5 compiled version of code. Empty if invalid or not compiled */
     compiledCode: string;
+    /** Edit mode. Default is modal */
+    editMode?: "modal" | "inline";
     /** Expressions that are made available as props */
     codedExprs: CodedExpr[];
     /** Queries that are made available as props */
