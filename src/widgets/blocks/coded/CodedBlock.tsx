@@ -529,7 +529,7 @@ function CodedBlockCodeEditor(props: {
       folding: false,
       foldingStrategy: "auto",
       fontLigatures: false,
-      fontSize: "14px",
+      fontSize: "12px",
       formatOnPaste: false,
       formatOnType: false,
       hideCursorInOverviewRuler: false,
