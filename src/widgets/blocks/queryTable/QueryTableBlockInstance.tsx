@@ -312,7 +312,7 @@ export default class QueryTableBlockInstance extends React.Component<Props, Stat
       return (
         <tr key="error">
           <td key="error" colSpan={this.props.block.blockDef.contents.length}>
-            <div className="alert alert-danger">Error loading data</div>
+            <div className="alert alert-danger">Error loading data: {this.state.error.message}</div>
           </td>
         </tr>
       )

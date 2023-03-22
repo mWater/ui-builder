@@ -384,7 +384,7 @@ export default class ContextVarInjector extends React.Component<Props, State> {
   render() {
     if (this.state.error) {
       // TODO localize
-      return <div className="alert alert-danger">Error loading data</div>
+      return <div className="alert alert-danger">Error loading data: {this.state.error.message}</div>
     }
     if (!this.state.filters) {
       return <div><i className="fas fa-spinner fa-spin"/></div>

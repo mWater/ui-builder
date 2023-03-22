@@ -224,7 +224,7 @@ export default class QueryRepeatBlockInstance extends React.Component<Props, Sta
   renderRows() {
     if (this.state.error) {
       // TODO localize
-      return <div className="alert alert-danger">Error loading data</div>
+      return <div className="alert alert-danger">Error loading data: {this.state.error.message}</div>
     }
 
     if (!this.state.rows) {

@@ -268,7 +268,7 @@ const RowInstance = (props: { blockDef: RowBlockDef; instanceProps: InstanceCtx;
   const database = instanceProps.database
   const table = contextVar.table!
 
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<Error | null>(null)
   const [loading, setLoading] = useState(true)
   const [id, setId] = useState<string | null>()
 
@@ -323,7 +323,7 @@ const RowInstance = (props: { blockDef: RowBlockDef; instanceProps: InstanceCtx;
   }
 
   if (error) {
-    return <div className="alert alert-danger">Error loading results</div>
+    return <div className="alert alert-danger">Error loading results: {error.message}</div>
   }
 
   // Inject context variable
