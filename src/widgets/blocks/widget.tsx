@@ -1,8 +1,8 @@
 import * as React from "react"
 import * as _ from "lodash"
 import LeafBlock from "../LeafBlock"
-import { BlockDef, NullBlockStore, Filter, ContextVar } from "../blocks"
-import { Expr } from "mwater-expressions"
+import { BlockDef, NullBlockStore, Filter, ContextVar, createExprVariables, createExprVariableValues } from "../blocks"
+import { Expr, PromiseExprEvaluator } from "mwater-expressions"
 import BlockPlaceholder from "../BlockPlaceholder"
 import { LabeledProperty, ContextVarPropertyEditor } from "../propertyEditors"
 import { Select } from "react-library/lib/bootstrap"
@@ -211,7 +211,17 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
         ...instanceCtx,
         contextVars: innerContextVars,
         contextVarValues: innerContextVarValues,
-        getContextVarExprValue: (contextVarId: string, expr: Expr) => {
+        getContextVarExprValue: (contextVarId: string | null, expr: Expr) => {
+          // If no context variable, evaluate expression
+          if (contextVarId == null) {
+            return new PromiseExprEvaluator({
+              schema: instanceCtx.schema,
+              locale: instanceCtx.locale,
+              variables: createExprVariables(innerContextVars),
+              variableValues: createExprVariableValues(innerContextVars, innerContextVarValues)
+            }).evaluateSync(expr)
+          }
+
           // Lookup outer id
           const outerContextVarId = this.blockDef.contextVarMap[contextVarId]
           if (outerContextVarId) {
