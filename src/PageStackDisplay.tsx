@@ -133,6 +133,11 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     return true
   }
 
+  /** Gets the page stack. Last item is top page */
+  getPageStack(): Page[] {
+    return this.state.pages
+  }
+
   renderChildBlock = (instanceCtx: InstanceCtx, childBlockDef: BlockDef | null) => {
     // Create block
     if (childBlockDef) {

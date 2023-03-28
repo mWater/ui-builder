@@ -38,6 +38,8 @@ export declare class PageStackDisplay extends React.Component<Props, State> impl
     closeAllPages(): Promise<boolean>;
     /** Validates a single page (by pageIndex), showing an error if fails */
     validatePage(pageIndex: number): Promise<boolean>;
+    /** Gets the page stack. Last item is top page */
+    getPageStack(): Page[];
     renderChildBlock: (instanceCtx: InstanceCtx, childBlockDef: BlockDef | null) => React.ReactElement<any, string | React.JSXElementConstructor<any>> | null;
     handleClose: () => void;
     /** Stores the registration for validation of a child block and returns an unregister function */
