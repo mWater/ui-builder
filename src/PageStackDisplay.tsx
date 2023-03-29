@@ -1,5 +1,5 @@
 import _ from "lodash"
-import React from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Page, PageStack } from "./PageStack"
 import { BlockDef } from "./widgets/blocks"
 import ContextVarsInjector from "./widgets/ContextVarsInjector"
@@ -8,6 +8,10 @@ import { BaseCtx, InstanceCtx } from "./contexts"
 import uuid from "uuid"
 
 import "./PageStackDisplay.css"
+import { WidgetDef } from "./widgets/widgets"
+import { localizeString } from "mwater-expressions"
+import { formatEmbeddedExprString } from "./embeddedExprs"
+import { evalContextVarExpr } from "./widgets/evalContextVarExpr"
 
 interface Props {
   baseCtx: BaseCtx
@@ -165,23 +169,61 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
     }
   }
 
-  renderPageContents(page: Page, pageIndex: number) {
-    // Lookup widget
-    const widgetDef = this.props.baseCtx.widgetLibrary.widgets[page.widgetId!]
-
-    if (!widgetDef) {
-      return <div className="alert alert-danger">Widget not found</div>
+  renderPage(page: Page, index: number) {
+    // Determine if invisible (behind a normal page)
+    let invisible = false
+    for (let i = index + 1; i < this.state.pages.length; i++) {
+      if (this.state.pages[i].type === "normal") {
+        invisible = true
+      }
     }
 
-    // Case of empty widget
-    if (!widgetDef.blockDef) {
-      return null
-    }
+    return <SinglePage
+      key={index}
+      page={page}
+      index={index}
+      invisible={invisible}
+      baseCtx={this.props.baseCtx}
+      pageStack={this.props.overridePageStack || this}
+      registerChildForValidation={this.registerChildForValidation}
+      handleClose={this.handleClose}
+    />
+  }
 
-    // Create outer instanceCtx. Context variables will be injected after
-    const outerInstanceCtx: InstanceCtx = {
-      ...this.props.baseCtx,
-      pageStack: this.props.overridePageStack || this,
+  render() {
+    return this.state.pages.map((page, index) => this.renderPage(page, index))
+  }
+}
+
+/** Displays a single page of a page stack. Calculates the title appropriately */
+function SinglePage(props: { 
+  page: Page
+  index: number
+  baseCtx: BaseCtx
+  pageStack: PageStack
+  handleClose: () => void
+  registerChildForValidation: (pageIndex: number, validate: () => string | null) => (() => void)
+  invisible: boolean
+}) {
+  const { page, index, handleClose, baseCtx, pageStack, invisible, registerChildForValidation } = props
+
+  // Lookup widget
+  const widgetDef = baseCtx.widgetLibrary.widgets[page.widgetId!]
+
+  function renderChildBlock(instanceCtx: InstanceCtx, childBlockDef: BlockDef | null) {
+    // Create block
+    if (childBlockDef) {
+      const block = instanceCtx.createBlock(childBlockDef)
+      return block.renderInstance(instanceCtx)
+    }
+    return null
+  }
+
+  // Create outer instanceCtx. Context variables will be injected after
+  const outerInstanceCtx = useMemo(() => {
+    return {
+      ...baseCtx,
+      pageStack: pageStack,
       contextVars: [],
       contextVarValues: {},
       getContextVarExprValue: () => {
@@ -196,11 +238,21 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
       getFilters: () => {
         throw new Error("Non-existant context variable")
       },
-      renderChildBlock: this.renderChildBlock,
-      registerForValidation: this.registerChildForValidation.bind(null, pageIndex)
+      renderChildBlock: renderChildBlock,
+      registerForValidation: registerChildForValidation.bind(null, index)
+    }
+  }, [])
+
+  // Get title if specified in the widget definition
+  const title = useTitle(widgetDef, page, outerInstanceCtx)
+
+  function renderPageContents() {
+    // Case of empty widget
+    if (!widgetDef.blockDef) {
+      return null
     }
 
-    const injectedContextVars = (this.props.baseCtx.globalContextVars || [])
+    const injectedContextVars = (baseCtx.globalContextVars || [])
       .concat(widgetDef.contextVars)
       .concat(widgetDef.privateContextVars || [])
 
@@ -230,65 +282,117 @@ export class PageStackDisplay extends React.Component<Props, State> implements P
               </div>
             )
           }
-          return this.renderChildBlock(innerInstanceCtx, widgetDef.blockDef)
+          return renderChildBlock(innerInstanceCtx, widgetDef.blockDef)
         }}
       </ContextVarsInjector>
     )
   }
 
-  renderPage(page: Page, index: number) {
-    // Determine if invisible (behind a normal page)
-    let invisible = false
-    for (let i = index + 1; i < this.state.pages.length; i++) {
-      if (this.state.pages[i].type === "normal") {
-        invisible = true
-      }
-    }
-
-    // Lookup widget
-    const widgetDef = this.props.baseCtx.widgetLibrary.widgets[page.widgetId!]
-    if (!widgetDef) {
-      return null
-    }
-
-    const contents = this.renderPageContents(page, index)
-
-    switch (page.type) {
-      case "normal":
-        return (
-          <div style={{ display: invisible ? "none" : "block" }} key={index} className={`page-${page.widgetId}`}>
-            <NormalPage
-              isFirst={index === 0}
-              onClose={this.handleClose}
-              key={index}
-              title={page.title}
-              pageMargins={widgetDef.pageMargins || "normal"}
-            >
-              {contents}
-            </NormalPage>
-          </div>
-        )
-      case "modal":
-        return (
-          <div style={{ display: invisible ? "none" : "block" }} key={index} className={`page-${page.widgetId}`}>
-            <ModalPage onClose={this.handleClose} key={index} title={page.title} size={page.modalSize || "normal"}>
-              {contents}
-            </ModalPage>
-          </div>
-        )
-      case "inline":
-        return (
-          <div style={{ display: invisible ? "none" : "block" }} key={index}>
-            {contents}
-          </div>
-        )
-    }
+  if (!widgetDef) {
+    return <div className="alert alert-danger">Widget not found</div>
   }
 
-  render() {
-    return this.state.pages.map((page, index) => this.renderPage(page, index))
+  const contents = renderPageContents()
+
+  switch (page.type) {
+    case "normal":
+      return (
+        <div style={{ display: invisible ? "none" : "block" }} key={index} className={`page-${page.widgetId}`}>
+          <NormalPage
+            isFirst={index === 0}
+            onClose={handleClose}
+            key={index}
+            title={title}
+            pageMargins={widgetDef.pageMargins || "normal"}
+          >
+            {contents}
+          </NormalPage>
+        </div>
+      )
+    case "modal":
+      return (
+        <div style={{ display: invisible ? "none" : "block" }} key={index} className={`page-${page.widgetId}`}>
+          <ModalPage onClose={handleClose} key={index} title={title} size={page.modalSize || "normal"}>
+            {contents}
+          </ModalPage>
+        </div>
+      )
+    case "inline":
+      return (
+        <div style={{ display: invisible ? "none" : "block" }} key={index}>
+          {contents}
+        </div>
+      )
   }
 }
+
+/**
+ * 
+ * @param widgetDef Definition of widget
+ * @param page Page
+ * @param instanceCtx Instance context (without context variables)
+ */
+function useTitle(widgetDef: WidgetDef, page: Page, instanceCtx: InstanceCtx) {
+  // Determine the title
+  const [title, setTitle] = useState<string | undefined>(page.title)
+
+  const contextVars = (instanceCtx.globalContextVars || []).concat(widgetDef.contextVars)
+
+  async function determineTitle() {
+    // Localize string
+    const titleTemplate = localizeString(widgetDef.title, instanceCtx.locale)
+
+    if (titleTemplate == null) {
+      setTitle(undefined)
+      return
+    }
+
+    // Temporarily set title with {0}, {1}, etc. for embedded expressions to be replaced
+    // by "..."
+    setTitle(titleTemplate.replace(/\{(\d+)\}/g, "..."))
+
+    // Get any embedded expression values
+    const exprValues: any[] = []
+    for (const ee of widgetDef.titleEmbeddedExprs || []) {
+      const contextVar = ee.contextVarId ? contextVars.find((cv) => cv.id == ee.contextVarId)! : null
+      exprValues.push(
+        await evalContextVarExpr({
+          contextVar,
+          contextVarValue: contextVar ? page.contextVarValues[contextVar.id] : null,
+          ctx: instanceCtx,
+          expr: ee.expr
+        })
+      )
+    }
+
+    // Format and replace
+    const formattedTitle = formatEmbeddedExprString({
+      text: titleTemplate,
+      embeddedExprs: widgetDef.titleEmbeddedExprs || [],
+      exprValues: exprValues,
+      schema: instanceCtx.schema,
+      contextVars: instanceCtx.contextVars,
+      locale: instanceCtx.locale,
+      formatLocale: instanceCtx.formatLocale
+    })
+
+    setTitle(formattedTitle)
+  }
+
+  // If title is not specified, use widgetDef.title
+  useEffect(() => {
+    if (page.title) {
+      return
+    }
+
+    determineTitle().catch((err) => {
+      console.error(err)
+    })
+  }, [page.title])
+
+  return title
+}
+
 
 /** Displays a page that is not a modal. Shows the title if present.
  * If the title is present and is not the first page, it may show a back

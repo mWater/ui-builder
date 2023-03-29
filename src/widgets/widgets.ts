@@ -1,5 +1,7 @@
+import { LocalizedString } from "mwater-expressions"
 import { BaseCtx, DesignCtx } from "../contexts"
 import { validateContextVarValue } from "../contextVarValues"
+import { EmbeddedExpr, validateEmbeddedExprs } from "../embeddedExprs"
 import { BlockDef, ContextVar, getBlockTree, NullBlockStore } from "./blocks"
 
 /** Widget is named and has a single block with a set of context variables specific to this widget */
@@ -36,6 +38,12 @@ export interface WidgetDef {
 
   /** Size of margins when displaying widget in page. Default is "normal" */
   pageMargins?: "normal" | "none"
+
+  /** Title of the page (unless overridden by opening page) */
+  title?: LocalizedString | null
+
+  /** Expression embedded in the text string. Referenced by {0}, {1}, etc. */
+  titleEmbeddedExprs?: EmbeddedExpr[]
 }
 
 export type LookupWidget = (id: string) => WidgetDef | null
@@ -73,6 +81,16 @@ export function validateWidget(widgetDef: WidgetDef, ctx: BaseCtx, includeChildr
     if (error) {
       return error
     }
+  }
+
+  // Validate title expressions
+  const err = validateEmbeddedExprs({
+    embeddedExprs: widgetDef.titleEmbeddedExprs || [],
+    schema: ctx.schema,
+    contextVars: globalContextVars.concat(widgetDef.contextVars)
+  })
+  if (err) {
+    return err
   }
 
   if (includeChildren) {

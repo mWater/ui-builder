@@ -1,6 +1,6 @@
 import * as React from "react"
 import { v4 as uuid } from "uuid"
-import { LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, TableSelect } from "../widgets/propertyEditors"
+import { EmbeddedExprsEditor, LabeledProperty, LocalizedTextPropertyEditor, PropertyEditor, TableSelect } from "../widgets/propertyEditors"
 import { validateWidget, WidgetDef } from "../widgets/widgets"
 import { ContextVar } from "../widgets/blocks"
 import { Schema, DataSource, EnumValue } from "mwater-expressions"
@@ -10,6 +10,7 @@ import { TextInput, Select, Checkbox, Toggle } from "react-library/lib/bootstrap
 import { ListEditorComponent } from "react-library/lib/ListEditorComponent"
 import { DesignCtx } from "../contexts"
 import { ContextVarValueEditor, validateContextVarValue } from "../contextVarValues"
+import { EmbeddedExpr } from "../embeddedExprs"
 
 interface WidgetEditorProps {
   designCtx: DesignCtx
@@ -144,6 +145,28 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             )}
           </PropertyEditor>
         </LabeledProperty>
+        <LabeledProperty label="Page Title" hint="If present, will add a title at top with a back button if applicable. Can be overridden with open page action.">
+          <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="title">
+            {(value, onChange) => (
+              <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={this.props.designCtx.locale} />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+        
+        <LabeledProperty label="Page Title embedded expressions" help="Reference in text as {0}, {1}, etc.">
+          <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="titleEmbeddedExprs">
+            {(value: EmbeddedExpr[] | null | undefined, onChange) => (
+              <EmbeddedExprsEditor
+                value={value}
+                onChange={onChange}
+                schema={this.props.designCtx.schema}
+                dataSource={this.props.designCtx.dataSource}
+                contextVars={allContextVars}
+              />
+            )}
+          </PropertyEditor>
+        </LabeledProperty>
+
         <LabeledProperty label="Widget ID" hint="Advanced">
           <input type="text" value={this.props.widgetDef.id} className="form-control form-control-sm" onFocus={ev => { ev.target.select() }}/>
         </LabeledProperty>
