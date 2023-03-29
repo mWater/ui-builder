@@ -22,3 +22,4 @@ export { localize } from "./widgets/localization";
 export { ContextVarExpr } from "./ContextVarExpr";
 export { evalContextVarExpr } from "./widgets/evalContextVarExpr";
 export { registerExtraCodedPackage, registerExtraProp } from "./widgets/blocks/coded/CodedBlock";
+export { HashHistoryPageStackDisplay } from "./HashHistoryPageStackDisplay";
