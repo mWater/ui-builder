@@ -134,7 +134,7 @@ export function HashHistoryPageStackDisplay(props: {
       // If modal or has changed database
       if (page.type == "modal" || page.database != baseCtx.database) {
         // Push to history to allow back to work, but don't change url
-        hashHistory.push(location.pathname + location.search + location.hash, { silent: true })
+        hashHistory.push(hashHistory.getLocation(), { silent: true })
       } else {
         // Convert to uri and silently push
         const uri = props.pageToLocation(page)
@@ -151,7 +151,7 @@ export function HashHistoryPageStackDisplay(props: {
       // If modal or has changed database
       if (page.type == "modal" || page.database != baseCtx.database) {
         // Push to history to allow back to work, but don't change url
-        hashHistory.replace(location.pathname + location.search + location.hash, { silent: true })
+        hashHistory.replace(hashHistory.getLocation(), { silent: true })
       } else {
         // Convert to uri and silently push
         const uri = props.pageToLocation(page)
