@@ -596,6 +596,34 @@ describe("select, order, limit", () => {
       expect(mockTransaction.addRow.mock.calls[1]).toEqual(["t2", { "2-1": "PKA" }])
     })
 
+    test("reorders in case of wrong topological order", async () => {
+      // Create changes
+      const txn = vdb.transaction()
+      const pk1 = await txn.addRow("t2", { })
+      const pk2 = await txn.addRow("t1", { number: 1 })
+      await txn.updateRow("t2", pk1, { "2-1": pk2 })
+      await txn.commit()
+
+      // Mock underlying transaction
+      const mockTransaction = {
+        addRow: jest.fn(),
+        updateRow: jest.fn(),
+        removeRow: jest.fn(),
+        commit: jest.fn()
+      }
+      ;(db.transaction as jest.Mock).mockReturnValue(mockTransaction)
+
+      // Mock return pks
+      mockTransaction.addRow.mockResolvedValueOnce("PKA")
+      mockTransaction.addRow.mockResolvedValueOnce("PKB")
+
+      // Commit to underlying database
+      await vdb.commit()
+
+      expect(mockTransaction.addRow.mock.calls[0]).toEqual(["t1", { number: 1 }])
+      expect(mockTransaction.addRow.mock.calls[1]).toEqual(["t2", { "2-1": "PKA" }])
+    })
+
     test("removes virtual rows locally", async () => {
       // Create changes
       const txn = vdb.transaction()

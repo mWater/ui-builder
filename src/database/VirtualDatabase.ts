@@ -170,10 +170,26 @@ export default class VirtualDatabase implements Database {
     // Apply mutations in one transaction
     const txn = this.database.transaction()
 
+    const remainingMutations = this.mutations.slice()
+
     // Store mapping from temp to real primary keys
     const pkMapping = {}
 
-    for (const mutation of this.mutations) {
+    // Limit number of mutations to prevent infinite loop
+    let loopCount = 0
+
+    while (remainingMutations.length > 0) {
+      const mutation = remainingMutations.shift()!
+
+      // Limit number of mutations to prevent infinite loop
+      loopCount += 1
+      if (loopCount > 1000000) {
+        throw new Error("Circular dependency in mutations")
+      }
+
+      // If depends on a temporary primary key not yet mapped, defer until later
+      let shouldDefer = false
+
       switch (mutation.type) {
         case "add":
           // Map any primary keys that are part of this virtual database to the real primary keys
@@ -185,8 +201,17 @@ export default class VirtualDatabase implements Database {
             if (pkMapping[pk]) {
               return pkMapping[pk]
             }
-            throw new Error("Missing mapping for " + pk)
+            else {
+              // Defer until later
+              shouldDefer = true
+              return pk
+            }
           })
+
+          if (shouldDefer) {
+            remainingMutations.push(mutation)
+            continue
+          }
 
           const primaryKey = await txn.addRow(mutation.table, mappedValues)
           pkMapping[mutation.primaryKey] = primaryKey
@@ -201,8 +226,17 @@ export default class VirtualDatabase implements Database {
             if (pkMapping[pk]) {
               return pkMapping[pk]
             }
-            throw new Error("Missing mapping for " + pk)
+            else {
+              // Defer until later
+              shouldDefer = true
+              return pk
+            }
           })
+          
+          if (shouldDefer) {
+            remainingMutations.push(mutation)
+            continue
+          }
 
           const updatePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
 
