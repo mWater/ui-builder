@@ -21,6 +21,6 @@ export declare class ColumnValuesEditor extends React.Component<{
         label: string;
         value: string;
     } | undefined) => void;
-    renderColumn(columnId: string): JSX.Element | null;
+    renderColumn(columnId: string): JSX.Element;
     render(): JSX.Element;
 }

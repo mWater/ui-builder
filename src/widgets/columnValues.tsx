@@ -52,7 +52,12 @@ export class ColumnValuesEditor extends React.Component<{
   renderColumn(columnId: string) {
     const column = this.props.schema.getColumn(this.props.table, columnId)
     if (!column) {
-      return null
+      return <tr key={columnId}>
+        <td colSpan={2}>{columnId} NOT FOUND</td>
+        <td key="remove">
+          <i className="fa fa-remove" onClick={this.handleRemove.bind(null, columnId)} />
+        </td>
+      </tr>
     }
     const contextVarExpr: ContextVarExpr = this.props.value[columnId]!
 
