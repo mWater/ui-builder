@@ -138,7 +138,7 @@ export class PanelBlock extends Block<PanelBlockDef> {
 const PanelComponent = (props: { main: React.ReactNode; header: React.ReactNode; footer: React.ReactNode }) => {
   return (
     <div className="card mb-3">
-      {props.header ? <div className="card-header">{props.header}</div> : null}
+      {props.header ? <div className="card-header ui-builder-card-header">{props.header}</div> : null}
       <div className="card-body">{props.main}</div>
       {props.footer ? <div className="card-footer">{props.footer}</div> : null}
     </div>
