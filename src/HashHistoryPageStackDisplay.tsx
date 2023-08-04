@@ -176,6 +176,9 @@ export function HashHistoryPageStackDisplay(props: {
       hashHistory.back({ silent: true })
       
       return result
+    },
+    getPageStack: () => {
+      return pageStackRef.current!.getPageStack()
     }
   }
 

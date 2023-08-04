@@ -28,4 +28,6 @@ export interface PageStack {
         pageCount: number;
         page: Page;
     }>;
+    /** Gets the page stack. Last item is top page */
+    getPageStack(): Page[];
 }

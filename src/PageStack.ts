@@ -31,4 +31,7 @@ export interface PageStack {
 
   /** Close top page. Returns whether successful and number of pages still open and page that was/would have closed */
   closePage(): Promise<{ success: boolean; pageCount: number, page: Page }>
+
+  /** Gets the page stack. Last item is top page */
+  getPageStack(): Page[]
 }
