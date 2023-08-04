@@ -61,6 +61,68 @@
   margin-bottom: 0;
 }
 
+.page-header-block h1,
+.page-header-block h2,
+.page-header-block h3,
+.page-header-block h4,
+.page-header-block h5 {
+  margin: 0;
+}
+
+.page-header-block {
+  border-bottom: 1px solid #ddd;
+}
+
+.page-header-block .back-button {
+  font-size: 24px;
+  padding-right: 10px;
+  color: #aaa;
+  cursor: pointer;
+}
+.page-header-block .back-button:hover {
+  color: var(--bs-primary);
+}
+
+/** Page header in design mode where it always shows a back arrow */
+.page-header-block-design {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+
+  margin-bottom: 15px;
+  padding: 10px 5px 10px 5px;
+}
+
+/* Tweak for design mode */
+.page-header-block-design .back-button {
+  margin-top: 4px;
+  padding-right: 5px;
+}
+.add-wizard-palette-item .page-header-block-design .back-button {
+  margin-top: 0px;
+}
+
+/** Page header in normal page mode where it only shows a back arrow if there is a previous page */
+.page-header-block-normal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+
+  margin: -15px -20px 15px -20px;
+  padding: 15px 20px 15px 20px;
+}
+
+/* Page header in modal page mode where it fits to modal header */
+.page-header-block-modal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+
+  margin: -16px -16px 10px -16px;
+  padding: 15px 15px 15px 16px;
+}
+
 @media screen {
   .page-break {
     border-bottom: dashed 1px #aaa;

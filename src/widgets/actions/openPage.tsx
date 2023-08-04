@@ -466,7 +466,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
 
         <LabeledProperty label="Variables">{renderContextVarValues()}</LabeledProperty>
 
-        <LabeledProperty label="Page Title">
+        <LabeledProperty label="Page Title" hint="Deprecated. Prefer Page Header widget">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="title">
             {(value, onChange) => (
               <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={props.locale} />
@@ -474,6 +474,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
           </PropertyEditor>
         </LabeledProperty>
 
+        {this.actionDef.title &&
         <LabeledProperty label="Page Title embedded expressions" help="Reference in text as {0}, {1}, etc.">
           <PropertyEditor obj={this.actionDef} onChange={onChange} property="titleEmbeddedExprs">
             {(value: EmbeddedExpr[] | null | undefined, onChange) => (
@@ -487,6 +488,7 @@ export class OpenPageAction extends Action<OpenPageActionDef> {
             )}
           </PropertyEditor>
         </LabeledProperty>
+        }
       </div>
     )
   }

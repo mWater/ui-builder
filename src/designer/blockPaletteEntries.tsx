@@ -40,6 +40,7 @@ import { ExpressionFilterBlockDef } from "../widgets/blocks/expressionFilter"
 import { VariableBlockDef } from "../widgets/blocks/variable"
 import { HtmlBlockDef } from "../widgets/blocks/html/HtmlBlock"
 import { CodedBlockDef } from "../widgets/blocks/coded/CodedBlock"
+import { PageHeaderBlockDef } from "../widgets/blocks/pageHeader"
 
 export interface BlockPaletteEntry {
   title: string
@@ -55,6 +56,20 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
     blockDef: { id: "", type: "text", text: { _base: "en", en: "" }, style: "div" } as TextBlockDef
   },
   {
+    title: "Page Header",
+    subtitle: "Special header for top of page",
+    blockDef: {
+      id: "",
+      type: "page-header",
+      child: {
+        type: "text",
+        id: "",
+        style: "h4",
+        text: { _base: "en", en: "Page Header" }
+      }
+    } as PageHeaderBlockDef
+  },
+  {
     title: "Header",
     blockDef: {
       id: "",
@@ -62,7 +77,7 @@ export const defaultBlockPaletteEntries: BlockPaletteEntry[] = [
       child: {
         type: "text",
         id: "",
-        style: "h4",
+        style: "h5",
         text: { _base: "en", en: "Header" }
       }
     } as HeaderBlockDef

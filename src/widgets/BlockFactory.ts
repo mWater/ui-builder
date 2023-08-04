@@ -41,6 +41,7 @@ import { ExpressionFilterBlock, ExpressionFilterBlockDef } from "./blocks/expres
 import { VariableBlock, VariableBlockDef } from "./blocks/variable"
 import HtmlBlock, { HtmlBlockDef } from "./blocks/html/HtmlBlock"
 import CodedBlock, { CodedBlockDef } from "./blocks/coded/CodedBlock"
+import { PageHeaderBlock, PageHeaderBlockDef } from "./blocks/pageHeader"
 
 export default class BlockFactory {
   customBlocks: { [type: string]: (blockDef: BlockDef) => Block<BlockDef> }
@@ -109,6 +110,8 @@ export default class BlockFactory {
         return new TOCBlock(blockDef as TOCBlockDef)
       case "header":
         return new HeaderBlock(blockDef as HeaderBlockDef)
+      case "page-header":
+        return new PageHeaderBlock(blockDef as PageHeaderBlockDef)
       case "alert":
         return new AlertBlock(blockDef as AlertBlockDef)
       case "validation":

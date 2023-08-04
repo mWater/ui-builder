@@ -451,7 +451,7 @@ class ModalPage extends React.Component<{
         onClose={this.props.onClose}
         size={size}
         header={this.props.title}
-        showCloseX={true}
+        showCloseX={!!this.props.title}
       >
         {this.props.children}
       </ModalPopupComponent>

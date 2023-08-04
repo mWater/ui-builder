@@ -145,7 +145,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             )}
           </PropertyEditor>
         </LabeledProperty>
-        <LabeledProperty label="Page Title" hint="If present, will add a title at top with a back button if applicable. Can be overridden with open page action.">
+        <LabeledProperty label="Page Title" hint="Deprecated: Prefer Page Header widget instead."  help="If present, will add a title at top with a back button if applicable. Can be overridden with open page action.">
           <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="title">
             {(value, onChange) => (
               <LocalizedTextPropertyEditor value={value} onChange={onChange} locale={this.props.designCtx.locale} />
@@ -153,6 +153,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           </PropertyEditor>
         </LabeledProperty>
         
+        { this.props.widgetDef.title && 
         <LabeledProperty label="Page Title embedded expressions" help="Reference in text as {0}, {1}, etc.">
           <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="titleEmbeddedExprs">
             {(value: EmbeddedExpr[] | null | undefined, onChange) => (
@@ -166,6 +167,7 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
             )}
           </PropertyEditor>
         </LabeledProperty>
+        }
 
         <LabeledProperty label="Widget ID" hint="Advanced">
           <input type="text" value={this.props.widgetDef.id} className="form-control form-control-sm" onFocus={ev => { ev.target.select() }}/>
