@@ -3,8 +3,3 @@
   color: var(--bs-primary);
   cursor: pointer;
 }
-
-/* Remove hN margins inside card headers */
-.ui-builder-card-header h1, .ui-builder-card-header h2, .ui-builder-card-header h3, .ui-builder-card-header h4, .ui-builder-card-header h5, .ui-builder-card-header h6 {
-  margin-bottom: 0;
-}
