@@ -71,7 +71,7 @@ export interface CodedBlockDef extends BlockDef {
 /** Evaluate a module which has been transpiled to commonjs */
 async function evaluateModule(code: string) {
   // Get all requires
-  const requires = [...code.matchAll(/[^a-zA-Z]require\([\'\"]([a-zA-Z0-9-]+)[\'\"]\)/g)].map((match) => match[1])
+  const requires = [...code.matchAll(/[^a-zA-Z]require\([\'\"]([a-zA-Z0-9-/]+)[\'\"]\)/g)].map((match) => match[1])
 
   // Import them all
   const importedModules: { [key: string]: any } = {}
