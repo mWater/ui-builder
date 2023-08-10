@@ -160,11 +160,14 @@ export default class VirtualDatabase implements Database {
   }
 
   /** Commit the changes that have been applied to this virtual database to the real underlying database and destroy the virtual database */
-  async commit(): Promise<void> {
+  async commit(): Promise<Mutation[]> {
+    // Keep record of mutations actually applied with real primary keys to return
+    const appliedMutations: Mutation[] = []
+
     if (this.mutations.length === 0) {
       this.destroyed = true
       this.database.removeChangeListener(this.handleChange)
-      return
+      return appliedMutations
     }
 
     // Apply mutations in one transaction
@@ -215,6 +218,7 @@ export default class VirtualDatabase implements Database {
 
           const primaryKey = await txn.addRow(mutation.table, mappedValues)
           pkMapping[mutation.primaryKey] = primaryKey
+          appliedMutations.push({ type: "add", primaryKey, table: mutation.table, values: mappedValues })
           break
         case "update":
           // Map any primary keys that are part of this virtual database to the real primary keys
@@ -241,11 +245,13 @@ export default class VirtualDatabase implements Database {
           const updatePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
 
           await txn.updateRow(mutation.table, updatePrimaryKey, mappedUpdates)
+          appliedMutations.push({ type: "update", table: mutation.table, primaryKey: updatePrimaryKey, updates: mappedUpdates })
           break
         case "remove":
           const removePrimaryKey = pkMapping[mutation.primaryKey] ? pkMapping[mutation.primaryKey] : mutation.primaryKey
 
           await txn.removeRow(mutation.table, removePrimaryKey)
+          appliedMutations.push({ type: "remove", table: mutation.table, primaryKey: removePrimaryKey })
           break
       }
     }
@@ -253,6 +259,8 @@ export default class VirtualDatabase implements Database {
     this.mutations = []
     this.destroyed = true
     this.database.removeChangeListener(this.handleChange)
+
+    return appliedMutations
   }
 
   /** Rollback any changes and destroy the virtual database */

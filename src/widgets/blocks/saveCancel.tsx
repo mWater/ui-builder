@@ -9,7 +9,6 @@ import {
   PropertyEditor,
   LabeledProperty,
   ContextVarPropertyEditor,
-  ContextVarAndExprPropertyEditor
 } from "../propertyEditors"
 import VirtualDatabase from "../../database/VirtualDatabase"
 import ContextVarsInjector from "../ContextVarsInjector"
