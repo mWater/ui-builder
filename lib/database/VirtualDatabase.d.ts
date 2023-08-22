@@ -42,7 +42,7 @@ export default class VirtualDatabase implements Database {
     transaction(): Transaction;
     refresh(): void;
     /** Commit the changes that have been applied to this virtual database to the real underlying database and destroy the virtual database */
-    commit(): Promise<void>;
+    commit(): Promise<Mutation[]>;
     /** Rollback any changes and destroy the virtual database */
     rollback(): void;
     /** Determine if a column should be included in the underlying query */

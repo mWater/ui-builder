@@ -153,7 +153,7 @@ export class DropdownBlock extends ControlBlock<DropdownBlockDef> {
 
   renderControl(props: RenderControlProps) {
     // If can't be rendered due to missing context variable, just show placeholder
-    if (!props.rowContextVar || !this.blockDef.column) {
+    if (!props.rowContextVar || !this.blockDef.column || props.invalid) {
       return (
         <ReactSelect
           menuPortalTarget={document.body}

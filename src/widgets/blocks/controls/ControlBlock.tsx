@@ -74,6 +74,9 @@ export interface RenderControlProps {
 
   /** True if in design mode */
   designMode: boolean
+
+  /** True if invalid and in design mode */
+  invalid?: boolean
 }
 
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
@@ -106,7 +109,8 @@ export abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<
       contextVarValues: {},
       formatLocale: designCtx.formatLocale,
       saving: false,
-      designMode: true
+      designMode: true,
+      invalid: this.validate(designCtx) != null
     }
 
     return this.renderControl(renderControlProps)

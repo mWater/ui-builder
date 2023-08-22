@@ -46,6 +46,8 @@ export interface RenderControlProps {
     formatLocale?: FormatLocaleObject;
     /** True if in design mode */
     designMode: boolean;
+    /** True if invalid and in design mode */
+    invalid?: boolean;
 }
 /** Abstract class for a control such as a dropdown, text field, etc that operates on a single column */
 export declare abstract class ControlBlock<T extends ControlBlockDef> extends LeafBlock<T> {
