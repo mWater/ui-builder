@@ -124,8 +124,10 @@ export const NewTab = (props: {
                     <i className="fa fa-fw fa-exclamation-circle text-danger" />
                   </span>
                 ) : null}
-                {widget.name}
-                {widget.description ? <span className="text-muted"> - {widget.description}</span> : null}
+                <span style={{ textDecoration: widget.deprecated ? 'line-through' : 'none', opacity: widget.deprecated ? 0.5 : 1 }}>
+                  {widget.name}
+                  {widget.description ? <span className="text-muted"> - {widget.description}</span> : null}
+                </span>
               </li>
             ))}
           </ul>

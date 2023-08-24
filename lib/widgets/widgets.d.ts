@@ -12,6 +12,8 @@ export interface WidgetDef {
     description: string;
     /** Optional grouping of this widget */
     group?: string;
+    /** True if widget is deprecated */
+    deprecated?: boolean;
     /** Block that it displays */
     blockDef: BlockDef | null;
     /** Context variables that act as arguments that will be passed to inner block */

@@ -293,7 +293,7 @@ export class WidgetBlock extends LeafBlock<WidgetBlockDef> {
   renderEditor(props: DesignCtx) {
     // Create widget options
     const widgetOptions = _.sortByAll(Object.values(props.widgetLibrary.widgets), "group", "name").map((w) => ({
-      label: (w.group ? `${w.group}: ` : "") + w.name,
+      label: (w.deprecated ? "Deprecated:" : "") + (w.group ? `${w.group}: ` : "") + w.name,
       value: w.id
     }))
 

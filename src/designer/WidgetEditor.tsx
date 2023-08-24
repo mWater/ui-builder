@@ -168,6 +168,13 @@ export class WidgetEditor extends React.Component<WidgetEditorProps> {
           </PropertyEditor>
         </LabeledProperty>
         }
+        <PropertyEditor obj={this.props.widgetDef} onChange={this.props.onWidgetDefChange} property="deprecated">
+          {(value, onChange) => (
+            <Checkbox value={value || false} onChange={onChange}>
+              Deprecated
+            </Checkbox>
+          )}
+        </PropertyEditor>
 
         <LabeledProperty label="Widget ID" hint="Advanced">
           <input type="text" value={this.props.widgetDef.id} className="form-control form-control-sm" onFocus={ev => { ev.target.select() }}/>

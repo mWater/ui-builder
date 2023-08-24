@@ -18,6 +18,9 @@ export interface WidgetDef {
   /** Optional grouping of this widget */
   group?: string
 
+  /** True if widget is deprecated */
+  deprecated?: boolean
+
   /** Block that it displays */
   blockDef: BlockDef | null
 

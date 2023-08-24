@@ -1,7 +1,6 @@
 import React from "react"
 import _ from "lodash"
 import { TOCItem } from "./toc"
-import { BlockDef } from ".."
 import produce from "immer"
 import {
   LabeledProperty,
@@ -17,6 +16,7 @@ import { LocalizedString } from "mwater-expressions"
 import { DesignCtx } from "../../../contexts"
 import { ContextVarExpr } from "../../../ContextVarExpr"
 import { EmbeddedExpr } from "../../../embeddedExprs"
+import { BlockDef } from "../../.."
 
 export function TOCDesignRightPane(props: {
   item: TOCItem
@@ -69,7 +69,7 @@ export function TOCDesignRightPane(props: {
 
   // Create widget options
   const widgetOptions = _.sortByAll(Object.values(renderProps.widgetLibrary.widgets), "group", "name").map((w) => ({
-    label: (w.group ? `${w.group}: ` : "") + w.name,
+    label: (w.deprecated ? "Deprecated:" : "") + (w.group ? `${w.group}: ` : "") + w.name,
     value: w.id
   }))
 
