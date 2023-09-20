@@ -77,7 +77,7 @@ export abstract class TextualBlock<T extends TextualBlockDef> extends LeafBlock<
 
   /** Processes HTML */
   processHTML(text: string) {
-    return <div dangerouslySetInnerHTML={{ __html: sanitize(text) }} />
+    return <div dangerouslySetInnerHTML={{ __html: sanitize(text, {ADD_ATTR: ['target']}) }} />
   }
 
   canonicalize() {
